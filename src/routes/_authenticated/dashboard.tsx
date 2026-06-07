@@ -24,10 +24,13 @@ type Counts = {
 
 function Dashboard() {
   const { user, roles } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const ar = locale === "ar";
   const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [sub, setSub] = useState<CompanySubscriptionInfo | null>(null);
+  const fetchSub = useServerFn(getMyCompanySubscription);
 
   useEffect(() => {
     if (!user) return;
