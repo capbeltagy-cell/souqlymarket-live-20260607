@@ -192,7 +192,15 @@ function ListingDetail() {
               <video controls src={l.video_url} className="w-full rounded-xl border border-border" />
             )}
             <div>
-              <Badge className="mb-2">{t(`cat_${l.type}` as never)}</Badge>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <Badge>{t(`cat_${l.type}` as never)}</Badge>
+                {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
+                  <Badge className="bg-accent text-accent-foreground gap-1"><Star className="h-3 w-3" />{ar ? "مميز" : "Featured"}</Badge>
+                )}
+                {company?.is_verified && (
+                  <Badge className="bg-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />{ar ? "شركة موثقة" : "Verified"}</Badge>
+                )}
+              </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                 {company && (
