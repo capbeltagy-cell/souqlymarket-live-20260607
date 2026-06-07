@@ -1,14 +1,11 @@
-// @lovable.dev/vite-tanstack-config defaults nitro to the cloudflare preset.
-// Override with NITRO_PRESET env (Vercel sets VERCEL=1 automatically).
+// @lovable.dev/vite-tanstack-config defaults nitro to off outside Lovable sandboxes.
+// Enable it for self-hosted deploys (Vercel/Netlify/etc). Nitro auto-detects
+// the target via NITRO_PRESET or platform env vars (VERCEL=1 → vercel preset).
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-const isVercel = !!process.env.VERCEL;
-
 export default defineConfig({
+  nitro: true,
   tanstackStart: {
-    server: {
-      entry: "server",
-      preset: isVercel ? "vercel" : undefined,
-    },
+    server: { entry: "server" },
   },
 });
