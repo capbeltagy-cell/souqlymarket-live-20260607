@@ -171,6 +171,8 @@ export type Database = {
           id: string
           listing_id: string | null
           notes: string | null
+          paid_at: string | null
+          payout_requested_at: string | null
           status: Database["public"]["Enums"]["commission_status"]
         }
         Insert: {
@@ -182,6 +184,8 @@ export type Database = {
           id?: string
           listing_id?: string | null
           notes?: string | null
+          paid_at?: string | null
+          payout_requested_at?: string | null
           status?: Database["public"]["Enums"]["commission_status"]
         }
         Update: {
@@ -193,6 +197,8 @@ export type Database = {
           id?: string
           listing_id?: string | null
           notes?: string | null
+          paid_at?: string | null
+          payout_requested_at?: string | null
           status?: Database["public"]["Enums"]["commission_status"]
         }
         Relationships: [

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { DollarSign, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { DollarSign, CheckCircle2, Clock, XCircle, Download, Send } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
-import { listMyCommissions, updateCommissionStatus } from "@/lib/commissions.functions";
+import { listMyCommissions, updateCommissionStatus, requestPayout } from "@/lib/commissions.functions";
 
 export const Route = createFileRoute("/_authenticated/commissions")({
   head: () => ({ meta: [{ title: "Commissions — Souqly" }] }),
@@ -17,14 +17,36 @@ export const Route = createFileRoute("/_authenticated/commissions")({
 
 type Row = {
   id: string; amount: number; currency: string; status: string; created_at: string;
+  payout_requested_at?: string | null; paid_at?: string | null;
   listings: { title_en: string | null; title_ar: string | null } | null;
   companies: { name_en: string | null; name_ar: string | null } | null;
 };
+
+function downloadCsv(rows: Row[], locale: string) {
+  const header = ["Date", "Listing", "Company", "Amount", "Currency", "Status", "PayoutRequestedAt", "PaidAt"];
+  const lines = rows.map((r) => [
+    new Date(r.created_at).toISOString(),
+    (locale === "ar" ? r.listings?.title_ar : r.listings?.title_en) ?? "",
+    (locale === "ar" ? r.companies?.name_ar : r.companies?.name_en) ?? "",
+    String(r.amount),
+    r.currency,
+    r.status,
+    r.payout_requested_at ?? "",
+    r.paid_at ?? "",
+  ].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","));
+  const csv = [header.join(","), ...lines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `commissions-${Date.now()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
 
 function CommissionsPage() {
   const { t, locale } = useI18n();
   const fetchList = useServerFn(listMyCommissions);
   const updateStatus = useServerFn(updateCommissionStatus);
+  const reqPayout = useServerFn(requestPayout);
   const [rows, setRows] = useState<Row[]>([]);
   const [role, setRole] = useState<string>("none");
   const [loading, setLoading] = useState(true);
@@ -44,6 +66,10 @@ function CommissionsPage() {
     try { await updateStatus({ data: { id, status } }); toast.success(t("status_updated")); load(); }
     catch (e) { toast.error((e as Error).message); }
   };
+  const onRequestPayout = async (id: string) => {
+    try { await reqPayout({ data: { id } }); toast.success(t("payout_requested") || "Payout requested"); load(); }
+    catch (e) { toast.error((e as Error).message); }
+  };
 
   const totals = rows.reduce((acc, r) => {
     acc.total += Number(r.amount);
@@ -56,12 +82,17 @@ function CommissionsPage() {
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-8 flex-1">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-primary" />
             {t("commissions_title")}
           </h1>
-          <Badge variant="outline" className="capitalize">{role}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="capitalize">{role}</Badge>
+            <Button size="sm" variant="outline" className="gap-2" disabled={rows.length === 0} onClick={() => downloadCsv(rows, locale)}>
+              <Download className="h-4 w-4" />{t("export_csv")}
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -86,10 +117,17 @@ function CommissionsPage() {
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {(locale === "ar" ? r.companies?.name_ar : r.companies?.name_en) ?? "—"} · {new Date(r.created_at).toLocaleDateString()}
+                      {r.payout_requested_at && <> · 📨 {new Date(r.payout_requested_at).toLocaleDateString()}</>}
+                      {r.paid_at && <> · ✅ {new Date(r.paid_at).toLocaleDateString()}</>}
                     </div>
                   </div>
                   <div className="font-bold text-success">${Number(r.amount).toLocaleString()} {r.currency}</div>
                   <StatusBadge status={r.status} />
+                  {role === "agent" && r.status === "approved" && !r.payout_requested_at && (
+                    <Button size="sm" variant="outline" className="gap-2" onClick={() => onRequestPayout(r.id)}>
+                      <Send className="h-4 w-4" />{t("request_payout")}
+                    </Button>
+                  )}
                   {role === "company" && r.status !== "paid" && (
                     <div className="flex gap-2">
                       {r.status !== "approved" && <Button size="sm" variant="outline" onClick={() => onSetStatus(r.id, "approved")}>{t("approve")}</Button>}
