@@ -161,6 +161,33 @@ export type Database = {
         }
         Relationships: []
       }
+      business_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          name_ar: string
+          name_en: string
+          slug: string
+          sort: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          name_ar: string
+          name_en: string
+          slug: string
+          sort?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          name_ar?: string
+          name_en?: string
+          slug?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       commissions: {
         Row: {
           agent_id: string
@@ -227,13 +254,17 @@ export type Database = {
       }
       companies: {
         Row: {
+          category_slug: string | null
           city: string | null
+          company_type: string | null
           country: string | null
           cover_url: string | null
           created_at: string
           description_ar: string | null
           description_en: string | null
           email: string | null
+          export_available: boolean
+          governorate: string | null
           id: string
           industry: string | null
           is_verified: boolean
@@ -242,6 +273,7 @@ export type Database = {
           name_en: string
           owner_id: string
           phone: string | null
+          production_capacity: string | null
           subscription_expires_at: string | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at: string | null
@@ -249,13 +281,17 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          category_slug?: string | null
           city?: string | null
+          company_type?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
           email?: string | null
+          export_available?: boolean
+          governorate?: string | null
           id?: string
           industry?: string | null
           is_verified?: boolean
@@ -264,6 +300,7 @@ export type Database = {
           name_en: string
           owner_id: string
           phone?: string | null
+          production_capacity?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -271,13 +308,17 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          category_slug?: string | null
           city?: string | null
+          company_type?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
           email?: string | null
+          export_available?: boolean
+          governorate?: string | null
           id?: string
           industry?: string | null
           is_verified?: boolean
@@ -286,6 +327,7 @@ export type Database = {
           name_en?: string
           owner_id?: string
           phone?: string | null
+          production_capacity?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -293,6 +335,124 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      company_profiles_extra: {
+        Row: {
+          achievements: Json
+          catalog_pdfs: Json
+          company_id: string
+          cover_url: string | null
+          created_at: string
+          downloads_count: number
+          gallery: Json
+          updated_at: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          achievements?: Json
+          catalog_pdfs?: Json
+          company_id: string
+          cover_url?: string | null
+          created_at?: string
+          downloads_count?: number
+          gallery?: Json
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          achievements?: Json
+          catalog_pdfs?: Json
+          company_id?: string
+          cover_url?: string | null
+          created_at?: string
+          downloads_count?: number
+          gallery?: Json
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_profiles_extra_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_referrals: {
+        Row: {
+          clicks: number
+          code: string
+          conversions: number
+          created_at: string
+          id: string
+          owner_user_id: string
+          signups: number
+        }
+        Insert: {
+          clicks?: number
+          code: string
+          conversions?: number
+          created_at?: string
+          id?: string
+          owner_user_id: string
+          signups?: number
+        }
+        Update: {
+          clicks?: number
+          code?: string
+          conversions?: number
+          created_at?: string
+          id?: string
+          owner_user_id?: string
+          signups?: number
+        }
+        Relationships: []
+      }
+      factories: {
+        Row: {
+          certifications: Json
+          company_id: string
+          created_at: string
+          employees_range: string | null
+          export_available: boolean
+          production_capacity: string | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          certifications?: Json
+          company_id: string
+          created_at?: string
+          employees_range?: string | null
+          export_available?: boolean
+          production_capacity?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          certifications?: Json
+          company_id?: string
+          created_at?: string
+          employees_range?: string | null
+          export_available?: boolean
+          production_capacity?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       favorites: {
         Row: {
@@ -613,6 +773,125 @@ export type Database = {
           },
         ]
       }
+      rfq_offers: {
+        Row: {
+          company_id: string
+          created_at: string
+          currency: string
+          id: string
+          lead_time_days: number | null
+          notes: string | null
+          price: number
+          rfq_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          lead_time_days?: number | null
+          notes?: string | null
+          price: number
+          rfq_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          lead_time_days?: number | null
+          notes?: string | null
+          price?: number
+          rfq_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rfq_offers_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfqs: {
+        Row: {
+          attachments: Json
+          budget_max: number | null
+          budget_min: number | null
+          buyer_id: string
+          category_slug: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          governorate: string | null
+          id: string
+          quantity: number | null
+          status: string
+          title: string
+          unit: string | null
+          updated_at: string
+          winner_offer_id: string | null
+        }
+        Insert: {
+          attachments?: Json
+          budget_max?: number | null
+          budget_min?: number | null
+          buyer_id: string
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          quantity?: number | null
+          status?: string
+          title: string
+          unit?: string | null
+          updated_at?: string
+          winner_offer_id?: string | null
+        }
+        Update: {
+          attachments?: Json
+          budget_max?: number | null
+          budget_min?: number | null
+          buyer_id?: string
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          quantity?: number | null
+          status?: string
+          title?: string
+          unit?: string | null
+          updated_at?: string
+          winner_offer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfqs_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "business_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -643,6 +922,116 @@ export type Database = {
         }
         Relationships: []
       }
+      tender_proposals: {
+        Row: {
+          company_id: string
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          price: number
+          status: string
+          tender_id: string
+          timeline_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          price: number
+          status?: string
+          tender_id: string
+          timeline_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          price?: number
+          status?: string
+          tender_id?: string
+          timeline_days?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tender_proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tender_proposals_tender_id_fkey"
+            columns: ["tender_id"]
+            isOneToOne: false
+            referencedRelation: "tenders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenders: {
+        Row: {
+          budget: number | null
+          category_slug: string | null
+          created_at: string
+          currency: string
+          deadline: string | null
+          description: string | null
+          governorate: string | null
+          id: string
+          publisher_id: string
+          status: string
+          title: string
+          updated_at: string
+          winner_proposal_id: string | null
+        }
+        Insert: {
+          budget?: number | null
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          publisher_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          winner_proposal_id?: string | null
+        }
+        Update: {
+          budget?: number | null
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          publisher_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          winner_proposal_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenders_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "business_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -663,6 +1052,113 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wholesale_listings: {
+        Row: {
+          active: boolean
+          category_slug: string | null
+          company_id: string
+          created_at: string
+          currency: string
+          description: string | null
+          governorate: string | null
+          id: string
+          images: Json
+          moq: number
+          price_per_unit: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category_slug?: string | null
+          company_id: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          images?: Json
+          moq?: number
+          price_per_unit?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category_slug?: string | null
+          company_id?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          images?: Json
+          moq?: number
+          price_per_unit?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_listings_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "business_categories"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "wholesale_listings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_orders: {
+        Row: {
+          buyer_id: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          listing_id: string
+          notes: string | null
+          quantity: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          listing_id: string
+          notes?: string | null
+          quantity: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string
+          notes?: string | null
+          quantity?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
