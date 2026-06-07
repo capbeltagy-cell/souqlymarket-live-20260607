@@ -55,9 +55,6 @@ function AdminCompanies() {
     finally { setBusy(null); }
   };
 
-  // ref the supabase import so tree-shaking doesn't strip it (used elsewhere if needed)
-  void supabase;
-
   if (!isAdmin) return (
     <Shell><div className="p-10 text-center text-muted-foreground">{ar ? "للمسؤولين فقط" : "Admins only"}</div></Shell>
   );
