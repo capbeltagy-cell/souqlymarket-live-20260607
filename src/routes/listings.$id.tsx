@@ -83,8 +83,10 @@ function NotFoundView() {
 function ListingDetail() {
   const { id } = Route.useParams();
   const { t, locale, dir } = useI18n();
+  const ar = locale === "ar";
   const { user } = useAuth();
   const convert = useServerFn(convertReferral);
+  const feature = useServerFn(featureMyListing);
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,14 +95,17 @@ function ListingDetail() {
   const [selectedRef, setSelectedRef] = useState("");
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [featuring, setFeaturing] = useState<7 | 30 | null>(null);
   const [fav, setFav] = useState(false);
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, featured, featured_until, views_count, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
+      // Track view (fire and forget)
+      supabase.rpc("increment_listing_view", { _id: id });
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
@@ -114,6 +119,16 @@ function ListingDetail() {
       setLoading(false);
     })();
   }, [id, user]);
+
+  const onFeature = async (days: 7 | 30) => {
+    setFeaturing(days);
+    try {
+      const res = await feature({ data: { listingId: id, days } });
+      toast.success(ar ? `تم تثبيت الإعلان حتى ${new Date(res.featured_until).toLocaleDateString()}` : `Featured until ${new Date(res.featured_until).toLocaleDateString()}`);
+      setL((cur) => cur ? { ...cur, featured: true, featured_until: res.featured_until } : cur);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setFeaturing(null); }
+  };
 
   async function toggleFav() {
     if (!user) { toast.error(t("nav_signin")); return; }
