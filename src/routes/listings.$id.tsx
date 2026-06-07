@@ -1,12 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, FileText, Heart, MapPin, Share2, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, FileText, Heart, Loader2, MapPin, Share2, TrendingUp } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { convertReferral } from "@/lib/referrals.functions";
 
 export const Route = createFileRoute("/listings/$id")({
   head: () => ({ meta: [{ title: "Listing — Souqly" }] }),
