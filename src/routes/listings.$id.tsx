@@ -215,7 +215,9 @@ function ListingDetail() {
                 </Button>
               ) : null}
               <div className="grid grid-cols-2 gap-2 mt-3">
-                <Button variant="outline" size="sm" className="gap-1"><Heart className="h-4 w-4" />{t("save_favorite")}</Button>
+                <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
+                  <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
+                </Button>
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
             </div>
