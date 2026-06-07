@@ -1,10 +1,14 @@
-// @lovable.dev/vite-tanstack-config defaults nitro to off outside Lovable sandboxes.
-// Enable it for self-hosted deploys (Vercel/Netlify/etc). Nitro auto-detects
-// the target via NITRO_PRESET or platform env vars (VERCEL=1 → vercel preset).
+// On Vercel/Netlify/etc, force the matching nitro preset. The Lovable defaults
+// would otherwise fall back to cloudflare-module and produce no Vercel output
+// (resulting in 404 NOT_FOUND for every route).
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const preset = process.env.NITRO_PRESET
+  || (process.env.VERCEL ? "vercel" : undefined)
+  || (process.env.NETLIFY ? "netlify" : undefined);
+
 export default defineConfig({
-  nitro: true,
+  nitro: preset ? { preset } : true,
   tanstackStart: {
     server: { entry: "server" },
   },
