@@ -39,7 +39,7 @@ function CompanyProfile() {
       if (data) {
         const { data: items } = await supabase
           .from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en)")
+          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
           .eq("company_id", id)
           .eq("status", "approved")
           .order("created_at", { ascending: false });
