@@ -138,10 +138,55 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Briefcase; label: str
   );
 }
 
-function CompanyDash({ counts }: { counts: Counts }) {
+function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscriptionInfo | null; ar: boolean }) {
   const { t } = useI18n();
+  const isPaid = sub?.isPaid ?? false;
+  const limit = sub?.listingLimit ?? 5;
+  const used = sub?.listingsCount ?? counts.listings;
+  const pct = limit === -1 ? 100 : Math.min(100, Math.round((used / limit) * 100));
+  const remaining = limit === -1 ? null : Math.max(0, limit - used);
   return (
     <>
+      <div className={`rounded-lg border p-5 mb-6 ${isPaid ? "border-success/40 bg-success/5" : "border-primary/30 bg-primary/5"}`}>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Crown className={`h-5 w-5 ${isPaid ? "text-success" : "text-primary"}`} />
+            <div>
+              <div className="font-semibold">
+                {isPaid
+                  ? (ar ? "اشتراك مدفوع نشط" : "Paid subscription active")
+                  : (ar ? "الباقة المجانية" : "Free plan")}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {isPaid
+                  ? (sub?.expiresAt ? (ar ? `ينتهي في ${new Date(sub.expiresAt).toLocaleDateString()}` : `Expires ${new Date(sub.expiresAt).toLocaleDateString()}`) : (ar ? "بدون تاريخ انتهاء" : "No expiry"))
+                  : (ar ? "أضف حتى 5 إعلانات مجاناً. اشترك بـ 499 ج.م شهرياً لإعلانات غير محدودة." : "Add up to 5 listings free. Subscribe for 499 EGP/mo for unlimited listings.")}
+              </div>
+            </div>
+          </div>
+          {!isPaid && (
+            <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
+              <Link to="/subscribe"><Sparkles className="h-4 w-4" />{ar ? "ترقية إلى المدفوع" : "Upgrade — 499 EGP/mo"}</Link>
+            </Button>
+          )}
+        </div>
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="font-medium">{ar ? "الإعلانات المستخدمة" : "Listings used"}</span>
+            <span className="text-muted-foreground">
+              {used} / {limit === -1 ? "∞" : limit}
+              {remaining !== null && remaining > 0 && (
+                <span className="ms-2">· {ar ? `متبقي ${remaining}` : `${remaining} left`}</span>
+              )}
+              {remaining === 0 && (
+                <span className="ms-2 text-warning">· {ar ? "وصلت للحد الأقصى" : "limit reached"}</span>
+              )}
+            </span>
+          </div>
+          <Progress value={pct} />
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Stat icon={FileText} label={t("total_listings")} value={String(counts.listings)} />
         <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
