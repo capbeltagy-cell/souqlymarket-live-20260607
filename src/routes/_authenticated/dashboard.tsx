@@ -205,7 +205,7 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
         <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
         <Button asChild variant="outline"><Link to="/company">{t("nav_company_profile")}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/company-profile-extra"><Building2 className="h-4 w-4" />{ar ? "تخصيص الملف" : "Profile extras"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/listings"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
         <FactoryDirectoryButton ar={ar} />
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
       </div>
