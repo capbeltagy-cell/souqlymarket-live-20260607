@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
@@ -60,6 +61,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingsIdRoute = ListingsIdRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRoutesByTo {
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRoutesById {
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRouteTypes {
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/listings/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/listings/new'
   id:
     | '__root__'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/_authenticated/listings/new'
   fileRoutesById: FileRoutesById
 }
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   ListingsIdRoute: typeof ListingsIdRoute
+  RCodeRoute: typeof RCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listings/$id': {
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   ListingsIdRoute: ListingsIdRoute,
+  RCodeRoute: RCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
