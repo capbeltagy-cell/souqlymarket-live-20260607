@@ -41,7 +41,9 @@ export interface SampleAgent {
   country_en: string;
   deals: number;
   initial: string;
+  verified?: boolean;
 }
+
 
 const img = (seed: string, w = 800, h = 600) =>
   `https://images.unsplash.com/${seed}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
