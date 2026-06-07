@@ -242,7 +242,9 @@ export type Database = {
           name_en: string
           owner_id: string
           phone: string | null
+          subscription_expires_at: string | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
+          subscription_updated_at: string | null
           updated_at: string
           website: string | null
         }
@@ -262,7 +264,9 @@ export type Database = {
           name_en: string
           owner_id: string
           phone?: string | null
+          subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
+          subscription_updated_at?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -282,7 +286,9 @@ export type Database = {
           name_en?: string
           owner_id?: string
           phone?: string | null
+          subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
+          subscription_updated_at?: string | null
           updated_at?: string
           website?: string | null
         }

@@ -15,6 +15,7 @@ import {
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import { getMyPlan } from "@/lib/billing.functions";
+import { getMyCompanySubscription } from "@/lib/subscription.functions";
 import { createListing } from "@/lib/listings.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,8 +30,9 @@ function NewListing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchPlan = useServerFn(getMyPlan);
+  const fetchSub = useServerFn(getMyCompanySubscription);
   const create = useServerFn(createListing);
-  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean } | null>(null);
+  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
 
   const [type, setType] = useState<ListingType>("product");
   const [title_ar, setTitleAr] = useState("");
@@ -52,19 +54,20 @@ function NewListing() {
     if (!user) return;
     (async () => {
       try {
-        const p = await fetchPlan();
-        let currentListings = 0;
-        if (p.hasCompany) {
-          const { data: company } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle();
-          if (company) {
-            const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("company_id", company.id);
-            currentListings = count ?? 0;
-          }
+        const [p, sub] = await Promise.all([fetchPlan(), fetchSub()]);
+        setPlanInfo({
+          plan: sub.isPaid ? "premium_company" : p.plan,
+          maxListings: sub.listingLimit,
+          currentListings: sub.listingsCount,
+          hasCompany: sub.hasCompany,
+          isPaid: sub.isPaid,
+        });
+        if (sub.hasCompany && !sub.isPaid && sub.listingsCount >= sub.listingLimit) {
+          navigate({ to: "/subscribe" });
         }
-        setPlanInfo({ plan: p.plan, maxListings: p.limits.maxListings, currentListings, hasCompany: p.hasCompany });
       } catch { /* noop */ }
     })();
-  }, [user, fetchPlan]);
+  }, [user, fetchPlan, fetchSub, navigate]);
 
   const atLimit = planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
 
@@ -100,7 +103,7 @@ function NewListing() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
-    if (atLimit) { toast.error(t("plan_limits_reached")); return; }
+    if (atLimit) { navigate({ to: "/subscribe" }); return; }
     setSubmitting(true);
     try {
       const res = await create({
@@ -123,9 +126,14 @@ function NewListing() {
       });
       toast.success(t("listing_published"));
       navigate({ to: "/listings/$id", params: { id: res.id } });
-    } catch (e) { toast.error((e as Error).message); }
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
+      else { toast.error(msg); }
+    }
     finally { setSubmitting(false); }
   };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -161,10 +169,10 @@ function NewListing() {
             <div className="rounded-lg border border-warning/40 bg-warning/10 p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="text-sm">
                 <div className="font-semibold">{t("plan_limits_reached")}</div>
-                <div className="text-muted-foreground">{t("upgrade_to_unlock")}</div>
+                <div className="text-muted-foreground">{t("upgrade_to_unlock")} — 499 EGP / شهر</div>
               </div>
               <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-                <Link to="/pricing"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
+                <Link to="/subscribe"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
               </Button>
             </div>
           )}
