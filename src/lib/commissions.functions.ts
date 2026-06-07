@@ -13,7 +13,8 @@ export const listMyCommissions = createServerFn({ method: "GET" })
       agent ? "agent" : company ? "company" : "none";
 
     let query = supabase.from("commissions").select(`
-      id, amount, currency, status, notes, created_at, listing_id, agent_id, company_id,
+      id, amount, currency, status, notes, created_at, payout_requested_at, paid_at,
+      listing_id, agent_id, company_id,
       listings(title_en, title_ar),
       agents(headline_en, user_id),
       companies(name_en, name_ar)
@@ -22,7 +23,7 @@ export const listMyCommissions = createServerFn({ method: "GET" })
     if (role === "agent" && agent) query = query.eq("agent_id", agent.id);
     else if (role === "company" && company) query = query.eq("company_id", company.id);
 
-    const { data, error } = await query.limit(100);
+    const { data, error } = await query.limit(500);
     if (error) throw new Error(error.message);
     return { role, commissions: data ?? [] };
   });
@@ -33,10 +34,22 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
     id: z.string().uuid(),
     status: z.enum(["pending", "approved", "paid"]),
   }).parse(d))
-
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { error } = await supabase.from("commissions").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const requestPayout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("commissions")
+      .update({ payout_requested_at: new Date().toISOString() })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

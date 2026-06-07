@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { DollarSign, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { DollarSign, CheckCircle2, Clock, XCircle, Download, Send } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
-import { listMyCommissions, updateCommissionStatus } from "@/lib/commissions.functions";
+import { listMyCommissions, updateCommissionStatus, requestPayout } from "@/lib/commissions.functions";
 
 export const Route = createFileRoute("/_authenticated/commissions")({
   head: () => ({ meta: [{ title: "Commissions — Souqly" }] }),
@@ -46,6 +46,7 @@ function CommissionsPage() {
   const { t, locale } = useI18n();
   const fetchList = useServerFn(listMyCommissions);
   const updateStatus = useServerFn(updateCommissionStatus);
+  const reqPayout = useServerFn(requestPayout);
   const [rows, setRows] = useState<Row[]>([]);
   const [role, setRole] = useState<string>("none");
   const [loading, setLoading] = useState(true);
@@ -63,6 +64,10 @@ function CommissionsPage() {
 
   const onSetStatus = async (id: string, status: "approved" | "paid" | "pending") => {
     try { await updateStatus({ data: { id, status } }); toast.success(t("status_updated")); load(); }
+    catch (e) { toast.error((e as Error).message); }
+  };
+  const onRequestPayout = async (id: string) => {
+    try { await reqPayout({ data: { id } }); toast.success(t("payout_requested") || "Payout requested"); load(); }
     catch (e) { toast.error((e as Error).message); }
   };
 
