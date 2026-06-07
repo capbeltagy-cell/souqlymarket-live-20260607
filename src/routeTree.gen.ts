@@ -17,6 +17,7 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 
@@ -59,6 +60,11 @@ const ListingsIdRoute = ListingsIdRouteImport.update({
   path: '/listings/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/listings/$id': typeof ListingsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/listings/$id': typeof ListingsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/listings/$id': typeof ListingsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
 }
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/dashboard'
+    | '/profile'
     | '/listings/$id'
     | '/listings/new'
   fileRoutesByTo: FileRoutesByTo
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/dashboard'
+    | '/profile'
     | '/listings/$id'
     | '/listings/new'
   id:
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/_authenticated/dashboard'
+    | '/_authenticated/profile'
     | '/listings/$id'
     | '/_authenticated/listings/new'
   fileRoutesById: FileRoutesById
@@ -212,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -231,11 +250,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
 }
 
