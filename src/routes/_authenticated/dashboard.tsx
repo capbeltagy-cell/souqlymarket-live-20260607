@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Briefcase, ClipboardList, DollarSign, FileText, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Users } from "lucide-react";
+import { Briefcase, ClipboardList, Crown, DollarSign, FileText, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { getMyCompanySubscription, type CompanySubscriptionInfo } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Souqly" }] }),
