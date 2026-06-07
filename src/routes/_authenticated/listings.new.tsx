@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { PlusCircle, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,9 @@ import {
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { ListingType } from "@/lib/sampleData";
+import { getMyPlan } from "@/lib/billing.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
   head: () => ({ meta: [{ title: "New Listing — Souqly" }] }),
@@ -23,7 +27,11 @@ const TYPES: ListingType[] = ["product", "service", "real_estate", "land", "fact
 
 function NewListing() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const fetchPlan = useServerFn(getMyPlan);
+  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number } | null>(null);
+
   const [type, setType] = useState<ListingType>("product");
   const [submitting, setSubmitting] = useState(false);
 
