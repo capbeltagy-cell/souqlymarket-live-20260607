@@ -15,7 +15,29 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 
 export const Route = createFileRoute("/listings/$id")({
-  head: () => ({ meta: [{ title: "Listing — Souqly" }] }),
+  loader: async ({ params }) => {
+    const { getListingMeta } = await import("@/lib/seo.functions");
+    return { meta: await getListingMeta({ data: { id: params.id } }) };
+  },
+  head: ({ loaderData, params }) => {
+    const m = loaderData?.meta;
+    const title = m ? `${m.title_en ?? m.title_ar ?? "Listing"} — Souqly` : "Listing — Souqly";
+    const desc = (m?.description_en ?? m?.description_ar ?? "Professional B2B listing on Souqly.").slice(0, 160);
+    const img = m?.images?.[0];
+    const url = `/listings/${params.id}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <NotFoundView />,
   errorComponent: () => (
     <div className="p-10 text-center"><p>Something went wrong.</p></div>
