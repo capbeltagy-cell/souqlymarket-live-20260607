@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type Counts = {
   listings: number; companies: number; agents: number;
   referrals: number; pendingCommissions: number; pendingListings: number;
-  leads: number;
+  leads?: number;
 };
 
 function Dashboard() {
