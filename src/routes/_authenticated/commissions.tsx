@@ -17,9 +17,30 @@ export const Route = createFileRoute("/_authenticated/commissions")({
 
 type Row = {
   id: string; amount: number; currency: string; status: string; created_at: string;
+  payout_requested_at?: string | null; paid_at?: string | null;
   listings: { title_en: string | null; title_ar: string | null } | null;
   companies: { name_en: string | null; name_ar: string | null } | null;
 };
+
+function downloadCsv(rows: Row[], locale: string) {
+  const header = ["Date", "Listing", "Company", "Amount", "Currency", "Status", "PayoutRequestedAt", "PaidAt"];
+  const lines = rows.map((r) => [
+    new Date(r.created_at).toISOString(),
+    (locale === "ar" ? r.listings?.title_ar : r.listings?.title_en) ?? "",
+    (locale === "ar" ? r.companies?.name_ar : r.companies?.name_en) ?? "",
+    String(r.amount),
+    r.currency,
+    r.status,
+    r.payout_requested_at ?? "",
+    r.paid_at ?? "",
+  ].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","));
+  const csv = [header.join(","), ...lines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `commissions-${Date.now()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
 
 function CommissionsPage() {
   const { t, locale } = useI18n();
