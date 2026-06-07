@@ -181,6 +181,26 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
             </div>
+            {isOwner && referrals.length > 0 && (
+              <form onSubmit={onConvert} className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
+                <h3 className="font-semibold text-sm">{t("convert_referral")}</h3>
+                <div className="space-y-1.5">
+                  <Label>{t("your_referral_code")}</Label>
+                  <select value={selectedRef} onChange={(e) => setSelectedRef(e.target.value)} required
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="">—</option>
+                    {referrals.map((r) => <option key={r.id} value={r.id}>{r.code} ({r.clicks} clicks, {r.conversions} conv)</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("referral_amount")}</Label>
+                  <Input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                </div>
+                <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary-hover">
+                  {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("convert_referral")}
+                </Button>
+              </form>
+            )}
           </aside>
         </div>
       </div>
