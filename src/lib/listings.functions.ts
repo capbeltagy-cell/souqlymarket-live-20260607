@@ -29,19 +29,21 @@ export const createListing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: company, error: cErr } = await supabase
       .from("companies")
-      .select("id, subscription_plan")
+      .select("id, subscription_plan, subscription_expires_at")
       .eq("owner_id", userId)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
     if (!company) throw new Error("Create a company profile before posting listings.");
 
-    // Enforce free plan listing cap
-    if (company.subscription_plan === "free") {
+    const exp = (company as { subscription_expires_at?: string | null }).subscription_expires_at ?? null;
+    const isPaid = company.subscription_plan === "premium_company" && (!exp || new Date(exp).getTime() > Date.now());
+
+    if (!isPaid) {
       const { count } = await supabase
         .from("listings")
         .select("id", { count: "exact", head: true })
         .eq("company_id", company.id);
-      if ((count ?? 0) >= 5) throw new Error("Free plan limit reached. Upgrade to add more listings.");
+      if ((count ?? 0) >= 5) throw new Error("LISTING_LIMIT_REACHED");
     }
 
     const { data: row, error } = await supabase
