@@ -399,7 +399,7 @@ export const listCategories = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin.from(T("business_categories")).select("*").order("sort");
-    return { categories: (data ?? []) as { slug: string; name_ar: string; name_en: string; icon: string | null; sort: number }[] };
+    return { categories: ((data ?? []) as unknown) as { slug: string; name_ar: string; name_en: string; icon: string | null; sort: number }[] };
   });
 
 // =========================================================================
