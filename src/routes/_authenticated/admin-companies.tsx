@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, Loader2, ShieldCheck, ShieldOff } from "lucide-react";
+import { BadgeCheck, Crown, Loader2, ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
+import { adminSetCompanyVerified } from "@/lib/phase2.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin-companies")({
   head: () => ({ meta: [{ title: "Admin · Companies — Souqly" }] }),
