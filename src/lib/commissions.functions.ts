@@ -31,8 +31,9 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({
     id: z.string().uuid(),
-    status: z.enum(["pending", "approved", "paid", "rejected"]),
+    status: z.enum(["pending", "approved", "paid"]),
   }).parse(d))
+
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { error } = await supabase.from("commissions").update({ status: data.status }).eq("id", data.id);
