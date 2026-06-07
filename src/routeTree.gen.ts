@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
@@ -93,6 +94,11 @@ const CompaniesIdRoute = CompaniesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CompaniesRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AgentsIdRoute = AgentsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -160,7 +166,7 @@ const AuthenticatedListingsNewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
@@ -185,7 +192,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
@@ -212,7 +220,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agents': typeof AgentsRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/seed'
     | '/verification'
     | '/agents/$id'
+    | '/auth/callback'
     | '/companies/$id'
     | '/listings/$id'
     | '/r/$code'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/seed'
     | '/verification'
     | '/agents/$id'
+    | '/auth/callback'
     | '/companies/$id'
     | '/listings/$id'
     | '/r/$code'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/_authenticated/seed'
     | '/_authenticated/verification'
     | '/agents/$id'
+    | '/auth/callback'
     | '/companies/$id'
     | '/listings/$id'
     | '/r/$code'
@@ -317,7 +329,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgentsRoute: typeof AgentsRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   CompaniesRoute: typeof CompaniesRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   MarketplaceRoute: typeof MarketplaceRoute
@@ -412,6 +424,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/companies/$id'
       preLoaderRoute: typeof CompaniesIdRouteImport
       parentRoute: typeof CompaniesRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/agents/$id': {
       id: '/agents/$id'
@@ -542,6 +561,16 @@ const AgentsRouteChildren: AgentsRouteChildren = {
 const AgentsRouteWithChildren =
   AgentsRoute._addFileChildren(AgentsRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface CompaniesRouteChildren {
   CompaniesIdRoute: typeof CompaniesIdRoute
 }
@@ -558,7 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgentsRoute: AgentsRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   CompaniesRoute: CompaniesRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   MarketplaceRoute: MarketplaceRoute,
@@ -570,13 +599,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
