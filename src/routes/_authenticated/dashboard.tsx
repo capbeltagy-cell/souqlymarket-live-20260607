@@ -104,7 +104,7 @@ function Dashboard() {
         ) : role === "admin" ? (
           <AdminDash counts={counts} />
         ) : role === "company" ? (
-          <CompanyDash counts={counts} />
+          <CompanyDash counts={counts} sub={sub} ar={ar} />
         ) : (
           <AgentDash counts={counts} />
         )}
