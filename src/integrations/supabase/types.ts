@@ -120,6 +120,7 @@ export type Database = {
           headline_ar: string | null
           headline_en: string | null
           id: string
+          is_verified: boolean
           languages: string[] | null
           specialties: string[] | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
@@ -135,6 +136,7 @@ export type Database = {
           headline_ar?: string | null
           headline_en?: string | null
           id?: string
+          is_verified?: boolean
           languages?: string[] | null
           specialties?: string[] | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
@@ -150,6 +152,7 @@ export type Database = {
           headline_ar?: string | null
           headline_en?: string | null
           id?: string
+          is_verified?: boolean
           languages?: string[] | null
           specialties?: string[] | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
