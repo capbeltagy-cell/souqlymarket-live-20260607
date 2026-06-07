@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, TrendingUp, Heart, MessageCircle } from "lucide-react";
+import { MapPin, TrendingUp, Heart, MessageCircle, BadgeCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +20,9 @@ export type ListingCardData = {
   country: string | null;
   commission_percentage: number | null;
   featured?: boolean | null;
+  featured_until?: string | null;
   company_id?: string | null;
-  companies?: { name_ar: string | null; name_en: string | null; phone?: string | null } | null;
+  companies?: { name_ar: string | null; name_en: string | null; phone?: string | null; is_verified?: boolean | null } | null;
 };
 
 const typeKey: Record<ListingType, string> = {
