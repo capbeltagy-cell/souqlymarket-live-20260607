@@ -10,7 +10,9 @@ import {
 
 export function SiteHeader() {
   const { t } = useI18n();
-  const { user, signOut } = useAuth();
+  const { user, roles, signOut } = useAuth();
+  const isAdmin = roles.includes("admin");
+
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
