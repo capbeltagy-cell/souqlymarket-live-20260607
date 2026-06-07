@@ -23,6 +23,7 @@ import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
+import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
@@ -103,6 +104,11 @@ const AuthenticatedVerificationRoute =
     path: '/verification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSeedRoute = AuthenticatedSeedRouteImport.update({
+  id: '/seed',
+  path: '/seed',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
+  '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/profile'
     | '/referrals'
+    | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/profile'
     | '/referrals'
+    | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
     | '/_authenticated/referrals'
+    | '/_authenticated/seed'
     | '/_authenticated/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -415,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seed': {
+      id: '/_authenticated/seed'
+      path: '/seed'
+      fullPath: '/seed'
+      preLoaderRoute: typeof AuthenticatedSeedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/referrals': {
       id: '/_authenticated/referrals'
       path: '/referrals'
@@ -490,6 +509,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
+  AuthenticatedSeedRoute: typeof AuthenticatedSeedRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
 }
@@ -503,6 +523,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
+  AuthenticatedSeedRoute: AuthenticatedSeedRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
 }
