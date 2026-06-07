@@ -35,8 +35,27 @@ function NewListing() {
   const [type, setType] = useState<ListingType>("product");
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const p = await fetchPlan();
+        const { data: company } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle();
+        let currentListings = 0;
+        if (company) {
+          const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("company_id", company.id);
+          currentListings = count ?? 0;
+        }
+        setPlanInfo({ plan: p.plan, maxListings: p.limits.maxListings, currentListings });
+      } catch { /* noop */ }
+    })();
+  }, [user, fetchPlan]);
+
+  const atLimit = planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (atLimit) { toast.error(t("plan_limits_reached")); return; }
     setSubmitting(true);
     setTimeout(() => {
       toast.success(t("listing_published"));
@@ -44,6 +63,7 @@ function NewListing() {
       navigate({ to: "/dashboard" });
     }, 600);
   };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
