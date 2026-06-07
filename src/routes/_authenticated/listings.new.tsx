@@ -70,10 +70,30 @@ function NewListing() {
       <SiteHeader />
       <div className="container-souqly py-8 flex-1">
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
-            <PlusCircle className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">{t("new_listing_title")}</h1>
+          <div className="flex items-center justify-between gap-2 mb-6 flex-wrap">
+            <div className="flex items-center gap-2">
+              <PlusCircle className="h-6 w-6 text-primary" />
+              <h1 className="text-2xl font-bold">{t("new_listing_title")}</h1>
+            </div>
+            {planInfo && (
+              <div className="text-xs text-muted-foreground">
+                {t("current_plan")}: <span className="font-semibold capitalize">{planInfo.plan.replace("_", " ")}</span>
+                {" · "}{planInfo.currentListings}/{planInfo.maxListings === -1 ? "∞" : planInfo.maxListings}
+              </div>
+            )}
           </div>
+          {atLimit && (
+            <div className="rounded-lg border border-warning/40 bg-warning/10 p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
+              <div className="text-sm">
+                <div className="font-semibold">{t("plan_limits_reached")}</div>
+                <div className="text-muted-foreground">{t("upgrade_to_unlock")}</div>
+              </div>
+              <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
+                <Link to="/pricing"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
+              </Button>
+            </div>
+          )}
+
           <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
