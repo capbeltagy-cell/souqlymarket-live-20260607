@@ -82,12 +82,17 @@ function CommissionsPage() {
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-8 flex-1">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-primary" />
             {t("commissions_title")}
           </h1>
-          <Badge variant="outline" className="capitalize">{role}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="capitalize">{role}</Badge>
+            <Button size="sm" variant="outline" className="gap-2" disabled={rows.length === 0} onClick={() => downloadCsv(rows, locale)}>
+              <Download className="h-4 w-4" />{t("export_csv")}
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -112,10 +117,17 @@ function CommissionsPage() {
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {(locale === "ar" ? r.companies?.name_ar : r.companies?.name_en) ?? "—"} · {new Date(r.created_at).toLocaleDateString()}
+                      {r.payout_requested_at && <> · 📨 {new Date(r.payout_requested_at).toLocaleDateString()}</>}
+                      {r.paid_at && <> · ✅ {new Date(r.paid_at).toLocaleDateString()}</>}
                     </div>
                   </div>
                   <div className="font-bold text-success">${Number(r.amount).toLocaleString()} {r.currency}</div>
                   <StatusBadge status={r.status} />
+                  {role === "agent" && r.status === "approved" && !r.payout_requested_at && (
+                    <Button size="sm" variant="outline" className="gap-2" onClick={() => onRequestPayout(r.id)}>
+                      <Send className="h-4 w-4" />{t("request_payout")}
+                    </Button>
+                  )}
                   {role === "company" && r.status !== "paid" && (
                     <div className="flex gap-2">
                       {r.status !== "approved" && <Button size="sm" variant="outline" onClick={() => onSetStatus(r.id, "approved")}>{t("approve")}</Button>}
