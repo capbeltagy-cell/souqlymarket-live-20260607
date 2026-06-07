@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon } from "lucide-react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -10,7 +10,9 @@ import {
 
 export function SiteHeader() {
   const { t } = useI18n();
-  const { user, signOut } = useAuth();
+  const { user, roles, signOut } = useAuth();
+  const isAdmin = roles.includes("admin");
+
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
@@ -50,6 +52,19 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/referrals" className="gap-2"><Link2 className="h-4 w-4" />{t("nav_referrals")}</Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/verification" className="gap-2"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link>
+                  </DropdownMenuItem>
+                )}
+
+
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive focus:text-destructive">

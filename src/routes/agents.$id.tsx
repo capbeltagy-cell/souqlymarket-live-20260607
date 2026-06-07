@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { MapPin, Trophy, Mail, TrendingUp, Star } from "lucide-react";
+import { MapPin, Trophy, Mail, TrendingUp, Star, BadgeCheck } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,15 @@ function AgentProfile() {
             {agent.initial}
           </div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold">{name}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-3xl font-bold">{name}</h1>
+              {agent.verified && (
+                <span className="inline-flex items-center gap-1 bg-primary-foreground/20 text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                  <BadgeCheck className="h-3.5 w-3.5" />{t("verified_agent")}
+                </span>
+              )}
+            </div>
+
             <p className="opacity-90 mt-1">{headline}</p>
             <div className="flex items-center gap-4 mt-3 text-sm opacity-90">
               <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{country}</span>

@@ -1,0 +1,42 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+export const listMyCommissions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    // Try as agent first
+    const { data: agent } = await supabase.from("agents").select("id").eq("user_id", userId).maybeSingle();
+    const { data: company } = await supabase.from("companies").select("id, name_en, name_ar").eq("owner_id", userId).maybeSingle();
+    const role: "agent" | "company" | "admin" | "none" =
+      agent ? "agent" : company ? "company" : "none";
+
+    let query = supabase.from("commissions").select(`
+      id, amount, currency, status, notes, created_at, listing_id, agent_id, company_id,
+      listings(title_en, title_ar),
+      agents(headline_en, user_id),
+      companies(name_en, name_ar)
+    `).order("created_at", { ascending: false });
+
+    if (role === "agent" && agent) query = query.eq("agent_id", agent.id);
+    else if (role === "company" && company) query = query.eq("company_id", company.id);
+
+    const { data, error } = await query.limit(100);
+    if (error) throw new Error(error.message);
+    return { role, commissions: data ?? [] };
+  });
+
+export const updateCommissionStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    id: z.string().uuid(),
+    status: z.enum(["pending", "approved", "paid"]),
+  }).parse(d))
+
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("commissions").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

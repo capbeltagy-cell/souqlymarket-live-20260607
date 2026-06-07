@@ -19,8 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
+import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
+import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 
 const PricingRoute = PricingRouteImport.update({
@@ -72,6 +75,17 @@ const AgentsIdRoute = AgentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AgentsRoute,
 } as any)
+const AuthenticatedVerificationRoute =
+  AuthenticatedVerificationRouteImport.update({
+    id: '/verification',
+    path: '/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -82,6 +96,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCommissionsRoute =
+  AuthenticatedCommissionsRouteImport.update({
+    id: '/commissions',
+    path: '/commissions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
     id: '/listings/new',
@@ -96,8 +116,11 @@ export interface FileRoutesByFullPath {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/commissions': typeof AuthenticatedCommissionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -110,8 +133,11 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/commissions': typeof AuthenticatedCommissionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -126,8 +152,11 @@ export interface FileRoutesById {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
+  '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -142,8 +171,11 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/commissions'
     | '/dashboard'
     | '/profile'
+    | '/referrals'
+    | '/verification'
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
@@ -156,8 +188,11 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/commissions'
     | '/dashboard'
     | '/profile'
+    | '/referrals'
+    | '/verification'
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
@@ -171,8 +206,11 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/_authenticated/commissions'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
+    | '/_authenticated/referrals'
+    | '/_authenticated/verification'
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
@@ -262,6 +300,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsIdRouteImport
       parentRoute: typeof AgentsRoute
     }
+    '/_authenticated/verification': {
+      id: '/_authenticated/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/referrals': {
+      id: '/_authenticated/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof AuthenticatedReferralsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -276,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/commissions': {
+      id: '/_authenticated/commissions'
+      path: '/commissions'
+      fullPath: '/commissions'
+      preLoaderRoute: typeof AuthenticatedCommissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/listings/new': {
       id: '/_authenticated/listings/new'
       path: '/listings/new'
@@ -287,14 +346,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
+  AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
+  AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
 }
 
