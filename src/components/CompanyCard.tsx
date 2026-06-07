@@ -25,6 +25,7 @@ export function CompanyCard({ c }: { c: SampleCompany }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
+
   );
 }
