@@ -55,6 +55,8 @@ type Listing = {
   price: number | null; currency: string | null;
   country: string | null; city: string | null;
   commission_percentage: number | null;
+  featured: boolean | null; featured_until: string | null;
+  views_count: number | null;
   company_id: string;
   companies: {
     id: string; name_ar: string; name_en: string;
