@@ -231,13 +231,13 @@ function ListingDetail() {
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
               {whatsappNum ? (
-                <Button asChild className="w-full bg-success hover:bg-success/90" size="lg">
+                <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
                   <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
                     {t("contact_whatsapp")}
                   </a>
                 </Button>
               ) : company?.email ? (
-                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg">
+                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
                   <a href={`mailto:${company.email}?subject=${encodeURIComponent(title)}`}>{t("contact_company")}</a>
                 </Button>
               ) : null}
