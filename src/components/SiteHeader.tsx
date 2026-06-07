@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard } from "lucide-react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -44,6 +44,13 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="gap-2"><LayoutDashboard className="h-4 w-4" />{t("nav_dashboard")}</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="gap-2"><UserIcon className="h-4 w-4" />{t("nav_profile")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive focus:text-destructive">
                   <LogOut className="h-4 w-4" />{t("nav_signout")}
