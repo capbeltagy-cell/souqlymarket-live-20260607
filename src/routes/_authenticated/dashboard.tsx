@@ -44,14 +44,12 @@ function Dashboard() {
         ]);
         setCounts({ listings: l.count ?? 0, companies: c.count ?? 0, agents: a.count ?? 0, referrals: 0, pendingCommissions: 0, pendingListings: p.count ?? 0 });
       } else if (role === "company") {
-        const { data: comp } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle();
-        setHasProfile(!!comp);
-        if (comp) {
-          const [l, pc] = await Promise.all([
-            supabase.from("listings").select("id", { count: "exact", head: true }).eq("company_id", comp.id),
-            supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", comp.id).eq("status", "pending"),
-          ]);
-          setCounts({ listings: l.count ?? 0, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc.count ?? 0, pendingListings: 0 });
+        const subInfo = await fetchSub();
+        setSub(subInfo);
+        setHasProfile(subInfo.hasCompany);
+        if (subInfo.companyId) {
+          const { count: pc } = await supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending");
+          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0 });
         } else {
           setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0 });
         }
