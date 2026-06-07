@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
 import { adminSetCompanyVerified } from "@/lib/phase2.functions";
-import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/_authenticated/admin-companies")({
   head: () => ({ meta: [{ title: "Admin · Companies — Souqly" }] }),
