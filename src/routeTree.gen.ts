@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
@@ -37,6 +38,11 @@ const PricingRoute = PricingRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesRoute = CompaniesRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/agent': typeof AuthenticatedAgentRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/agent': typeof AuthenticatedAgentRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/agent'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/agent'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/_authenticated/agent'
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompaniesRoute: typeof CompaniesRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   ListingsIdRoute: typeof ListingsIdRoute
@@ -279,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/companies': {
@@ -457,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   CompaniesRoute: CompaniesRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   ListingsIdRoute: ListingsIdRoute,
