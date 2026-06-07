@@ -2,30 +2,46 @@ import { Link } from "@tanstack/react-router";
 import { BadgeCheck, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
-import type { SampleCompany } from "@/lib/sampleData";
+import { initialOf } from "@/lib/marketplace";
 
-export function CompanyCard({ c }: { c: SampleCompany }) {
+export type CompanyCardData = {
+  id: string;
+  name_ar: string | null;
+  name_en: string | null;
+  industry: string | null;
+  country: string | null;
+  is_verified: boolean | null;
+  logo_url: string | null;
+  listingCount?: number;
+};
+
+export function CompanyCard({ c }: { c: CompanyCardData }) {
   const { locale, t } = useI18n();
+  const name = (locale === "ar" ? c.name_ar : c.name_en) ?? c.name_en ?? c.name_ar ?? "";
   return (
     <Link to="/companies/$id" params={{ id: c.id }} className="block rounded-lg border border-border bg-card p-5 shadow-card hover:shadow-elev transition">
-
       <div className="flex items-start gap-4">
-        <div className="h-14 w-14 rounded-md hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
-          {c.initial}
-        </div>
+        {c.logo_url ? (
+          <img src={c.logo_url} alt="" className="h-14 w-14 rounded-md object-cover flex-shrink-0" />
+        ) : (
+          <div className="h-14 w-14 rounded-md hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
+            {initialOf(name)}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <h3 className="font-semibold truncate">{locale === "ar" ? c.name_ar : c.name_en}</h3>
-            {c.verified && <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />}
+            <h3 className="font-semibold truncate">{name}</h3>
+            {c.is_verified && <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />}
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">{locale === "ar" ? c.industry_ar : c.industry_en}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{c.industry ?? "—"}</p>
           <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{locale === "ar" ? c.country_ar : c.country_en}</span>
-            <Badge variant="secondary" className="text-xs">{c.listings} {t("listings_count")}</Badge>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{c.country ?? "—"}</span>
+            {typeof c.listingCount === "number" && (
+              <Badge variant="secondary" className="text-xs">{c.listingCount} {t("listings_count")}</Badge>
+            )}
           </div>
         </div>
       </div>
     </Link>
-
   );
 }

@@ -1,58 +1,95 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { MapPin, Trophy, Mail, TrendingUp, Star, BadgeCheck } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { MapPin, Mail, Star, BadgeCheck, Trophy } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
-import { ListingCard } from "@/components/ListingCard";
+import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
-import { sampleAgents, sampleListings } from "@/lib/sampleData";
+import { supabase } from "@/integrations/supabase/client";
+import { initialOf } from "@/lib/marketplace";
 
 export const Route = createFileRoute("/agents/$id")({
-  loader: ({ params }) => {
-    const agent = sampleAgents.find((a) => a.id === params.id);
-    if (!agent) throw notFound();
-    return { agent };
-  },
-  head: ({ loaderData }) => ({
-    meta: [{ title: `${loaderData?.agent.name_en ?? "Agent"} — Souqly` }],
-  }),
-  notFoundComponent: () => <div className="p-10 text-center">Agent not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Something went wrong</div>,
+  head: () => ({ meta: [{ title: "Agent — Souqly" }] }),
+  notFoundComponent: () => <Shell><div className="p-10 text-center">Agent not found</div></Shell>,
+  errorComponent: () => <Shell><div className="p-10 text-center">Something went wrong</div></Shell>,
   component: AgentProfile,
 });
 
+type Agent = {
+  id: string; user_id: string;
+  headline_ar: string | null; headline_en: string | null;
+  bio_ar: string | null; bio_en: string | null;
+  country: string | null; city: string | null;
+  specialties: string[] | null; languages: string[] | null;
+  is_verified: boolean;
+};
+
+type Profile = { id: string; full_name: string | null; avatar_url: string | null; phone: string | null };
+
 function AgentProfile() {
-  const { agent } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const { locale, t } = useI18n();
-  const name = locale === "ar" ? agent.name_ar : agent.name_en;
-  const headline = locale === "ar" ? agent.headline_ar : agent.headline_en;
-  const country = locale === "ar" ? agent.country_ar : agent.country_en;
+  const [agent, setAgent] = useState<Agent | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [deals, setDeals] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data: a } = await supabase.from("agents").select("*").eq("id", id).maybeSingle();
+      setAgent(a as Agent | null);
+      if (a) {
+        const [{ data: p }, { count }] = await Promise.all([
+          supabase.from("profiles").select("id, full_name, avatar_url, phone").eq("id", a.user_id).maybeSingle(),
+          supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", a.id).eq("status", "paid"),
+        ]);
+        setProfile(p as Profile | null);
+        setDeals(count ?? 0);
+      }
+      setLoading(false);
+    })();
+  }, [id]);
+
+  if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
+  if (!agent) return <Shell><div className="p-10 text-center">Agent not found</div></Shell>;
+
+  const name = profile?.full_name ?? "Souqly Agent";
+  const headline = (locale === "ar" ? agent.headline_ar : agent.headline_en) ?? "";
+  const bio = (locale === "ar" ? agent.bio_ar : agent.bio_en) ?? "";
+  const country = [agent.city, agent.country].filter(Boolean).join(", ");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
+    <Shell>
       <section className="hero-gradient text-primary-foreground">
         <div className="container-souqly py-10 flex flex-col md:flex-row md:items-center gap-6">
-          <div className="h-24 w-24 rounded-full bg-accent text-accent-foreground grid place-items-center text-4xl font-bold">
-            {agent.initial}
-          </div>
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="" className="h-24 w-24 rounded-full object-cover" />
+          ) : (
+            <div className="h-24 w-24 rounded-full bg-accent text-accent-foreground grid place-items-center text-4xl font-bold">{initialOf(name)}</div>
+          )}
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-3xl font-bold">{name}</h1>
-              {agent.verified && (
-                <span className="inline-flex items-center gap-1 bg-primary-foreground/20 text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+              {agent.is_verified && (
+                <span className="inline-flex items-center gap-1 bg-primary-foreground/20 rounded-full px-2 py-0.5 text-xs">
                   <BadgeCheck className="h-3.5 w-3.5" />{t("verified_agent")}
                 </span>
               )}
             </div>
-
-            <p className="opacity-90 mt-1">{headline}</p>
-            <div className="flex items-center gap-4 mt-3 text-sm opacity-90">
-              <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{country}</span>
-              <span className="flex items-center gap-1"><Trophy className="h-4 w-4" />{agent.deals} {t("deals_closed")}</span>
+            {headline && <p className="opacity-90 mt-1">{headline}</p>}
+            <div className="flex items-center gap-4 mt-3 text-sm opacity-90 flex-wrap">
+              {country && <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{country}</span>}
+              <span className="flex items-center gap-1"><Trophy className="h-4 w-4" />{deals} {t("deals_closed")}</span>
             </div>
           </div>
-          <Button variant="secondary" className="gap-2"><Mail className="h-4 w-4" />{t("contact_agent")}</Button>
+          {profile?.phone && (
+            <Button asChild variant="secondary" className="gap-2">
+              <a href={`https://wa.me/${profile.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer">
+                <Mail className="h-4 w-4" />{t("contact_agent")}
+              </a>
+            </Button>
+          )}
         </div>
       </section>
       <section className="container-souqly py-8 flex-1 grid lg:grid-cols-3 gap-6">
@@ -60,36 +97,46 @@ function AgentProfile() {
           <div className="rounded-lg border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-3">{t("agent_stats")}</h2>
             <div className="grid grid-cols-2 gap-3">
-              <Stat icon={Trophy} label={t("deals_closed")} value={String(agent.deals)} />
-              <Stat icon={Star} label="★" value="4.9" />
-              <Stat icon={TrendingUp} label={t("commission")} value="12%" />
-              <Stat icon={MapPin} label={t("filter_country")} value={country} />
+              <Stat label={t("deals_closed")} value={String(deals)} />
+              <Stat label="★" value="—" />
             </div>
           </div>
           <div className="rounded-lg border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-2">{t("about")}</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">{headline}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{bio || headline || "—"}</p>
+            {agent.specialties && agent.specialties.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1">
+                {agent.specialties.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}
+              </div>
+            )}
+            {agent.languages && agent.languages.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {agent.languages.map((l) => <Badge key={l} variant="outline">{l}</Badge>)}
+              </div>
+            )}
           </div>
           <Button asChild variant="outline" className="w-full"><Link to="/agents">← {t("nav_agents")}</Link></Button>
         </aside>
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold">{t("portfolio")}</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {sampleListings.slice(0, 4).map((l) => <ListingCard key={l.id} l={l} />)}
+        <div className="lg:col-span-2">
+          <div className="rounded-lg border border-border bg-card p-6 shadow-card">
+            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2"><Star className="h-5 w-5 text-accent" />{t("portfolio")}</h2>
+            <p className="text-sm text-muted-foreground">{t("empty_referrals")}</p>
           </div>
         </div>
       </section>
-      <SiteFooter />
-    </div>
+    </Shell>
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Trophy; label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md bg-surface-2 p-3">
-      <Icon className="h-4 w-4 text-primary mb-1" />
       <div className="text-base font-bold">{value}</div>
       <div className="text-xs text-muted-foreground truncate">{label}</div>
     </div>
   );
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-screen flex flex-col"><SiteHeader />{children}<SiteFooter /></div>;
 }
