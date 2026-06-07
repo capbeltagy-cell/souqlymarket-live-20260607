@@ -52,6 +52,19 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/referrals" className="gap-2"><Link2 className="h-4 w-4" />{t("nav_referrals")}</Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/verification" className="gap-2"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link>
+                  </DropdownMenuItem>
+                )}
+
+
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive focus:text-destructive">
