@@ -17,22 +17,35 @@ function AuthCallback() {
       try {
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
-        const errDesc = url.searchParams.get("error_description") ?? url.hash.match(/error_description=([^&]+)/)?.[1];
+        const tokenHash = url.searchParams.get("token_hash");
+        const type = url.searchParams.get("type");
+        const errDesc =
+          url.searchParams.get("error_description") ??
+          url.hash.match(/error_description=([^&]+)/)?.[1];
 
         if (errDesc) throw new Error(decodeURIComponent(errDesc));
 
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
+        } else if (tokenHash && type) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: type as "signup" | "recovery" | "invite" | "email_change" | "email",
+          });
+          if (error) throw error;
         } else {
           // Hash-based (implicit) flow: detectSessionInUrl in the client handles it.
-          // Give it a tick to settle, then verify.
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 150));
           const { data } = await supabase.auth.getSession();
           if (!data.session) throw new Error("No session returned from provider");
         }
 
-        navigate({ to: "/dashboard", replace: true });
+        if (type === "recovery") {
+          navigate({ to: "/reset-password", replace: true });
+        } else {
+          navigate({ to: "/dashboard", replace: true });
+        }
       } catch (e) {
         toast.error((e as Error).message);
         navigate({ to: "/auth", replace: true });
