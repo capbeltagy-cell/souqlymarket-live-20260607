@@ -7,6 +7,8 @@ const preset = process.env.NITRO_PRESET
   || (process.env.VERCEL ? "vercel" : undefined)
   || (process.env.NETLIFY ? "netlify" : undefined);
 
+console.log("[vite.config] resolved nitro preset:", preset, "VERCEL=", process.env.VERCEL, "NITRO_PRESET=", process.env.NITRO_PRESET);
+
 export default defineConfig({
   nitro: preset ? { preset } : true,
   tanstackStart: {
