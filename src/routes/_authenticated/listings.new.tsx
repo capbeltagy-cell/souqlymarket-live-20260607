@@ -103,7 +103,7 @@ function NewListing() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
-    if (atLimit) { toast.error(t("plan_limits_reached")); return; }
+    if (atLimit) { navigate({ to: "/subscribe" }); return; }
     setSubmitting(true);
     try {
       const res = await create({
@@ -126,9 +126,14 @@ function NewListing() {
       });
       toast.success(t("listing_published"));
       navigate({ to: "/listings/$id", params: { id: res.id } });
-    } catch (e) { toast.error((e as Error).message); }
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
+      else { toast.error(msg); }
+    }
     finally { setSubmitting(false); }
   };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
