@@ -57,16 +57,48 @@ function NotFoundView() {
 function ListingDetail() {
   const { id } = Route.useParams();
   const { t, locale, dir } = useI18n();
+  const { user } = useAuth();
+  const convert = useServerFn(convertReferral);
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+  const [referrals, setReferrals] = useState<{ id: string; code: string; clicks: number; conversions: number }[]>([]);
+  const [selectedRef, setSelectedRef] = useState("");
+  const [amount, setAmount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    supabase.from("listings")
-      .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
-      .eq("id", id).maybeSingle()
-      .then(({ data }) => { setL(data as unknown as Listing); setLoading(false); });
-  }, [id]);
+    (async () => {
+      const { data } = await supabase.from("listings")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
+        .eq("id", id).maybeSingle();
+      setL(data as unknown as Listing);
+      if (data && user) {
+        const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
+        if (owned) {
+          setIsOwner(true);
+          const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
+          setReferrals(refs ?? []);
+        }
+      }
+      setLoading(false);
+    })();
+  }, [id, user]);
+
+  const onConvert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRef || !amount) return;
+    setSubmitting(true);
+    try {
+      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "USD" } });
+      toast.success(t("convert_success"));
+      setAmount(""); setSelectedRef("");
+      const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
+      setReferrals(refs ?? []);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSubmitting(false); }
+  };
 
   if (loading) return <div className="min-h-screen flex flex-col"><SiteHeader /><div className="p-10 text-center text-muted-foreground flex-1">{t("loading")}</div><SiteFooter /></div>;
   if (!l) return <NotFoundView />;
