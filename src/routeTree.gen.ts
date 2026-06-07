@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
@@ -23,7 +24,9 @@ import { Route as AuthenticatedVerificationRouteImport } from './routes/_authent
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
+import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 
 const PricingRoute = PricingRouteImport.update({
@@ -58,6 +61,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingsIdRoute = ListingsIdRouteImport.update({
@@ -96,12 +104,22 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompanyRoute = AuthenticatedCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCommissionsRoute =
   AuthenticatedCommissionsRouteImport.update({
     id: '/commissions',
     path: '/commissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAgentRoute = AuthenticatedAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
     id: '/listings/new',
@@ -116,7 +134,9 @@ export interface FileRoutesByFullPath {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/agent': typeof AuthenticatedAgentRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
+  '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
@@ -124,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRoutesByTo {
@@ -133,7 +154,9 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/agent': typeof AuthenticatedAgentRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
+  '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
@@ -141,6 +164,7 @@ export interface FileRoutesByTo {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRoutesById {
@@ -152,7 +176,9 @@ export interface FileRoutesById {
   '/companies': typeof CompaniesRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
+  '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
@@ -160,6 +186,7 @@ export interface FileRoutesById {
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/r/$code': typeof RCodeRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
 }
 export interface FileRouteTypes {
@@ -171,7 +198,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/agent'
     | '/commissions'
+    | '/company'
     | '/dashboard'
     | '/profile'
     | '/referrals'
@@ -179,6 +208,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/listings/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -188,7 +218,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/agent'
     | '/commissions'
+    | '/company'
     | '/dashboard'
     | '/profile'
     | '/referrals'
@@ -196,6 +228,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/listings/new'
   id:
     | '__root__'
@@ -206,7 +239,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/marketplace'
     | '/pricing'
+    | '/_authenticated/agent'
     | '/_authenticated/commissions'
+    | '/_authenticated/company'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/referrals'
@@ -214,6 +249,7 @@ export interface FileRouteTypes {
     | '/agents/$id'
     | '/companies/$id'
     | '/listings/$id'
+    | '/r/$code'
     | '/_authenticated/listings/new'
   fileRoutesById: FileRoutesById
 }
@@ -226,6 +262,7 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   ListingsIdRoute: typeof ListingsIdRoute
+  RCodeRoute: typeof RCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -279,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listings/$id': {
       id: '/listings/$id'
       path: '/listings/$id'
@@ -328,11 +372,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company': {
+      id: '/_authenticated/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof AuthenticatedCompanyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/commissions': {
       id: '/_authenticated/commissions'
       path: '/commissions'
       fullPath: '/commissions'
       preLoaderRoute: typeof AuthenticatedCommissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/agent': {
+      id: '/_authenticated/agent'
+      path: '/agent'
+      fullPath: '/agent'
+      preLoaderRoute: typeof AuthenticatedAgentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/listings/new': {
@@ -346,7 +404,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
+  AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
@@ -355,7 +415,9 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
+  AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
@@ -398,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   ListingsIdRoute: ListingsIdRoute,
+  RCodeRoute: RCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
