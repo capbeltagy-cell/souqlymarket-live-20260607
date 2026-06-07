@@ -26,6 +26,7 @@ function AdminCompanies() {
   const ar = locale === "ar";
   const list = useServerFn(adminListCompanies);
   const setPaid = useServerFn(adminSetCompanyPaid);
+  const setVerified = useServerFn(adminSetCompanyVerified);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const isAdmin = roles.includes("admin");
@@ -43,6 +44,19 @@ function AdminCompanies() {
     } catch (e) { toast.error((e as Error).message); }
     finally { setBusy(null); }
   };
+
+  const toggleVerify = async (row: Row) => {
+    setBusy(row.id);
+    try {
+      await setVerified({ data: { companyId: row.id, verified: !row.is_verified } });
+      toast.success(ar ? "تم تحديث التوثيق" : "Verification updated");
+      await load();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(null); }
+  };
+
+  // ref the supabase import so tree-shaking doesn't strip it (used elsewhere if needed)
+  void supabase;
 
   if (!isAdmin) return (
     <Shell><div className="p-10 text-center text-muted-foreground">{ar ? "للمسؤولين فقط" : "Admins only"}</div></Shell>
