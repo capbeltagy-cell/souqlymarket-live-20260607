@@ -248,6 +248,35 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
             </div>
+            {!isOwner && <LeadForm listingId={id} />}
+            {isOwner && (
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" />{ar ? "تثبيت الإعلان في الأعلى" : "Pin listing to top"}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {ar
+                      ? "اظهر إعلانك في صدارة السوق ولفت انتباه المزيد من العملاء."
+                      : "Promote your listing to the top of the marketplace for more visibility."}
+                  </p>
+                  {l.featured && l.featured_until && new Date(l.featured_until).getTime() > Date.now() && (
+                    <p className="text-xs text-success mt-1">
+                      {ar ? `مميز حتى ${new Date(l.featured_until).toLocaleDateString()}` : `Featured until ${new Date(l.featured_until).toLocaleDateString()}`}
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button type="button" variant="outline" disabled={!!featuring} onClick={() => onFeature(7)} className="flex-col h-auto py-3">
+                    <span className="font-bold">7 {ar ? "أيام" : "days"}</span>
+                    <span className="text-xs text-muted-foreground">{FEATURE_PRICING_EGP[7]} EGP</span>
+                  </Button>
+                  <Button type="button" disabled={!!featuring} onClick={() => onFeature(30)} className="bg-primary hover:bg-primary-hover flex-col h-auto py-3">
+                    <span className="font-bold">30 {ar ? "يوم" : "days"}</span>
+                    <span className="text-xs">{FEATURE_PRICING_EGP[30]} EGP</span>
+                  </Button>
+                </div>
+                {featuring && <div className="text-xs text-muted-foreground text-center"><Loader2 className="h-3 w-3 animate-spin inline me-1" />{ar ? "جارٍ التثبيت…" : "Pinning…"}</div>}
+              </div>
+            )}
             {isOwner && referrals.length > 0 && (
               <form onSubmit={onConvert} className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
                 <h3 className="font-semibold text-sm">{t("convert_referral")}</h3>
