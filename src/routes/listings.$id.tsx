@@ -89,6 +89,7 @@ function ListingDetail() {
   const [selectedRef, setSelectedRef] = useState("");
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [fav, setFav] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -103,10 +104,25 @@ function ListingDetail() {
           const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
           setReferrals(refs ?? []);
         }
+        const { data: f } = await supabase.from("favorites").select("id").eq("user_id", user.id).eq("listing_id", id).maybeSingle();
+        setFav(!!f);
       }
       setLoading(false);
     })();
   }, [id, user]);
+
+  async function toggleFav() {
+    if (!user) { toast.error(t("nav_signin")); return; }
+    try {
+      if (fav) {
+        await supabase.from("favorites").delete().eq("user_id", user.id).eq("listing_id", id);
+        setFav(false); toast.success(t("unfavorited"));
+      } else {
+        await supabase.from("favorites").insert({ user_id: user.id, listing_id: id });
+        setFav(true); toast.success(t("favorited"));
+      }
+    } catch (e) { toast.error((e as Error).message); }
+  }
 
   const onConvert = async (e: React.FormEvent) => {
     e.preventDefault();
