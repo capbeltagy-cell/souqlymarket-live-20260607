@@ -250,3 +250,21 @@ function AdminDash({ counts }: { counts: Counts }) {
     </>
   );
 }
+
+function FactoryDirectoryButton({ ar }: { ar: boolean }) {
+  const [busy, setBusy] = useState(false);
+  const add = async () => {
+    setBusy(true);
+    try {
+      await upsertMyFactory({ data: { export_available: false } });
+      toast.success(ar ? "تمت إضافتك إلى دليل المصانع" : "Added to factory directory");
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(false); }
+  };
+  return (
+    <Button variant="outline" className="gap-2" onClick={add} disabled={busy}>
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Factory className="h-4 w-4" />}
+      {ar ? "أضفني لدليل المصانع" : "Add to factory directory"}
+    </Button>
+  );
+}
