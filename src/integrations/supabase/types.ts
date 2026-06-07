@@ -161,6 +161,33 @@ export type Database = {
         }
         Relationships: []
       }
+      business_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          name_ar: string
+          name_en: string
+          slug: string
+          sort: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          name_ar: string
+          name_en: string
+          slug: string
+          sort?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          name_ar?: string
+          name_en?: string
+          slug?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       commissions: {
         Row: {
           agent_id: string
@@ -227,13 +254,17 @@ export type Database = {
       }
       companies: {
         Row: {
+          category_slug: string | null
           city: string | null
+          company_type: string | null
           country: string | null
           cover_url: string | null
           created_at: string
           description_ar: string | null
           description_en: string | null
           email: string | null
+          export_available: boolean
+          governorate: string | null
           id: string
           industry: string | null
           is_verified: boolean
@@ -242,6 +273,7 @@ export type Database = {
           name_en: string
           owner_id: string
           phone: string | null
+          production_capacity: string | null
           subscription_expires_at: string | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at: string | null
@@ -249,13 +281,17 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          category_slug?: string | null
           city?: string | null
+          company_type?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
           email?: string | null
+          export_available?: boolean
+          governorate?: string | null
           id?: string
           industry?: string | null
           is_verified?: boolean
@@ -264,6 +300,7 @@ export type Database = {
           name_en: string
           owner_id: string
           phone?: string | null
+          production_capacity?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -271,13 +308,17 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          category_slug?: string | null
           city?: string | null
+          company_type?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
           email?: string | null
+          export_available?: boolean
+          governorate?: string | null
           id?: string
           industry?: string | null
           is_verified?: boolean
@@ -286,11 +327,89 @@ export type Database = {
           name_en?: string
           owner_id?: string
           phone?: string | null
+          production_capacity?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      company_profiles_extra: {
+        Row: {
+          achievements: Json
+          catalog_pdfs: Json
+          company_id: string
+          cover_url: string | null
+          created_at: string
+          downloads_count: number
+          gallery: Json
+          updated_at: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          achievements?: Json
+          catalog_pdfs?: Json
+          company_id: string
+          cover_url?: string | null
+          created_at?: string
+          downloads_count?: number
+          gallery?: Json
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          achievements?: Json
+          catalog_pdfs?: Json
+          company_id?: string
+          cover_url?: string | null
+          created_at?: string
+          downloads_count?: number
+          gallery?: Json
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_profiles_extra_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_referrals: {
+        Row: {
+          clicks: number
+          code: string
+          conversions: number
+          created_at: string
+          id: string
+          owner_user_id: string
+          signups: number
+        }
+        Insert: {
+          clicks?: number
+          code: string
+          conversions?: number
+          created_at?: string
+          id?: string
+          owner_user_id: string
+          signups?: number
+        }
+        Update: {
+          clicks?: number
+          code?: string
+          conversions?: number
+          created_at?: string
+          id?: string
+          owner_user_id?: string
+          signups?: number
         }
         Relationships: []
       }
