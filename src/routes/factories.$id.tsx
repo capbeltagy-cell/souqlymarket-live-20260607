@@ -7,8 +7,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/factories/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="Factory not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: FactoryProfile,
 });
 
@@ -60,4 +60,15 @@ function FactoryProfile() {
 
 function Info({ label, value }: { label: string; value: any }) {
   return <div className="rounded-lg border border-border bg-card p-4"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+}
+
+
+function Fallback({ msg }: { msg: string }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <SiteFooter />
+    </div>
+  );
 }

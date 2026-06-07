@@ -12,8 +12,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getTender, listTenderProposals, submitTenderProposal, awardTender } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/tenders/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="Tender not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: TenderDetail,
 });
 
@@ -104,4 +104,15 @@ function TenderDetail() {
 
 function Cell({ label, value }: { label: string; value: any }) {
   return <div className="rounded border border-border bg-card p-2"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+}
+
+
+function Fallback({ msg }: { msg: string }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <SiteFooter />
+    </div>
+  );
 }

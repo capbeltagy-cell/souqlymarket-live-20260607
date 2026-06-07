@@ -11,8 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getWholesale, submitWholesaleOrder } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/wholesale/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="Wholesale listing not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: WholesaleDetail,
 });
 
@@ -68,6 +68,17 @@ function WholesaleDetail() {
           )}
         </div>
       </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
+
+function Fallback({ msg }: { msg: string }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
       <SiteFooter />
     </div>
   );

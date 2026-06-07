@@ -12,8 +12,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getRfq, listRfqOffers, submitRfqOffer, awardRfq } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/rfq/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="RFQ not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: RfqDetail,
 });
 
@@ -116,4 +116,15 @@ function RfqDetail() {
 
 function Cell({ label, value }: { label: string; value: any }) {
   return <div className="rounded border border-border bg-card p-2"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+}
+
+
+function Fallback({ msg }: { msg: string }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <SiteFooter />
+    </div>
+  );
 }

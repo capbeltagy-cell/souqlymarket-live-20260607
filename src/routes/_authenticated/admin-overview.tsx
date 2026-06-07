@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useAuth } from "@/hooks/useAuth";
 import { getAdminOverview } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/_authenticated/admin-overview")({ component: AdminOverview });
@@ -10,10 +11,19 @@ export const Route = createFileRoute("/_authenticated/admin-overview")({ compone
 function AdminOverview() {
   const { locale } = useI18n();
   const ar = locale === "ar";
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("admin");
   const [d, setD] = useState<any>(null);
   const [err, setErr] = useState<string | null>(null);
-  useEffect(() => { getAdminOverview().then(setD).catch((e) => setErr(e.message)); }, []);
+  useEffect(() => { if (isAdmin) getAdminOverview().then(setD).catch((e) => setErr(e.message)); }, [isAdmin]);
 
+  if (!isAdmin) return (
+    <div className="min-h-screen flex flex-col bg-surface-2">
+      <SiteHeader />
+      <div className="container-souqly py-10 flex-1 text-center text-muted-foreground">{ar ? "للمسؤولين فقط" : "Admins only"}</div>
+      <SiteFooter />
+    </div>
+  );
   if (err) return <div className="p-10 text-center text-destructive">{err}</div>;
   if (!d) return <div className="p-10 text-center">…</div>;
 
