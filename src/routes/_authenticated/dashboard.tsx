@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Activity, Briefcase, ClipboardList, Crown, DollarSign, FileText, Inbox, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Activity, Briefcase, Building2, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -11,6 +11,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyCompanySubscription, type CompanySubscriptionInfo } from "@/lib/subscription.functions";
+import { upsertMyFactory } from "@/lib/phase3.functions";
+import { toast } from "sonner";
+import { useServerFn as _useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Souqly" }] }),
