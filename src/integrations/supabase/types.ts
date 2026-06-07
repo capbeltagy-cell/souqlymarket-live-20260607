@@ -323,10 +323,68 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          buyer_email: string | null
+          buyer_name: string
+          buyer_phone: string | null
+          buyer_user_id: string | null
+          company_id: string
+          created_at: string
+          id: string
+          listing_id: string
+          message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_email?: string | null
+          buyer_name: string
+          buyer_phone?: string | null
+          buyer_user_id?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          listing_id: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_email?: string | null
+          buyer_name?: string
+          buyer_phone?: string | null
+          buyer_user_id?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           category: string | null
           city: string | null
+          clicks_count: number
           commission_percentage: number | null
           company_id: string
           country: string | null
@@ -335,8 +393,10 @@ export type Database = {
           description_ar: string | null
           description_en: string | null
           featured: boolean
+          featured_until: string | null
           id: string
           images: string[] | null
+          leads_count: number
           location: string | null
           pdf_url: string | null
           price: number | null
@@ -351,6 +411,7 @@ export type Database = {
         Insert: {
           category?: string | null
           city?: string | null
+          clicks_count?: number
           commission_percentage?: number | null
           company_id: string
           country?: string | null
@@ -359,8 +420,10 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           featured?: boolean
+          featured_until?: string | null
           id?: string
           images?: string[] | null
+          leads_count?: number
           location?: string | null
           pdf_url?: string | null
           price?: number | null
@@ -375,6 +438,7 @@ export type Database = {
         Update: {
           category?: string | null
           city?: string | null
+          clicks_count?: number
           commission_percentage?: number | null
           company_id?: string
           country?: string | null
@@ -383,8 +447,10 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           featured?: boolean
+          featured_until?: string | null
           id?: string
           images?: string[] | null
+          leads_count?: number
           location?: string | null
           pdf_url?: string | null
           price?: number | null
@@ -402,6 +468,69 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          company_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          listing_id: string | null
+          metadata: Json
+          provider: string | null
+          provider_reference: string | null
+          purpose: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          company_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          metadata?: Json
+          provider?: string | null
+          provider_reference?: string | null
+          purpose: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          metadata?: Json
+          provider?: string | null
+          provider_reference?: string | null
+          purpose?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           },
         ]
@@ -556,6 +685,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_listing_click: { Args: { _id: string }; Returns: undefined }
+      increment_listing_view: { Args: { _id: string }; Returns: undefined }
       increment_referral_click: {
         Args: { _code: string }
         Returns: {
