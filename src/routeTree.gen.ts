@@ -9,39 +9,78 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WholesaleRouteImport } from './routes/wholesale'
+import { Route as TendersRouteImport } from './routes/tenders'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FactoriesRouteImport } from './routes/factories'
 import { Route as CompaniesRouteImport } from './routes/companies'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
+import { Route as TendersIdRouteImport } from './routes/tenders.$id'
+import { Route as RfqIdRouteImport } from './routes/rfq.$id'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
+import { Route as FactoriesIdRouteImport } from './routes/factories.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
+import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
+import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_authenticated/referral-program'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
+import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
+import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
+import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
+import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
+import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
+import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 
+const WholesaleRoute = WholesaleRouteImport.update({
+  id: '/wholesale',
+  path: '/wholesale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TendersRoute = TendersRouteImport.update({
+  id: '/tenders',
+  path: '/tenders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RfqRoute = RfqRouteImport.update({
+  id: '/rfq',
+  path: '/rfq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -64,9 +103,19 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FactoriesRoute = FactoriesRouteImport.update({
+  id: '/factories',
+  path: '/factories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompaniesRoute = CompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -88,6 +137,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WholesaleIdRoute = WholesaleIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => WholesaleRoute,
+} as any)
+const TendersIdRoute = TendersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => TendersRoute,
+} as any)
+const RfqIdRoute = RfqIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => RfqRoute,
+} as any)
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
   path: '/r/$code',
@@ -98,10 +162,20 @@ const ListingsIdRoute = ListingsIdRouteImport.update({
   path: '/listings/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FactoriesIdRoute = FactoriesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => FactoriesRoute,
+} as any)
 const CompaniesIdRoute = CompaniesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => CompaniesRoute,
+} as any)
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CategoriesRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
@@ -129,6 +203,12 @@ const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   path: '/referrals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReferralProgramRoute =
+  AuthenticatedReferralProgramRouteImport.update({
+    id: '/referral-program',
+    path: '/referral-program',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -154,6 +234,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompanyProfileExtraRoute =
+  AuthenticatedCompanyProfileExtraRouteImport.update({
+    id: '/company-profile-extra',
+    path: '/company-profile-extra',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompanyRoute = AuthenticatedCompanyRouteImport.update({
   id: '/company',
   path: '/company',
@@ -175,12 +261,45 @@ const AuthenticatedAgentRoute = AuthenticatedAgentRouteImport.update({
   path: '/agent',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminOverviewRoute =
+  AuthenticatedAdminOverviewRouteImport.update({
+    id: '/admin-overview',
+    path: '/admin-overview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCompaniesRoute =
   AuthenticatedAdminCompaniesRouteImport.update({
     id: '/admin-companies',
     path: '/admin-companies',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedWholesaleNewRoute =
+  AuthenticatedWholesaleNewRouteImport.update({
+    id: '/wholesale/new',
+    path: '/wholesale/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTendersNewRoute = AuthenticatedTendersNewRouteImport.update({
+  id: '/tenders/new',
+  path: '/tenders/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTendersMineRoute =
+  AuthenticatedTendersMineRouteImport.update({
+    id: '/tenders/mine',
+    path: '/tenders/mine',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRfqNewRoute = AuthenticatedRfqNewRouteImport.update({
+  id: '/rfq/new',
+  path: '/rfq/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRfqMineRoute = AuthenticatedRfqMineRouteImport.update({
+  id: '/rfq/mine',
+  path: '/rfq/mine',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
     id: '/listings/new',
@@ -192,61 +311,99 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/factories': typeof FactoriesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rfq': typeof RfqRouteWithChildren
+  '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
+  '/tenders': typeof TendersRouteWithChildren
+  '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
+  '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/companies/$id': typeof CompaniesIdRoute
+  '/factories/$id': typeof FactoriesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
+  '/rfq/$id': typeof RfqIdRoute
+  '/tenders/$id': typeof TendersIdRoute
+  '/wholesale/$id': typeof WholesaleIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/rfq/mine': typeof AuthenticatedRfqMineRoute
+  '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/tenders/mine': typeof AuthenticatedTendersMineRoute
+  '/tenders/new': typeof AuthenticatedTendersNewRoute
+  '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/factories': typeof FactoriesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rfq': typeof RfqRouteWithChildren
+  '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
+  '/tenders': typeof TendersRouteWithChildren
+  '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
+  '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/companies/$id': typeof CompaniesIdRoute
+  '/factories/$id': typeof FactoriesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
+  '/rfq/$id': typeof RfqIdRoute
+  '/tenders/$id': typeof TendersIdRoute
+  '/wholesale/$id': typeof WholesaleIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/rfq/mine': typeof AuthenticatedRfqMineRoute
+  '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/tenders/mine': typeof AuthenticatedTendersMineRoute
+  '/tenders/new': typeof AuthenticatedTendersNewRoute
+  '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -254,31 +411,50 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/factories': typeof FactoriesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rfq': typeof RfqRouteWithChildren
+  '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
+  '/tenders': typeof TendersRouteWithChildren
+  '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
+  '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/companies/$id': typeof CompaniesIdRoute
+  '/factories/$id': typeof FactoriesIdRoute
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
+  '/rfq/$id': typeof RfqIdRoute
+  '/tenders/$id': typeof TendersIdRoute
+  '/wholesale/$id': typeof WholesaleIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
+  '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
+  '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
+  '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
+  '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -286,92 +462,149 @@ export interface FileRouteTypes {
     | '/'
     | '/agents'
     | '/auth'
+    | '/categories'
     | '/companies'
+    | '/factories'
     | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/reset-password'
+    | '/rfq'
+    | '/search'
     | '/subscribe'
+    | '/tenders'
+    | '/wholesale'
     | '/admin-companies'
+    | '/admin-overview'
     | '/agent'
     | '/analytics'
     | '/commissions'
     | '/company'
+    | '/company-profile-extra'
     | '/dashboard'
     | '/favorites'
     | '/leads'
     | '/moderation'
     | '/profile'
+    | '/referral-program'
     | '/referrals'
     | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/auth/callback'
+    | '/categories/$slug'
     | '/companies/$id'
+    | '/factories/$id'
     | '/listings/$id'
     | '/r/$code'
+    | '/rfq/$id'
+    | '/tenders/$id'
+    | '/wholesale/$id'
     | '/listings/new'
+    | '/rfq/mine'
+    | '/rfq/new'
+    | '/tenders/mine'
+    | '/tenders/new'
+    | '/wholesale/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/agents'
     | '/auth'
+    | '/categories'
     | '/companies'
+    | '/factories'
     | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/reset-password'
+    | '/rfq'
+    | '/search'
     | '/subscribe'
+    | '/tenders'
+    | '/wholesale'
     | '/admin-companies'
+    | '/admin-overview'
     | '/agent'
     | '/analytics'
     | '/commissions'
     | '/company'
+    | '/company-profile-extra'
     | '/dashboard'
     | '/favorites'
     | '/leads'
     | '/moderation'
     | '/profile'
+    | '/referral-program'
     | '/referrals'
     | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/auth/callback'
+    | '/categories/$slug'
     | '/companies/$id'
+    | '/factories/$id'
     | '/listings/$id'
     | '/r/$code'
+    | '/rfq/$id'
+    | '/tenders/$id'
+    | '/wholesale/$id'
     | '/listings/new'
+    | '/rfq/mine'
+    | '/rfq/new'
+    | '/tenders/mine'
+    | '/tenders/new'
+    | '/wholesale/new'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/agents'
     | '/auth'
+    | '/categories'
     | '/companies'
+    | '/factories'
     | '/forgot-password'
     | '/marketplace'
     | '/pricing'
     | '/reset-password'
+    | '/rfq'
+    | '/search'
     | '/subscribe'
+    | '/tenders'
+    | '/wholesale'
     | '/_authenticated/admin-companies'
+    | '/_authenticated/admin-overview'
     | '/_authenticated/agent'
     | '/_authenticated/analytics'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
+    | '/_authenticated/company-profile-extra'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/leads'
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
+    | '/_authenticated/referral-program'
     | '/_authenticated/referrals'
     | '/_authenticated/seed'
     | '/_authenticated/verification'
     | '/agents/$id'
     | '/auth/callback'
+    | '/categories/$slug'
     | '/companies/$id'
+    | '/factories/$id'
     | '/listings/$id'
     | '/r/$code'
+    | '/rfq/$id'
+    | '/tenders/$id'
+    | '/wholesale/$id'
     | '/_authenticated/listings/new'
+    | '/_authenticated/rfq/mine'
+    | '/_authenticated/rfq/new'
+    | '/_authenticated/tenders/mine'
+    | '/_authenticated/tenders/new'
+    | '/_authenticated/wholesale/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -379,23 +612,57 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  CategoriesRoute: typeof CategoriesRouteWithChildren
   CompaniesRoute: typeof CompaniesRouteWithChildren
+  FactoriesRoute: typeof FactoriesRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RfqRoute: typeof RfqRouteWithChildren
+  SearchRoute: typeof SearchRoute
   SubscribeRoute: typeof SubscribeRoute
+  TendersRoute: typeof TendersRouteWithChildren
+  WholesaleRoute: typeof WholesaleRouteWithChildren
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wholesale': {
+      id: '/wholesale'
+      path: '/wholesale'
+      fullPath: '/wholesale'
+      preLoaderRoute: typeof WholesaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tenders': {
+      id: '/tenders'
+      path: '/tenders'
+      fullPath: '/tenders'
+      preLoaderRoute: typeof TendersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subscribe': {
       id: '/subscribe'
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rfq': {
+      id: '/rfq'
+      path: '/rfq'
+      fullPath: '/rfq'
+      preLoaderRoute: typeof RfqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -426,11 +693,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/factories': {
+      id: '/factories'
+      path: '/factories'
+      fullPath: '/factories'
+      preLoaderRoute: typeof FactoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/companies': {
       id: '/companies'
       path: '/companies'
       fullPath: '/companies'
       preLoaderRoute: typeof CompaniesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -461,6 +742,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wholesale/$id': {
+      id: '/wholesale/$id'
+      path: '/$id'
+      fullPath: '/wholesale/$id'
+      preLoaderRoute: typeof WholesaleIdRouteImport
+      parentRoute: typeof WholesaleRoute
+    }
+    '/tenders/$id': {
+      id: '/tenders/$id'
+      path: '/$id'
+      fullPath: '/tenders/$id'
+      preLoaderRoute: typeof TendersIdRouteImport
+      parentRoute: typeof TendersRoute
+    }
+    '/rfq/$id': {
+      id: '/rfq/$id'
+      path: '/$id'
+      fullPath: '/rfq/$id'
+      preLoaderRoute: typeof RfqIdRouteImport
+      parentRoute: typeof RfqRoute
+    }
     '/r/$code': {
       id: '/r/$code'
       path: '/r/$code'
@@ -475,12 +777,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/factories/$id': {
+      id: '/factories/$id'
+      path: '/$id'
+      fullPath: '/factories/$id'
+      preLoaderRoute: typeof FactoriesIdRouteImport
+      parentRoute: typeof FactoriesRoute
+    }
     '/companies/$id': {
       id: '/companies/$id'
       path: '/$id'
       fullPath: '/companies/$id'
       preLoaderRoute: typeof CompaniesIdRouteImport
       parentRoute: typeof CompaniesRoute
+    }
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
+      parentRoute: typeof CategoriesRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -515,6 +831,13 @@ declare module '@tanstack/react-router' {
       path: '/referrals'
       fullPath: '/referrals'
       preLoaderRoute: typeof AuthenticatedReferralsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/referral-program': {
+      id: '/_authenticated/referral-program'
+      path: '/referral-program'
+      fullPath: '/referral-program'
+      preLoaderRoute: typeof AuthenticatedReferralProgramRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -552,6 +875,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company-profile-extra': {
+      id: '/_authenticated/company-profile-extra'
+      path: '/company-profile-extra'
+      fullPath: '/company-profile-extra'
+      preLoaderRoute: typeof AuthenticatedCompanyProfileExtraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/company': {
       id: '/_authenticated/company'
       path: '/company'
@@ -580,11 +910,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-overview': {
+      id: '/_authenticated/admin-overview'
+      path: '/admin-overview'
+      fullPath: '/admin-overview'
+      preLoaderRoute: typeof AuthenticatedAdminOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-companies': {
       id: '/_authenticated/admin-companies'
       path: '/admin-companies'
       fullPath: '/admin-companies'
       preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/wholesale/new': {
+      id: '/_authenticated/wholesale/new'
+      path: '/wholesale/new'
+      fullPath: '/wholesale/new'
+      preLoaderRoute: typeof AuthenticatedWholesaleNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tenders/new': {
+      id: '/_authenticated/tenders/new'
+      path: '/tenders/new'
+      fullPath: '/tenders/new'
+      preLoaderRoute: typeof AuthenticatedTendersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tenders/mine': {
+      id: '/_authenticated/tenders/mine'
+      path: '/tenders/mine'
+      fullPath: '/tenders/mine'
+      preLoaderRoute: typeof AuthenticatedTendersMineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rfq/new': {
+      id: '/_authenticated/rfq/new'
+      path: '/rfq/new'
+      fullPath: '/rfq/new'
+      preLoaderRoute: typeof AuthenticatedRfqNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rfq/mine': {
+      id: '/_authenticated/rfq/mine'
+      path: '/rfq/mine'
+      fullPath: '/rfq/mine'
+      preLoaderRoute: typeof AuthenticatedRfqMineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/listings/new': {
@@ -599,36 +971,52 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
+  AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
+  AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedSeedRoute: typeof AuthenticatedSeedRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
+  AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
+  AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
+  AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
+  AuthenticatedTendersNewRoute: typeof AuthenticatedTendersNewRoute
+  AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
+  AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
+  AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedSeedRoute: AuthenticatedSeedRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
+  AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
+  AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
+  AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
+  AuthenticatedTendersNewRoute: AuthenticatedTendersNewRoute,
+  AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -655,6 +1043,18 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface CategoriesRouteChildren {
+  CategoriesSlugRoute: typeof CategoriesSlugRoute
+}
+
+const CategoriesRouteChildren: CategoriesRouteChildren = {
+  CategoriesSlugRoute: CategoriesSlugRoute,
+}
+
+const CategoriesRouteWithChildren = CategoriesRoute._addFileChildren(
+  CategoriesRouteChildren,
+)
+
 interface CompaniesRouteChildren {
   CompaniesIdRoute: typeof CompaniesIdRoute
 }
@@ -667,17 +1067,68 @@ const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
   CompaniesRouteChildren,
 )
 
+interface FactoriesRouteChildren {
+  FactoriesIdRoute: typeof FactoriesIdRoute
+}
+
+const FactoriesRouteChildren: FactoriesRouteChildren = {
+  FactoriesIdRoute: FactoriesIdRoute,
+}
+
+const FactoriesRouteWithChildren = FactoriesRoute._addFileChildren(
+  FactoriesRouteChildren,
+)
+
+interface RfqRouteChildren {
+  RfqIdRoute: typeof RfqIdRoute
+}
+
+const RfqRouteChildren: RfqRouteChildren = {
+  RfqIdRoute: RfqIdRoute,
+}
+
+const RfqRouteWithChildren = RfqRoute._addFileChildren(RfqRouteChildren)
+
+interface TendersRouteChildren {
+  TendersIdRoute: typeof TendersIdRoute
+}
+
+const TendersRouteChildren: TendersRouteChildren = {
+  TendersIdRoute: TendersIdRoute,
+}
+
+const TendersRouteWithChildren =
+  TendersRoute._addFileChildren(TendersRouteChildren)
+
+interface WholesaleRouteChildren {
+  WholesaleIdRoute: typeof WholesaleIdRoute
+}
+
+const WholesaleRouteChildren: WholesaleRouteChildren = {
+  WholesaleIdRoute: WholesaleIdRoute,
+}
+
+const WholesaleRouteWithChildren = WholesaleRoute._addFileChildren(
+  WholesaleRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  CategoriesRoute: CategoriesRouteWithChildren,
   CompaniesRoute: CompaniesRouteWithChildren,
+  FactoriesRoute: FactoriesRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RfqRoute: RfqRouteWithChildren,
+  SearchRoute: SearchRoute,
   SubscribeRoute: SubscribeRoute,
+  TendersRoute: TendersRouteWithChildren,
+  WholesaleRoute: WholesaleRouteWithChildren,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
 }
