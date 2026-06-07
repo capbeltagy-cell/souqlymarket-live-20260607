@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { MapPin, Trophy, Mail, TrendingUp, Star } from "lucide-react";
+import { MapPin, Trophy, Mail, TrendingUp, Star, BadgeCheck } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
