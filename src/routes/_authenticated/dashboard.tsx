@@ -193,7 +193,7 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Stat icon={FileText} label={t("total_listings")} value={String(counts.listings)} />
-        <Stat icon={Inbox} label={ar ? "طلبات العملاء" : "Leads"} value={String(sub?.companyId ? (counts as Counts & { leads?: number }).leads ?? "—" : "—")} />
+        <Stat icon={Inbox} label={ar ? "طلبات العملاء" : "Leads"} value={String(counts.leads ?? 0)} />
         <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
         <Stat icon={Users} label={t("active_referrals")} value={String(counts.referrals)} />
       </div>
