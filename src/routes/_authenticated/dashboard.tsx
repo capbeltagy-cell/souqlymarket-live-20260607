@@ -49,10 +49,13 @@ function Dashboard() {
         setSub(subInfo);
         setHasProfile(subInfo.hasCompany);
         if (subInfo.companyId) {
-          const { count: pc } = await supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending");
-          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0 });
+          const [{ count: pc }, { count: lc }] = await Promise.all([
+            supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending"),
+            supabase.from("leads").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "new"),
+          ]);
+          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0, leads: lc ?? 0 });
         } else {
-          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0 });
+          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 });
         }
       } else {
         const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
