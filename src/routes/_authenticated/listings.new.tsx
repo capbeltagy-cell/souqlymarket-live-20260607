@@ -164,10 +164,10 @@ function NewListing() {
             <div className="rounded-lg border border-warning/40 bg-warning/10 p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="text-sm">
                 <div className="font-semibold">{t("plan_limits_reached")}</div>
-                <div className="text-muted-foreground">{t("upgrade_to_unlock")}</div>
+                <div className="text-muted-foreground">{t("upgrade_to_unlock")} — 499 EGP / شهر</div>
               </div>
               <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-                <Link to="/pricing"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
+                <Link to="/subscribe"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
               </Button>
             </div>
           )}
