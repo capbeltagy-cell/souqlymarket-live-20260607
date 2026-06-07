@@ -11,8 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getWholesale, submitWholesaleOrder } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/wholesale/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="Wholesale listing not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: WholesaleDetail,
 });
 

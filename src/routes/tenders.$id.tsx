@@ -12,8 +12,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getTender, listTenderProposals, submitTenderProposal, awardTender } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/tenders/$id")({
-  notFoundComponent: () => <div className="p-10 text-center">Not found</div>,
-  errorComponent: () => <div className="p-10 text-center">Error</div>,
+  notFoundComponent: () => <Fallback msg="Tender not found" />,
+  errorComponent: () => <Fallback msg="Something went wrong" />,
   component: TenderDetail,
 });
 
