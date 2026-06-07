@@ -30,8 +30,9 @@ function NewListing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchPlan = useServerFn(getMyPlan);
+  const fetchSub = useServerFn(getMyCompanySubscription);
   const create = useServerFn(createListing);
-  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean } | null>(null);
+  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
 
   const [type, setType] = useState<ListingType>("product");
   const [title_ar, setTitleAr] = useState("");
@@ -53,19 +54,20 @@ function NewListing() {
     if (!user) return;
     (async () => {
       try {
-        const p = await fetchPlan();
-        let currentListings = 0;
-        if (p.hasCompany) {
-          const { data: company } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle();
-          if (company) {
-            const { count } = await supabase.from("listings").select("id", { count: "exact", head: true }).eq("company_id", company.id);
-            currentListings = count ?? 0;
-          }
+        const [p, sub] = await Promise.all([fetchPlan(), fetchSub()]);
+        setPlanInfo({
+          plan: sub.isPaid ? "premium_company" : p.plan,
+          maxListings: sub.listingLimit,
+          currentListings: sub.listingsCount,
+          hasCompany: sub.hasCompany,
+          isPaid: sub.isPaid,
+        });
+        if (sub.hasCompany && !sub.isPaid && sub.listingsCount >= sub.listingLimit) {
+          navigate({ to: "/subscribe" });
         }
-        setPlanInfo({ plan: p.plan, maxListings: p.limits.maxListings, currentListings, hasCompany: p.hasCompany });
       } catch { /* noop */ }
     })();
-  }, [user, fetchPlan]);
+  }, [user, fetchPlan, fetchSub, navigate]);
 
   const atLimit = planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
 
