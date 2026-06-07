@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Briefcase, ClipboardList, Crown, DollarSign, FileText, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Activity, Briefcase, ClipboardList, Crown, DollarSign, FileText, Inbox, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
