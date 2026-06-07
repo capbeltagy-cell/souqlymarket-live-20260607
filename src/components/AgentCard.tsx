@@ -21,6 +21,7 @@ export function AgentCard({ a }: { a: SampleAgent }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
+
   );
 }
