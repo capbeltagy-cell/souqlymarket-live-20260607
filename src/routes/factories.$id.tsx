@@ -61,3 +61,14 @@ function FactoryProfile() {
 function Info({ label, value }: { label: string; value: any }) {
   return <div className="rounded-lg border border-border bg-card p-4"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
 }
+
+
+function Fallback({ msg }: { msg: string }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <SiteFooter />
+    </div>
+  );
+}
