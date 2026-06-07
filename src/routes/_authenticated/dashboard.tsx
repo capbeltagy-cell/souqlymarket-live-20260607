@@ -13,7 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { getMyCompanySubscription, type CompanySubscriptionInfo } from "@/lib/subscription.functions";
 import { upsertMyFactory } from "@/lib/phase3.functions";
 import { toast } from "sonner";
-import { useServerFn as _useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Souqly" }] }),
