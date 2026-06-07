@@ -93,10 +93,11 @@ export const sampleCompanies: SampleCompany[] = [
 ];
 
 export const sampleAgents: SampleAgent[] = [
-  { id: "a1", name_ar: "خالد المنصور", name_en: "Khaled Al-Mansour", headline_ar: "خبير مبيعات B2B • 12 سنة خبرة", headline_en: "B2B sales specialist • 12y experience", country_ar: "السعودية", country_en: "Saudi Arabia", deals: 87, initial: "K" },
-  { id: "a2", name_ar: "ليلى عبد الرحمن", name_en: "Layla Abdulrahman", headline_ar: "متخصصة عقارات تجارية", headline_en: "Commercial real estate specialist", country_ar: "الإمارات", country_en: "UAE", deals: 64, initial: "L" },
+  { id: "a1", name_ar: "خالد المنصور", name_en: "Khaled Al-Mansour", headline_ar: "خبير مبيعات B2B • 12 سنة خبرة", headline_en: "B2B sales specialist • 12y experience", country_ar: "السعودية", country_en: "Saudi Arabia", deals: 87, initial: "K", verified: true },
+  { id: "a2", name_ar: "ليلى عبد الرحمن", name_en: "Layla Abdulrahman", headline_ar: "متخصصة عقارات تجارية", headline_en: "Commercial real estate specialist", country_ar: "الإمارات", country_en: "UAE", deals: 64, initial: "L", verified: true },
   { id: "a3", name_ar: "أحمد فاروق", name_en: "Ahmed Farouk", headline_ar: "تسويق صناعي ومعدات ثقيلة", headline_en: "Industrial & heavy equipment marketing", country_ar: "مصر", country_en: "Egypt", deals: 41, initial: "A" },
-  { id: "a4", name_ar: "ريم الحسن", name_en: "Reem Al-Hassan", headline_ar: "خدمات لوجستية وشحن", headline_en: "Logistics & freight services", country_ar: "الأردن", country_en: "Jordan", deals: 33, initial: "R" },
+  { id: "a4", name_ar: "ريم الحسن", name_en: "Reem Al-Hassan", headline_ar: "خدمات لوجستية وشحن", headline_en: "Logistics & freight services", country_ar: "الأردن", country_en: "Jordan", deals: 33, initial: "R", verified: true },
+
 ];
 
 export function listingTitle(l: SampleListing, locale: Locale) {
