@@ -68,7 +68,16 @@ export function SiteHeader() {
                   <Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/referrals" className="gap-2"><Link2 className="h-4 w-4" />{t("nav_referrals")}</Link>
+                  <Link to="/referral-program" className="gap-2"><Link2 className="h-4 w-4" />برنامج الإحالات</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/rfq/mine" className="gap-2"><ListChecks className="h-4 w-4" />طلباتي للأسعار</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/tenders/mine" className="gap-2"><ListChecks className="h-4 w-4" />مناقصاتي</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/company-profile-extra" className="gap-2"><Building2 className="h-4 w-4" />تخصيص ملف الشركة</Link>
                 </DropdownMenuItem>
                 {isAdmin && (
                   <>
