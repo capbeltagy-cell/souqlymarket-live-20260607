@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { BadgeCheck, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -6,7 +7,8 @@ import type { SampleCompany } from "@/lib/sampleData";
 export function CompanyCard({ c }: { c: SampleCompany }) {
   const { locale, t } = useI18n();
   return (
-    <div className="rounded-lg border border-border bg-card p-5 shadow-card hover:shadow-elev transition">
+    <Link to="/companies/$id" params={{ id: c.id }} className="block rounded-lg border border-border bg-card p-5 shadow-card hover:shadow-elev transition">
+
       <div className="flex items-start gap-4">
         <div className="h-14 w-14 rounded-md hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
           {c.initial}
