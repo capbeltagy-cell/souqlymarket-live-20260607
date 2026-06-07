@@ -29,16 +29,27 @@ function Marketplace() {
 
   useEffect(() => {
     setLoading(true);
+    const nowIso = new Date().toISOString();
     let query = supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
       .eq("status", "approved")
-      .order("featured", { ascending: false })
       .order("created_at", { ascending: false })
-      .limit(60);
+      .limit(120);
     if (type !== "all") query = query.eq("type", type);
     query.then(({ data }) => {
-      setItems((data ?? []) as unknown as ListingCardData[]);
+      const rows = (data ?? []) as unknown as (ListingCardData & { featured_until?: string | null; companies?: { is_verified?: boolean } | null })[];
+      // Sort: active-featured first, then verified-company listings, then newest
+      const sorted = [...rows].sort((a, b) => {
+        const af = a.featured && (!a.featured_until || a.featured_until > nowIso) ? 1 : 0;
+        const bf = b.featured && (!b.featured_until || b.featured_until > nowIso) ? 1 : 0;
+        if (af !== bf) return bf - af;
+        const av = a.companies?.is_verified ? 1 : 0;
+        const bv = b.companies?.is_verified ? 1 : 0;
+        if (av !== bv) return bv - av;
+        return 0;
+      });
+      setItems(sorted);
       setLoading(false);
     });
   }, [type]);

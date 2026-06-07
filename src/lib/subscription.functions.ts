@@ -62,7 +62,7 @@ export const adminListCompanies = createServerFn({ method: "GET" })
     if (!isAdmin) throw new Error("Forbidden");
     const { data, error } = await supabase
       .from("companies")
-      .select("id, name_ar, name_en, owner_id, subscription_plan, subscription_expires_at, subscription_updated_at, created_at")
+      .select("id, name_ar, name_en, owner_id, is_verified, subscription_plan, subscription_expires_at, subscription_updated_at, created_at")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((c) => ({

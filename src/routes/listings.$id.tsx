@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, FileText, Heart, Loader2, MapPin, Share2, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, FileText, Heart, Loader2, MapPin, Share2, Sparkles, Star, TrendingUp } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { LeadForm } from "@/components/LeadForm";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
+import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 
 export const Route = createFileRoute("/listings/$id")({
   loader: async ({ params }) => {
@@ -53,6 +55,8 @@ type Listing = {
   price: number | null; currency: string | null;
   country: string | null; city: string | null;
   commission_percentage: number | null;
+  featured: boolean | null; featured_until: string | null;
+  views_count: number | null;
   company_id: string;
   companies: {
     id: string; name_ar: string; name_en: string;
@@ -79,8 +83,10 @@ function NotFoundView() {
 function ListingDetail() {
   const { id } = Route.useParams();
   const { t, locale, dir } = useI18n();
+  const ar = locale === "ar";
   const { user } = useAuth();
   const convert = useServerFn(convertReferral);
+  const feature = useServerFn(featureMyListing);
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,14 +95,17 @@ function ListingDetail() {
   const [selectedRef, setSelectedRef] = useState("");
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [featuring, setFeaturing] = useState<7 | 30 | null>(null);
   const [fav, setFav] = useState(false);
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, featured, featured_until, views_count, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
+      // Track view (fire and forget)
+      supabase.rpc("increment_listing_view", { _id: id });
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
@@ -110,6 +119,16 @@ function ListingDetail() {
       setLoading(false);
     })();
   }, [id, user]);
+
+  const onFeature = async (days: 7 | 30) => {
+    setFeaturing(days);
+    try {
+      const res = await feature({ data: { listingId: id, days } });
+      toast.success(ar ? `تم تثبيت الإعلان حتى ${new Date(res.featured_until).toLocaleDateString()}` : `Featured until ${new Date(res.featured_until).toLocaleDateString()}`);
+      setL((cur) => cur ? { ...cur, featured: true, featured_until: res.featured_until } : cur);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setFeaturing(null); }
+  };
 
   async function toggleFav() {
     if (!user) { toast.error(t("nav_signin")); return; }
@@ -173,7 +192,15 @@ function ListingDetail() {
               <video controls src={l.video_url} className="w-full rounded-xl border border-border" />
             )}
             <div>
-              <Badge className="mb-2">{t(`cat_${l.type}` as never)}</Badge>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <Badge>{t(`cat_${l.type}` as never)}</Badge>
+                {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
+                  <Badge className="bg-accent text-accent-foreground gap-1"><Star className="h-3 w-3" />{ar ? "مميز" : "Featured"}</Badge>
+                )}
+                {company?.is_verified && (
+                  <Badge className="bg-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />{ar ? "شركة موثقة" : "Verified"}</Badge>
+                )}
+              </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                 {company && (
@@ -204,13 +231,13 @@ function ListingDetail() {
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
               {whatsappNum ? (
-                <Button asChild className="w-full bg-success hover:bg-success/90" size="lg">
+                <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
                   <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
                     {t("contact_whatsapp")}
                   </a>
                 </Button>
               ) : company?.email ? (
-                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg">
+                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
                   <a href={`mailto:${company.email}?subject=${encodeURIComponent(title)}`}>{t("contact_company")}</a>
                 </Button>
               ) : null}
@@ -221,6 +248,35 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
             </div>
+            {!isOwner && <LeadForm listingId={id} />}
+            {isOwner && (
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" />{ar ? "تثبيت الإعلان في الأعلى" : "Pin listing to top"}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {ar
+                      ? "اظهر إعلانك في صدارة السوق ولفت انتباه المزيد من العملاء."
+                      : "Promote your listing to the top of the marketplace for more visibility."}
+                  </p>
+                  {l.featured && l.featured_until && new Date(l.featured_until).getTime() > Date.now() && (
+                    <p className="text-xs text-success mt-1">
+                      {ar ? `مميز حتى ${new Date(l.featured_until).toLocaleDateString()}` : `Featured until ${new Date(l.featured_until).toLocaleDateString()}`}
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button type="button" variant="outline" disabled={!!featuring} onClick={() => onFeature(7)} className="flex-col h-auto py-3">
+                    <span className="font-bold">7 {ar ? "أيام" : "days"}</span>
+                    <span className="text-xs text-muted-foreground">{FEATURE_PRICING_EGP[7]} EGP</span>
+                  </Button>
+                  <Button type="button" disabled={!!featuring} onClick={() => onFeature(30)} className="bg-primary hover:bg-primary-hover flex-col h-auto py-3">
+                    <span className="font-bold">30 {ar ? "يوم" : "days"}</span>
+                    <span className="text-xs">{FEATURE_PRICING_EGP[30]} EGP</span>
+                  </Button>
+                </div>
+                {featuring && <div className="text-xs text-muted-foreground text-center"><Loader2 className="h-3 w-3 animate-spin inline me-1" />{ar ? "جارٍ التثبيت…" : "Pinning…"}</div>}
+              </div>
+            )}
             {isOwner && referrals.length > 0 && (
               <form onSubmit={onConvert} className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
                 <h3 className="font-semibold text-sm">{t("convert_referral")}</h3>

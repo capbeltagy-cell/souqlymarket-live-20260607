@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Briefcase, ClipboardList, Crown, DollarSign, FileText, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Activity, Briefcase, ClipboardList, Crown, DollarSign, FileText, Inbox, LayoutDashboard, Link2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type Counts = {
   listings: number; companies: number; agents: number;
   referrals: number; pendingCommissions: number; pendingListings: number;
+  leads?: number;
 };
 
 function Dashboard() {
@@ -48,10 +49,13 @@ function Dashboard() {
         setSub(subInfo);
         setHasProfile(subInfo.hasCompany);
         if (subInfo.companyId) {
-          const { count: pc } = await supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending");
-          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0 });
+          const [{ count: pc }, { count: lc }] = await Promise.all([
+            supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending"),
+            supabase.from("leads").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "new"),
+          ]);
+          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0, leads: lc ?? 0 });
         } else {
-          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0 });
+          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 });
         }
       } else {
         const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
@@ -189,12 +193,14 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Stat icon={FileText} label={t("total_listings")} value={String(counts.listings)} />
+        <Stat icon={Inbox} label={ar ? "طلبات العملاء" : "Leads"} value={String(counts.leads ?? 0)} />
         <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
-        <Stat icon={Settings} label={t("nav_company_profile")} value="—" />
         <Stat icon={Users} label={t("active_referrals")} value={String(counts.referrals)} />
       </div>
       <div className="flex flex-wrap gap-2">
         <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/listings/new"><PlusCircle className="h-4 w-4" />{t("new_listing")}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
         <Button asChild variant="outline"><Link to="/company">{t("nav_company_profile")}</Link></Button>
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
       </div>

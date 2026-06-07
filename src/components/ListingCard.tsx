@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, TrendingUp, Heart, MessageCircle } from "lucide-react";
+import { MapPin, TrendingUp, Heart, MessageCircle, BadgeCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +20,9 @@ export type ListingCardData = {
   country: string | null;
   commission_percentage: number | null;
   featured?: boolean | null;
+  featured_until?: string | null;
   company_id?: string | null;
-  companies?: { name_ar: string | null; name_en: string | null; phone?: string | null } | null;
+  companies?: { name_ar: string | null; name_en: string | null; phone?: string | null; is_verified?: boolean | null } | null;
 };
 
 const typeKey: Record<ListingType, string> = {
@@ -77,7 +78,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
         <Badge className="absolute top-3 start-3 bg-surface/95 text-foreground hover:bg-surface">
           {t(typeKey[l.type] as never)}
         </Badge>
-        {l.featured && (
+        {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
           <Badge className="absolute top-3 end-3 bg-accent text-accent-foreground hover:bg-accent">★</Badge>
         )}
         <button onClick={toggleFav} disabled={favBusy}
@@ -89,7 +90,12 @@ export function ListingCard({ l }: { l: ListingCardData }) {
       <div className="p-4 space-y-3">
         <div>
           <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
-          {company && <p className="text-xs text-muted-foreground mt-1">{t("by_company")} {company}</p>}
+          {company && (
+            <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
+              {l.companies?.is_verified && <BadgeCheck className="h-3 w-3 text-primary" />}
+              {t("by_company")} {company}
+            </p>
+          )}
         </div>
         <div className="flex items-center justify-between text-xs">
           <span className="flex items-center gap-1 text-muted-foreground">
