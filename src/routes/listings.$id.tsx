@@ -15,7 +15,29 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 
 export const Route = createFileRoute("/listings/$id")({
-  head: () => ({ meta: [{ title: "Listing — Souqly" }] }),
+  loader: async ({ params }) => {
+    const { getListingMeta } = await import("@/lib/seo.functions");
+    return { meta: await getListingMeta({ data: { id: params.id } }) };
+  },
+  head: ({ loaderData, params }) => {
+    const m = loaderData?.meta;
+    const title = m ? `${m.title_en ?? m.title_ar ?? "Listing"} — Souqly` : "Listing — Souqly";
+    const desc = (m?.description_en ?? m?.description_ar ?? "Professional B2B listing on Souqly.").slice(0, 160);
+    const img = m?.images?.[0];
+    const url = `/listings/${params.id}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <NotFoundView />,
   errorComponent: () => (
     <div className="p-10 text-center"><p>Something went wrong.</p></div>
@@ -67,6 +89,7 @@ function ListingDetail() {
   const [selectedRef, setSelectedRef] = useState("");
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [fav, setFav] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -81,10 +104,25 @@ function ListingDetail() {
           const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
           setReferrals(refs ?? []);
         }
+        const { data: f } = await supabase.from("favorites").select("id").eq("user_id", user.id).eq("listing_id", id).maybeSingle();
+        setFav(!!f);
       }
       setLoading(false);
     })();
   }, [id, user]);
+
+  async function toggleFav() {
+    if (!user) { toast.error(t("nav_signin")); return; }
+    try {
+      if (fav) {
+        await supabase.from("favorites").delete().eq("user_id", user.id).eq("listing_id", id);
+        setFav(false); toast.success(t("unfavorited"));
+      } else {
+        await supabase.from("favorites").insert({ user_id: user.id, listing_id: id });
+        setFav(true); toast.success(t("favorited"));
+      }
+    } catch (e) { toast.error((e as Error).message); }
+  }
 
   const onConvert = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,7 +215,9 @@ function ListingDetail() {
                 </Button>
               ) : null}
               <div className="grid grid-cols-2 gap-2 mt-3">
-                <Button variant="outline" size="sm" className="gap-1"><Heart className="h-4 w-4" />{t("save_favorite")}</Button>
+                <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
+                  <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
+                </Button>
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
             </div>

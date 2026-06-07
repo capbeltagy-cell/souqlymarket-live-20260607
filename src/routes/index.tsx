@@ -40,7 +40,7 @@ function Landing() {
     (async () => {
       const [lRes, cRes, aRes] = await Promise.all([
         supabase.from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en)")
+          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
           .eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
         supabase.from("companies")
           .select("id, name_ar, name_en, industry, country, is_verified, logo_url")

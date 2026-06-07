@@ -10,7 +10,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
 
 export const Route = createFileRoute("/agents/$id")({
-  head: () => ({ meta: [{ title: "Agent — Souqly" }] }),
+  loader: async ({ params }) => {
+    const { getAgentMeta } = await import("@/lib/seo.functions");
+    return { meta: await getAgentMeta({ data: { id: params.id } }) };
+  },
+  head: ({ loaderData, params }) => {
+    const m = loaderData?.meta;
+    const name = m?.full_name ?? "Souqly Agent";
+    const headline = m?.headline_en ?? m?.headline_ar ?? "";
+    const title = `${name}${headline ? ` — ${headline}` : ""} — Souqly`;
+    const desc = (m?.bio_en ?? m?.bio_ar ?? `${name} on Souqly — B2B sales agent.`).slice(0, 160);
+    const img = m?.avatar_url ?? undefined;
+    const url = `/agents/${params.id}`;
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title }, { property: "og:description", content: desc },
+        { property: "og:type", content: "profile" }, { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <Shell><div className="p-10 text-center">Agent not found</div></Shell>,
   errorComponent: () => <Shell><div className="p-10 text-center">Something went wrong</div></Shell>,
   component: AgentProfile,

@@ -11,7 +11,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
 
 export const Route = createFileRoute("/companies/$id")({
-  head: () => ({ meta: [{ title: "Company — Souqly" }] }),
+  loader: async ({ params }) => {
+    const { getCompanyMeta } = await import("@/lib/seo.functions");
+    return { meta: await getCompanyMeta({ data: { id: params.id } }) };
+  },
+  head: ({ loaderData, params }) => {
+    const m = loaderData?.meta;
+    const title = m ? `${m.name_en ?? m.name_ar ?? "Company"} — Souqly` : "Company — Souqly";
+    const desc = (m?.description_en ?? m?.description_ar ?? `${m?.industry ?? "B2B"} company on Souqly.`).slice(0, 160);
+    const img = m?.cover_url ?? m?.logo_url ?? undefined;
+    const url = `/companies/${params.id}`;
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title }, { property: "og:description", content: desc },
+        { property: "og:type", content: "profile" }, { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <Shell><div className="p-10 text-center">Company not found</div></Shell>,
   errorComponent: () => <Shell><div className="p-10 text-center">Something went wrong</div></Shell>,
   component: CompanyProfile,
@@ -39,7 +58,7 @@ function CompanyProfile() {
       if (data) {
         const { data: items } = await supabase
           .from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en)")
+          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
           .eq("company_id", id)
           .eq("status", "approved")
           .order("created_at", { ascending: false });

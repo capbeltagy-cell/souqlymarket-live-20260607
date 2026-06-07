@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
@@ -21,14 +23,22 @@ import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
+import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
+import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -37,6 +47,11 @@ const PricingRoute = PricingRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesRoute = CompaniesRouteImport.update({
@@ -89,6 +104,11 @@ const AuthenticatedVerificationRoute =
     path: '/verification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSeedRoute = AuthenticatedSeedRouteImport.update({
+  id: '/seed',
+  path: '/seed',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -97,6 +117,16 @@ const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -132,14 +162,19 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -152,14 +187,19 @@ export interface FileRoutesByTo {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -174,14 +214,19 @@ export interface FileRoutesById {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
+  '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/agents/$id': typeof AgentsIdRoute
   '/companies/$id': typeof CompaniesIdRoute
@@ -196,14 +241,19 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
+    | '/reset-password'
     | '/agent'
     | '/commissions'
     | '/company'
     | '/dashboard'
+    | '/favorites'
+    | '/moderation'
     | '/profile'
     | '/referrals'
+    | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -216,14 +266,19 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
+    | '/reset-password'
     | '/agent'
     | '/commissions'
     | '/company'
     | '/dashboard'
+    | '/favorites'
+    | '/moderation'
     | '/profile'
     | '/referrals'
+    | '/seed'
     | '/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -237,14 +292,19 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/companies'
+    | '/forgot-password'
     | '/marketplace'
     | '/pricing'
+    | '/reset-password'
     | '/_authenticated/agent'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
+    | '/_authenticated/favorites'
+    | '/_authenticated/moderation'
     | '/_authenticated/profile'
     | '/_authenticated/referrals'
+    | '/_authenticated/seed'
     | '/_authenticated/verification'
     | '/agents/$id'
     | '/companies/$id'
@@ -259,14 +319,23 @@ export interface RootRouteChildren {
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompaniesRoute: typeof CompaniesRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -279,6 +348,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/companies': {
@@ -351,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seed': {
+      id: '/_authenticated/seed'
+      path: '/seed'
+      fullPath: '/seed'
+      preLoaderRoute: typeof AuthenticatedSeedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/referrals': {
       id: '/_authenticated/referrals'
       path: '/referrals'
@@ -363,6 +446,20 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/moderation': {
+      id: '/_authenticated/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof AuthenticatedModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/favorites': {
+      id: '/_authenticated/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -408,8 +505,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
+  AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
+  AuthenticatedSeedRoute: typeof AuthenticatedSeedRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
 }
@@ -419,8 +519,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
+  AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
+  AuthenticatedSeedRoute: AuthenticatedSeedRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
 }
@@ -457,8 +560,10 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   CompaniesRoute: CompaniesRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
 }

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2 } from "lucide-react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -59,15 +59,27 @@ export function SiteHeader() {
                   <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/referrals" className="gap-2"><Link2 className="h-4 w-4" />{t("nav_referrals")}</Link>
                 </DropdownMenuItem>
                 {isAdmin && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/verification" className="gap-2"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link>
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/verification" className="gap-2"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/moderation" className="gap-2"><ListChecks className="h-4 w-4" />{t("nav_moderation")}</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/seed" className="gap-2"><Sprout className="h-4 w-4" />{t("seed_title")}</Link>
+                    </DropdownMenuItem>
+                  </>
                 )}
 
 
