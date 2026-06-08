@@ -10,19 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WholesaleRouteImport } from './routes/wholesale'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TendersRouteImport } from './routes/tenders'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FactoriesRouteImport } from './routes/factories'
+import { Route as ControlCenterX7RouteImport } from './routes/control-center-x7'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
@@ -63,6 +71,11 @@ const WholesaleRoute = WholesaleRouteImport.update({
   path: '/wholesale',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TendersRoute = TendersRouteImport.update({
   id: '/tenders',
   path: '/tenders',
@@ -88,6 +101,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -98,14 +121,34 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
   path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FactoriesRoute = FactoriesRouteImport.update({
   id: '/factories',
   path: '/factories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ControlCenterX7Route = ControlCenterX7RouteImport.update({
+  id: '/control-center-x7',
+  path: '/control-center-x7',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesRoute = CompaniesRouteImport.update({
@@ -126,6 +169,11 @@ const AuthRoute = AuthRouteImport.update({
 const AgentsRoute = AgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -309,19 +357,27 @@ const AuthenticatedListingsNewRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
+  '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -358,19 +414,27 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
+  '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -409,19 +473,27 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
+  '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -460,19 +532,27 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/agents'
     | '/auth'
     | '/categories'
     | '/companies'
+    | '/contact'
+    | '/control-center-x7'
     | '/factories'
+    | '/faq'
     | '/forgot-password'
+    | '/how-it-works'
     | '/marketplace'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/subscribe'
     | '/tenders'
+    | '/terms'
     | '/wholesale'
     | '/admin-companies'
     | '/admin-overview'
@@ -509,19 +589,27 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/agents'
     | '/auth'
     | '/categories'
     | '/companies'
+    | '/contact'
+    | '/control-center-x7'
     | '/factories'
+    | '/faq'
     | '/forgot-password'
+    | '/how-it-works'
     | '/marketplace'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/subscribe'
     | '/tenders'
+    | '/terms'
     | '/wholesale'
     | '/admin-companies'
     | '/admin-overview'
@@ -559,19 +647,27 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/agents'
     | '/auth'
     | '/categories'
     | '/companies'
+    | '/contact'
+    | '/control-center-x7'
     | '/factories'
+    | '/faq'
     | '/forgot-password'
+    | '/how-it-works'
     | '/marketplace'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/subscribe'
     | '/tenders'
+    | '/terms'
     | '/wholesale'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-overview'
@@ -610,19 +706,27 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   CategoriesRoute: typeof CategoriesRouteWithChildren
   CompaniesRoute: typeof CompaniesRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  ControlCenterX7Route: typeof ControlCenterX7Route
   FactoriesRoute: typeof FactoriesRouteWithChildren
+  FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
   SubscribeRoute: typeof SubscribeRoute
   TendersRoute: typeof TendersRouteWithChildren
+  TermsRoute: typeof TermsRoute
   WholesaleRoute: typeof WholesaleRouteWithChildren
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
@@ -635,6 +739,13 @@ declare module '@tanstack/react-router' {
       path: '/wholesale'
       fullPath: '/wholesale'
       preLoaderRoute: typeof WholesaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tenders': {
@@ -672,6 +783,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -686,6 +811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -693,11 +825,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/factories': {
       id: '/factories'
       path: '/factories'
       fullPath: '/factories'
       preLoaderRoute: typeof FactoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/control-center-x7': {
+      id: '/control-center-x7'
+      path: '/control-center-x7'
+      fullPath: '/control-center-x7'
+      preLoaderRoute: typeof ControlCenterX7RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/companies': {
@@ -726,6 +879,13 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents'
       preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1115,19 +1275,27 @@ const WholesaleRouteWithChildren = WholesaleRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   CategoriesRoute: CategoriesRouteWithChildren,
   CompaniesRoute: CompaniesRouteWithChildren,
+  ContactRoute: ContactRoute,
+  ControlCenterX7Route: ControlCenterX7Route,
   FactoriesRoute: FactoriesRouteWithChildren,
+  FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HowItWorksRoute: HowItWorksRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
   SubscribeRoute: SubscribeRoute,
   TendersRoute: TendersRouteWithChildren,
+  TermsRoute: TermsRoute,
   WholesaleRoute: WholesaleRouteWithChildren,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
@@ -1135,13 +1303,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
