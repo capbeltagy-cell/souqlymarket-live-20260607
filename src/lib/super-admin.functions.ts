@@ -12,7 +12,7 @@ async function assertSuper(ctx: { userId: string; supabase: any }) {
   if (!ALLOWED.includes(email)) throw new Error("Access denied");
   // ensure admin role
   await supabaseAdmin.from("user_roles").upsert({ user_id: ctx.userId, role: "admin" }, { onConflict: "user_id,role" });
-  return supabaseAdmin;
+  return supabaseAdmin as any;
 }
 
 export const superCheck = createServerFn({ method: "POST" })
