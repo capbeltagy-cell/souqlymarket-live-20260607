@@ -102,6 +102,24 @@ function Landing() {
         </div>
       </section>
 
+      <section className="border-y border-border bg-surface">
+        <div className="container-souqly py-6 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+          {[
+            { icon: ShieldCheck, label: "شركات موثقة" },
+            { icon: ShieldCheck, label: "منصة آمنة" },
+            { icon: Building2, label: "سوق B2B مصري" },
+            { icon: Package, label: "5 إعلانات مجاناً" },
+            { icon: Sparkles, label: "ترقية بـ 499 ج.م/شهر" },
+          ].map(({ icon: Icon, label }) => (
+            <div key={label} className="flex flex-col items-center gap-1.5">
+              <Icon className="h-5 w-5 text-primary" />
+              <div className="text-xs font-medium">{label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       <section className="container-souqly py-16">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">{t("section_categories")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
