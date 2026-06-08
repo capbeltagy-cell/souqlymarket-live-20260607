@@ -46,7 +46,7 @@ export const superList = createServerFn({ method: "POST" })
     const admin = await assertSuper(context);
     if (data.entity === "users") {
       const { data: users } = await admin.auth.admin.listUsers({ perPage: data.limit });
-      return users?.users?.map((u) => ({ id: u.id, email: u.email, created_at: u.created_at, banned_until: (u as any).banned_until })) ?? [];
+      return users?.users?.map((u: any) => ({ id: u.id, email: u.email, created_at: u.created_at, banned_until: u.banned_until })) ?? [];
     }
     const { data: rows, error } = await admin.from(data.entity).select("*").order("created_at", { ascending: false }).limit(data.limit);
     if (error) throw error;
