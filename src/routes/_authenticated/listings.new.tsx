@@ -50,6 +50,10 @@ function NewListing() {
   const [currency, setCurrency] = useState("EGP");
 
   const [commission, setCommission] = useState("5");
+  const [propertySubtype, setPropertySubtype] = useState("");
+  const [areaSqm, setAreaSqm] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+  const [bathrooms, setBathrooms] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -132,6 +136,10 @@ function NewListing() {
           images,
           video_url: null,
           pdf_url: pdf_url || null,
+          property_subtype: propertySubtype || null,
+          area_sqm: areaSqm ? Number(areaSqm) : null,
+          bedrooms: bedrooms ? Number(bedrooms) : null,
+          bathrooms: bathrooms ? Number(bathrooms) : null,
         } as never,
       });
       toast.success(t("listing_published"));
@@ -200,6 +208,33 @@ function NewListing() {
                 </Select>
               </Field>
             </div>
+            {(type === "real_estate" || type === "land") && (
+              <div className="grid sm:grid-cols-4 gap-4">
+                <Field label={locale === "ar" ? "النوع الفرعي" : "Subtype"}>
+                  <select value={propertySubtype} onChange={(e) => setPropertySubtype(e.target.value)}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="">—</option>
+                    {(type === "real_estate"
+                      ? [["apartment","شقة","Apartment"],["villa","فيلا","Villa"],["shop","محل","Shop"],["office","مكتب","Office"],["warehouse","مخزن","Warehouse"]]
+                      : [["agricultural","زراعية","Agricultural"],["industrial","صناعية","Industrial"],["investment","استثمارية","Investment"],["building","بناء","Building"]]
+                    ).map(([v, ar, en]) => <option key={v} value={v}>{locale === "ar" ? ar : en}</option>)}
+                  </select>
+                </Field>
+                <Field label={locale === "ar" ? "المساحة (م²)" : "Area (m²)"}>
+                  <Input type="number" min="0" value={areaSqm} onChange={(e) => setAreaSqm(e.target.value)} />
+                </Field>
+                {type === "real_estate" && (
+                  <>
+                    <Field label={locale === "ar" ? "غرف النوم" : "Bedrooms"}>
+                      <Input type="number" min="0" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
+                    </Field>
+                    <Field label={locale === "ar" ? "الحمامات" : "Bathrooms"}>
+                      <Input type="number" min="0" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
+                    </Field>
+                  </>
+                )}
+              </div>
+            )}
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label={`${t("field_title")} (AR)`} required>
                 <Input dir="rtl" required maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} />

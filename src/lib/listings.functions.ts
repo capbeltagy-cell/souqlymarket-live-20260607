@@ -27,6 +27,10 @@ export const createListing = createServerFn({ method: "POST" })
       video_url: z.string().url().optional().nullable(),
       pdf_url: z.string().url().optional().nullable(),
       commission_percentage: z.number().min(0).max(100).default(5),
+      property_subtype: z.string().max(40).optional().nullable(),
+      area_sqm: z.number().nonnegative().optional().nullable(),
+      bedrooms: z.number().int().nonnegative().optional().nullable(),
+      bathrooms: z.number().int().nonnegative().optional().nullable(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -72,6 +76,10 @@ export const createListing = createServerFn({ method: "POST" })
         video_url: data.video_url,
         pdf_url: data.pdf_url,
         commission_percentage: data.commission_percentage,
+        property_subtype: data.property_subtype ?? null,
+        area_sqm: data.area_sqm ?? null,
+        bedrooms: data.bedrooms ?? null,
+        bathrooms: data.bathrooms ?? null,
         status: "approved", // auto-approve for beta; admin can flip later
       })
       .select("id")
