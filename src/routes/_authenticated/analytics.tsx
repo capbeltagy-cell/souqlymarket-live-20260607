@@ -49,10 +49,11 @@ function Analytics() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Stat icon={Eye} label={ar ? "المشاهدات" : "Views"} value={totals.views} />
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <Stat icon={Eye} label={ar ? "المشاهدات" : "Listing views"} value={totals.views} />
         <Stat icon={MousePointerClick} label={ar ? "النقرات" : "Clicks"} value={totals.clicks} />
-        <Stat icon={Inbox} label={ar ? "الطلبات الواردة" : "Leads received"} value={totals.leads} />
+        <Stat icon={Inbox} label={ar ? "الطلبات الواردة" : "Lead count"} value={totals.leads} />
+        <Stat icon={BadgeCheck} label={ar ? "طلبات الوكلاء" : "Agent applications"} value={totals.agentApplications} />
         <Stat icon={TrendingUp} label={ar ? "معدل التحويل" : "Conversion rate"} value={`${totals.conversionRate}%`} />
       </div>
 
