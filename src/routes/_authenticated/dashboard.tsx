@@ -252,6 +252,7 @@ function AdminDash({ counts }: { counts: Counts }) {
         <Button asChild variant="outline" className="gap-2"><Link to="/verification"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/admin-companies"><Crown className="h-4 w-4" />Companies</Link></Button>
         <Button asChild variant="outline"><Link to="/marketplace">{t("nav_marketplace")}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/admin-revenue"><DollarSign className="h-4 w-4" />Revenue</Link></Button>
       </div>
     </>
   );
