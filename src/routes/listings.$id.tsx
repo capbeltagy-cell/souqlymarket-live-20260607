@@ -153,7 +153,7 @@ function ListingDetail() {
     if (!selectedRef || !amount) return;
     setSubmitting(true);
     try {
-      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "USD" } });
+      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "EGP" } });
       toast.success(t("convert_success"));
       setAmount(""); setSelectedRef("");
       const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
