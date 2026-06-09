@@ -65,6 +65,7 @@ function NewListing() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [forceDup, setForceDup] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -81,7 +82,9 @@ function NewListing() {
         if (sub.hasCompany && !sub.isPaid && sub.listingsCount >= sub.listingLimit) {
           navigate({ to: "/subscribe" });
         }
-      } catch { /* noop */ }
+      } catch (e) {
+        setPlanError((e as Error).message || "Could not load plan");
+      }
     })();
   }, [user, fetchPlan, fetchSub, navigate]);
 
@@ -351,11 +354,11 @@ function NewListing() {
               </div>
             )}
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={`${t("field_title")} (AR)`} required>
-                <Input dir="rtl" required maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} />
+              <Field label={`${t("field_title")} (AR)`}>
+                <Input dir="rtl" maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
               </Field>
-              <Field label={`${t("field_title")} (EN)`} required>
-                <Input required maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} />
+              <Field label={`${t("field_title")} (EN)`}>
+                <Input maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
               </Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -489,9 +492,16 @@ function NewListing() {
             </div>
 
             <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-card/95 backdrop-blur border-t border-border sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:pt-2">
-              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
+              {planError && (
+                <div className="mb-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                  {planError}
+                </div>
+              )}
+              <Button type="submit" disabled={submitting || uploading} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
                 {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                {locale === "ar" ? "نشر الإعلان" : t("submit_listing")}
+                {uploading
+                  ? (locale === "ar" ? "جارٍ رفع الملفات…" : "Uploading files…")
+                  : (locale === "ar" ? "نشر الإعلان" : t("submit_listing"))}
               </Button>
             </div>
           </form>
