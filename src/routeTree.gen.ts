@@ -251,9 +251,9 @@ const FactoriesIdRoute = FactoriesIdRouteImport.update({
   getParentRoute: () => FactoriesRoute,
 } as any)
 const CompaniesIdRoute = CompaniesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => CompaniesRoute,
+  id: '/companies/$id',
+  path: '/companies/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   id: '/$slug',
@@ -855,6 +855,7 @@ export interface RootRouteChildren {
   TendersRoute: typeof TendersRouteWithChildren
   TermsRoute: typeof TermsRoute
   WholesaleRoute: typeof WholesaleRouteWithChildren
+  CompaniesIdRoute: typeof CompaniesIdRoute
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
@@ -1109,10 +1110,10 @@ declare module '@tanstack/react-router' {
     }
     '/companies/$id': {
       id: '/companies/$id'
-      path: '/$id'
+      path: '/companies/$id'
       fullPath: '/companies/$id'
       preLoaderRoute: typeof CompaniesIdRouteImport
-      parentRoute: typeof CompaniesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/categories/$slug': {
       id: '/categories/$slug'
@@ -1497,6 +1498,7 @@ const rootRouteChildren: RootRouteChildren = {
   TendersRoute: TendersRouteWithChildren,
   TermsRoute: TermsRoute,
   WholesaleRoute: WholesaleRouteWithChildren,
+  CompaniesIdRoute: CompaniesIdRoute,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
