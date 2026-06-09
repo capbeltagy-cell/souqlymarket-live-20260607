@@ -350,16 +350,34 @@ function NewListing() {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={t("field_latitude")} required>
-                <Input readOnly value={latitude} placeholder={t("field_latitude")} />
+              <Field label={locale === "ar" ? "السعر (جنيه)" : "Price (EGP)"}>
+                <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder={locale === "ar" ? "السعر بالجنيه المصري" : "Price in EGP"} />
               </Field>
-              <Field label={t("field_longitude")} required>
-                <Input readOnly value={longitude} placeholder={t("field_longitude")} />
+              <Field label={t("field_commission")}>
+                <Input type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
               </Field>
             </div>
 
-            <div className="pt-2">
-              <div className="mb-3 text-sm text-muted-foreground">{t("click_map_to_set_location")}</div>
+            <div className="pt-2 space-y-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="text-sm font-semibold">
+                  {locale === "ar" ? "الموقع على الخريطة (اختياري)" : "Map location (optional)"}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                  {locale === "ar" ? "استخدم موقعي الحالي" : "Use my current location"}
+                </Button>
+              </div>
+              {!latitude || !longitude ? (
+                <div className="rounded-md border border-warning/40 bg-warning/10 p-3 text-xs text-foreground">
+                  {locale === "ar"
+                    ? "إضافة الموقع على الخريطة تزيد ثقة الإعلان وتساعد العملاء على الوصول إليك"
+                    : "Adding map location boosts trust and helps customers reach you"}
+                </div>
+              ) : (
+                <div className="text-xs text-muted-foreground">
+                  {locale === "ar" ? "الإحداثيات" : "Coordinates"}: {latitude}, {longitude}
+                </div>
+              )}
               <MapView
                 markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title: locale === "ar" ? title_ar : title_en || title_ar, description: [city, governorate, country].filter(Boolean).join(" · ") }] : []}
                 center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
@@ -370,18 +388,6 @@ function NewListing() {
                 }}
                 className="mb-4"
               />
-            </div>
-
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Field label={t("field_price")}>
-                <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
-              </Field>
-              <Field label="Currency">
-                <Input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={4} />
-              </Field>
-              <Field label={t("field_commission")} required>
-                <Input required type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
-              </Field>
             </div>
 
             <div className="space-y-2">
@@ -407,9 +413,10 @@ function NewListing() {
               </Field>
             </div>
 
-            <div className="pt-2">
-              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="bg-primary hover:bg-primary-hover">
-                {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("submit_listing")}
+            <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-card/95 backdrop-blur border-t border-border sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:pt-2">
+              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
+                {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                {locale === "ar" ? "نشر الإعلان" : t("submit_listing")}
               </Button>
             </div>
           </form>
