@@ -81,14 +81,21 @@ function MapPage() {
     [city, governorate, listings, typeFilter],
   );
 
-  const markers = filtered.map((item) => ({
-    id: item.id,
-    lat: item.latitude ?? 0,
-    lng: item.longitude ?? 0,
-    type: item.type,
-    title: locale === "ar" ? item.title_ar ?? item.title_en ?? "" : item.title_en ?? item.title_ar ?? "",
-    description: [item.city, item.governorate, item.country].filter(Boolean).join(" · "),
-  }));
+  const markers = filtered.map((item) => {
+    const loc = [
+      translateEgyptCity(item.city, locale) ?? item.city,
+      translateEgyptGovernorate(item.governorate, locale) ?? item.governorate,
+    ].filter(Boolean).join(" · ");
+    const priceLabel = item.price && item.price > 0 ? ` • ${formatPrice(item.price, locale)}` : "";
+    return {
+      id: item.id,
+      lat: item.latitude ?? 0,
+      lng: item.longitude ?? 0,
+      type: item.type,
+      title: locale === "ar" ? item.title_ar ?? item.title_en ?? "" : item.title_en ?? item.title_ar ?? "",
+      description: `${loc}${priceLabel}`,
+    };
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
