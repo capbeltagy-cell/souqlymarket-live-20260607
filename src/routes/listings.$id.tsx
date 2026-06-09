@@ -211,6 +211,14 @@ function ListingDetail() {
                 {company?.is_verified && <TrustBadge kind="verified_company" />}
                 {company?.is_premium && <TrustBadge kind="premium_company" />}
                 {isOwner && <TrustBadge kind="owner" />}
+                {hasLive && (
+                  <Badge className="bg-success/15 text-success border border-success/30">
+                    {ar ? "موثق بالتصوير المباشر" : "Verified live photo"}
+                  </Badge>
+                )}
+                {!hasLive && hasUploaded && (
+                  <Badge variant="outline">{ar ? "صورة مرفوعة" : "Uploaded photo"}</Badge>
+                )}
               </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
