@@ -50,6 +50,10 @@ function NewListing() {
   const [currency, setCurrency] = useState("EGP");
 
   const [commission, setCommission] = useState("5");
+  const [propertySubtype, setPropertySubtype] = useState("");
+  const [areaSqm, setAreaSqm] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+  const [bathrooms, setBathrooms] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
