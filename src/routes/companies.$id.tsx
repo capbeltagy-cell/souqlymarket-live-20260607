@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BadgeCheck, MapPin, Mail, Globe } from "lucide-react";
+import { MapPin, Mail, Globe, Phone, MessageCircle } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
+import { TrustBadge, profileCompletion } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
@@ -41,7 +43,8 @@ type Company = {
   description_ar: string | null; description_en: string | null;
   industry: string | null; country: string | null; city: string | null;
   email: string | null; website: string | null; phone: string | null;
-  logo_url: string | null; cover_url: string | null; is_verified: boolean;
+  logo_url: string | null; cover_url: string | null;
+  is_verified: boolean; is_premium: boolean | null;
 };
 
 function CompanyProfile() {
