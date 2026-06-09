@@ -17,10 +17,12 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as RealEstateRouteImport } from './routes/real-estate'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as LandsRouteImport } from './routes/lands'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -110,6 +112,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RealEstateRoute = RealEstateRouteImport.update({
+  id: '/real-estate',
+  path: '/real-estate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -128,6 +135,11 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandsRoute = LandsRouteImport.update({
+  id: '/lands',
+  path: '/lands',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -393,10 +405,12 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/lands': typeof LandsRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
@@ -454,10 +468,12 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/lands': typeof LandsRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
@@ -517,10 +533,12 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/lands': typeof LandsRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
@@ -580,10 +598,12 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/lands'
     | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
+    | '/real-estate'
     | '/refund-policy'
     | '/reset-password'
     | '/rfq'
@@ -641,10 +661,12 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/lands'
     | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
+    | '/real-estate'
     | '/refund-policy'
     | '/reset-password'
     | '/rfq'
@@ -703,10 +725,12 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/lands'
     | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
+    | '/real-estate'
     | '/refund-policy'
     | '/reset-password'
     | '/rfq'
@@ -766,10 +790,12 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  LandsRoute: typeof LandsRoute
   MapRoute: typeof MapRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  RealEstateRoute: typeof RealEstateRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RfqRoute: typeof RfqRouteWithChildren
@@ -840,6 +866,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/real-estate': {
+      id: '/real-estate'
+      path: '/real-estate'
+      fullPath: '/real-estate'
+      preLoaderRoute: typeof RealEstateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -866,6 +899,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lands': {
+      id: '/lands'
+      path: '/lands'
+      fullPath: '/lands'
+      preLoaderRoute: typeof LandsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -1370,10 +1410,12 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
+  LandsRoute: LandsRoute,
   MapRoute: MapRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  RealEstateRoute: RealEstateRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RfqRoute: RfqRouteWithChildren,
