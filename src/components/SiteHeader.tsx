@@ -26,6 +26,8 @@ export function SiteHeader() {
 
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Link to="/marketplace" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_marketplace")}</Link>
+          <Link to="/real-estate" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">عقارات</Link>
+          <Link to="/lands" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">أراضي</Link>
           <Link to="/wholesale" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">سوق الجملة</Link>
           <Link to="/factories" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">المصانع</Link>
           <Link to="/rfq" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">طلبات الأسعار</Link>
