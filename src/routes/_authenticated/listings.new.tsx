@@ -354,11 +354,11 @@ function NewListing() {
               </div>
             )}
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={`${t("field_title")} (AR)`} required>
-                <Input dir="rtl" required maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} />
+              <Field label={`${t("field_title")} (AR)`}>
+                <Input dir="rtl" maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
               </Field>
-              <Field label={`${t("field_title")} (EN)`} required>
-                <Input required maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} />
+              <Field label={`${t("field_title")} (EN)`}>
+                <Input maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
               </Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
