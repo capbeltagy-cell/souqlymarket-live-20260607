@@ -78,6 +78,10 @@ function ProfilePage() {
               <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
             </div>
             <div className="space-y-2">
+              <Label>{t("profile_display_name")}</Label>
+              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder={fullName} />
+            </div>
+            <div className="space-y-2">
               <Label>{t("profile_phone")}</Label>
               <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
