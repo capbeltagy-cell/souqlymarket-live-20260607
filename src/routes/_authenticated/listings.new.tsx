@@ -47,7 +47,6 @@ function NewListing() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState("EGP");
 
   const [commission, setCommission] = useState("5");
   const [propertySubtype, setPropertySubtype] = useState("");
@@ -112,30 +111,39 @@ function NewListing() {
     e.preventDefault();
     if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
     if (atLimit) { navigate({ to: "/subscribe" }); return; }
+
+    if (!title_ar.trim() && !title_en.trim()) {
+      toast.error(locale === "ar" ? "من فضلك أدخل عنوان الإعلان" : "Please enter a title");
+      return;
+    }
+    if (!governorate) {
+      toast.error(locale === "ar" ? "اختر المحافظة" : "Select a governorate");
+      return;
+    }
+    if (!city) {
+      toast.error(locale === "ar" ? "اختر المدينة" : "Select a city");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      if (!latitude || !longitude) {
-        toast.error(t("select_location_on_map"));
-        setSubmitting(false);
-        return;
-      }
       const res = await create({
         data: {
           type,
-          title_ar,
-          title_en,
+          title_ar: title_ar || title_en,
+          title_en: title_en || title_ar,
           description_ar: description_ar || null,
           description_en: description_en || null,
           country: country || null,
           city,
           governorate,
           location: [city, governorate, country].filter(Boolean).join(" · ") || null,
-          latitude: Number(latitude),
-          longitude: Number(longitude),
+          latitude: latitude ? Number(latitude) : null,
+          longitude: longitude ? Number(longitude) : null,
           category: null,
           price: price ? Number(price) : null,
-          currency,
-          commission_percentage: Number(commission),
+          currency: "EGP",
+          commission_percentage: Number(commission || 5),
           images,
           video_url: null,
           pdf_url: pdf_url || null,
@@ -148,14 +156,33 @@ function NewListing() {
           address_line: addressLine || null,
         } as never,
       });
-      toast.success(t("listing_published"));
-      navigate({ to: "/listings/$id", params: { id: res.id } });
+      toast.success(locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully");
+      try {
+        await navigate({ to: "/listings/$id", params: { id: res.id } });
+      } catch {
+        await navigate({ to: "/marketplace" });
+      }
     } catch (e) {
       const msg = (e as Error).message;
       if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
-      else { toast.error(msg); }
+      else { toast.error(msg || (locale === "ar" ? "تعذّر نشر الإعلان" : "Could not publish listing")); }
     }
     finally { setSubmitting(false); }
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error(locale === "ar" ? "الموقع غير مدعوم في المتصفح" : "Geolocation not supported");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(pos.coords.latitude.toFixed(6));
+        setLongitude(pos.coords.longitude.toFixed(6));
+        toast.success(locale === "ar" ? "تم تحديد موقعك" : "Location set");
+      },
+      () => toast.error(locale === "ar" ? "تعذّر الحصول على الموقع" : "Could not get location"),
+    );
   };
 
 
@@ -323,16 +350,34 @@ function NewListing() {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={t("field_latitude")} required>
-                <Input readOnly value={latitude} placeholder={t("field_latitude")} />
+              <Field label={locale === "ar" ? "السعر (جنيه)" : "Price (EGP)"}>
+                <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder={locale === "ar" ? "السعر بالجنيه المصري" : "Price in EGP"} />
               </Field>
-              <Field label={t("field_longitude")} required>
-                <Input readOnly value={longitude} placeholder={t("field_longitude")} />
+              <Field label={t("field_commission")}>
+                <Input type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
               </Field>
             </div>
 
-            <div className="pt-2">
-              <div className="mb-3 text-sm text-muted-foreground">{t("click_map_to_set_location")}</div>
+            <div className="pt-2 space-y-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="text-sm font-semibold">
+                  {locale === "ar" ? "الموقع على الخريطة (اختياري)" : "Map location (optional)"}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                  {locale === "ar" ? "استخدم موقعي الحالي" : "Use my current location"}
+                </Button>
+              </div>
+              {!latitude || !longitude ? (
+                <div className="rounded-md border border-warning/40 bg-warning/10 p-3 text-xs text-foreground">
+                  {locale === "ar"
+                    ? "إضافة الموقع على الخريطة تزيد ثقة الإعلان وتساعد العملاء على الوصول إليك"
+                    : "Adding map location boosts trust and helps customers reach you"}
+                </div>
+              ) : (
+                <div className="text-xs text-muted-foreground">
+                  {locale === "ar" ? "الإحداثيات" : "Coordinates"}: {latitude}, {longitude}
+                </div>
+              )}
               <MapView
                 markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title: locale === "ar" ? title_ar : title_en || title_ar, description: [city, governorate, country].filter(Boolean).join(" · ") }] : []}
                 center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
@@ -343,18 +388,6 @@ function NewListing() {
                 }}
                 className="mb-4"
               />
-            </div>
-
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Field label={t("field_price")}>
-                <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
-              </Field>
-              <Field label="Currency">
-                <Input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={4} />
-              </Field>
-              <Field label={t("field_commission")} required>
-                <Input required type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
-              </Field>
             </div>
 
             <div className="space-y-2">
@@ -380,9 +413,10 @@ function NewListing() {
               </Field>
             </div>
 
-            <div className="pt-2">
-              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="bg-primary hover:bg-primary-hover">
-                {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("submit_listing")}
+            <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-card/95 backdrop-blur border-t border-border sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:pt-2">
+              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
+                {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                {locale === "ar" ? "نشر الإعلان" : t("submit_listing")}
               </Button>
             </div>
           </form>
