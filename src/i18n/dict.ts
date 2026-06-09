@@ -540,7 +540,14 @@ export const dict = {
     seo_listing_default: "Professional B2B listing on Souqly",
     favorited: "Added to favorites",
     unfavorited: "Removed from favorites",
+    field_governorate: "Governorate",
+    active_listings: "Active listings",
+    pro_agents: "Pro agents",
+    featured_items: "Featured items",
+    success: "Success",
+    select_location_on_map: "Pick location on map",
   },
+
 
 
 
