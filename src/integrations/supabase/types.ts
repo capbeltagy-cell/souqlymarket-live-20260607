@@ -601,6 +601,9 @@ export type Database = {
       }
       listings: {
         Row: {
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
           category: string | null
           city: string | null
           clicks_count: number
@@ -622,6 +625,7 @@ export type Database = {
           longitude: number | null
           pdf_url: string | null
           price: number | null
+          property_subtype: string | null
           status: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -631,6 +635,9 @@ export type Database = {
           views_count: number
         }
         Insert: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
           category?: string | null
           city?: string | null
           clicks_count?: number
@@ -652,6 +659,7 @@ export type Database = {
           longitude?: number | null
           pdf_url?: string | null
           price?: number | null
+          property_subtype?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -661,6 +669,9 @@ export type Database = {
           views_count?: number
         }
         Update: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
           category?: string | null
           city?: string | null
           clicks_count?: number
@@ -682,6 +693,7 @@ export type Database = {
           longitude?: number | null
           pdf_url?: string | null
           price?: number | null
+          property_subtype?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar?: string
           title_en?: string
