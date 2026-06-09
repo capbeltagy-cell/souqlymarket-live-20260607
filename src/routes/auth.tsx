@@ -122,6 +122,14 @@ function AuthPage() {
                     <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="mt-1.5" />
                   </div>
                   <div>
+                    <Label htmlFor="display">{t("auth_display_name")}</Label>
+                    <Input id="display" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="mt-1.5" placeholder={fullName || ""} />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">{t("auth_phone")}</Label>
+                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5" placeholder={t("auth_phone_hint")} />
+                  </div>
+                  <div>
                     <Label>{t("auth_role")}</Label>
                     <RadioGroup value={role} onValueChange={(v) => setRole(v as "company" | "agent")} className="grid grid-cols-2 gap-2 mt-1.5">
                       <label className={`flex items-center gap-2 rounded-md border p-3 cursor-pointer ${role === "company" ? "border-primary bg-primary/5" : "border-border"}`}>
