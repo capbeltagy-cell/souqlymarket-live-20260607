@@ -109,7 +109,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
