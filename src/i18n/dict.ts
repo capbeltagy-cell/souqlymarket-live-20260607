@@ -481,6 +481,9 @@ export const dict = {
     company_updated: "Company profile updated",
     field_industry: "Industry",
     field_city: "City",
+    field_latitude: "Latitude",
+    field_longitude: "Longitude",
+
     field_images: "Images",
     field_video: "Video",
     field_pdf: "PDF",
