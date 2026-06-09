@@ -243,8 +243,9 @@ function ListingDetail() {
           <aside className="space-y-4">
             <div className="rounded-xl border border-border bg-card p-6 shadow-card sticky top-20">
               {l.price && l.price > 0 && (
-                <div className="text-3xl font-bold text-primary mb-1">{l.currency ?? "USD"} {l.price.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-primary mb-1">{formatPrice(l.price, locale)}</div>
               )}
+
               <div className="flex items-center gap-1 text-sm text-success font-medium mb-4">
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
