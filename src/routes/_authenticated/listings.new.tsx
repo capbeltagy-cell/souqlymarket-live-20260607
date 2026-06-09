@@ -65,6 +65,7 @@ function NewListing() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [forceDup, setForceDup] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -81,7 +82,9 @@ function NewListing() {
         if (sub.hasCompany && !sub.isPaid && sub.listingsCount >= sub.listingLimit) {
           navigate({ to: "/subscribe" });
         }
-      } catch { /* noop */ }
+      } catch (e) {
+        setPlanError((e as Error).message || "Could not load plan");
+      }
     })();
   }, [user, fetchPlan, fetchSub, navigate]);
 
