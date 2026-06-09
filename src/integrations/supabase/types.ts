@@ -558,6 +558,9 @@ export type Database = {
           images: string[] | null
           leads_count: number
           location: string | null
+          governorate: string | null
+          latitude: number | null
+          longitude: number | null
           pdf_url: string | null
           price: number | null
           status: Database["public"]["Enums"]["listing_status"]
@@ -585,6 +588,9 @@ export type Database = {
           images?: string[] | null
           leads_count?: number
           location?: string | null
+          governorate?: string | null
+          latitude?: number | null
+          longitude?: number | null
           pdf_url?: string | null
           price?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -612,6 +618,9 @@ export type Database = {
           images?: string[] | null
           leads_count?: number
           location?: string | null
+          governorate?: string | null
+          latitude?: number | null
+          longitude?: number | null
           pdf_url?: string | null
           price?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -1201,7 +1210,10 @@ export type Database = {
         | "real_estate"
         | "land"
         | "factory"
+        | "company"
         | "opportunity"
+        | "market"
+        | "fish_shed"
       subscription_plan: "free" | "premium_company" | "premium_agent"
     }
     CompositeTypes: {
@@ -1340,7 +1352,10 @@ export const Constants = {
         "real_estate",
         "land",
         "factory",
+        "company",
         "opportunity",
+        "market",
+        "fish_shed",
       ],
       subscription_plan: ["free", "premium_company", "premium_agent"],
     },

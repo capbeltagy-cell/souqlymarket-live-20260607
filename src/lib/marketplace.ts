@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/dict";
 import { supabase } from "@/integrations/supabase/client";
 
-export const LISTING_TYPES = ["product", "service", "real_estate", "land", "factory", "opportunity"] as const;
+export const LISTING_TYPES = ["product", "service", "real_estate", "land", "factory", "company", "opportunity", "market", "fish_shed"] as const;
 export type ListingType = (typeof LISTING_TYPES)[number];
 
 export function publicMediaUrl(bucket: string, path: string | null | undefined): string | null {

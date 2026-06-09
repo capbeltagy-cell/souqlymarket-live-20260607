@@ -10,11 +10,13 @@ import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
+import { MapView } from "@/components/MapView";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
+import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 
 export const Route = createFileRoute("/listings/$id")({
   loader: async ({ params }) => {
@@ -53,7 +55,8 @@ type Listing = {
   description_ar: string | null; description_en: string | null;
   images: string[] | null; video_url: string | null; pdf_url: string | null;
   price: number | null; currency: string | null;
-  country: string | null; city: string | null;
+  country: string | null; city: string | null; governorate: string | null;
+  latitude: number | null; longitude: number | null;
   commission_percentage: number | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
@@ -101,7 +104,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, city, commission_percentage, featured, featured_until, views_count, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, featured, featured_until, views_count, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
@@ -208,11 +211,26 @@ function ListingDetail() {
                     {company.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}{companyName}
                   </Link>
                 )}
-                {(l.city || l.country) && (
-                  <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{[l.city, l.country].filter(Boolean).join(", ")}</span>
+                {(l.city || l.governorate || l.country) && (
+                  <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{
+                    [
+                      translateEgyptCity(l.city, locale) ?? l.city,
+                      translateEgyptGovernorate(l.governorate, locale) ?? l.governorate,
+                      l.country,
+                    ].filter(Boolean).join(", ")
+                  }</span>
                 )}
               </div>
             </div>
+            {l.latitude !== null && l.longitude !== null && (
+              <div className="rounded-xl overflow-hidden border border-border bg-card mb-4">
+                <MapView
+                  markers={[{ id: l.id, lat: l.latitude, lng: l.longitude, type: l.type as any, title, description: [translateEgyptCity(l.city, locale) ?? l.city, translateEgyptGovernorate(l.governorate, locale) ?? l.governorate, l.country].filter(Boolean).join(" · ") }]}
+                  center={[l.latitude, l.longitude]}
+                  zoom={13}
+                />
+              </div>
+            )}
             <div className="prose max-w-none text-foreground">
               <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{desc || "—"}</p>
             </div>

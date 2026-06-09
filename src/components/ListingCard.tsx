@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,8 @@ export type ListingCardData = {
   price: number | null;
   currency: string | null;
   country: string | null;
+  city?: string | null;
+  governorate?: string | null;
   commission_percentage: number | null;
   featured?: boolean | null;
   featured_until?: string | null;
@@ -31,7 +34,10 @@ const typeKey: Record<ListingType, string> = {
   real_estate: "cat_real_estate",
   land: "cat_land",
   factory: "cat_factory",
+  company: "cat_company",
   opportunity: "cat_opportunity",
+  market: "cat_market",
+  fish_shed: "cat_fish_shed",
 };
 
 const placeholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%23e2e8f0'/></svg>";
@@ -96,6 +102,17 @@ export function ListingCard({ l }: { l: ListingCardData }) {
               {t("by_company")} {company}
             </p>
           )}
+        {(l.city || l.governorate || l.country) && (
+          <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
+            <MapPin className="h-3 w-3" />{
+              [
+                translateEgyptCity(l.city, locale) ?? l.city,
+                translateEgyptGovernorate(l.governorate, locale) ?? l.governorate,
+                l.country,
+              ].filter(Boolean).join(", ")
+            }
+          </p>
+        )}
         </div>
         <div className="flex items-center justify-between text-xs">
           <span className="flex items-center gap-1 text-muted-foreground">

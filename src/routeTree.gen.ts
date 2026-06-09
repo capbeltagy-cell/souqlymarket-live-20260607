@@ -20,6 +20,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -119,6 +120,11 @@ const PricingRoute = PricingRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -368,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -425,6 +432,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -484,6 +492,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -543,6 +552,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
@@ -600,6 +610,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/how-it-works'
+    | '/map'
     | '/marketplace'
     | '/pricing'
     | '/privacy'
@@ -717,6 +729,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  MapRoute: typeof MapRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -809,6 +822,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -1286,6 +1306,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
+  MapRoute: MapRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -1303,3 +1324,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getCityVariants, getGovernorateVariants } from "@/lib/egypt.locations";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const T = (s: string) => s as any; // bypass generated types for new tables
@@ -509,8 +510,16 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin.from("companies").select("*").limit(200);
     if (data.q) q = q.or(`name_ar.ilike.%${data.q}%,name_en.ilike.%${data.q}%`);
-    if (data.city) q = q.eq("city", data.city);
-    if (data.governorate) q = q.eq("governorate", data.governorate);
+    if (data.city) {
+      const cityValues = getCityVariants(data.city);
+      if (cityValues.length === 1) q = q.eq("city", cityValues[0]);
+      else q = q.in("city", cityValues);
+    }
+    if (data.governorate) {
+      const governorateValues = getGovernorateVariants(data.governorate);
+      if (governorateValues.length === 1) q = q.eq("governorate", governorateValues[0]);
+      else q = q.in("governorate", governorateValues);
+    }
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     if (data.company_type) q = q.eq("company_type", data.company_type);
     if (typeof data.verified === "boolean") q = q.eq("is_verified", data.verified);

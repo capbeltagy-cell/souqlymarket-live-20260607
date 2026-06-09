@@ -17,8 +17,10 @@ import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import { getMyPlan } from "@/lib/billing.functions";
 import { getMyCompanySubscription } from "@/lib/subscription.functions";
 import { createListing } from "@/lib/listings.functions";
+import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { MapView } from "@/components/MapView";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
   head: () => ({ meta: [{ title: "New Listing — Souqly" }] }),
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/listings/new")({
 });
 
 function NewListing() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchPlan = useServerFn(getMyPlan);
@@ -39,13 +41,15 @@ function NewListing() {
   const [title_en, setTitleEn] = useState("");
   const [description_ar, setDescAr] = useState("");
   const [description_en, setDescEn] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("Egypt");
   const [city, setCity] = useState("");
+  const [governorate, setGovernorate] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [commission, setCommission] = useState("5");
   const [images, setImages] = useState<string[]>([]);
-  const [video_url, setVideo] = useState("");
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -91,10 +95,6 @@ function NewListing() {
     const url = await uploadFile(file, "image");
     if (url) setImages((prev) => [...prev, url]);
   };
-  const onVideoUpload = async (file: File) => {
-    const url = await uploadFile(file, "video");
-    if (url) setVideo(url);
-  };
   const onPdfUpload = async (file: File) => {
     const url = await uploadFile(file, "pdf");
     if (url) setPdf(url);
@@ -106,21 +106,30 @@ function NewListing() {
     if (atLimit) { navigate({ to: "/subscribe" }); return; }
     setSubmitting(true);
     try {
+      if (!latitude || !longitude) {
+        toast.error(t("select_location_on_map"));
+        setSubmitting(false);
+        return;
+      }
       const res = await create({
         data: {
           type,
-          title_ar, title_en,
+          title_ar,
+          title_en,
           description_ar: description_ar || null,
           description_en: description_en || null,
           country: country || null,
-          city: city || null,
-          location: null,
+          city,
+          governorate,
+          location: [city, governorate, country].filter(Boolean).join(" · ") || null,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
           category: null,
           price: price ? Number(price) : null,
           currency,
           commission_percentage: Number(commission),
           images,
-          video_url: video_url || null,
+          video_url: null,
           pdf_url: pdf_url || null,
         } as never,
       });
@@ -178,7 +187,7 @@ function NewListing() {
           )}
 
           <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-1 gap-4">
               <Field label={t("field_type")}>
                 <Select value={type} onValueChange={(v) => setType(v as ListingType)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -188,9 +197,6 @@ function NewListing() {
                     ))}
                   </SelectContent>
                 </Select>
-              </Field>
-              <Field label={t("field_country")}>
-                <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Saudi Arabia" />
               </Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -209,6 +215,70 @@ function NewListing() {
                 <Textarea rows={4} value={description_en} onChange={(e) => setDescEn(e.target.value)} />
               </Field>
             </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Field label={t("field_country")} required>
+                <Input value={country} readOnly />
+              </Field>
+              <Field label={t("field_governorate")} required>
+                <select
+                  required
+                  value={governorate}
+                  onChange={(e) => {
+                    setGovernorate(e.target.value);
+                    setCity("");
+                    if (!country) setCountry("Egypt");
+                  }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">{t("field_governorate")}</option>
+                  {EGYPT_GOVERNORATES.map((gov) => (
+                    <option key={gov.value} value={gov.value}>
+                      {locale === "ar" ? gov.label_ar : gov.label_en}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label={t("field_city")} required>
+                <select
+                  required
+                  disabled={!governorate}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">{t("field_city")}</option>
+                  {getCitiesForGovernorate(governorate).map((ct) => (
+                    <option key={ct.value} value={ct.value}>
+                      {locale === "ar" ? ct.label_ar : ct.label_en}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label={t("field_latitude")} required>
+                <Input readOnly value={latitude} placeholder={t("field_latitude")} />
+              </Field>
+              <Field label={t("field_longitude")} required>
+                <Input readOnly value={longitude} placeholder={t("field_longitude")} />
+              </Field>
+            </div>
+
+            <div className="pt-2">
+              <div className="mb-3 text-sm text-muted-foreground">{t("click_map_to_set_location")}</div>
+              <MapView
+                markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title: locale === "ar" ? title_ar : title_en || title_ar, description: [city, governorate, country].filter(Boolean).join(" · ") }] : []}
+                center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
+                zoom={latitude && longitude ? 12 : 6}
+                onMapClick={(coords) => {
+                  setLatitude(coords.lat.toFixed(6));
+                  setLongitude(coords.lng.toFixed(6));
+                }}
+                className="mb-4"
+              />
+            </div>
+
             <div className="grid sm:grid-cols-3 gap-4">
               <Field label={t("field_price")}>
                 <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
@@ -238,11 +308,8 @@ function NewListing() {
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={t("field_video")}>
-                <UploadButton url={video_url} accept="video/*" onChange={onVideoUpload} onClear={() => setVideo("")} />
-              </Field>
-              <Field label={t("field_pdf")}>
+            <div className="grid sm:grid-cols-1 gap-4">
+              <Field label={t("field_pdf") }>
                 <UploadButton url={pdf_url} accept="application/pdf" onChange={onPdfUpload} onClear={() => setPdf("")} />
               </Field>
             </div>

@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nProvider";
 import { advancedSearchCompanies, listCategories } from "@/lib/phase3.functions";
-
-const GOVS = ["القاهرة","الجيزة","الإسكندرية","الشرقية","الدقهلية","القليوبية","المنوفية","الغربية","البحيرة","كفر الشيخ","دمياط","بورسعيد","الإسماعيلية","السويس","شمال سيناء","جنوب سيناء","البحر الأحمر","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","الوادي الجديد","مطروح"];
+import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locations";
 const TYPES = [
   { v: "factory", ar: "مصنع" },
   { v: "supplier", ar: "مورد" },
@@ -24,8 +23,8 @@ function SearchPage() {
   const { locale } = useI18n();
   const ar = locale === "ar";
   const [q, setQ] = useState("");
-  const [city, setCity] = useState("");
-  const [gov, setGov] = useState("");
+  const [city, setCity] = useState("all");
+  const [gov, setGov] = useState("all");
   const [cat, setCat] = useState("");
   const [type, setType] = useState("");
   const [verified, setVerified] = useState<"" | "yes" | "no">("");
@@ -36,12 +35,14 @@ function SearchPage() {
 
   useEffect(() => { listCategories().then((r) => setCats(r.categories)); }, []);
 
+  const cities = gov !== "all" ? getCitiesForGovernorate(gov) : [];
+
   async function run() {
     setLoading(true);
     const r = await advancedSearchCompanies({ data: {
       q: q || undefined,
-      city: city || undefined,
-      governorate: gov || undefined,
+      city: city !== "all" ? city : undefined,
+      governorate: gov !== "all" ? gov : undefined,
       category_slug: cat || undefined,
       company_type: type || undefined,
       verified: verified === "" ? undefined : verified === "yes",
@@ -58,10 +59,22 @@ function SearchPage() {
         <h1 className="text-3xl font-bold mb-6">{ar ? "بحث متقدم" : "Advanced Search"}</h1>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           <Input placeholder={ar ? "اسم الشركة" : "Company name"} value={q} onChange={(e) => setQ(e.target.value)} />
-          <Input placeholder={ar ? "المدينة" : "City"} value={city} onChange={(e) => setCity(e.target.value)} />
-          <select className="h-10 rounded-md border border-input bg-background px-3" value={gov} onChange={(e) => setGov(e.target.value)}>
-            <option value="">{ar ? "كل المحافظات" : "All governorates"}</option>
-            {GOVS.map((g) => <option key={g} value={g}>{g}</option>)}
+          <select className="h-10 rounded-md border border-input bg-background px-3" value={gov} onChange={(e) => { setGov(e.target.value); setCity("all"); }}>
+            <option value="all">{ar ? "كل المحافظات" : "All governorates"}</option>
+            {EGYPT_GOVERNORATES.map((g) => (
+              <option key={g.value} value={g.value}>{ar ? g.label_ar : g.label_en}</option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            disabled={gov === "all"}
+          >
+            <option value="all">{ar ? "كل المدن" : "All cities"}</option>
+            {cities.map((ct) => (
+              <option key={ct.value} value={ct.value}>{ar ? ct.label_ar : ct.label_en}</option>
+            ))}
           </select>
           <select className="h-10 rounded-md border border-input bg-background px-3" value={cat} onChange={(e) => setCat(e.target.value)}>
             <option value="">{ar ? "كل الأقسام" : "All categories"}</option>

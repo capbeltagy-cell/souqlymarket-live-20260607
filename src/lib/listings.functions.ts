@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const LISTING_TYPE = z.enum(["product", "service", "real_estate", "land", "factory", "opportunity"]);
+const LISTING_TYPE = z.enum(["product", "service", "real_estate", "land", "factory", "company", "opportunity", "market", "fish_shed"]);
 
 export const createListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -17,8 +17,11 @@ export const createListing = createServerFn({ method: "POST" })
       price: z.number().nonnegative().nullable(),
       currency: z.string().min(2).max(8).default("USD"),
       country: z.string().max(80).optional().nullable(),
-      city: z.string().max(80).optional().nullable(),
+      city: z.string().trim().min(2).max(80),
+      governorate: z.string().trim().min(2).max(80),
       location: z.string().max(200).optional().nullable(),
+      latitude: z.number().gte(-90).lte(90),
+      longitude: z.number().gte(-180).lte(180),
       images: z.array(z.string()).max(10).default([]),
       video_url: z.string().url().optional().nullable(),
       pdf_url: z.string().url().optional().nullable(),
@@ -60,7 +63,10 @@ export const createListing = createServerFn({ method: "POST" })
         currency: data.currency,
         country: data.country,
         city: data.city,
+        governorate: data.governorate,
         location: data.location,
+        latitude: data.latitude,
+        longitude: data.longitude,
         images: data.images,
         video_url: data.video_url,
         pdf_url: data.pdf_url,
