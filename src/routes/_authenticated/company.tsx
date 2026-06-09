@@ -132,10 +132,10 @@ function CompanyEdit() {
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
             <Field label="Email">
-              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Input type="text" inputMode="email" placeholder="name@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
             <Field label="Website">
-              <Input type="url" placeholder="https://" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+              <Input type="text" inputMode="url" placeholder="example.com" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
             </Field>
           </div>
           <Field label={t("company_about_ar")}>
