@@ -38,7 +38,7 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
   useEffect(() => {
     setLoading(true);
     supabase.from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, purpose, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
       .eq("type", listingType)
       .eq("status", "approved")
       .order("featured", { ascending: false })
@@ -51,13 +51,14 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
 
   const filtered = useMemo(() => rows.filter((r) => {
     if (subtype !== "all" && (r.property_subtype ?? "") !== subtype) return false;
+    if (purposeFilter !== "all" && (r.purpose ?? "") !== purposeFilter) return false;
     if (governorate !== "all" && normalizeEgyptGovernorate(r.governorate ?? null) !== governorate) return false;
     if (city !== "all" && normalizeEgyptCity(r.city ?? null) !== city) return false;
     if (minPrice && (Number(r.price) || 0) < Number(minPrice)) return false;
     if (maxPrice && (Number(r.price) || 0) > Number(maxPrice)) return false;
     if (minArea && (Number(r.area_sqm) || 0) < Number(minArea)) return false;
     return true;
-  }), [rows, subtype, governorate, city, minPrice, maxPrice, minArea]);
+  }), [rows, subtype, purposeFilter, governorate, city, minPrice, maxPrice, minArea]);
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
