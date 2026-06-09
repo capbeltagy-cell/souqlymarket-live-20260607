@@ -33,24 +33,51 @@ function Landing() {
   const { t, dir } = useI18n();
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
   const [listings, setListings] = useState<ListingCardData[]>([]);
+  const [products, setProducts] = useState<ListingCardData[]>([]);
+  const [properties, setProperties] = useState<ListingCardData[]>([]);
+  const [lands, setLands] = useState<ListingCardData[]>([]);
+  const [factoryListings, setFactoryListings] = useState<ListingCardData[]>([]);
   const [companies, setCompanies] = useState<CompanyCardData[]>([]);
   const [agents, setAgents] = useState<AgentCardData[]>([]);
+  const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }>>([]);
+  const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }>>([]);
+  const [stats, setStats] = useState({ companies: 0, factories: 0, agents: 0, listings: 0, verified: 0 });
 
   useEffect(() => {
     (async () => {
-      const [lRes, cRes, aRes] = await Promise.all([
-        supabase.from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
-          .eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("companies")
-          .select("id, name_ar, name_en, industry, country, is_verified, logo_url")
-          .order("is_verified", { ascending: false }).limit(6),
-        supabase.from("agents")
-          .select("id, user_id, headline_ar, headline_en, country, is_verified")
-          .order("is_verified", { ascending: false }).limit(4),
+      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
+      const [lRes, pRes, reRes, landRes, facRes, cRes, aRes, rfqRes, tenderRes,
+             cCount, fCount, aCount, lCount, vCount] = await Promise.all([
+        supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "real_estate").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "land").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "factory").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).limit(6),
+        supabase.from("agents").select("id, user_id, headline_ar, headline_en, country, is_verified").order("is_verified", { ascending: false }).limit(4),
+        supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id", { count: "exact", head: true }),
+        supabase.from("factories").select("company_id", { count: "exact", head: true }),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
+        supabase.from("companies").select("id", { count: "exact", head: true }).eq("is_verified", true),
       ]);
       setListings((lRes.data ?? []) as unknown as ListingCardData[]);
+      setProducts((pRes.data ?? []) as unknown as ListingCardData[]);
+      setProperties((reRes.data ?? []) as unknown as ListingCardData[]);
+      setLands((landRes.data ?? []) as unknown as ListingCardData[]);
+      setFactoryListings((facRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
+      setRfqs((rfqRes.data ?? []) as never);
+      setTenders((tenderRes.data ?? []) as never);
+      setStats({
+        companies: cCount.count ?? 0,
+        factories: fCount.count ?? 0,
+        agents: aCount.count ?? 0,
+        listings: lCount.count ?? 0,
+        verified: vCount.count ?? 0,
+      });
       const agentList = aRes.data ?? [];
       const userIds = agentList.map((a) => a.user_id).filter(Boolean) as string[];
       const profiles = userIds.length
