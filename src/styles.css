@@ -42,85 +42,124 @@
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
-  /* Souqly — LinkedIn-inspired navy palette */
-  --background: oklch(0.985 0.003 247);
-  --foreground: oklch(0.18 0.03 250);
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.965 0.006 247);
+  /* Souqly — Premium dark blue Egyptian B2B palette */
+  --background: #041827;
+  --foreground: #e8f0ff;
+  --surface: #0d2942;
+  --surface-2: #102f4d;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.03 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.03 250);
+  --card: #0b2440;
+  --card-foreground: #f3f8ff;
+  --popover: #0d2942;
+  --popover-foreground: #f3f8ff;
 
-  --primary: oklch(0.32 0.08 250);          /* deep navy */
-  --primary-foreground: oklch(0.99 0.003 247);
-  --primary-hover: oklch(0.26 0.09 250);
+  --primary: #3f78ff;
+  --primary-foreground: #ffffff;
+  --primary-hover: #2f64e8;
 
-  --secondary: oklch(0.955 0.01 247);
-  --secondary-foreground: oklch(0.2 0.04 250);
+  --secondary: #6093c1;
+  --secondary-foreground: #f2f8ff;
 
-  --muted: oklch(0.955 0.01 247);
-  --muted-foreground: oklch(0.5 0.025 250);
+  --muted: #6f8fb2;
+  --muted-foreground: #b3c6dd;
 
-  --accent: oklch(0.62 0.16 35);            /* trust orange accent */
-  --accent-foreground: oklch(1 0 0);
+  --accent: #ffd26d;
+  --accent-foreground: #092236;
 
-  --success: oklch(0.62 0.14 155);
-  --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.72 0.16 80);
-  --warning-foreground: oklch(0.18 0.03 250);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
+  --success: #40d882;
+  --success-foreground: #05231c;
+  --warning: #ffb750;
+  --warning-foreground: #142115;
+  --destructive: #f1625d;
+  --destructive-foreground: #ffffff;
 
-  --border: oklch(0.91 0.012 247);
-  --input: oklch(0.91 0.012 247);
-  --ring: oklch(0.32 0.08 250);
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #5a86ff;
 
   --font-display: "Cairo", "Inter", system-ui, sans-serif;
   --font-body: "Cairo", "Inter", system-ui, sans-serif;
 
-  --shadow-card: 0 1px 2px 0 oklch(0.18 0.03 250 / 0.04), 0 1px 3px 0 oklch(0.18 0.03 250 / 0.06);
-  --shadow-elev: 0 8px 24px -8px oklch(0.18 0.03 250 / 0.18);
+  --shadow-card: 0 18px 45px -28px rgba(0, 0, 0, 0.48), 0 6px 18px -12px rgba(0, 0, 0, 0.28);
+  --shadow-elev: 0 24px 80px -40px rgba(0, 0, 0, 0.5);
 }
 
 .dark {
-  --background: oklch(0.16 0.025 250);
-  --foreground: oklch(0.97 0.005 247);
-  --surface: oklch(0.21 0.03 250);
-  --surface-2: oklch(0.25 0.03 250);
-  --card: oklch(0.21 0.03 250);
-  --card-foreground: oklch(0.97 0.005 247);
-  --popover: oklch(0.21 0.03 250);
-  --popover-foreground: oklch(0.97 0.005 247);
-  --primary: oklch(0.78 0.06 240);
-  --primary-foreground: oklch(0.18 0.03 250);
-  --primary-hover: oklch(0.85 0.05 240);
-  --secondary: oklch(0.28 0.03 250);
-  --secondary-foreground: oklch(0.97 0.005 247);
-  --muted: oklch(0.28 0.03 250);
-  --muted-foreground: oklch(0.72 0.02 250);
-  --accent: oklch(0.7 0.18 40);
-  --accent-foreground: oklch(0.18 0.03 250);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.78 0.06 240);
+  --background: #031523;
+  --foreground: #eef4ff;
+  --surface: #081d33;
+  --surface-2: #0c2641;
+  --card: #0b2440;
+  --card-foreground: #f5f9ff;
+  --popover: #0b2440;
+  --popover-foreground: #f5f9ff;
+  --primary: #4a82ff;
+  --primary-foreground: #ffffff;
+  --primary-hover: #3c6be2;
+  --secondary: #5d8cc8;
+  --secondary-foreground: #eef4ff;
+  --muted: #7b95b6;
+  --muted-foreground: #c3d1e6;
+  --accent: #ffc963;
+  --accent-foreground: #092236;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #5a86ff;
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  *, *::before, *::after { box-sizing: border-box; border-color: var(--color-border); }
   html { font-family: var(--font-body); }
   body {
+    min-height: 100vh;
     background-color: var(--color-background);
     color: var(--color-foreground);
+    line-height: 1.65;
     font-feature-settings: "ss01", "cv11";
   }
+  a { color: inherit; }
+  button, input, textarea, select { font: inherit; }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
 
   /* RTL-aware logical helpers */
   [dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(15, 40, 68, 0.82);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 28px 60px -28px rgba(0, 0, 0, 0.45);
+  }
+  .panel-card {
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-card);
+  }
+  .section-surface {
+    background: linear-gradient(180deg, rgba(10, 25, 42, 0.9), rgba(13, 41, 66, 0.85));
+  }
+  .premium-panel {
+    background: linear-gradient(180deg, rgba(7, 21, 42, 0.9), rgba(13, 35, 59, 0.92));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow-card);
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
 }
 
 @utility container-souqly {
@@ -131,5 +170,5 @@
 }
 
 @utility hero-gradient {
-  background: linear-gradient(135deg, oklch(0.32 0.08 250) 0%, oklch(0.24 0.1 255) 100%);
+  background: linear-gradient(135deg, #061b30 0%, #112f55 52%, #0e264a 100%);
 }

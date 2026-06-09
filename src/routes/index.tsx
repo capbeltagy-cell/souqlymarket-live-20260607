@@ -72,7 +72,7 @@ function Landing() {
         }} />
         <div className="container-souqly relative py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
               <Sparkles className="h-3 w-3" />{t("tagline")}
             </span>
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">{t("hero_title")}</h1>
@@ -81,9 +81,21 @@ function Landing() {
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="bg-white/5 border-white/30 text-primary-foreground hover:bg-white/10">
+              <Button asChild size="lg" variant="outline" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/15">
                 <Link to="/auth" search={{ mode: "signup" }}>{t("cta_join_company")}</Link>
               </Button>
+            </div>
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: "شركات موثوقة" },
+                { label: "تواصل سريع" },
+                { label: "قوائم مصدقة" },
+                { label: "دعم 24/7" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl bg-white/10 px-4 py-3 text-sm text-primary-foreground/80">
+                  {item.label}
+                </div>
+              ))}
             </div>
           </div>
           <div className="hidden md:block relative">
@@ -102,14 +114,78 @@ function Landing() {
         </div>
       </section>
 
+      <section className="container-souqly py-14">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-[1.5rem] glass-card p-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { label: t("companies_count"), value: companies.length, subtitle: t("trusted_companies") },
+                { label: t("listings_count"), value: listings.length, subtitle: t("active_listings") },
+                { label: t("nav_agents"), value: agents.length, subtitle: t("pro_agents") },
+                { label: t("section_featured"), value: listings.filter((l) => l.featured).length, subtitle: t("featured_items") },
+              ].map((stat) => (
+                <div key={stat.label} className="rounded-3xl bg-surface p-5">
+                  <div className="text-3xl font-bold">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground mt-2">{stat.subtitle}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] panel-card p-8 flex flex-col justify-between">
+            <div>
+              <div className="text-sm uppercase tracking-[0.2em] text-accent">{t("trust_indicators")}</div>
+              <h2 className="text-3xl font-bold mt-4">{t("trusted_b2b_network")}</h2>
+              <p className="text-muted-foreground mt-3">{t("trust_subtitle")}</p>
+            </div>
+            <div className="grid gap-3 mt-8">
+              {[
+                { title: t("verified_profiles"), description: t("verified_profiles_desc") },
+                { title: t("secure_transactions"), description: t("secure_transactions_desc") },
+                { title: t("fast_connect"), description: t("fast_connect_desc") },
+              ].map((item) => (
+                <div key={item.title} className="rounded-3xl border border-white/10 bg-surface p-5">
+                  <div className="font-semibold">{item.title}</div>
+                  <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="container-souqly py-14">
+        <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+          <div>
+            <h2 className="text-3xl font-bold">{t("success_stories")}</h2>
+            <p className="text-muted-foreground mt-2">{t("success_stories_subtitle")}</p>
+          </div>
+          <Button asChild variant="outline" className="border-white/20 bg-surface hover:bg-white/5">
+            <Link to="/about">{t("learn_more")}</Link>
+          </Button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { title: t("story_1_title"), body: t("story_1_body") },
+            { title: t("story_2_title"), body: t("story_2_body") },
+            { title: t("story_3_title"), body: t("story_3_body") },
+          ].map((story) => (
+            <div key={story.title} className="rounded-3xl border border-border bg-card p-6 shadow-card hover:-translate-y-1 transition">
+              <div className="text-sm text-muted-foreground uppercase tracking-[0.18em] mb-3">{t("success")}</div>
+              <h3 className="font-semibold text-xl mb-3">{story.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{story.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="border-y border-border bg-surface">
         <div className="container-souqly py-6 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
           {[
-            { icon: ShieldCheck, label: "شركات موثقة" },
-            { icon: ShieldCheck, label: "منصة آمنة" },
-            { icon: Building2, label: "سوق B2B مصري" },
-            { icon: Package, label: "5 إعلانات مجاناً" },
-            { icon: Sparkles, label: "ترقية بـ 499 ج.م/شهر" },
+            { icon: ShieldCheck, label: t("companies_count") },
+            { icon: ShieldCheck, label: t("nav_agents") },
+            { icon: Building2, label: t("nav_companies") },
+            { icon: Package, label: t("section_featured") },
+            { icon: Sparkles, label: t("cta_join_company") },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex flex-col items-center gap-1.5">
               <Icon className="h-5 w-5 text-primary" />
@@ -119,16 +195,15 @@ function Landing() {
         </div>
       </section>
 
-
       <section className="container-souqly py-16">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">{t("section_categories")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map(({ key, icon: Icon }) => (
-            <Link key={key} to="/marketplace" className="group rounded-lg border border-border bg-card p-6 text-center hover:border-primary hover:shadow-elev transition">
-              <div className="mx-auto h-12 w-12 rounded-lg bg-primary/10 text-primary grid place-items-center mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition">
+            <Link key={key} to="/marketplace" className="group rounded-3xl border border-white/10 bg-surface p-6 text-center hover:border-primary/30 hover:shadow-elev transition">
+              <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 text-primary grid place-items-center mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition">
                 <Icon className="h-6 w-6" />
               </div>
-              <div className="text-sm font-medium">{t(key)}</div>
+              <div className="text-sm font-semibold text-foreground">{t(key)}</div>
             </Link>
           ))}
         </div>

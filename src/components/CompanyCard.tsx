@@ -19,22 +19,22 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
   const { locale, t } = useI18n();
   const name = (locale === "ar" ? c.name_ar : c.name_en) ?? c.name_en ?? c.name_ar ?? "";
   return (
-    <Link to="/companies/$id" params={{ id: c.id }} className="block rounded-lg border border-border bg-card p-5 shadow-card hover:shadow-elev transition">
+    <Link to="/companies/$id" params={{ id: c.id }} className="block rounded-[1.5rem] border border-white/10 bg-surface-2 p-5 shadow-elev transition duration-200 hover:-translate-y-1 hover:bg-surface">
       <div className="flex items-start gap-4">
         {c.logo_url ? (
-          <img src={c.logo_url} alt="" className="h-14 w-14 rounded-md object-cover flex-shrink-0" />
+          <img src={c.logo_url} alt="" className="h-14 w-14 rounded-xl object-cover flex-shrink-0" />
         ) : (
-          <div className="h-14 w-14 rounded-md hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
+          <div className="h-14 w-14 rounded-xl hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
             {initialOf(name)}
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold truncate">{name}</h3>
-            {c.is_verified && <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />}
+            {c.is_verified && <Badge variant="secondary">{t("verified_company")}</Badge>}
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">{c.industry ?? "—"}</p>
-          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">{c.industry ?? "—"}</p>
+          <div className="flex flex-wrap items-center gap-3 mt-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{c.country ?? "—"}</span>
             {typeof c.listingCount === "number" && (
               <Badge variant="secondary" className="text-xs">{c.listingCount} {t("listings_count")}</Badge>

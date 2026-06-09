@@ -15,26 +15,26 @@ export function SiteHeader() {
 
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 shadow-xl shadow-black/10 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
       <div className="container-souqly flex h-16 items-center gap-6">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg text-primary">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+        <Link to="/" className="flex items-center gap-3 font-bold text-lg text-primary">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
             <Briefcase className="h-5 w-5" />
           </div>
           <span>{t("brand")}</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1 text-sm">
-          <Link to="/marketplace" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">{t("nav_marketplace")}</Link>
-          <Link to="/wholesale" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">سوق الجملة</Link>
-          <Link to="/factories" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">المصانع</Link>
-          <Link to="/rfq" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">طلبات الأسعار</Link>
-          <Link to="/tenders" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">المناقصات</Link>
-          <Link to="/companies" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">{t("nav_companies")}</Link>
-          <Link to="/pricing" className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition">{t("nav_pricing")}</Link>
+        <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+          <Link to="/marketplace" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_marketplace")}</Link>
+          <Link to="/wholesale" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">سوق الجملة</Link>
+          <Link to="/factories" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">المصانع</Link>
+          <Link to="/rfq" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">طلبات الأسعار</Link>
+          <Link to="/tenders" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">المناقصات</Link>
+          <Link to="/companies" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_companies")}</Link>
+          <Link to="/pricing" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_pricing")}</Link>
         </nav>
 
-        <div className="ms-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-3">
           <LanguageToggle />
           {user ? (
             <DropdownMenu>

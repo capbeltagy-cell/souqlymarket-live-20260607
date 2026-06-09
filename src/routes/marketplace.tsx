@@ -75,14 +75,53 @@ function Marketplace() {
       <section className="bg-surface-2 border-b border-border">
         <div className="container-souqly py-10">
           <h1 className="text-3xl font-bold mb-4">{t("nav_marketplace")}</h1>
-          <div className="relative max-w-2xl">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="ps-10 h-12 bg-card" />
+          <div className="rounded-[2rem] border border-white/10 bg-surface p-6 shadow-elev">
+            <div className="relative max-w-2xl">
+              <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="ps-11 h-14 bg-surface" />
+            </div>
+            <div className="mt-6 grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr]">
+              <div className="flex flex-wrap gap-2">
+                {TYPES.map((tp) => (
+                  <Button key={tp.value} size="sm" variant={type === tp.value ? "default" : "outline"}
+                    onClick={() => setType(tp.value)}
+                    className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}>
+                    {t(tp.key as never)}
+                  </Button>
+                ))}
+              </div>
+              <select
+                className="h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
+                value={governorate}
+                onChange={(e) => {
+                  setGovernorate(e.target.value);
+                  setCity("all");
+                }}
+              >
+                <option value="all">{t("filter_governorate")}</option>
+                {EGYPT_GOVERNORATES.map((gov) => (
+                  <option key={gov.value} value={gov.value}>
+                    {locale === "ar" ? gov.label_ar : gov.label_en}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                disabled={governorate === "all"}
+              >
+                <option value="all">{t("filter_city")}</option>
+                {cities.map((ct) => (
+                  <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </section>
       <section className="container-souqly py-8 flex-1">
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="mb-6">
           {TYPES.map((tp) => (
             <Button key={tp.value} size="sm" variant={type === tp.value ? "default" : "outline"}
               onClick={() => setType(tp.value)}
@@ -116,6 +155,14 @@ function Marketplace() {
               <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
             ))}
           </select>
+        </div>
+        <div className="rounded-[2rem] glass-card p-6 mb-8">
+          <div className="text-xs uppercase tracking-[0.28em] text-accent mb-4">{t("section_categories")}</div>
+          <div className="flex flex-wrap gap-2">
+            {TYPES.filter((tp) => tp.value !== "all").map((tp) => (
+              <span key={tp.value} className="status-pill">{t(tp.key as never)}</span>
+            ))}
+          </div>
         </div>
         {loading ? (
           <div className="py-20 text-center text-muted-foreground">{t("loading")}</div>

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, BadgeCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { initialOf } from "@/lib/marketplace";
 
@@ -18,7 +19,7 @@ export function AgentCard({ a }: { a: AgentCardData }) {
   const name = a.profile?.full_name ?? "Souqly Agent";
   const headline = (locale === "ar" ? a.headline_ar : a.headline_en) ?? a.headline_en ?? a.headline_ar ?? "";
   return (
-    <Link to="/agents/$id" params={{ id: a.id }} className="block rounded-lg border border-border bg-card p-5 shadow-card hover:shadow-elev transition">
+    <Link to="/agents/$id" params={{ id: a.id }} className="block rounded-[1.5rem] border border-white/10 bg-surface-2 p-5 shadow-elev transition duration-200 hover:-translate-y-1 hover:bg-surface">
       <div className="flex items-start gap-4">
         {a.profile?.avatar_url ? (
           <img src={a.profile.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover flex-shrink-0" />
@@ -28,12 +29,12 @@ export function AgentCard({ a }: { a: AgentCardData }) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold truncate">{name}</h3>
-            {a.is_verified && <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" aria-label={t("verified_agent")} />}
+            {a.is_verified && <Badge variant="secondary">{t("verified_agent")}</Badge>}
           </div>
-          {headline && <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{headline}</p>}
-          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+          {headline && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{headline}</p>}
+          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{a.country ?? "—"}</span>
           </div>
         </div>

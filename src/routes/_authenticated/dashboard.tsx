@@ -122,24 +122,26 @@ function Dashboard() {
 
 function Onboard({ title, body, cta }: { title: string; body: string; cta: { label: string; to: string } }) {
   return (
-    <div className="rounded-lg border border-primary/30 bg-primary/5 p-5 mb-6 flex items-center justify-between gap-3 flex-wrap">
-      <div>
-        <div className="font-semibold">{title}</div>
-        <div className="text-sm text-muted-foreground">{body}</div>
+    <div className="rounded-[1.5rem] border border-primary/20 bg-primary/5 p-6 mb-6 shadow-card">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="font-semibold text-lg">{title}</div>
+          <div className="text-sm text-muted-foreground mt-1">{body}</div>
+        </div>
+        <Button asChild className="bg-primary hover:bg-primary-hover">
+          <Link to={cta.to}>{cta.label}</Link>
+        </Button>
       </div>
-      <Button asChild className="bg-primary hover:bg-primary-hover">
-        <Link to={cta.to}>{cta.label}</Link>
-      </Button>
     </div>
   );
 }
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Briefcase; label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-5 shadow-card">
-      <div className="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
-      <div className="mt-3 text-2xl font-bold">{value}</div>
-      <div className="text-xs text-muted-foreground mt-1">{label}</div>
+    <div className="rounded-[1.5rem] border border-white/10 bg-surface p-6 shadow-elev">
+      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
+      <div className="mt-4 text-3xl font-bold tracking-tight">{value}</div>
+      <div className="text-sm text-muted-foreground mt-2">{label}</div>
     </div>
   );
 }

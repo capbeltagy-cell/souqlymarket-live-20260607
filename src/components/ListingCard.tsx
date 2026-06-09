@@ -77,15 +77,15 @@ export function ListingCard({ l }: { l: ListingCardData }) {
   }
 
   return (
-    <div className="group overflow-hidden rounded-lg border border-border bg-card shadow-card hover:shadow-elev transition-all">
+    <div className="group overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface-2 shadow-elev transition-all duration-200 hover:-translate-y-1 hover:bg-surface">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img src={image} alt={title} loading="lazy"
-          className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <Badge className="absolute top-3 start-3 bg-surface/95 text-foreground hover:bg-surface">
           {t(typeKey[l.type] as never)}
         </Badge>
         {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
-          <Badge className="absolute top-3 end-3 bg-accent text-accent-foreground hover:bg-accent">★</Badge>
+          <Badge className="absolute top-3 end-3 bg-accent text-accent-foreground hover:bg-accent">★ {t("feature_featured_listings")}</Badge>
         )}
         <button onClick={toggleFav} disabled={favBusy}
           className="absolute bottom-3 end-3 h-9 w-9 rounded-full bg-surface/95 grid place-items-center hover:bg-surface transition disabled:opacity-50"
@@ -97,9 +97,11 @@ export function ListingCard({ l }: { l: ListingCardData }) {
         <div>
           <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
           {company && (
-            <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
-              {l.companies?.is_verified && <BadgeCheck className="h-3 w-3 text-primary" />}
-              {t("by_company")} {company}
+            <p className="text-xs text-muted-foreground mt-1 inline-flex flex-wrap items-center gap-2">
+              {l.companies?.is_verified && (
+                <Badge variant="secondary" className="text-[10px] tracking-[0.18em] px-2 py-1">{t("verified_company")}</Badge>
+              )}
+              <span>{t("by_company")} {company}</span>
             </p>
           )}
         {(l.city || l.governorate || l.country) && (
