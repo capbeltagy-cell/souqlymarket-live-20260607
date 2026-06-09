@@ -208,6 +208,33 @@ function NewListing() {
                 </Select>
               </Field>
             </div>
+            {(type === "real_estate" || type === "land") && (
+              <div className="grid sm:grid-cols-4 gap-4">
+                <Field label={locale === "ar" ? "النوع الفرعي" : "Subtype"}>
+                  <select value={propertySubtype} onChange={(e) => setPropertySubtype(e.target.value)}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="">—</option>
+                    {(type === "real_estate"
+                      ? [["apartment","شقة","Apartment"],["villa","فيلا","Villa"],["shop","محل","Shop"],["office","مكتب","Office"],["warehouse","مخزن","Warehouse"]]
+                      : [["agricultural","زراعية","Agricultural"],["industrial","صناعية","Industrial"],["investment","استثمارية","Investment"],["building","بناء","Building"]]
+                    ).map(([v, ar, en]) => <option key={v} value={v}>{locale === "ar" ? ar : en}</option>)}
+                  </select>
+                </Field>
+                <Field label={locale === "ar" ? "المساحة (م²)" : "Area (m²)"}>
+                  <Input type="number" min="0" value={areaSqm} onChange={(e) => setAreaSqm(e.target.value)} />
+                </Field>
+                {type === "real_estate" && (
+                  <>
+                    <Field label={locale === "ar" ? "غرف النوم" : "Bedrooms"}>
+                      <Input type="number" min="0" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
+                    </Field>
+                    <Field label={locale === "ar" ? "الحمامات" : "Bathrooms"}>
+                      <Input type="number" min="0" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
+                    </Field>
+                  </>
+                )}
+              </div>
+            )}
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label={`${t("field_title")} (AR)`} required>
                 <Input dir="rtl" required maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} />
