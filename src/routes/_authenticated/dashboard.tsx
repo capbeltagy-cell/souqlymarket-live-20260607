@@ -216,9 +216,6 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
     </>
   );
 }
-    </>
-  );
-}
 
 function AgentDash({ counts }: { counts: Counts }) {
   const { t } = useI18n();
