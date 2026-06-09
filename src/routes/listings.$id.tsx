@@ -17,6 +17,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
+import { formatPrice } from "@/lib/currency";
+
 
 export const Route = createFileRoute("/listings/$id")({
   loader: async ({ params }) => {
