@@ -37,40 +37,47 @@ function Dashboard() {
 
   useEffect(() => {
     if (!user) return;
+    const zero: Counts = { listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 };
     (async () => {
-      if (role === "admin") {
-        const [l, c, a, p] = await Promise.all([
-          supabase.from("listings").select("id", { count: "exact", head: true }),
-          supabase.from("companies").select("id", { count: "exact", head: true }),
-          supabase.from("agents").select("id", { count: "exact", head: true }),
-          supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
-        ]);
-        setCounts({ listings: l.count ?? 0, companies: c.count ?? 0, agents: a.count ?? 0, referrals: 0, pendingCommissions: 0, pendingListings: p.count ?? 0 });
-      } else if (role === "company") {
-        const subInfo = await fetchSub();
-        setSub(subInfo);
-        setHasProfile(subInfo.hasCompany);
-        if (subInfo.companyId) {
-          const [{ count: pc }, { count: lc }] = await Promise.all([
-            supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending"),
-            supabase.from("leads").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "new"),
+      try {
+        if (role === "admin") {
+          const [l, c, a, p] = await Promise.all([
+            supabase.from("listings").select("id", { count: "exact", head: true }),
+            supabase.from("companies").select("id", { count: "exact", head: true }),
+            supabase.from("agents").select("id", { count: "exact", head: true }),
+            supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
           ]);
-          setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0, leads: lc ?? 0 });
+          setCounts({ listings: l.count ?? 0, companies: c.count ?? 0, agents: a.count ?? 0, referrals: 0, pendingCommissions: 0, pendingListings: p.count ?? 0 });
+        } else if (role === "company") {
+          let subInfo: CompanySubscriptionInfo | null = null;
+          try { subInfo = await fetchSub(); } catch (e) { console.error("fetchSub failed", e); }
+          setSub(subInfo);
+          setHasProfile(subInfo?.hasCompany ?? false);
+          if (subInfo?.companyId) {
+            const [{ count: pc }, { count: lc }] = await Promise.all([
+              supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending"),
+              supabase.from("leads").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "new"),
+            ]);
+            setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0, leads: lc ?? 0 });
+          } else {
+            setCounts(zero);
+          }
         } else {
-          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 });
+          const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
+          setHasProfile(!!ag);
+          if (ag) {
+            const [r, pc] = await Promise.all([
+              supabase.from("referrals").select("id", { count: "exact", head: true }).eq("agent_id", ag.id),
+              supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
+            ]);
+            setCounts({ ...zero, agents: 1, referrals: r.count ?? 0, pendingCommissions: pc.count ?? 0 });
+          } else {
+            setCounts(zero);
+          }
         }
-      } else {
-        const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
-        setHasProfile(!!ag);
-        if (ag) {
-          const [r, pc] = await Promise.all([
-            supabase.from("referrals").select("id", { count: "exact", head: true }).eq("agent_id", ag.id),
-            supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
-          ]);
-          setCounts({ listings: 0, companies: 0, agents: 1, referrals: r.count ?? 0, pendingCommissions: pc.count ?? 0, pendingListings: 0 });
-        } else {
-          setCounts({ listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0 });
-        }
+      } catch (e) {
+        console.error("Dashboard load failed", e);
+        setCounts(zero);
       }
     })();
   }, [user, role]);
