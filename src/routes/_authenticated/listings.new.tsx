@@ -16,7 +16,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import { getMyPlan } from "@/lib/billing.functions";
 import { getMyCompanySubscription } from "@/lib/subscription.functions";
-import { createListing } from "@/lib/listings.functions";
+import { createListing, checkListingDuplicate } from "@/lib/listings.functions";
 import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
