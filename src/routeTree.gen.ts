@@ -13,6 +13,7 @@ import { Route as WholesaleRouteImport } from './routes/wholesale'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TendersRouteImport } from './routes/tenders'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchAllRouteImport } from './routes/search-all'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RfqRouteImport } from './routes/rfq'
@@ -91,6 +92,11 @@ const TendersRoute = TendersRouteImport.update({
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchAllRoute = SearchAllRouteImport.update({
@@ -422,6 +428,7 @@ export interface FileRoutesByFullPath {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -486,6 +493,7 @@ export interface FileRoutesByTo {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -552,6 +560,7 @@ export interface FileRoutesById {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -618,6 +627,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -747,6 +758,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -813,6 +825,7 @@ export interface RootRouteChildren {
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
   SearchAllRoute: typeof SearchAllRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscribeRoute: typeof SubscribeRoute
   TendersRoute: typeof TendersRouteWithChildren
   TermsRoute: typeof TermsRoute
@@ -849,6 +862,13 @@ declare module '@tanstack/react-router' {
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search-all': {
@@ -1441,6 +1461,7 @@ const rootRouteChildren: RootRouteChildren = {
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
   SearchAllRoute: SearchAllRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscribeRoute: SubscribeRoute,
   TendersRoute: TendersRouteWithChildren,
   TermsRoute: TermsRoute,
@@ -1451,13 +1472,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

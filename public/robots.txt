@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /control-center-x7
+Disallow: /seed
+
+Sitemap: https://souqlymarket.com/sitemap.xml
