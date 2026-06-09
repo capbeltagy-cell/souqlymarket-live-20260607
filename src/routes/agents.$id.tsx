@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Mail, Star, BadgeCheck, Trophy } from "lucide-react";
+import { MapPin, Phone, Star, Trophy, MessageCircle } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
+import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/agents/$id")({
   loader: async ({ params }) => {
@@ -43,10 +45,10 @@ type Agent = {
   bio_ar: string | null; bio_en: string | null;
   country: string | null; city: string | null;
   specialties: string[] | null; languages: string[] | null;
-  is_verified: boolean;
+  is_verified: boolean; is_trusted: boolean | null; is_premium: boolean | null;
 };
 
-type Profile = { id: string; full_name: string | null; avatar_url: string | null; phone: string | null };
+type Profile = { id: string; full_name: string | null; display_name: string | null; avatar_url: string | null; phone: string | null; phone_verified: boolean | null };
 
 function AgentProfile() {
   const { id } = Route.useParams();
@@ -54,6 +56,8 @@ function AgentProfile() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [deals, setDeals] = useState(0);
+  const [earnings, setEarnings] = useState(0);
+  const [referralEarnings, setReferralEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,12 +65,17 @@ function AgentProfile() {
       const { data: a } = await supabase.from("agents").select("*").eq("id", id).maybeSingle();
       setAgent(a as Agent | null);
       if (a) {
-        const [{ data: p }, { count }] = await Promise.all([
-          supabase.from("profiles").select("id, full_name, avatar_url, phone").eq("id", a.user_id).maybeSingle(),
+        const [{ data: p }, { count }, { data: paid }] = await Promise.all([
+          supabase.from("profiles").select("id, full_name, display_name, avatar_url, phone, phone_verified").eq("id", a.user_id).maybeSingle(),
           supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", a.id).eq("status", "paid"),
+          supabase.from("commissions").select("amount, notes").eq("agent_id", a.id).eq("status", "paid"),
         ]);
         setProfile(p as Profile | null);
         setDeals(count ?? 0);
+        const total = (paid ?? []).reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
+        const refTotal = (paid ?? []).filter((r: { notes: string | null }) => (r.notes ?? "").toLowerCase().includes("referral")).reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
+        setEarnings(total);
+        setReferralEarnings(refTotal);
       }
       setLoading(false);
     })();
