@@ -29,6 +29,9 @@ type ListingMarker = {
   city: string | null;
   latitude: number | null;
   longitude: number | null;
+  price: number | null;
+  phone: string | null;
+  whatsapp: string | null;
 };
 
 const TYPES: { value: ListingType | "all"; key: string }[] = [
