@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { MessageCircle, Phone } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,19 +33,32 @@ function FactoryProfile() {
 
   if (!company) return <div className="p-10 text-center">…</div>;
 
+  const wa = company.phone?.replace(/[^0-9]/g, "");
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <section className="container-souqly py-10 flex-1 space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
           {company.logo_url && <img src={company.logo_url} className="h-20 w-20 rounded-lg object-cover" alt="" />}
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">{ar ? company.name_ar : company.name_en}</h1>
-            <div className="flex gap-2 mt-1">
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {company.is_verified && <TrustBadge kind="verified_company" />}
               {factory?.verified && <Badge>{ar ? "مصنع موثق" : "Verified factory"}</Badge>}
               {factory?.export_available && <Badge variant="secondary">{ar ? "متاح للتصدير" : "Export"}</Badge>}
             </div>
           </div>
+          {wa && (
+            <div className="flex flex-col gap-2">
+              <Button asChild className="gap-2 bg-success hover:bg-success/90">
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{ar ? "واتساب" : "WhatsApp"}</a>
+              </Button>
+              <Button asChild variant="secondary" className="gap-2">
+                <a href={`tel:+${wa}`}><Phone className="h-4 w-4" />{ar ? "اتصال" : "Call"}</a>
+              </Button>
+            </div>
+          )}
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <Info label={ar ? "المحافظة" : "Governorate"} value={company.governorate ?? company.city ?? company.country} />
