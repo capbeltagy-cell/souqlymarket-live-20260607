@@ -554,10 +554,13 @@ export type Database = {
           description_en: string | null
           featured: boolean
           featured_until: string | null
+          governorate: string | null
           id: string
           images: string[] | null
+          latitude: number | null
           leads_count: number
           location: string | null
+          longitude: number | null
           pdf_url: string | null
           price: number | null
           status: Database["public"]["Enums"]["listing_status"]
@@ -581,10 +584,13 @@ export type Database = {
           description_en?: string | null
           featured?: boolean
           featured_until?: string | null
+          governorate?: string | null
           id?: string
           images?: string[] | null
+          latitude?: number | null
           leads_count?: number
           location?: string | null
+          longitude?: number | null
           pdf_url?: string | null
           price?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -608,10 +614,13 @@ export type Database = {
           description_en?: string | null
           featured?: boolean
           featured_until?: string | null
+          governorate?: string | null
           id?: string
           images?: string[] | null
+          latitude?: number | null
           leads_count?: number
           location?: string | null
+          longitude?: number | null
           pdf_url?: string | null
           price?: number | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -1202,6 +1211,9 @@ export type Database = {
         | "land"
         | "factory"
         | "opportunity"
+        | "company"
+        | "market"
+        | "fish_shed"
       subscription_plan: "free" | "premium_company" | "premium_agent"
     }
     CompositeTypes: {
@@ -1341,6 +1353,9 @@ export const Constants = {
         "land",
         "factory",
         "opportunity",
+        "company",
+        "market",
+        "fish_shed",
       ],
       subscription_plan: ["free", "premium_company", "premium_agent"],
     },
