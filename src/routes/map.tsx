@@ -51,7 +51,7 @@ function MapPage() {
     setLoading(true);
     supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude")
+      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price, phone, whatsapp")
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(500)
