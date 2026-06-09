@@ -15,8 +15,9 @@ export const createListing = createServerFn({ method: "POST" })
       description_en: z.string().max(4000).optional().nullable(),
       category: z.string().max(80).optional().nullable(),
       price: z.number().nonnegative().nullable(),
-      currency: z.string().min(2).max(8).default("USD"),
-      country: z.string().max(80).optional().nullable(),
+      currency: z.string().min(2).max(8).default("EGP"),
+      country: z.string().max(80).optional().nullable().default("Egypt"),
+
       city: z.string().trim().min(2).max(80),
       governorate: z.string().trim().min(2).max(80),
       location: z.string().max(200).optional().nullable(),

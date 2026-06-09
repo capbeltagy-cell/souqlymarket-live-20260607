@@ -41,13 +41,14 @@ function NewListing() {
   const [title_en, setTitleEn] = useState("");
   const [description_ar, setDescAr] = useState("");
   const [description_en, setDescEn] = useState("");
-  const [country, setCountry] = useState("Egypt");
+  const [country] = useState("Egypt");
   const [city, setCity] = useState("");
   const [governorate, setGovernorate] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("EGP");
+
   const [commission, setCommission] = useState("5");
   const [images, setImages] = useState<string[]>([]);
   const [pdf_url, setPdf] = useState("");
@@ -226,8 +227,8 @@ function NewListing() {
                   onChange={(e) => {
                     setGovernorate(e.target.value);
                     setCity("");
-                    if (!country) setCountry("Egypt");
                   }}
+
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="">{t("field_governorate")}</option>

@@ -266,7 +266,13 @@ export const dict = {
     seo_listing_default: "إعلان احترافي على سوقلي",
     favorited: "أضيف إلى المفضلة",
     unfavorited: "أزيل من المفضلة",
+    active_listings: "إعلان نشط",
+    pro_agents: "مسوق محترف",
+    featured_items: "عنصر مميز",
+    success: "تم بنجاح",
+    select_location_on_map: "تحديد الموقع على الخريطة",
   },
+
 
 
 
@@ -475,6 +481,9 @@ export const dict = {
     company_updated: "Company profile updated",
     field_industry: "Industry",
     field_city: "City",
+    field_latitude: "Latitude",
+    field_longitude: "Longitude",
+
     field_images: "Images",
     field_video: "Video",
     field_pdf: "PDF",
@@ -533,7 +542,14 @@ export const dict = {
     seo_listing_default: "Professional B2B listing on Souqly",
     favorited: "Added to favorites",
     unfavorited: "Removed from favorites",
+    field_governorate: "Governorate",
+    active_listings: "Active listings",
+    pro_agents: "Pro agents",
+    featured_items: "Featured items",
+    success: "Success",
+    select_location_on_map: "Pick location on map",
   },
+
 
 
 

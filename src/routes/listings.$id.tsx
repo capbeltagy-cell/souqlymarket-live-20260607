@@ -17,6 +17,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
+import { formatPrice } from "@/lib/currency";
+
 
 export const Route = createFileRoute("/listings/$id")({
   loader: async ({ params }) => {
@@ -151,7 +153,7 @@ function ListingDetail() {
     if (!selectedRef || !amount) return;
     setSubmitting(true);
     try {
-      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "USD" } });
+      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "EGP" } });
       toast.success(t("convert_success"));
       setAmount(""); setSelectedRef("");
       const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
@@ -243,8 +245,9 @@ function ListingDetail() {
           <aside className="space-y-4">
             <div className="rounded-xl border border-border bg-card p-6 shadow-card sticky top-20">
               {l.price && l.price > 0 && (
-                <div className="text-3xl font-bold text-primary mb-1">{l.currency ?? "USD"} {l.price.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-primary mb-1">{formatPrice(l.price, locale)}</div>
               )}
+
               <div className="flex items-center gap-1 text-sm text-success font-medium mb-4">
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>

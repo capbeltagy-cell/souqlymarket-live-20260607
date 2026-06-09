@@ -8,6 +8,8 @@ import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locat
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/currency";
+
 import type { ListingType } from "@/lib/marketplace";
 
 export type ListingCardData = {
@@ -127,11 +129,12 @@ export function ListingCard({ l }: { l: ListingCardData }) {
         <div className="flex items-center justify-between pt-2 border-t border-border gap-2">
           <div className="min-w-0">
             {l.price && l.price > 0 ? (
-              <div className="font-bold text-primary text-lg truncate">{l.currency ?? "USD"} {l.price.toLocaleString()}</div>
+              <div className="font-bold text-primary text-lg truncate">{formatPrice(l.price, locale)}</div>
             ) : (
               <div className="text-xs text-muted-foreground">—</div>
             )}
           </div>
+
           <div className="flex gap-1.5 flex-shrink-0">
             {wa && (
               <Button asChild size="sm" variant="outline" className="text-success border-success/40 hover:bg-success/5 hover:text-success px-2"

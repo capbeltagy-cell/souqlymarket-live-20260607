@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { formatPrice } from "@/lib/currency";
 import { useEffect, useState } from "react";
 import { DollarSign, CheckCircle2, Clock, XCircle, Download, Send } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -96,9 +97,10 @@ function CommissionsPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <KPI label={t("total_earnings")} value={`$${totals.total.toLocaleString()}`} icon={DollarSign} />
-          <KPI label={t("commissions_paid")} value={`$${totals.paid.toLocaleString()}`} icon={CheckCircle2} />
-          <KPI label={t("commissions_pending")} value={`$${totals.pending.toLocaleString()}`} icon={Clock} />
+          <KPI label={t("total_earnings")} value={formatPrice(totals.total, locale, { showZero: true })} icon={DollarSign} />
+          <KPI label={t("commissions_paid")} value={formatPrice(totals.paid, locale, { showZero: true })} icon={CheckCircle2} />
+          <KPI label={t("commissions_pending")} value={formatPrice(totals.pending, locale, { showZero: true })} icon={Clock} />
+
         </div>
 
         <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
@@ -121,7 +123,7 @@ function CommissionsPage() {
                       {r.paid_at && <> · ✅ {new Date(r.paid_at).toLocaleDateString()}</>}
                     </div>
                   </div>
-                  <div className="font-bold text-success">${Number(r.amount).toLocaleString()} {r.currency}</div>
+                  <div className="font-bold text-success">{formatPrice(Number(r.amount), locale)}</div>
                   <StatusBadge status={r.status} />
                   {role === "agent" && r.status === "approved" && !r.payout_requested_at && (
                     <Button size="sm" variant="outline" className="gap-2" onClick={() => onRequestPayout(r.id)}>
