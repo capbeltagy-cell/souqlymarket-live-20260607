@@ -293,6 +293,119 @@ function Landing() {
         </section>
       )}
 
+      <section className="container-souqly py-10">
+        <div className="rounded-[1.5rem] panel-card p-8">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">{t("section_stats_title")}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              { label: t("stat_total_companies"), value: stats.companies },
+              { label: t("stat_total_factories"), value: stats.factories },
+              { label: t("stat_total_agents"), value: stats.agents },
+              { label: t("stat_total_listings"), value: stats.listings },
+              { label: t("stat_verified_companies"), value: stats.verified },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl bg-surface p-5 text-center">
+                <div className="text-3xl font-bold text-primary">{s.value.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground mt-2 uppercase tracking-[0.18em]">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {products.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_products")}</h2>
+            <Button asChild variant="ghost"><Link to="/marketplace" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {products.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {properties.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_properties")}</h2>
+            <Button asChild variant="ghost"><Link to="/real-estate" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {properties.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {lands.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_lands")}</h2>
+            <Button asChild variant="ghost"><Link to="/lands" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {lands.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {factoryListings.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_factories")}</h2>
+            <Button asChild variant="ghost"><Link to="/factories" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {factoryListings.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {(rfqs.length > 0 || tenders.length > 0) && (
+        <section className="container-souqly py-10">
+          <div className="grid lg:grid-cols-2 gap-6">
+            {rfqs.length > 0 && (
+              <div className="rounded-[1.5rem] panel-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">{t("featured_rfqs")}</h3>
+                  <Button asChild variant="ghost" size="sm"><Link to="/rfq">{t("view_all")}</Link></Button>
+                </div>
+                <div className="space-y-3">
+                  {rfqs.map((r) => (
+                    <Link key={r.id} to="/rfq/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                      <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {r.governorate ?? "—"} · {r.budget_min ? `${r.budget_min.toLocaleString()} - ${(r.budget_max ?? r.budget_min).toLocaleString()} EGP` : "—"}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {tenders.length > 0 && (
+              <div className="rounded-[1.5rem] panel-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">{t("featured_tenders")}</h3>
+                  <Button asChild variant="ghost" size="sm"><Link to="/tenders">{t("view_all")}</Link></Button>
+                </div>
+                <div className="space-y-3">
+                  {tenders.map((r) => (
+                    <Link key={r.id} to="/tenders/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                      <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {r.governorate ?? "—"} · {r.budget ? `${r.budget.toLocaleString()} EGP` : "—"} {r.deadline ? `· ${r.deadline}` : ""}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+
+
       <section className="container-souqly py-16">
         <div className="hero-gradient rounded-2xl p-10 md:p-14 text-primary-foreground grid md:grid-cols-2 gap-6 items-center">
           <div>
