@@ -96,9 +96,10 @@ function CommissionsPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <KPI label={t("total_earnings")} value={`$${totals.total.toLocaleString()}`} icon={DollarSign} />
-          <KPI label={t("commissions_paid")} value={`$${totals.paid.toLocaleString()}`} icon={CheckCircle2} />
-          <KPI label={t("commissions_pending")} value={`$${totals.pending.toLocaleString()}`} icon={Clock} />
+          <KPI label={t("total_earnings")} value={formatPrice(totals.total, locale, { showZero: true })} icon={DollarSign} />
+          <KPI label={t("commissions_paid")} value={formatPrice(totals.paid, locale, { showZero: true })} icon={CheckCircle2} />
+          <KPI label={t("commissions_pending")} value={formatPrice(totals.pending, locale, { showZero: true })} icon={Clock} />
+
         </div>
 
         <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
