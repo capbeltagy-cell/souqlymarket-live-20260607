@@ -628,6 +628,7 @@ export type Database = {
           featured_until: string | null
           governorate: string | null
           id: string
+          image_sources: string[]
           images: string[] | null
           latitude: number | null
           leads_count: number
@@ -635,6 +636,7 @@ export type Database = {
           longitude: number | null
           ownership_type: string | null
           pdf_url: string | null
+          phone: string | null
           price: number | null
           property_subtype: string | null
           purpose: string | null
@@ -645,6 +647,7 @@ export type Database = {
           updated_at: string
           video_url: string | null
           views_count: number
+          whatsapp: string | null
         }
         Insert: {
           address_line?: string | null
@@ -665,6 +668,7 @@ export type Database = {
           featured_until?: string | null
           governorate?: string | null
           id?: string
+          image_sources?: string[]
           images?: string[] | null
           latitude?: number | null
           leads_count?: number
@@ -672,6 +676,7 @@ export type Database = {
           longitude?: number | null
           ownership_type?: string | null
           pdf_url?: string | null
+          phone?: string | null
           price?: number | null
           property_subtype?: string | null
           purpose?: string | null
@@ -682,6 +687,7 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
           views_count?: number
+          whatsapp?: string | null
         }
         Update: {
           address_line?: string | null
@@ -702,6 +708,7 @@ export type Database = {
           featured_until?: string | null
           governorate?: string | null
           id?: string
+          image_sources?: string[]
           images?: string[] | null
           latitude?: number | null
           leads_count?: number
@@ -709,6 +716,7 @@ export type Database = {
           longitude?: number | null
           ownership_type?: string | null
           pdf_url?: string | null
+          phone?: string | null
           price?: number | null
           property_subtype?: string | null
           purpose?: string | null
@@ -719,6 +727,7 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
           views_count?: number
+          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -1389,7 +1398,12 @@ export type Database = {
       application_status: "pending" | "accepted" | "rejected"
       commission_status: "pending" | "approved" | "paid"
       invoice_status: "pending" | "paid" | "failed" | "refunded" | "void"
-      listing_status: "draft" | "pending" | "approved" | "rejected"
+      listing_status:
+        | "draft"
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "pending_review"
       listing_type:
         | "product"
         | "service"
@@ -1542,7 +1556,13 @@ export const Constants = {
       application_status: ["pending", "accepted", "rejected"],
       commission_status: ["pending", "approved", "paid"],
       invoice_status: ["pending", "paid", "failed", "refunded", "void"],
-      listing_status: ["draft", "pending", "approved", "rejected"],
+      listing_status: [
+        "draft",
+        "pending",
+        "approved",
+        "rejected",
+        "pending_review",
+      ],
       listing_type: [
         "product",
         "service",
