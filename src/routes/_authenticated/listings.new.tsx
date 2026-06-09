@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
+import { Camera, Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
