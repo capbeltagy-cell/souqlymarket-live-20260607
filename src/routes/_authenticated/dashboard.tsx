@@ -238,6 +238,7 @@ function AgentDash({ counts }: { counts: Counts }) {
         <Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/referrals">{t("create_referral")}</Link></Button>
         <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />Performance</Link></Button>
         <Button asChild variant="outline"><Link to="/wallet">Wallet</Link></Button>
         <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
       </div>
@@ -260,6 +261,7 @@ function AdminDash({ counts }: { counts: Counts }) {
         <Button asChild variant="outline" className="gap-2"><Link to="/admin-companies"><Crown className="h-4 w-4" />Companies</Link></Button>
         <Button asChild variant="outline"><Link to="/marketplace">{t("nav_marketplace")}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/admin-revenue"><DollarSign className="h-4 w-4" />Revenue</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/admin-executive"><Activity className="h-4 w-4" />Executive</Link></Button>
       </div>
     </>
   );
