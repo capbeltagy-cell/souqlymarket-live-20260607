@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Briefcase, Building2, Factory, Handshake, Landmark, Package, ShieldCheck, Sparkles, TrendingUp, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Sparkles, TrendingUp, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
