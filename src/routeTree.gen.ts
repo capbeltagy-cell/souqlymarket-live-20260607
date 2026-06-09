@@ -63,9 +63,11 @@ import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
+import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
@@ -347,6 +349,12 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAgentPerformanceRoute =
+  AuthenticatedAgentPerformanceRouteImport.update({
+    id: '/agent-performance',
+    path: '/agent-performance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAgentRoute = AuthenticatedAgentRouteImport.update({
   id: '/agent',
   path: '/agent',
@@ -362,6 +370,12 @@ const AuthenticatedAdminOverviewRoute =
   AuthenticatedAdminOverviewRouteImport.update({
     id: '/admin-overview',
     path: '/admin-overview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminExecutiveRoute =
+  AuthenticatedAdminExecutiveRouteImport.update({
+    id: '/admin-executive',
+    path: '/admin-executive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminCompaniesRoute =
@@ -434,9 +448,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
+  '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -499,9 +515,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
+  '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -566,9 +584,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
+  '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
@@ -633,9 +653,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/admin-companies'
+    | '/admin-executive'
     | '/admin-overview'
     | '/admin-revenue'
     | '/agent'
+    | '/agent-performance'
     | '/analytics'
     | '/commissions'
     | '/company'
@@ -698,9 +720,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/admin-companies'
+    | '/admin-executive'
     | '/admin-overview'
     | '/admin-revenue'
     | '/agent'
+    | '/agent-performance'
     | '/analytics'
     | '/commissions'
     | '/company'
@@ -764,9 +788,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/_authenticated/admin-companies'
+    | '/_authenticated/admin-executive'
     | '/_authenticated/admin-overview'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/agent'
+    | '/_authenticated/agent-performance'
     | '/_authenticated/analytics'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
@@ -1214,6 +1240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/agent-performance': {
+      id: '/_authenticated/agent-performance'
+      path: '/agent-performance'
+      fullPath: '/agent-performance'
+      preLoaderRoute: typeof AuthenticatedAgentPerformanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agent': {
       id: '/_authenticated/agent'
       path: '/agent'
@@ -1233,6 +1266,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-overview'
       fullPath: '/admin-overview'
       preLoaderRoute: typeof AuthenticatedAdminOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-executive': {
+      id: '/_authenticated/admin-executive'
+      path: '/admin-executive'
+      fullPath: '/admin-executive'
+      preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin-companies': {
@@ -1289,9 +1329,11 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
+  AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
+  AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
@@ -1317,9 +1359,11 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
+  AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
+  AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
@@ -1472,3 +1516,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

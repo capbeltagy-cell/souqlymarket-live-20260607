@@ -23,6 +23,7 @@ type Lead = Awaited<ReturnType<typeof listMyLeads>>["leads"][number];
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-primary text-primary-foreground",
   contacted: "bg-warning text-warning-foreground",
+  negotiating: "bg-accent text-accent-foreground",
   won: "bg-success text-success-foreground",
   lost: "bg-muted text-muted-foreground",
 };
@@ -41,7 +42,7 @@ function LeadsPage() {
   const onChange = async (lead: Lead, status: string) => {
     setBusy(lead.id);
     try {
-      await setStatus({ data: { leadId: lead.id, status: status as "new" | "contacted" | "won" | "lost" } });
+      await setStatus({ data: { leadId: lead.id, status: status as "new" | "contacted" | "negotiating" | "won" | "lost" } });
       toast.success(ar ? "تم تحديث الحالة" : "Status updated");
       setLeads((prev) => prev?.map((l) => (l.id === lead.id ? { ...l, status } : l)) ?? null);
     } catch (e) { toast.error((e as Error).message); }
@@ -49,8 +50,8 @@ function LeadsPage() {
   };
 
   const STATUS_LABEL: Record<string, string> = ar
-    ? { new: "جديد", contacted: "تم التواصل", won: "نجح", lost: "فُقد" }
-    : { new: "New", contacted: "Contacted", won: "Won", lost: "Lost" };
+    ? { new: "جديد", contacted: "تم التواصل", negotiating: "قيد التفاوض", won: "نجح", lost: "فُقد" }
+    : { new: "New", contacted: "Contacted", negotiating: "Negotiating", won: "Closed Won", lost: "Closed Lost" };
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">

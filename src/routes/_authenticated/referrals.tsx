@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Link2, Copy, TrendingUp, MousePointerClick, PlusCircle } from "lucide-react";
+import { Link2, Copy, TrendingUp, MousePointerClick, PlusCircle, UserPlus, DollarSign } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
+import { formatPrice } from "@/lib/currency";
 import { listMyReferrals, createReferral } from "@/lib/referrals.functions";
+import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
@@ -28,9 +30,12 @@ type Row = {
 
 function ReferralsPage() {
   const { t, locale } = useI18n();
+  const ar = locale === "ar";
   const fetchList = useServerFn(listMyReferrals);
+  const fetchAnalytics = useServerFn(getMyReferralAnalytics);
   const create = useServerFn(createReferral);
   const [rows, setRows] = useState<Row[]>([]);
+  const [analytics, setAnalytics] = useState<{ clicks: number; registrations: number; conversions: number; revenue: number } | null>(null);
   const [listings, setListings] = useState<{ id: string; title_en: string; title_ar: string }[]>([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,6 +49,7 @@ function ReferralsPage() {
   };
   useEffect(() => {
     load();
+    fetchAnalytics().then((a) => setAnalytics(a)).catch(() => undefined);
     supabase.from("listings").select("id, title_en, title_ar").eq("status", "approved").limit(50)
       .then(({ data }) => setListings(data ?? []));
   }, []);
@@ -73,10 +79,11 @@ function ReferralsPage() {
           <Link2 className="h-6 w-6 text-primary" /> {t("referrals_title")}
         </h1>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <KPI icon={Link2} label={t("active_referrals")} value={String(rows.length)} />
-          <KPI icon={MousePointerClick} label={t("clicks")} value={String(totals.clicks)} />
-          <KPI icon={TrendingUp} label={t("conversions")} value={String(totals.conv)} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <KPI icon={MousePointerClick} label={t("clicks")} value={String(analytics?.clicks ?? totals.clicks)} />
+          <KPI icon={UserPlus} label={ar ? "تسجيلات" : "Registrations"} value={String(analytics?.registrations ?? 0)} />
+          <KPI icon={TrendingUp} label={t("conversions")} value={String(analytics?.conversions ?? totals.conv)} />
+          <KPI icon={DollarSign} label={ar ? "الإيرادات الناتجة" : "Revenue generated"} value={formatPrice(analytics?.revenue ?? 0, locale, { showZero: true })} />
         </div>
 
         <form onSubmit={onCreate} className="rounded-lg border border-border bg-card p-5 shadow-card mb-6 flex flex-col sm:flex-row gap-3 items-end">

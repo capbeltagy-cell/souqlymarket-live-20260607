@@ -117,7 +117,7 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       leadId: z.string().uuid(),
-      status: z.enum(["new", "contacted", "won", "lost"]),
+      status: z.enum(["new", "contacted", "negotiating", "won", "lost"]),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -135,15 +135,21 @@ export const getCompanyAnalytics = createServerFn({ method: "GET" })
     const { data: company } = await supabase
       .from("companies").select("id, is_verified").eq("owner_id", userId).maybeSingle();
     if (!company) {
-      return { hasCompany: false, totals: { listings: 0, views: 0, clicks: 0, leads: 0, conversionRate: 0 }, perListing: [], isVerified: false };
+      return { hasCompany: false, totals: { listings: 0, views: 0, clicks: 0, leads: 0, agentApplications: 0, conversionRate: 0 }, perListing: [], isVerified: false };
     }
-    const { data: rows, error } = await supabase
-      .from("listings")
-      .select("id, title_ar, title_en, views_count, clicks_count, leads_count, featured, featured_until, status")
-      .eq("company_id", company.id)
-      .order("views_count", { ascending: false });
-    if (error) throw new Error(error.message);
-    const list = rows ?? [];
+    const [listingsRes, appsRes] = await Promise.all([
+      supabase
+        .from("listings")
+        .select("id, title_ar, title_en, views_count, clicks_count, leads_count, featured, featured_until, status")
+        .eq("company_id", company.id)
+        .order("views_count", { ascending: false }),
+      supabase
+        .from("agent_applications")
+        .select("id", { count: "exact", head: true })
+        .eq("company_id", company.id),
+    ]);
+    if (listingsRes.error) throw new Error(listingsRes.error.message);
+    const list = listingsRes.data ?? [];
     const totals = list.reduce(
       (acc, r) => {
         acc.views += r.views_count ?? 0;
@@ -151,7 +157,7 @@ export const getCompanyAnalytics = createServerFn({ method: "GET" })
         acc.leads += r.leads_count ?? 0;
         return acc;
       },
-      { listings: list.length, views: 0, clicks: 0, leads: 0, conversionRate: 0 },
+      { listings: list.length, views: 0, clicks: 0, leads: 0, agentApplications: appsRes.count ?? 0, conversionRate: 0 },
     );
     totals.conversionRate = totals.views > 0 ? Math.round((totals.leads / totals.views) * 1000) / 10 : 0;
     return {
