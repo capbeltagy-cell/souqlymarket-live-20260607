@@ -99,12 +99,12 @@ export function ListingCard({ l }: { l: ListingCardData }) {
         <div>
           <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
           {company && (
-            <p className="text-xs text-muted-foreground mt-1 inline-flex flex-wrap items-center gap-2">
+            <div className="text-xs text-muted-foreground mt-1 inline-flex flex-wrap items-center gap-2">
               {l.companies?.is_verified && (
                 <Badge variant="secondary" className="text-[10px] tracking-[0.18em] px-2 py-1">{t("verified_company")}</Badge>
               )}
               <span>{t("by_company")} {company}</span>
-            </p>
+            </div>
           )}
         {(l.city || l.governorate || l.country) && (
           <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
