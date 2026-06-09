@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Briefcase, Building2, Factory, Handshake, Landmark, Package, ShieldCheck, Sparkles, TrendingUp, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Sparkles, TrendingUp, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -180,51 +180,9 @@ function Landing() {
         </div>
       </section>
 
-      <section className="container-souqly py-14">
-        <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
-          <div>
-            <h2 className="text-3xl font-bold">{t("success_stories")}</h2>
-            <p className="text-muted-foreground mt-2">{t("success_stories_subtitle")}</p>
-          </div>
-          <Button asChild variant="outline" className="border-white/20 bg-surface hover:bg-white/5">
-            <Link to="/about">{t("learn_more")}</Link>
-          </Button>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { title: t("story_1_title"), body: t("story_1_body") },
-            { title: t("story_2_title"), body: t("story_2_body") },
-            { title: t("story_3_title"), body: t("story_3_body") },
-          ].map((story) => (
-            <div key={story.title} className="rounded-3xl border border-border bg-card p-6 shadow-card hover:-translate-y-1 transition">
-              <div className="text-sm text-muted-foreground uppercase tracking-[0.18em] mb-3">{t("success")}</div>
-              <h3 className="font-semibold text-xl mb-3">{story.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{story.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-border bg-surface">
-        <div className="container-souqly py-6 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-          {[
-            { icon: ShieldCheck, label: t("companies_count") },
-            { icon: ShieldCheck, label: t("nav_agents") },
-            { icon: Building2, label: t("nav_companies") },
-            { icon: Package, label: t("section_featured") },
-            { icon: Sparkles, label: t("cta_join_company") },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex flex-col items-center gap-1.5">
-              <Icon className="h-5 w-5 text-primary" />
-              <div className="text-xs font-medium">{label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="container-souqly py-16">
+      <section className="container-souqly py-12">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">{t("section_categories")}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
           {categories.map(({ key, icon: Icon }) => (
             <Link key={key} to="/marketplace" className="group rounded-3xl border border-white/10 bg-surface p-6 text-center hover:border-primary/30 hover:shadow-elev transition">
               <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 text-primary grid place-items-center mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition">
@@ -248,26 +206,6 @@ function Landing() {
         </section>
       )}
 
-      <section className="bg-surface-2 mt-16 py-16">
-        <div className="container-souqly">
-          <h2 className="text-2xl md:text-3xl font-bold mb-10 text-center">{t("section_how_it_works")}</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: Briefcase, title: "how_1_title", body: "how_1_body" },
-              { icon: Handshake, title: "how_2_title", body: "how_2_body" },
-              { icon: ShieldCheck, title: "how_3_title", body: "how_3_body" },
-            ].map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-lg bg-card border border-border p-6">
-                <div className="h-12 w-12 rounded-md bg-primary text-primary-foreground grid place-items-center mb-4">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{t(title as never)}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{t(body as never)}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {companies.length > 0 && (
         <section className="container-souqly py-16">
