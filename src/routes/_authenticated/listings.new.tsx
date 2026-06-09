@@ -54,6 +54,9 @@ function NewListing() {
   const [areaSqm, setAreaSqm] = useState("");
   const [bedrooms, setBedrooms] = useState("");
   const [bathrooms, setBathrooms] = useState("");
+  const [purpose, setPurpose] = useState<"sale" | "rent" | "">("");
+  const [ownershipType, setOwnershipType] = useState("");
+  const [addressLine, setAddressLine] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
