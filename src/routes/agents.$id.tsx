@@ -84,10 +84,11 @@ function AgentProfile() {
   if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
   if (!agent) return <Shell><div className="p-10 text-center">Agent not found</div></Shell>;
 
-  const name = profile?.full_name ?? "Souqly Agent";
+  const name = profile?.display_name || profile?.full_name || "Souqly Agent";
   const headline = (locale === "ar" ? agent.headline_ar : agent.headline_en) ?? "";
   const bio = (locale === "ar" ? agent.bio_ar : agent.bio_en) ?? "";
   const country = [agent.city, agent.country].filter(Boolean).join(", ");
+  const wa = profile?.phone?.replace(/[^0-9]/g, "");
 
   return (
     <Shell>
@@ -101,11 +102,10 @@ function AgentProfile() {
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-3xl font-bold">{name}</h1>
-              {agent.is_verified && (
-                <span className="inline-flex items-center gap-1 bg-primary-foreground/20 rounded-full px-2 py-0.5 text-xs">
-                  <BadgeCheck className="h-3.5 w-3.5" />{t("verified_agent")}
-                </span>
-              )}
+              {agent.is_verified && <TrustBadge kind="verified_agent" />}
+              {agent.is_trusted && <TrustBadge kind="trusted_agent" />}
+              {agent.is_premium && <TrustBadge kind="premium_agent" />}
+              {profile?.phone_verified && <TrustBadge kind="verified_phone" />}
             </div>
             {headline && <p className="opacity-90 mt-1">{headline}</p>}
             <div className="flex items-center gap-4 mt-3 text-sm opacity-90 flex-wrap">
@@ -113,12 +113,15 @@ function AgentProfile() {
               <span className="flex items-center gap-1"><Trophy className="h-4 w-4" />{deals} {t("deals_closed")}</span>
             </div>
           </div>
-          {profile?.phone && (
-            <Button asChild variant="secondary" className="gap-2">
-              <a href={`https://wa.me/${profile.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer">
-                <Mail className="h-4 w-4" />{t("contact_agent")}
-              </a>
-            </Button>
+          {wa && (
+            <div className="flex flex-col gap-2">
+              <Button asChild className="gap-2 bg-success hover:bg-success/90">
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{t("contact_whatsapp")}</a>
+              </Button>
+              <Button asChild variant="secondary" className="gap-2">
+                <a href={`tel:+${wa}`}><Phone className="h-4 w-4" />{t("call_now")}</a>
+              </Button>
+            </div>
           )}
         </div>
       </section>
@@ -128,6 +131,8 @@ function AgentProfile() {
             <h2 className="font-semibold mb-3">{t("agent_stats")}</h2>
             <div className="grid grid-cols-2 gap-3">
               <Stat label={t("deals_closed")} value={String(deals)} />
+              <Stat label={t("total_earnings")} value={formatPrice(earnings, locale)} />
+              <Stat label={t("referral_earnings")} value={formatPrice(referralEarnings, locale)} />
               <Stat label="★" value="—" />
             </div>
           </div>
