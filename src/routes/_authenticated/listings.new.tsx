@@ -137,8 +137,42 @@ function NewListing() {
       return;
     }
 
+    if (!phone.trim() && !whatsapp.trim()) {
+      toast.error(locale === "ar" ? "أضف رقم هاتف أو واتساب للتواصل" : "Add a phone or WhatsApp number");
+      return;
+    }
+
     setSubmitting(true);
     try {
+      // Pre-publish duplicate check (warn-only; server enforces exact)
+      if (!forceDup) {
+        try {
+          const dup = await checkDup({ data: {
+            title_ar: title_ar || title_en,
+            title_en: title_en || title_ar,
+            governorate,
+            phone: phone || whatsapp || null,
+            latitude: latitude ? Number(latitude) : null,
+            longitude: longitude ? Number(longitude) : null,
+          } });
+          if (dup.severity === "exact") {
+            toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل ولا يمكن نشره" : "Exact duplicate — cannot publish");
+            setSubmitting(false);
+            return;
+          }
+          if (dup.severity === "similar") {
+            setForceDup(true);
+            toast.warning(
+              locale === "ar"
+                ? "تنبيه: يوجد إعلان مشابه. اضغط نشر مرة أخرى للمتابعة كمراجعة"
+                : "Similar listing found. Press publish again to send for review",
+            );
+            setSubmitting(false);
+            return;
+          }
+        } catch { /* non-fatal */ }
+      }
+
       const res = await create({
         data: {
           type,
@@ -157,6 +191,9 @@ function NewListing() {
           currency: "EGP",
           commission_percentage: Number(commission || 5),
           images,
+          image_sources: imageSources,
+          phone: phone || null,
+          whatsapp: whatsapp || null,
           video_url: null,
           pdf_url: pdf_url || null,
           property_subtype: propertySubtype || null,
@@ -166,9 +203,15 @@ function NewListing() {
           purpose: purpose || null,
           ownership_type: ownershipType || null,
           address_line: addressLine || null,
+          force: forceDup,
         } as never,
       });
-      toast.success(locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully");
+      const pending = (res as { status?: string }).status === "pending_review";
+      toast.success(
+        pending
+          ? (locale === "ar" ? "تم استلام إعلانك وسيتم مراجعته قريبًا" : "Listing submitted for review")
+          : (locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully"),
+      );
       try {
         await navigate({ to: "/listings/$id", params: { id: res.id } });
       } catch {
@@ -177,6 +220,9 @@ function NewListing() {
     } catch (e) {
       const msg = (e as Error).message;
       if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
+      else if (msg.includes("DUPLICATE_EXACT")) {
+        toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل" : "Exact duplicate listing");
+      }
       else { toast.error(msg || (locale === "ar" ? "تعذّر نشر الإعلان" : "Could not publish listing")); }
     }
     finally { setSubmitting(false); }
