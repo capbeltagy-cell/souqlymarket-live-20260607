@@ -95,7 +95,17 @@ function AuthPage() {
         phone: p,
         options: { data: { role } },
       });
-      if (error) throw error;
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+        if (msg.includes("phone provider") || msg.includes("provider") || (error as { code?: string }).code === "phone_provider_disabled") {
+          toast.error(ar
+            ? "تسجيل الدخول بالجوال غير متاح حالياً. الرجاء استخدام البريد الإلكتروني أو جوجل."
+            : "Phone login is not available yet. Please use Email or Google to continue.");
+          setStep("choose");
+          return;
+        }
+        throw error;
+      }
       setPhone(p);
       setStep("otp");
       toast.success(ar ? "تم إرسال الرمز" : "OTP sent");
@@ -176,6 +186,7 @@ function AuthPage() {
                 <Button onClick={() => { setMethod("phone"); setStep("phone"); }} variant="outline" className="w-full gap-2 h-11">
                   <Phone className="h-4 w-4" /> {ar ? "متابعة برقم الجوال" : "Continue with Mobile"}
                 </Button>
+                <p className="text-[11px] text-muted-foreground text-center -mt-1">{ar ? "قد يكون تسجيل الدخول بالجوال غير متاح" : "Mobile login may be unavailable"}</p>
                 <Button onClick={() => { setMethod("email"); setStep("email"); }} variant="outline" className="w-full gap-2 h-11">
                   <Mail className="h-4 w-4" /> {ar ? "متابعة بالبريد" : "Continue with Email"}
                 </Button>
