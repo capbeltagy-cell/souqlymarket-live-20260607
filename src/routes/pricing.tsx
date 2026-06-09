@@ -33,7 +33,7 @@ const PLANS: { key: PlanKey; titleKey: string; price: number; desc: string; feat
 ];
 
 function Pricing() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
   const fetchPlan = useServerFn(getMyPlan);
   const upgrade = useServerFn(upgradePlan);
