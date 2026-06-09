@@ -11,7 +11,34 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getRfq, listRfqOffers, submitRfqOffer, awardRfq } from "@/lib/phase3.functions";
 
+const DEFAULT_OG = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+
 export const Route = createFileRoute("/rfq/$id")({
+  loader: async ({ params }) => {
+    const { getRfqMeta } = await import("@/lib/seo.functions");
+    try { return { meta: await getRfqMeta({ data: { id: params.id } }) }; }
+    catch { return { meta: null }; }
+  },
+  head: ({ loaderData, params }) => {
+    const m: any = loaderData?.meta;
+    const title = m?.title ? `${m.title} — RFQ — Souqly` : "RFQ — Souqly";
+    const desc = (m?.description ?? "Request for Quote on Souqly.").slice(0, 160);
+    const att = Array.isArray(m?.attachments) ? m.attachments : [];
+    const img = att.find((a: any) => typeof a?.url === "string" && /\.(png|jpe?g|webp|gif)$/i.test(a.url))?.url ?? DEFAULT_OG;
+    const url = `/rfq/${params.id}`;
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: img },
+        { name: "twitter:image", content: img },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <Fallback msg="RFQ not found" />,
   errorComponent: () => <Fallback msg="Something went wrong" />,
   component: RfqDetail,
