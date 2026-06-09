@@ -56,11 +56,12 @@ type Listing = {
   id: string; type: string;
   title_ar: string; title_en: string;
   description_ar: string | null; description_en: string | null;
-  images: string[] | null; video_url: string | null; pdf_url: string | null;
+  images: string[] | null; image_sources: string[] | null; video_url: string | null; pdf_url: string | null;
   price: number | null; currency: string | null;
   country: string | null; city: string | null; governorate: string | null;
   latitude: number | null; longitude: number | null;
   commission_percentage: number | null;
+  phone: string | null; whatsapp: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
   updated_at: string | null;
