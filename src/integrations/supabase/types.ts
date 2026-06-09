@@ -483,6 +483,65 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          description: string | null
+          due_at: string | null
+          id: string
+          invoice_number: string
+          metadata: Json
+          paid_at: string | null
+          payment_id: string | null
+          purpose: string
+          status: Database["public"]["Enums"]["invoice_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          invoice_number: string
+          metadata?: Json
+          paid_at?: string | null
+          payment_id?: string | null
+          purpose: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          invoice_number?: string
+          metadata?: Json
+          paid_at?: string | null
+          payment_id?: string | null
+          purpose?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           buyer_email: string | null
@@ -1062,6 +1121,89 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          reason: Database["public"]["Enums"]["wallet_tx_reason"]
+          reference_id: string | null
+          reference_type: string | null
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          reason: Database["public"]["Enums"]["wallet_tx_reason"]
+          reference_id?: string | null
+          reference_type?: string | null
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          reason?: Database["public"]["Enums"]["wallet_tx_reason"]
+          reference_id?: string | null
+          reference_type?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          kind: Database["public"]["Enums"]["wallet_kind"]
+          pending_balance: number
+          total_earned: number
+          total_paid_out: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          kind: Database["public"]["Enums"]["wallet_kind"]
+          pending_balance?: number
+          total_earned?: number
+          total_paid_out?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["wallet_kind"]
+          pending_balance?: number
+          total_earned?: number
+          total_paid_out?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       wholesale_listings: {
         Row: {
           active: boolean
@@ -1183,6 +1325,13 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_wallet: {
+        Args: {
+          _kind: Database["public"]["Enums"]["wallet_kind"]
+          _user_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1203,6 +1352,7 @@ export type Database = {
       app_role: "admin" | "company" | "agent"
       application_status: "pending" | "accepted" | "rejected"
       commission_status: "pending" | "approved" | "paid"
+      invoice_status: "pending" | "paid" | "failed" | "refunded" | "void"
       listing_status: "draft" | "pending" | "approved" | "rejected"
       listing_type:
         | "product"
@@ -1215,6 +1365,16 @@ export type Database = {
         | "market"
         | "fish_shed"
       subscription_plan: "free" | "premium_company" | "premium_agent"
+      wallet_kind: "company" | "agent" | "platform"
+      wallet_tx_reason:
+        | "commission"
+        | "referral"
+        | "payout"
+        | "subscription"
+        | "featured"
+        | "manual_credit"
+        | "manual_debit"
+        | "refund"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1345,6 +1505,7 @@ export const Constants = {
       app_role: ["admin", "company", "agent"],
       application_status: ["pending", "accepted", "rejected"],
       commission_status: ["pending", "approved", "paid"],
+      invoice_status: ["pending", "paid", "failed", "refunded", "void"],
       listing_status: ["draft", "pending", "approved", "rejected"],
       listing_type: [
         "product",
@@ -1358,6 +1519,17 @@ export const Constants = {
         "fish_shed",
       ],
       subscription_plan: ["free", "premium_company", "premium_agent"],
+      wallet_kind: ["company", "agent", "platform"],
+      wallet_tx_reason: [
+        "commission",
+        "referral",
+        "payout",
+        "subscription",
+        "featured",
+        "manual_credit",
+        "manual_debit",
+        "refund",
+      ],
     },
   },
 } as const
