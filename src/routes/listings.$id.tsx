@@ -268,15 +268,15 @@ function ListingDetail() {
               <div className="flex items-center gap-1 text-sm text-success font-medium mb-4">
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
-              {whatsappNum ? (
+              {contactPhone ? (
                 <div className="space-y-2">
                   <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                    <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
+                    <a href={`https://wa.me/${whatsappNum || contactPhone}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
                       {t("contact_whatsapp")}
                     </a>
                   </Button>
                   <Button asChild variant="outline" className="w-full" size="lg">
-                    <a href={`tel:+${whatsappNum}`}>{t("call_now")}</a>
+                    <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
               ) : company?.email ? (
