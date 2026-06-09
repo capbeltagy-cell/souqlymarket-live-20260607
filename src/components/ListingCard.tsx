@@ -8,6 +8,8 @@ import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locat
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/currency";
+
 import type { ListingType } from "@/lib/marketplace";
 
 export type ListingCardData = {
