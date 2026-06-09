@@ -416,6 +416,15 @@ function NewListing() {
               </Field>
             </div>
 
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label={locale === "ar" ? "رقم الهاتف" : "Phone"} required>
+                <Input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="01XXXXXXXXX" />
+              </Field>
+              <Field label={locale === "ar" ? "رقم واتساب (اختياري)" : "WhatsApp (optional)"}>
+                <Input type="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="01XXXXXXXXX" />
+              </Field>
+            </div>
+
             <div className="pt-2 space-y-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="text-sm font-semibold">
@@ -454,16 +463,24 @@ function NewListing() {
                 {images.map((url, i) => (
                   <div key={url} className="relative">
                     <img src={url} alt="" className="h-20 w-20 object-cover rounded border border-border" />
-                    <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))}
+                    <span className={`absolute bottom-0 inset-x-0 text-[9px] text-center py-0.5 ${imageSources[i] === "live_capture" ? "bg-success/90 text-success-foreground" : "bg-muted/90 text-muted-foreground"}`}>
+                      {imageSources[i] === "live_capture" ? (locale === "ar" ? "تصوير مباشر" : "Live") : (locale === "ar" ? "مرفوعة" : "Upload")}
+                    </span>
+                    <button type="button" onClick={() => removeImage(i)}
                       className="absolute -top-1 -end-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground grid place-items-center"><X className="h-3 w-3" /></button>
                   </div>
                 ))}
                 <label className="h-20 w-20 rounded border-2 border-dashed border-input grid place-items-center cursor-pointer hover:bg-muted">
                   {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0])} />
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "uploaded")} />
+                </label>
+                <label className="h-20 w-20 rounded border-2 border-dashed border-success/60 grid place-items-center cursor-pointer hover:bg-success/5" title={locale === "ar" ? "تصوير مباشر" : "Live capture"}>
+                  {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5 text-success" />}
+                  <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "live_capture")} />
                 </label>
               </div>
             </div>
+
 
             <div className="grid sm:grid-cols-1 gap-4">
               <Field label={t("field_pdf") }>
