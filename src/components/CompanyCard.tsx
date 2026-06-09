@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { BadgeCheck, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { initialOf } from "@/lib/marketplace";
 
@@ -11,6 +12,7 @@ export type CompanyCardData = {
   industry: string | null;
   country: string | null;
   is_verified: boolean | null;
+  is_premium?: boolean | null;
   logo_url: string | null;
   listingCount?: number;
 };
@@ -29,9 +31,10 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             <h3 className="font-semibold truncate">{name}</h3>
-            {c.is_verified && <Badge variant="secondary">{t("verified_company")}</Badge>}
+            {c.is_verified && <TrustBadge kind="verified_company" />}
+            {c.is_premium && <TrustBadge kind="premium_company" />}
           </div>
           <p className="text-sm text-muted-foreground mt-1">{c.industry ?? "—"}</p>
           <div className="flex flex-wrap items-center gap-3 mt-4 text-xs text-muted-foreground">
@@ -45,3 +48,4 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
     </Link>
   );
 }
+
