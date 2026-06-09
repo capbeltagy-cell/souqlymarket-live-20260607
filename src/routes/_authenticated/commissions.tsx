@@ -123,7 +123,7 @@ function CommissionsPage() {
                       {r.paid_at && <> · ✅ {new Date(r.paid_at).toLocaleDateString()}</>}
                     </div>
                   </div>
-                  <div className="font-bold text-success">${Number(r.amount).toLocaleString()} {r.currency}</div>
+                  <div className="font-bold text-success">{formatPrice(Number(r.amount), locale)}</div>
                   <StatusBadge status={r.status} />
                   {role === "agent" && r.status === "approved" && !r.payout_requested_at && (
                     <Button size="sm" variant="outline" className="gap-2" onClick={() => onRequestPayout(r.id)}>
