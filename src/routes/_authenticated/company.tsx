@@ -68,11 +68,32 @@ function CompanyEdit() {
     finally { setUploading(null); }
   };
 
+  const normalizeUrl = (raw: string): string | null => {
+    const v = raw.trim();
+    if (!v) return null;
+    return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  };
+  const isArabic = (typeof document !== "undefined" && document.documentElement.dir === "rtl");
+  const msg = (ar: string, en: string) => (isArabic ? ar : en);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Manual validation (no native type=url/email so we control the messages)
+    const website = normalizeUrl(form.website);
+    if (form.website.trim() && website) {
+      try { new URL(website); } catch {
+        toast.error(msg("رابط الموقع غير صالح. مثال: example.com", "Invalid website URL. Example: example.com"));
+        return;
+      }
+    }
+    const email = form.email.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error(msg("البريد الإلكتروني غير صالح.", "Invalid email address."));
+      return;
+    }
     setSubmitting(true);
     try {
-      const res = await save({ data: { ...form, website: form.website || null, email: form.email || null } as never });
+      const res = await save({ data: { ...form, website: website, email: email || null } as never });
       toast.success(res.created ? t("company_created") : t("company_updated"));
       navigate({ to: "/companies/$id", params: { id: res.id } });
     } catch (e) { toast.error((e as Error).message); }
