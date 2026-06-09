@@ -136,6 +136,10 @@ function NewListing() {
           images,
           video_url: null,
           pdf_url: pdf_url || null,
+          property_subtype: propertySubtype || null,
+          area_sqm: areaSqm ? Number(areaSqm) : null,
+          bedrooms: bedrooms ? Number(bedrooms) : null,
+          bathrooms: bathrooms ? Number(bathrooms) : null,
         } as never,
       });
       toast.success(t("listing_published"));
