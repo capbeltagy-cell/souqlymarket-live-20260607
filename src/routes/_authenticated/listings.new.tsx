@@ -143,6 +143,9 @@ function NewListing() {
           area_sqm: areaSqm ? Number(areaSqm) : null,
           bedrooms: bedrooms ? Number(bedrooms) : null,
           bathrooms: bathrooms ? Number(bathrooms) : null,
+          purpose: purpose || null,
+          ownership_type: ownershipType || null,
+          address_line: addressLine || null,
         } as never,
       });
       toast.success(t("listing_published"));
