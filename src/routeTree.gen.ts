@@ -44,6 +44,7 @@ import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
@@ -51,6 +52,7 @@ import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_auth
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
@@ -58,6 +60,7 @@ import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
+import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
@@ -241,6 +244,11 @@ const AgentsIdRoute = AgentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AgentsRoute,
 } as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVerificationRoute =
   AuthenticatedVerificationRouteImport.update({
     id: '/verification',
@@ -276,6 +284,11 @@ const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
@@ -315,6 +328,12 @@ const AuthenticatedAgentRoute = AuthenticatedAgentRouteImport.update({
   path: '/agent',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRevenueRoute =
+  AuthenticatedAdminRevenueRouteImport.update({
+    id: '/admin-revenue',
+    path: '/admin-revenue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOverviewRoute =
   AuthenticatedAdminOverviewRouteImport.update({
     id: '/admin-overview',
@@ -388,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
@@ -395,6 +415,7 @@ export interface FileRoutesByFullPath {
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -402,6 +423,7 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof AuthenticatedReferralsRoute
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -446,6 +468,7 @@ export interface FileRoutesByTo {
   '/wholesale': typeof WholesaleRouteWithChildren
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
@@ -453,6 +476,7 @@ export interface FileRoutesByTo {
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -460,6 +484,7 @@ export interface FileRoutesByTo {
   '/referrals': typeof AuthenticatedReferralsRoute
   '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -506,6 +531,7 @@ export interface FileRoutesById {
   '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
@@ -513,6 +539,7 @@ export interface FileRoutesById {
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -520,6 +547,7 @@ export interface FileRoutesById {
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -566,6 +594,7 @@ export interface FileRouteTypes {
     | '/wholesale'
     | '/admin-companies'
     | '/admin-overview'
+    | '/admin-revenue'
     | '/agent'
     | '/analytics'
     | '/commissions'
@@ -573,6 +602,7 @@ export interface FileRouteTypes {
     | '/company-profile-extra'
     | '/dashboard'
     | '/favorites'
+    | '/invoices'
     | '/leads'
     | '/moderation'
     | '/profile'
@@ -580,6 +610,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/seed'
     | '/verification'
+    | '/wallet'
     | '/agents/$id'
     | '/auth/callback'
     | '/categories/$slug'
@@ -624,6 +655,7 @@ export interface FileRouteTypes {
     | '/wholesale'
     | '/admin-companies'
     | '/admin-overview'
+    | '/admin-revenue'
     | '/agent'
     | '/analytics'
     | '/commissions'
@@ -631,6 +663,7 @@ export interface FileRouteTypes {
     | '/company-profile-extra'
     | '/dashboard'
     | '/favorites'
+    | '/invoices'
     | '/leads'
     | '/moderation'
     | '/profile'
@@ -638,6 +671,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/seed'
     | '/verification'
+    | '/wallet'
     | '/agents/$id'
     | '/auth/callback'
     | '/categories/$slug'
@@ -683,6 +717,7 @@ export interface FileRouteTypes {
     | '/wholesale'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-overview'
+    | '/_authenticated/admin-revenue'
     | '/_authenticated/agent'
     | '/_authenticated/analytics'
     | '/_authenticated/commissions'
@@ -690,6 +725,7 @@ export interface FileRouteTypes {
     | '/_authenticated/company-profile-extra'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
+    | '/_authenticated/invoices'
     | '/_authenticated/leads'
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
@@ -697,6 +733,7 @@ export interface FileRouteTypes {
     | '/_authenticated/referrals'
     | '/_authenticated/seed'
     | '/_authenticated/verification'
+    | '/_authenticated/wallet'
     | '/agents/$id'
     | '/auth/callback'
     | '/categories/$slug'
@@ -992,6 +1029,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsIdRouteImport
       parentRoute: typeof AgentsRoute
     }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/verification': {
       id: '/_authenticated/verification'
       path: '/verification'
@@ -1041,6 +1085,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/invoices': {
+      id: '/_authenticated/invoices'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof AuthenticatedInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -1088,6 +1139,13 @@ declare module '@tanstack/react-router' {
       path: '/agent'
       fullPath: '/agent'
       preLoaderRoute: typeof AuthenticatedAgentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-revenue': {
+      id: '/_authenticated/admin-revenue'
+      path: '/admin-revenue'
+      fullPath: '/admin-revenue'
+      preLoaderRoute: typeof AuthenticatedAdminRevenueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin-overview': {
@@ -1152,6 +1210,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
+  AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
@@ -1159,6 +1218,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
+  AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -1166,6 +1226,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedSeedRoute: typeof AuthenticatedSeedRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
@@ -1177,6 +1238,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
+  AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
@@ -1184,6 +1246,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
+  AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -1191,6 +1254,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedSeedRoute: AuthenticatedSeedRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
