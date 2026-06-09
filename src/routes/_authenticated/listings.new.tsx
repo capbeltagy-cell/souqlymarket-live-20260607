@@ -492,9 +492,16 @@ function NewListing() {
             </div>
 
             <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-card/95 backdrop-blur border-t border-border sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:pt-2">
-              <Button type="submit" disabled={submitting || uploading || !planInfo?.hasCompany} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
+              {planError && (
+                <div className="mb-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                  {planError}
+                </div>
+              )}
+              <Button type="submit" disabled={submitting || uploading} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
                 {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                {locale === "ar" ? "نشر الإعلان" : t("submit_listing")}
+                {uploading
+                  ? (locale === "ar" ? "جارٍ رفع الملفات…" : "Uploading files…")
+                  : (locale === "ar" ? "نشر الإعلان" : t("submit_listing"))}
               </Button>
             </div>
           </form>
