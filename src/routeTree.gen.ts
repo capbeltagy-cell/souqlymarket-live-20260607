@@ -31,13 +31,13 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FactoriesRouteImport } from './routes/factories'
 import { Route as ControlCenterX7RouteImport } from './routes/control-center-x7'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
 import { Route as TendersIdRouteImport } from './routes/tenders.$id'
 import { Route as RfqIdRouteImport } from './routes/rfq.$id'
@@ -186,11 +186,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompaniesRoute = CompaniesRouteImport.update({
-  id: '/companies',
-  path: '/companies',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -218,6 +213,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
+  id: '/companies/',
+  path: '/companies/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WholesaleIdRoute = WholesaleIdRouteImport.update({
@@ -424,7 +424,6 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
-  '/companies': typeof CompaniesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
@@ -478,6 +477,7 @@ export interface FileRoutesByFullPath {
   '/rfq/$id': typeof RfqIdRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
+  '/companies/': typeof CompaniesIndexRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -491,7 +491,6 @@ export interface FileRoutesByTo {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
-  '/companies': typeof CompaniesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
@@ -545,6 +544,7 @@ export interface FileRoutesByTo {
   '/rfq/$id': typeof RfqIdRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
+  '/companies': typeof CompaniesIndexRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -560,7 +560,6 @@ export interface FileRoutesById {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/categories': typeof CategoriesRouteWithChildren
-  '/companies': typeof CompaniesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
   '/factories': typeof FactoriesRouteWithChildren
@@ -614,6 +613,7 @@ export interface FileRoutesById {
   '/rfq/$id': typeof RfqIdRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
+  '/companies/': typeof CompaniesIndexRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -629,7 +629,6 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/categories'
-    | '/companies'
     | '/contact'
     | '/control-center-x7'
     | '/factories'
@@ -683,6 +682,7 @@ export interface FileRouteTypes {
     | '/rfq/$id'
     | '/tenders/$id'
     | '/wholesale/$id'
+    | '/companies/'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -696,7 +696,6 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/categories'
-    | '/companies'
     | '/contact'
     | '/control-center-x7'
     | '/factories'
@@ -750,6 +749,7 @@ export interface FileRouteTypes {
     | '/rfq/$id'
     | '/tenders/$id'
     | '/wholesale/$id'
+    | '/companies'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -764,7 +764,6 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/categories'
-    | '/companies'
     | '/contact'
     | '/control-center-x7'
     | '/factories'
@@ -818,6 +817,7 @@ export interface FileRouteTypes {
     | '/rfq/$id'
     | '/tenders/$id'
     | '/wholesale/$id'
+    | '/companies/'
     | '/_authenticated/listings/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
@@ -833,7 +833,6 @@ export interface RootRouteChildren {
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   CategoriesRoute: typeof CategoriesRouteWithChildren
-  CompaniesRoute: typeof CompaniesRouteWithChildren
   ContactRoute: typeof ContactRoute
   ControlCenterX7Route: typeof ControlCenterX7Route
   FactoriesRoute: typeof FactoriesRouteWithChildren
@@ -858,6 +857,7 @@ export interface RootRouteChildren {
   WholesaleRoute: typeof WholesaleRouteWithChildren
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
+  CompaniesIndexRoute: typeof CompaniesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1016,13 +1016,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/companies': {
-      id: '/companies'
-      path: '/companies'
-      fullPath: '/companies'
-      preLoaderRoute: typeof CompaniesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/categories': {
       id: '/categories'
       path: '/categories'
@@ -1063,6 +1056,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies/': {
+      id: '/companies/'
+      path: '/companies'
+      fullPath: '/companies/'
+      preLoaderRoute: typeof CompaniesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wholesale/$id': {
@@ -1423,18 +1423,6 @@ const CategoriesRouteWithChildren = CategoriesRoute._addFileChildren(
   CategoriesRouteChildren,
 )
 
-interface CompaniesRouteChildren {
-  CompaniesIdRoute: typeof CompaniesIdRoute
-}
-
-const CompaniesRouteChildren: CompaniesRouteChildren = {
-  CompaniesIdRoute: CompaniesIdRoute,
-}
-
-const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
-  CompaniesRouteChildren,
-)
-
 interface FactoriesRouteChildren {
   FactoriesIdRoute: typeof FactoriesIdRoute
 }
@@ -1487,7 +1475,6 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   CategoriesRoute: CategoriesRouteWithChildren,
-  CompaniesRoute: CompaniesRouteWithChildren,
   ContactRoute: ContactRoute,
   ControlCenterX7Route: ControlCenterX7Route,
   FactoriesRoute: FactoriesRouteWithChildren,
@@ -1512,6 +1499,7 @@ const rootRouteChildren: RootRouteChildren = {
   WholesaleRoute: WholesaleRouteWithChildren,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
+  CompaniesIndexRoute: CompaniesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
