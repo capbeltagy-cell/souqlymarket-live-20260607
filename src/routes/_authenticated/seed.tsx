@@ -17,11 +17,15 @@ export const Route = createFileRoute("/_authenticated/seed")({
 
 function SeedPage() {
   const { t } = useI18n();
-  const { roles } = useAuth();
+  const { roles, loading } = useAuth();
   const run = useServerFn(seedEgyptDemo);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const isAdmin = roles.includes("admin");
+
+  if (!loading && !isAdmin) return <Navigate to="/dashboard" replace />;
+
+
 
   async function onRun() {
     setBusy(true);
