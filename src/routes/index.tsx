@@ -43,6 +43,7 @@ function EmptyState({ label, href }: { label: string; href: string }) {
 
 function Landing() {
   const { t, dir, locale } = useI18n();
+  const ar = locale === "ar";
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [products, setProducts] = useState<ListingCardData[]>([]);
@@ -53,11 +54,12 @@ function Landing() {
   const [wholesale, setWholesale] = useState<any[]>([]);
   const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }>>([]);
   const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }>>([]);
+  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0, leads: 0 });
 
   useEffect(() => {
     (async () => {
       const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
-      const [lRes, pRes, reRes, landRes, facRes, cRes, wRes, rfqRes, tenderRes] = await Promise.all([
+      const [lRes, pRes, reRes, landRes, facRes, cRes, wRes, rfqRes, tenderRes, cCount, lCount, aCount, leadCount] = await Promise.all([
         supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
         supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
         supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "real_estate").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
@@ -67,6 +69,10 @@ function Landing() {
         supabase.from("wholesale_listings").select("*, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
         supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(4),
         supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id", { count: "exact", head: true }),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+        supabase.from("leads").select("id", { count: "exact", head: true }),
       ]);
       setListings((lRes.data ?? []) as unknown as ListingCardData[]);
       setProducts((pRes.data ?? []) as unknown as ListingCardData[]);
@@ -77,6 +83,12 @@ function Landing() {
       setWholesale((wRes.data ?? []) as any[]);
       setRfqs((rfqRes.data ?? []) as never);
       setTenders((tenderRes.data ?? []) as never);
+      setCounts({
+        companies: cCount.count ?? 0,
+        listings: lCount.count ?? 0,
+        agents: aCount.count ?? 0,
+        leads: leadCount.count ?? 0,
+      });
     })();
   }, []);
 
@@ -95,24 +107,31 @@ function Landing() {
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
               <Sparkles className="h-3 w-3" />{t("tagline")}
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">{t("hero_title")}</h1>
+            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
+              {ar ? "سوقلي يربط الشركات والموردين ومسوقي المبيعات في مصر." : "Souqly connects companies, suppliers and sales agents across Egypt."}
+            </h1>
             <p className="text-base md:text-lg text-primary-foreground/85 max-w-xl">{t("hero_subtitle")}</p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "سجّل شركتك" : "Register Company"}<Arrow className="h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/15">
-                <Link to="/auth" search={{ mode: "signup" }}>{t("cta_join_company")}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>{ar ? "كن مسوّقاً" : "Become an Agent"}</Link>
+              </Button>
+              <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-white/10">
+                <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
               </Button>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: locale === "ar" ? "شركات موثوقة" : "Verified companies" },
-                { label: locale === "ar" ? "تواصل سريع" : "Fast connections" },
-                { label: locale === "ar" ? "قوائم مصدقة" : "Approved listings" },
+                { label: ar ? "شركة" : "Companies", value: counts.companies },
+                { label: ar ? "إعلان" : "Listings", value: counts.listings },
+                { label: ar ? "مسوّق" : "Agents", value: counts.agents },
+                { label: ar ? "صفقة/طلب" : "Deals & Leads", value: counts.leads },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-white/10 px-3 py-2.5 text-sm text-primary-foreground/80 text-center">
-                  {item.label}
+                <div key={item.label} className="rounded-2xl bg-white/10 px-3 py-3 text-center backdrop-blur">
+                  <div className="text-2xl font-extrabold tabular-nums">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}</div>
+                  <div className="text-xs text-primary-foreground/75 mt-0.5">{item.label}</div>
                 </div>
               ))}
             </div>
