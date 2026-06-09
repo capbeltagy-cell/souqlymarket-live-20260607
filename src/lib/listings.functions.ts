@@ -76,6 +76,10 @@ export const createListing = createServerFn({ method: "POST" })
         video_url: data.video_url,
         pdf_url: data.pdf_url,
         commission_percentage: data.commission_percentage,
+        property_subtype: data.property_subtype ?? null,
+        area_sqm: data.area_sqm ?? null,
+        bedrooms: data.bedrooms ?? null,
+        bathrooms: data.bathrooms ?? null,
         status: "approved", // auto-approve for beta; admin can flip later
       })
       .select("id")
