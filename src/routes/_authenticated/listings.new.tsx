@@ -34,6 +34,7 @@ function NewListing() {
   const fetchPlan = useServerFn(getMyPlan);
   const fetchSub = useServerFn(getMyCompanySubscription);
   const create = useServerFn(createListing);
+  const checkDup = useServerFn(checkListingDuplicate);
   const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
 
   const [type, setType] = useState<ListingType>("product");
@@ -47,6 +48,8 @@ function NewListing() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
 
   const [commission, setCommission] = useState("5");
   const [propertySubtype, setPropertySubtype] = useState("");
@@ -57,9 +60,11 @@ function NewListing() {
   const [ownershipType, setOwnershipType] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [imageSources, setImageSources] = useState<("live_capture" | "uploaded")[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [forceDup, setForceDup] = useState(false);
 
   useEffect(() => {
     if (!user) return;
