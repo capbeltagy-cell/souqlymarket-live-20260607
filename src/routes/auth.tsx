@@ -186,6 +186,7 @@ function AuthPage() {
                 <Button onClick={() => { setMethod("phone"); setStep("phone"); }} variant="outline" className="w-full gap-2 h-11">
                   <Phone className="h-4 w-4" /> {ar ? "متابعة برقم الجوال" : "Continue with Mobile"}
                 </Button>
+                <p className="text-[11px] text-muted-foreground text-center -mt-1">{ar ? "قد يكون تسجيل الدخول بالجوال غير متاح" : "Mobile login may be unavailable"}</p>
                 <Button onClick={() => { setMethod("email"); setStep("email"); }} variant="outline" className="w-full gap-2 h-11">
                   <Mail className="h-4 w-4" /> {ar ? "متابعة بالبريد" : "Continue with Email"}
                 </Button>
