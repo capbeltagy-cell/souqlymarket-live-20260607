@@ -50,7 +50,7 @@ export const convertReferral = createServerFn({ method: "POST" })
     z.object({
       referralId: z.string().uuid(),
       amount: z.number().nonnegative(),
-      currency: z.string().min(2).max(8).default("USD"),
+      currency: z.string().min(2).max(8).default("EGP"),
       notes: z.string().max(500).optional().nullable(),
     }).parse(d),
   )
