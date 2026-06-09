@@ -76,7 +76,7 @@ function Pricing() {
                 <h3 className="font-bold text-lg">{t(p.titleKey as never)}</h3>
                 <p className="text-sm text-muted-foreground mt-1 mb-4">{t(p.desc as never)}</p>
                 <div className="mb-6">
-                  <span className="text-4xl font-extrabold">${p.price}</span>
+                  <span className="text-4xl font-extrabold">{p.price === 0 ? (locale === "ar" ? "مجاناً" : "Free") : (locale === "ar" ? `${p.price.toLocaleString("ar-EG")} جنيه` : `EGP ${p.price.toLocaleString()}`)}</span>
                   <span className="text-muted-foreground">{t("monthly")}</span>
                 </div>
                 <ul className="space-y-2 mb-6">
