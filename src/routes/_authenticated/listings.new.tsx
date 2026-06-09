@@ -103,13 +103,20 @@ function NewListing() {
     } finally { setUploading(false); }
   };
 
-  const onImageUpload = async (file: File) => {
+  const onImageUpload = async (file: File, source: "live_capture" | "uploaded" = "uploaded") => {
     const url = await uploadFile(file, "image");
-    if (url) setImages((prev) => [...prev, url]);
+    if (url) {
+      setImages((prev) => [...prev, url]);
+      setImageSources((prev) => [...prev, source]);
+    }
   };
   const onPdfUpload = async (file: File) => {
     const url = await uploadFile(file, "pdf");
     if (url) setPdf(url);
+  };
+  const removeImage = (i: number) => {
+    setImages((prev) => prev.filter((_, j) => j !== i));
+    setImageSources((prev) => prev.filter((_, j) => j !== i));
   };
 
   const onSubmit = async (e: React.FormEvent) => {
