@@ -107,24 +107,31 @@ function Landing() {
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
               <Sparkles className="h-3 w-3" />{t("tagline")}
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">{t("hero_title")}</h1>
+            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
+              {ar ? "سوقلي يربط الشركات والموردين ومسوقي المبيعات في مصر." : "Souqly connects companies, suppliers and sales agents across Egypt."}
+            </h1>
             <p className="text-base md:text-lg text-primary-foreground/85 max-w-xl">{t("hero_subtitle")}</p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "سجّل شركتك" : "Register Company"}<Arrow className="h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/15">
-                <Link to="/auth" search={{ mode: "signup" }}>{t("cta_join_company")}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>{ar ? "كن مسوّقاً" : "Become an Agent"}</Link>
+              </Button>
+              <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-white/10">
+                <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
               </Button>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: locale === "ar" ? "شركات موثوقة" : "Verified companies" },
-                { label: locale === "ar" ? "تواصل سريع" : "Fast connections" },
-                { label: locale === "ar" ? "قوائم مصدقة" : "Approved listings" },
+                { label: ar ? "شركة" : "Companies", value: counts.companies },
+                { label: ar ? "إعلان" : "Listings", value: counts.listings },
+                { label: ar ? "مسوّق" : "Agents", value: counts.agents },
+                { label: ar ? "صفقة/طلب" : "Deals & Leads", value: counts.leads },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-white/10 px-3 py-2.5 text-sm text-primary-foreground/80 text-center">
-                  {item.label}
+                <div key={item.label} className="rounded-2xl bg-white/10 px-3 py-3 text-center backdrop-blur">
+                  <div className="text-2xl font-extrabold tabular-nums">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}</div>
+                  <div className="text-xs text-primary-foreground/75 mt-0.5">{item.label}</div>
                 </div>
               ))}
             </div>
