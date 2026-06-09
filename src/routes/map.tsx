@@ -7,11 +7,15 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { MapView } from "@/components/MapView";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
-import { EGYPT_GOVERNORATES, getCitiesForGovernorate, normalizeEgyptCity, normalizeEgyptGovernorate } from "@/lib/egypt.locations";
+import { EGYPT_GOVERNORATES, getCitiesForGovernorate, normalizeEgyptCity, normalizeEgyptGovernorate, translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/map")({
-  head: () => ({ meta: [{ title: "Map — Souqly" }, { name: "description", content: "Browse marketplace listings on the map." }] }),
+  head: () => ({ meta: [
+    { title: "Map — Souqly" },
+    { name: "description", content: "Browse real estate, lands, factories and warehouses on the map across Egypt." },
+  ] }),
   component: MapPage,
 });
 
@@ -25,6 +29,9 @@ type ListingMarker = {
   city: string | null;
   latitude: number | null;
   longitude: number | null;
+  price: number | null;
+  phone: string | null;
+  whatsapp: string | null;
 };
 
 const TYPES: { value: ListingType | "all"; key: string }[] = [
@@ -44,7 +51,7 @@ function MapPage() {
     setLoading(true);
     supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude")
+      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price, phone, whatsapp")
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(500)
@@ -74,14 +81,21 @@ function MapPage() {
     [city, governorate, listings, typeFilter],
   );
 
-  const markers = filtered.map((item) => ({
-    id: item.id,
-    lat: item.latitude ?? 0,
-    lng: item.longitude ?? 0,
-    type: item.type,
-    title: locale === "ar" ? item.title_ar ?? item.title_en ?? "" : item.title_en ?? item.title_ar ?? "",
-    description: [item.city, item.governorate, item.country].filter(Boolean).join(" · "),
-  }));
+  const markers = filtered.map((item) => {
+    const loc = [
+      translateEgyptCity(item.city, locale) ?? item.city,
+      translateEgyptGovernorate(item.governorate, locale) ?? item.governorate,
+    ].filter(Boolean).join(" · ");
+    const priceLabel = item.price && item.price > 0 ? ` • ${formatPrice(item.price, locale)}` : "";
+    return {
+      id: item.id,
+      lat: item.latitude ?? 0,
+      lng: item.longitude ?? 0,
+      type: item.type,
+      title: locale === "ar" ? item.title_ar ?? item.title_en ?? "" : item.title_en ?? item.title_ar ?? "",
+      description: `${loc}${priceLabel}`,
+    };
+  });
 
   return (
     <div className="min-h-screen flex flex-col">

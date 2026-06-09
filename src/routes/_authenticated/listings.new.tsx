@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
+import { Camera, Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -16,7 +16,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import { getMyPlan } from "@/lib/billing.functions";
 import { getMyCompanySubscription } from "@/lib/subscription.functions";
-import { createListing } from "@/lib/listings.functions";
+import { createListing, checkListingDuplicate } from "@/lib/listings.functions";
 import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +34,7 @@ function NewListing() {
   const fetchPlan = useServerFn(getMyPlan);
   const fetchSub = useServerFn(getMyCompanySubscription);
   const create = useServerFn(createListing);
+  const checkDup = useServerFn(checkListingDuplicate);
   const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
 
   const [type, setType] = useState<ListingType>("product");
@@ -47,6 +48,8 @@ function NewListing() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
 
   const [commission, setCommission] = useState("5");
   const [propertySubtype, setPropertySubtype] = useState("");
@@ -57,9 +60,11 @@ function NewListing() {
   const [ownershipType, setOwnershipType] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [imageSources, setImageSources] = useState<("live_capture" | "uploaded")[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [forceDup, setForceDup] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -98,13 +103,20 @@ function NewListing() {
     } finally { setUploading(false); }
   };
 
-  const onImageUpload = async (file: File) => {
+  const onImageUpload = async (file: File, source: "live_capture" | "uploaded" = "uploaded") => {
     const url = await uploadFile(file, "image");
-    if (url) setImages((prev) => [...prev, url]);
+    if (url) {
+      setImages((prev) => [...prev, url]);
+      setImageSources((prev) => [...prev, source]);
+    }
   };
   const onPdfUpload = async (file: File) => {
     const url = await uploadFile(file, "pdf");
     if (url) setPdf(url);
+  };
+  const removeImage = (i: number) => {
+    setImages((prev) => prev.filter((_, j) => j !== i));
+    setImageSources((prev) => prev.filter((_, j) => j !== i));
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -125,8 +137,42 @@ function NewListing() {
       return;
     }
 
+    if (!phone.trim() && !whatsapp.trim()) {
+      toast.error(locale === "ar" ? "أضف رقم هاتف أو واتساب للتواصل" : "Add a phone or WhatsApp number");
+      return;
+    }
+
     setSubmitting(true);
     try {
+      // Pre-publish duplicate check (warn-only; server enforces exact)
+      if (!forceDup) {
+        try {
+          const dup = await checkDup({ data: {
+            title_ar: title_ar || title_en,
+            title_en: title_en || title_ar,
+            governorate,
+            phone: phone || whatsapp || null,
+            latitude: latitude ? Number(latitude) : null,
+            longitude: longitude ? Number(longitude) : null,
+          } });
+          if (dup.severity === "exact") {
+            toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل ولا يمكن نشره" : "Exact duplicate — cannot publish");
+            setSubmitting(false);
+            return;
+          }
+          if (dup.severity === "similar") {
+            setForceDup(true);
+            toast.warning(
+              locale === "ar"
+                ? "تنبيه: يوجد إعلان مشابه. اضغط نشر مرة أخرى للمتابعة كمراجعة"
+                : "Similar listing found. Press publish again to send for review",
+            );
+            setSubmitting(false);
+            return;
+          }
+        } catch { /* non-fatal */ }
+      }
+
       const res = await create({
         data: {
           type,
@@ -145,6 +191,9 @@ function NewListing() {
           currency: "EGP",
           commission_percentage: Number(commission || 5),
           images,
+          image_sources: imageSources,
+          phone: phone || null,
+          whatsapp: whatsapp || null,
           video_url: null,
           pdf_url: pdf_url || null,
           property_subtype: propertySubtype || null,
@@ -154,9 +203,15 @@ function NewListing() {
           purpose: purpose || null,
           ownership_type: ownershipType || null,
           address_line: addressLine || null,
+          force: forceDup,
         } as never,
       });
-      toast.success(locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully");
+      const pending = (res as { status?: string }).status === "pending_review";
+      toast.success(
+        pending
+          ? (locale === "ar" ? "تم استلام إعلانك وسيتم مراجعته قريبًا" : "Listing submitted for review")
+          : (locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully"),
+      );
       try {
         await navigate({ to: "/listings/$id", params: { id: res.id } });
       } catch {
@@ -165,6 +220,9 @@ function NewListing() {
     } catch (e) {
       const msg = (e as Error).message;
       if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
+      else if (msg.includes("DUPLICATE_EXACT")) {
+        toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل" : "Exact duplicate listing");
+      }
       else { toast.error(msg || (locale === "ar" ? "تعذّر نشر الإعلان" : "Could not publish listing")); }
     }
     finally { setSubmitting(false); }
@@ -358,6 +416,15 @@ function NewListing() {
               </Field>
             </div>
 
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label={locale === "ar" ? "رقم الهاتف" : "Phone"} required>
+                <Input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="01XXXXXXXXX" />
+              </Field>
+              <Field label={locale === "ar" ? "رقم واتساب (اختياري)" : "WhatsApp (optional)"}>
+                <Input type="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="01XXXXXXXXX" />
+              </Field>
+            </div>
+
             <div className="pt-2 space-y-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="text-sm font-semibold">
@@ -396,16 +463,24 @@ function NewListing() {
                 {images.map((url, i) => (
                   <div key={url} className="relative">
                     <img src={url} alt="" className="h-20 w-20 object-cover rounded border border-border" />
-                    <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))}
+                    <span className={`absolute bottom-0 inset-x-0 text-[9px] text-center py-0.5 ${imageSources[i] === "live_capture" ? "bg-success/90 text-success-foreground" : "bg-muted/90 text-muted-foreground"}`}>
+                      {imageSources[i] === "live_capture" ? (locale === "ar" ? "تصوير مباشر" : "Live") : (locale === "ar" ? "مرفوعة" : "Upload")}
+                    </span>
+                    <button type="button" onClick={() => removeImage(i)}
                       className="absolute -top-1 -end-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground grid place-items-center"><X className="h-3 w-3" /></button>
                   </div>
                 ))}
                 <label className="h-20 w-20 rounded border-2 border-dashed border-input grid place-items-center cursor-pointer hover:bg-muted">
                   {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0])} />
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "uploaded")} />
+                </label>
+                <label className="h-20 w-20 rounded border-2 border-dashed border-success/60 grid place-items-center cursor-pointer hover:bg-success/5" title={locale === "ar" ? "تصوير مباشر" : "Live capture"}>
+                  {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5 text-success" />}
+                  <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "live_capture")} />
                 </label>
               </div>
             </div>
+
 
             <div className="grid sm:grid-cols-1 gap-4">
               <Field label={t("field_pdf") }>

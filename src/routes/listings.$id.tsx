@@ -56,11 +56,12 @@ type Listing = {
   id: string; type: string;
   title_ar: string; title_en: string;
   description_ar: string | null; description_en: string | null;
-  images: string[] | null; video_url: string | null; pdf_url: string | null;
+  images: string[] | null; image_sources: string[] | null; video_url: string | null; pdf_url: string | null;
   price: number | null; currency: string | null;
   country: string | null; city: string | null; governorate: string | null;
   latitude: number | null; longitude: number | null;
   commission_percentage: number | null;
+  phone: string | null; whatsapp: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
   updated_at: string | null;
@@ -108,7 +109,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
@@ -172,7 +173,10 @@ function ListingDetail() {
   const company = l.companies;
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
-  const whatsappNum = company?.phone?.replace(/[^0-9]/g, "");
+  const contactPhone = (l.phone || l.whatsapp || company?.phone || "").replace(/[^0-9]/g, "");
+  const whatsappNum = (l.whatsapp || l.phone || company?.phone || "").replace(/[^0-9]/g, "");
+  const hasLive = (l.image_sources ?? []).includes("live_capture");
+  const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -207,6 +211,14 @@ function ListingDetail() {
                 {company?.is_verified && <TrustBadge kind="verified_company" />}
                 {company?.is_premium && <TrustBadge kind="premium_company" />}
                 {isOwner && <TrustBadge kind="owner" />}
+                {hasLive && (
+                  <Badge className="bg-success/15 text-success border border-success/30">
+                    {ar ? "موثق بالتصوير المباشر" : "Verified live photo"}
+                  </Badge>
+                )}
+                {!hasLive && hasUploaded && (
+                  <Badge variant="outline">{ar ? "صورة مرفوعة" : "Uploaded photo"}</Badge>
+                )}
               </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
@@ -256,15 +268,15 @@ function ListingDetail() {
               <div className="flex items-center gap-1 text-sm text-success font-medium mb-4">
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
-              {whatsappNum ? (
+              {contactPhone ? (
                 <div className="space-y-2">
                   <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                    <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
+                    <a href={`https://wa.me/${whatsappNum || contactPhone}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
                       {t("contact_whatsapp")}
                     </a>
                   </Button>
                   <Button asChild variant="outline" className="w-full" size="lg">
-                    <a href={`tel:+${whatsappNum}`}>{t("call_now")}</a>
+                    <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
               ) : company?.email ? (
