@@ -11,7 +11,32 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getTender, listTenderProposals, submitTenderProposal, awardTender } from "@/lib/phase3.functions";
 
+const DEFAULT_OG = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+
 export const Route = createFileRoute("/tenders/$id")({
+  loader: async ({ params }) => {
+    const { getTenderMeta } = await import("@/lib/seo.functions");
+    try { return { meta: await getTenderMeta({ data: { id: params.id } }) }; }
+    catch { return { meta: null }; }
+  },
+  head: ({ loaderData, params }) => {
+    const m: any = loaderData?.meta;
+    const title = m?.title ? `${m.title} — Tender — Souqly` : "Tender — Souqly";
+    const desc = (m?.description ?? "Public tender on Souqly.").slice(0, 160);
+    const url = `/tenders/${params.id}`;
+    return {
+      meta: [
+        { title }, { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: DEFAULT_OG },
+        { name: "twitter:image", content: DEFAULT_OG },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => <Fallback msg="Tender not found" />,
   errorComponent: () => <Fallback msg="Something went wrong" />,
   component: TenderDetail,
