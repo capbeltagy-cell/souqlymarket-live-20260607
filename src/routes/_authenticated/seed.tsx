@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sprout } from "lucide-react";
@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { seedEgyptDemo } from "@/lib/seed.functions";
 
 export const Route = createFileRoute("/_authenticated/seed")({
-  head: () => ({ meta: [{ title: "Seed demo data — Souqly" }] }),
+  head: () => ({ meta: [{ title: "Seed demo data — Souqly" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: SeedPage,
 });
 
