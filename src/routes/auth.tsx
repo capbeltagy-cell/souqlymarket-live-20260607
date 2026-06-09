@@ -95,7 +95,17 @@ function AuthPage() {
         phone: p,
         options: { data: { role } },
       });
-      if (error) throw error;
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+        if (msg.includes("phone provider") || msg.includes("provider") || (error as { code?: string }).code === "phone_provider_disabled") {
+          toast.error(ar
+            ? "تسجيل الدخول بالجوال غير متاح حالياً. الرجاء استخدام البريد الإلكتروني أو جوجل."
+            : "Phone login is not available yet. Please use Email or Google to continue.");
+          setStep("choose");
+          return;
+        }
+        throw error;
+      }
       setPhone(p);
       setStep("otp");
       toast.success(ar ? "تم إرسال الرمز" : "OTP sent");
