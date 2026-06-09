@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
+import { GlobalSearch } from "./GlobalSearch";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -37,6 +38,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex items-center gap-3">
+          <div className="hidden md:block w-[260px] lg:w-[340px]">
+            <GlobalSearch compact />
+          </div>
           <LanguageToggle />
           {user ? (
             <DropdownMenu>
