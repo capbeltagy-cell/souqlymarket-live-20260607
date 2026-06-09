@@ -210,6 +210,8 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
         <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
         <FactoryDirectoryButton ar={ar} />
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
+        <Button asChild variant="outline"><Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link></Button>
+        <Button asChild variant="outline"><Link to="/invoices">{ar ? "الفواتير" : "Invoices"}</Link></Button>
       </div>
     </>
   );
@@ -229,6 +231,8 @@ function AgentDash({ counts }: { counts: Counts }) {
         <Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/referrals">{t("create_referral")}</Link></Button>
         <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
+        <Button asChild variant="outline"><Link to="/wallet">Wallet</Link></Button>
+        <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
       </div>
     </>
   );
@@ -248,6 +252,7 @@ function AdminDash({ counts }: { counts: Counts }) {
         <Button asChild variant="outline" className="gap-2"><Link to="/verification"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/admin-companies"><Crown className="h-4 w-4" />Companies</Link></Button>
         <Button asChild variant="outline"><Link to="/marketplace">{t("nav_marketplace")}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/admin-revenue"><DollarSign className="h-4 w-4" />Revenue</Link></Button>
       </div>
     </>
   );
