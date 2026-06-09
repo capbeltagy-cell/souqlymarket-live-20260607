@@ -231,6 +231,8 @@ function AgentDash({ counts }: { counts: Counts }) {
         <Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/referrals">{t("create_referral")}</Link></Button>
         <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
+        <Button asChild variant="outline"><Link to="/wallet">Wallet</Link></Button>
+        <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
       </div>
     </>
   );
