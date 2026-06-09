@@ -51,14 +51,14 @@ function AuthPage() {
   async function handleGoogle() {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: { role },
-        },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
-      if (error) throw error;
+      if (result.error) throw result.error;
+      if (!result.redirected) {
+        // Tokens set; navigate to dashboard
+        navigate({ to: "/dashboard" });
+      }
     } catch (err) { toast.error((err as Error).message); }
     finally { setBusy(false); }
   }
