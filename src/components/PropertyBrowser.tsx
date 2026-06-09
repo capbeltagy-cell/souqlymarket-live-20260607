@@ -112,8 +112,13 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
             {filtered.map((r) => (
               <div key={r.id} className="space-y-2">
                 <ListingCard l={r} />
-                {(r.area_sqm || r.property_subtype) && (
-                  <div className="px-2 flex items-center gap-3 text-xs text-muted-foreground">
+                {(r.area_sqm || r.property_subtype || r.purpose) && (
+                  <div className="px-2 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                    {r.purpose && (
+                      <Badge className="text-[10px] bg-primary/10 text-primary hover:bg-primary/10">
+                        {r.purpose === "sale" ? (ar ? "للبيع" : "For Sale") : (ar ? "للإيجار" : "For Rent")}
+                      </Badge>
+                    )}
                     {r.property_subtype && (
                       <Badge variant="secondary" className="text-[10px]">
                         {subtypes.find((s) => s.value === r.property_subtype)
