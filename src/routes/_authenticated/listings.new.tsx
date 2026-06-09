@@ -47,7 +47,6 @@ function NewListing() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState("EGP");
 
   const [commission, setCommission] = useState("5");
   const [propertySubtype, setPropertySubtype] = useState("");
