@@ -266,7 +266,6 @@ export const dict = {
     seo_listing_default: "إعلان احترافي على سوقلي",
     favorited: "أضيف إلى المفضلة",
     unfavorited: "أزيل من المفضلة",
-    field_governorate: "المحافظة",
     active_listings: "إعلان نشط",
     pro_agents: "مسوق محترف",
     featured_items: "عنصر مميز",
