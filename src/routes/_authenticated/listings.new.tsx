@@ -112,30 +112,39 @@ function NewListing() {
     e.preventDefault();
     if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
     if (atLimit) { navigate({ to: "/subscribe" }); return; }
+
+    if (!title_ar.trim() && !title_en.trim()) {
+      toast.error(locale === "ar" ? "من فضلك أدخل عنوان الإعلان" : "Please enter a title");
+      return;
+    }
+    if (!governorate) {
+      toast.error(locale === "ar" ? "اختر المحافظة" : "Select a governorate");
+      return;
+    }
+    if (!city) {
+      toast.error(locale === "ar" ? "اختر المدينة" : "Select a city");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      if (!latitude || !longitude) {
-        toast.error(t("select_location_on_map"));
-        setSubmitting(false);
-        return;
-      }
       const res = await create({
         data: {
           type,
-          title_ar,
-          title_en,
+          title_ar: title_ar || title_en,
+          title_en: title_en || title_ar,
           description_ar: description_ar || null,
           description_en: description_en || null,
           country: country || null,
           city,
           governorate,
           location: [city, governorate, country].filter(Boolean).join(" · ") || null,
-          latitude: Number(latitude),
-          longitude: Number(longitude),
+          latitude: latitude ? Number(latitude) : null,
+          longitude: longitude ? Number(longitude) : null,
           category: null,
           price: price ? Number(price) : null,
-          currency,
-          commission_percentage: Number(commission),
+          currency: "EGP",
+          commission_percentage: Number(commission || 5),
           images,
           video_url: null,
           pdf_url: pdf_url || null,
@@ -148,14 +157,33 @@ function NewListing() {
           address_line: addressLine || null,
         } as never,
       });
-      toast.success(t("listing_published"));
-      navigate({ to: "/listings/$id", params: { id: res.id } });
+      toast.success(locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully");
+      try {
+        await navigate({ to: "/listings/$id", params: { id: res.id } });
+      } catch {
+        await navigate({ to: "/marketplace" });
+      }
     } catch (e) {
       const msg = (e as Error).message;
       if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
-      else { toast.error(msg); }
+      else { toast.error(msg || (locale === "ar" ? "تعذّر نشر الإعلان" : "Could not publish listing")); }
     }
     finally { setSubmitting(false); }
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error(locale === "ar" ? "الموقع غير مدعوم في المتصفح" : "Geolocation not supported");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(pos.coords.latitude.toFixed(6));
+        setLongitude(pos.coords.longitude.toFixed(6));
+        toast.success(locale === "ar" ? "تم تحديد موقعك" : "Location set");
+      },
+      () => toast.error(locale === "ar" ? "تعذّر الحصول على الموقع" : "Could not get location"),
+    );
   };
 
 
