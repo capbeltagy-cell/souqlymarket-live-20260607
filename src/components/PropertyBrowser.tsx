@@ -76,6 +76,13 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
               {ar ? s.label_ar : s.label_en}
             </Button>
           ))}
+          <div className="ms-auto flex gap-1">
+            {(["all", "sale", "rent"] as const).map((p) => (
+              <Button key={p} size="sm" variant={purposeFilter === p ? "default" : "outline"} onClick={() => setPurposeFilter(p)}>
+                {p === "all" ? (ar ? "كل الأغراض" : "All") : p === "sale" ? (ar ? "للبيع" : "Sale") : (ar ? "للإيجار" : "Rent")}
+              </Button>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6 p-4 rounded-lg border border-border bg-card">
