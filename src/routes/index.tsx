@@ -43,6 +43,7 @@ function EmptyState({ label, href }: { label: string; href: string }) {
 
 function Landing() {
   const { t, dir, locale } = useI18n();
+  const ar = locale === "ar";
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [products, setProducts] = useState<ListingCardData[]>([]);
@@ -53,11 +54,12 @@ function Landing() {
   const [wholesale, setWholesale] = useState<any[]>([]);
   const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }>>([]);
   const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }>>([]);
+  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0, leads: 0 });
 
   useEffect(() => {
     (async () => {
       const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
-      const [lRes, pRes, reRes, landRes, facRes, cRes, wRes, rfqRes, tenderRes] = await Promise.all([
+      const [lRes, pRes, reRes, landRes, facRes, cRes, wRes, rfqRes, tenderRes, cCount, lCount, aCount, leadCount] = await Promise.all([
         supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
         supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
         supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "real_estate").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
@@ -67,6 +69,10 @@ function Landing() {
         supabase.from("wholesale_listings").select("*, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
         supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(4),
         supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id", { count: "exact", head: true }),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+        supabase.from("leads").select("id", { count: "exact", head: true }),
       ]);
       setListings((lRes.data ?? []) as unknown as ListingCardData[]);
       setProducts((pRes.data ?? []) as unknown as ListingCardData[]);
@@ -77,6 +83,12 @@ function Landing() {
       setWholesale((wRes.data ?? []) as any[]);
       setRfqs((rfqRes.data ?? []) as never);
       setTenders((tenderRes.data ?? []) as never);
+      setCounts({
+        companies: cCount.count ?? 0,
+        listings: lCount.count ?? 0,
+        agents: aCount.count ?? 0,
+        leads: leadCount.count ?? 0,
+      });
     })();
   }, []);
 
