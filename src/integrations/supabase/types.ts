@@ -601,6 +601,7 @@ export type Database = {
       }
       listings: {
         Row: {
+          address_line: string | null
           area_sqm: number | null
           bathrooms: number | null
           bedrooms: number | null
@@ -623,9 +624,11 @@ export type Database = {
           leads_count: number
           location: string | null
           longitude: number | null
+          ownership_type: string | null
           pdf_url: string | null
           price: number | null
           property_subtype: string | null
+          purpose: string | null
           status: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -635,6 +638,7 @@ export type Database = {
           views_count: number
         }
         Insert: {
+          address_line?: string | null
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
@@ -657,9 +661,11 @@ export type Database = {
           leads_count?: number
           location?: string | null
           longitude?: number | null
+          ownership_type?: string | null
           pdf_url?: string | null
           price?: number | null
           property_subtype?: string | null
+          purpose?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -669,6 +675,7 @@ export type Database = {
           views_count?: number
         }
         Update: {
+          address_line?: string | null
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
@@ -691,9 +698,11 @@ export type Database = {
           leads_count?: number
           location?: string | null
           longitude?: number | null
+          ownership_type?: string | null
           pdf_url?: string | null
           price?: number | null
           property_subtype?: string | null
+          purpose?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar?: string
           title_en?: string
