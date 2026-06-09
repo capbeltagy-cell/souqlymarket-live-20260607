@@ -166,17 +166,18 @@ type DupInput = {
 };
 
 async function detectDuplicateInternal(
-  supabase: { from: (t: string) => { select: (s: string) => { gte: (c: string, v: string) => Promise<{ data: unknown }> } } },
+  supabase: unknown,
   input: DupInput,
 ): Promise<{ severity: "none" | "similar" | "exact"; count: number }> {
   const since = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString();
-  const { data } = await (supabase as unknown as {
+  const sb = supabase as {
     from: (t: string) => {
       select: (s: string) => {
         gte: (c: string, v: string) => Promise<{ data: Array<Record<string, unknown>> | null }>;
       };
     };
-  }).from("listings")
+  };
+  const { data } = await sb.from("listings")
     .select("id, title_ar, title_en, governorate, phone, latitude, longitude, company_id, created_at")
     .gte("created_at", since);
   const rows = (data ?? []) as Array<{
