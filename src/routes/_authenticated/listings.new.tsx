@@ -227,8 +227,8 @@ function NewListing() {
                   onChange={(e) => {
                     setGovernorate(e.target.value);
                     setCity("");
-                    if (!country) setCountry("Egypt");
                   }}
+
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="">{t("field_governorate")}</option>
