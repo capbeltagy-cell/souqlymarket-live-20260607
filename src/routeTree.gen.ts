@@ -13,6 +13,7 @@ import { Route as WholesaleRouteImport } from './routes/wholesale'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TendersRouteImport } from './routes/tenders'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SearchAllRouteImport } from './routes/search-all'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -90,6 +91,11 @@ const TendersRoute = TendersRouteImport.update({
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchAllRoute = SearchAllRouteImport.update({
+  id: '/search-all',
+  path: '/search-all',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -415,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
+  '/search-all': typeof SearchAllRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -478,6 +485,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
+  '/search-all': typeof SearchAllRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -543,6 +551,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
+  '/search-all': typeof SearchAllRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
@@ -608,6 +617,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rfq'
     | '/search'
+    | '/search-all'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -671,6 +681,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rfq'
     | '/search'
+    | '/search-all'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -735,6 +746,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rfq'
     | '/search'
+    | '/search-all'
     | '/subscribe'
     | '/tenders'
     | '/terms'
@@ -800,6 +812,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
+  SearchAllRoute: typeof SearchAllRoute
   SubscribeRoute: typeof SubscribeRoute
   TendersRoute: typeof TendersRouteWithChildren
   TermsRoute: typeof TermsRoute
@@ -836,6 +849,13 @@ declare module '@tanstack/react-router' {
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search-all': {
+      id: '/search-all'
+      path: '/search-all'
+      fullPath: '/search-all'
+      preLoaderRoute: typeof SearchAllRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -1420,6 +1440,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
+  SearchAllRoute: SearchAllRoute,
   SubscribeRoute: SubscribeRoute,
   TendersRoute: TendersRouteWithChildren,
   TermsRoute: TermsRoute,
