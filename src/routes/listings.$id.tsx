@@ -203,9 +203,9 @@ function ListingDetail() {
                 {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
                   <Badge className="bg-accent text-accent-foreground gap-1"><Star className="h-3 w-3" />{ar ? "مميز" : "Featured"}</Badge>
                 )}
-                {company?.is_verified && (
-                  <Badge className="bg-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />{ar ? "شركة موثقة" : "Verified"}</Badge>
-                )}
+                {company?.is_verified && <TrustBadge kind="verified_company" />}
+                {company?.is_premium && <TrustBadge kind="premium_company" />}
+                {isOwner && <TrustBadge kind="owner" />}
               </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
@@ -222,6 +222,9 @@ function ListingDetail() {
                       l.country,
                     ].filter(Boolean).join(", ")
                   }</span>
+                )}
+                {l.updated_at && (
+                  <span className="text-xs">{t("last_updated")}: {new Date(l.updated_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}</span>
                 )}
               </div>
             </div>
