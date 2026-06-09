@@ -22,16 +22,18 @@ function ProfilePage() {
   const { t } = useI18n();
   const { user, roles } = useAuth();
   const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("full_name, phone, bio").eq("id", user.id).maybeSingle()
+    supabase.from("profiles").select("full_name, display_name, phone, bio").eq("id", user.id).maybeSingle()
       .then(({ data }) => {
         if (data) {
           setFullName(data.full_name ?? "");
+          setDisplayName(data.display_name ?? "");
           setPhone(data.phone ?? "");
           setBio(data.bio ?? "");
         }
@@ -43,7 +45,7 @@ function ProfilePage() {
     if (!user) return;
     setSaving(true);
     const { error } = await supabase.from("profiles").upsert({
-      id: user.id, full_name: fullName, phone, bio,
+      id: user.id, full_name: fullName, display_name: displayName, phone, bio,
     });
     setSaving(false);
     if (error) toast.error(error.message);
@@ -74,6 +76,10 @@ function ProfilePage() {
             <div className="space-y-2">
               <Label>{t("profile_full_name")}</Label>
               <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t("profile_display_name")}</Label>
+              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder={fullName} />
             </div>
             <div className="space-y-2">
               <Label>{t("profile_phone")}</Label>

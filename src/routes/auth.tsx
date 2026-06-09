@@ -26,6 +26,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState<"company" | "agent">("company");
   const [busy, setBusy] = useState(false);
   const { t, dir } = useI18n();
@@ -43,7 +45,7 @@ function AuthPage() {
           email, password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: { full_name: fullName, role },
+            data: { full_name: fullName, display_name: displayName || fullName, phone, role },
           },
         });
         if (error) throw error;
@@ -118,6 +120,14 @@ function AuthPage() {
                   <div>
                     <Label htmlFor="name">{t("auth_full_name")}</Label>
                     <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="mt-1.5" />
+                  </div>
+                  <div>
+                    <Label htmlFor="display">{t("auth_display_name")}</Label>
+                    <Input id="display" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="mt-1.5" placeholder={fullName || ""} />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">{t("auth_phone")}</Label>
+                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5" placeholder={t("auth_phone_hint")} />
                   </div>
                   <div>
                     <Label>{t("auth_role")}</Label>

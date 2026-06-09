@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BadgeCheck, MapPin, Mail, Globe } from "lucide-react";
+import { MapPin, Mail, Globe, Phone, MessageCircle } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
+import { TrustBadge, profileCompletion } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
@@ -41,7 +43,8 @@ type Company = {
   description_ar: string | null; description_en: string | null;
   industry: string | null; country: string | null; city: string | null;
   email: string | null; website: string | null; phone: string | null;
-  logo_url: string | null; cover_url: string | null; is_verified: boolean;
+  logo_url: string | null; cover_url: string | null;
+  is_verified: boolean; is_premium: boolean | null;
 };
 
 function CompanyProfile() {
@@ -86,11 +89,8 @@ function CompanyProfile() {
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-3xl font-bold">{name}</h1>
-              {company.is_verified && (
-                <span className="inline-flex items-center gap-1 bg-primary-foreground/20 rounded-full px-2 py-0.5 text-xs">
-                  <BadgeCheck className="h-3.5 w-3.5" />{t("verified_company")}
-                </span>
-              )}
+              {company.is_verified && <TrustBadge kind="verified_company" />}
+              {company.is_premium && <TrustBadge kind="premium_company" />}
             </div>
             {company.industry && <p className="opacity-90 mt-1">{company.industry}</p>}
             <div className="flex items-center gap-4 mt-3 text-sm opacity-90 flex-wrap">
@@ -98,26 +98,41 @@ function CompanyProfile() {
               <Badge variant="secondary">{listings.length} {t("listings_count")}</Badge>
             </div>
           </div>
-          {company.email && (
-            <Button asChild variant="secondary" className="gap-2">
-              <a href={`mailto:${company.email}`}><Mail className="h-4 w-4" />{t("contact_company")}</a>
-            </Button>
-          )}
+          <div className="flex flex-col gap-2">
+            {company.phone && (
+              <>
+                <Button asChild className="gap-2 bg-success hover:bg-success/90">
+                  <a href={`https://wa.me/${company.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{t("contact_whatsapp")}</a>
+                </Button>
+                <Button asChild variant="secondary" className="gap-2">
+                  <a href={`tel:${company.phone}`}><Phone className="h-4 w-4" />{t("call_now")}</a>
+                </Button>
+              </>
+            )}
+            {!company.phone && company.email && (
+              <Button asChild variant="secondary" className="gap-2">
+                <a href={`mailto:${company.email}`}><Mail className="h-4 w-4" />{t("contact_company")}</a>
+              </Button>
+            )}
+          </div>
         </div>
       </section>
       <section className="container-souqly py-8 flex-1 grid lg:grid-cols-3 gap-6">
         <aside className="lg:col-span-1 space-y-4">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="font-medium">{t("profile_completion")}</span>
+              <span className="text-muted-foreground">{profileCompletion(company)}%</span>
+            </div>
+            <Progress value={profileCompletion(company)} />
+          </div>
           <div className="rounded-lg border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-2">{t("about")}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{desc ?? "—"}</p>
             <div className="mt-4 space-y-2 text-sm">
               {company.website && <div className="flex items-center gap-2 text-muted-foreground"><Globe className="h-4 w-4" /> <a href={company.website} target="_blank" rel="noreferrer" className="hover:text-primary truncate">{company.website}</a></div>}
               {company.email && <div className="flex items-center gap-2 text-muted-foreground"><Mail className="h-4 w-4" /> {company.email}</div>}
-              {company.phone && (
-                <a href={`https://wa.me/${company.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-success hover:underline">
-                  {t("contact_whatsapp")} · {company.phone}
-                </a>
-              )}
+              {company.phone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="h-4 w-4" />{company.phone}</div>}
             </div>
           </div>
           <Button asChild variant="outline" className="w-full"><Link to="/companies">← {t("nav_companies")}</Link></Button>

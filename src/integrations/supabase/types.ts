@@ -120,6 +120,8 @@ export type Database = {
           headline_ar: string | null
           headline_en: string | null
           id: string
+          is_premium: boolean
+          is_trusted: boolean
           is_verified: boolean
           languages: string[] | null
           specialties: string[] | null
@@ -136,6 +138,8 @@ export type Database = {
           headline_ar?: string | null
           headline_en?: string | null
           id?: string
+          is_premium?: boolean
+          is_trusted?: boolean
           is_verified?: boolean
           languages?: string[] | null
           specialties?: string[] | null
@@ -152,6 +156,8 @@ export type Database = {
           headline_ar?: string | null
           headline_en?: string | null
           id?: string
+          is_premium?: boolean
+          is_trusted?: boolean
           is_verified?: boolean
           languages?: string[] | null
           specialties?: string[] | null
@@ -267,6 +273,7 @@ export type Database = {
           governorate: string | null
           id: string
           industry: string | null
+          is_premium: boolean
           is_verified: boolean
           logo_url: string | null
           name_ar: string
@@ -294,6 +301,7 @@ export type Database = {
           governorate?: string | null
           id?: string
           industry?: string | null
+          is_premium?: boolean
           is_verified?: boolean
           logo_url?: string | null
           name_ar: string
@@ -321,6 +329,7 @@ export type Database = {
           governorate?: string | null
           id?: string
           industry?: string | null
+          is_premium?: boolean
           is_verified?: boolean
           logo_url?: string | null
           name_ar?: string
@@ -789,9 +798,11 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          display_name: string | null
           full_name: string | null
           id: string
           phone: string | null
+          phone_verified: boolean
           preferred_language: string
           updated_at: string
         }
@@ -799,9 +810,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          display_name?: string | null
           full_name?: string | null
           id: string
           phone?: string | null
+          phone_verified?: boolean
           preferred_language?: string
           updated_at?: string
         }
@@ -809,9 +822,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          display_name?: string | null
           full_name?: string | null
           id?: string
           phone?: string | null
+          phone_verified?: boolean
           preferred_language?: string
           updated_at?: string
         }

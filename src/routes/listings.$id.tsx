@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
 import { MapView } from "@/components/MapView";
+import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -62,10 +63,11 @@ type Listing = {
   commission_percentage: number | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
+  updated_at: string | null;
   company_id: string;
   companies: {
     id: string; name_ar: string; name_en: string;
-    is_verified: boolean; phone: string | null; email: string | null;
+    is_verified: boolean; is_premium?: boolean | null; phone: string | null; email: string | null;
   } | null;
 };
 
@@ -106,7 +108,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, featured, featured_until, views_count, company_id, companies(id, name_ar, name_en, is_verified, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
@@ -202,9 +204,9 @@ function ListingDetail() {
                 {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
                   <Badge className="bg-accent text-accent-foreground gap-1"><Star className="h-3 w-3" />{ar ? "مميز" : "Featured"}</Badge>
                 )}
-                {company?.is_verified && (
-                  <Badge className="bg-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />{ar ? "شركة موثقة" : "Verified"}</Badge>
-                )}
+                {company?.is_verified && <TrustBadge kind="verified_company" />}
+                {company?.is_premium && <TrustBadge kind="premium_company" />}
+                {isOwner && <TrustBadge kind="owner" />}
               </div>
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
@@ -221,6 +223,9 @@ function ListingDetail() {
                       l.country,
                     ].filter(Boolean).join(", ")
                   }</span>
+                )}
+                {l.updated_at && (
+                  <span className="text-xs">{t("last_updated")}: {new Date(l.updated_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}</span>
                 )}
               </div>
             </div>
@@ -252,11 +257,16 @@ function ListingDetail() {
                 <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
               </div>
               {whatsappNum ? (
-                <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                  <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
-                    {t("contact_whatsapp")}
-                  </a>
-                </Button>
+                <div className="space-y-2">
+                  <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
+                    <a href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
+                      {t("contact_whatsapp")}
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full" size="lg">
+                    <a href={`tel:+${whatsappNum}`}>{t("call_now")}</a>
+                  </Button>
+                </div>
               ) : company?.email ? (
                 <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
                   <a href={`mailto:${company.email}?subject=${encodeURIComponent(title)}`}>{t("contact_company")}</a>
