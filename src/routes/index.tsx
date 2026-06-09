@@ -33,24 +33,51 @@ function Landing() {
   const { t, dir } = useI18n();
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
   const [listings, setListings] = useState<ListingCardData[]>([]);
+  const [products, setProducts] = useState<ListingCardData[]>([]);
+  const [properties, setProperties] = useState<ListingCardData[]>([]);
+  const [lands, setLands] = useState<ListingCardData[]>([]);
+  const [factoryListings, setFactoryListings] = useState<ListingCardData[]>([]);
   const [companies, setCompanies] = useState<CompanyCardData[]>([]);
   const [agents, setAgents] = useState<AgentCardData[]>([]);
+  const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }>>([]);
+  const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }>>([]);
+  const [stats, setStats] = useState({ companies: 0, factories: 0, agents: 0, listings: 0, verified: 0 });
 
   useEffect(() => {
     (async () => {
-      const [lRes, cRes, aRes] = await Promise.all([
-        supabase.from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
-          .eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("companies")
-          .select("id, name_ar, name_en, industry, country, is_verified, logo_url")
-          .order("is_verified", { ascending: false }).limit(6),
-        supabase.from("agents")
-          .select("id, user_id, headline_ar, headline_en, country, is_verified")
-          .order("is_verified", { ascending: false }).limit(4),
+      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
+      const [lRes, pRes, reRes, landRes, facRes, cRes, aRes, rfqRes, tenderRes,
+             cCount, fCount, aCount, lCount, vCount] = await Promise.all([
+        supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "real_estate").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "land").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "factory").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).limit(6),
+        supabase.from("agents").select("id, user_id, headline_ar, headline_en, country, is_verified").order("is_verified", { ascending: false }).limit(4),
+        supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id", { count: "exact", head: true }),
+        supabase.from("factories").select("company_id", { count: "exact", head: true }),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
+        supabase.from("companies").select("id", { count: "exact", head: true }).eq("is_verified", true),
       ]);
       setListings((lRes.data ?? []) as unknown as ListingCardData[]);
+      setProducts((pRes.data ?? []) as unknown as ListingCardData[]);
+      setProperties((reRes.data ?? []) as unknown as ListingCardData[]);
+      setLands((landRes.data ?? []) as unknown as ListingCardData[]);
+      setFactoryListings((facRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
+      setRfqs((rfqRes.data ?? []) as never);
+      setTenders((tenderRes.data ?? []) as never);
+      setStats({
+        companies: cCount.count ?? 0,
+        factories: fCount.count ?? 0,
+        agents: aCount.count ?? 0,
+        listings: lCount.count ?? 0,
+        verified: vCount.count ?? 0,
+      });
       const agentList = aRes.data ?? [];
       const userIds = agentList.map((a) => a.user_id).filter(Boolean) as string[];
       const profiles = userIds.length
@@ -265,6 +292,119 @@ function Landing() {
           </div>
         </section>
       )}
+
+      <section className="container-souqly py-10">
+        <div className="rounded-[1.5rem] panel-card p-8">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">{t("section_stats_title")}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              { label: t("stat_total_companies"), value: stats.companies },
+              { label: t("stat_total_factories"), value: stats.factories },
+              { label: t("stat_total_agents"), value: stats.agents },
+              { label: t("stat_total_listings"), value: stats.listings },
+              { label: t("stat_verified_companies"), value: stats.verified },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl bg-surface p-5 text-center">
+                <div className="text-3xl font-bold text-primary">{s.value.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground mt-2 uppercase tracking-[0.18em]">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {products.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_products")}</h2>
+            <Button asChild variant="ghost"><Link to="/marketplace" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {products.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {properties.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_properties")}</h2>
+            <Button asChild variant="ghost"><Link to="/real-estate" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {properties.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {lands.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_lands")}</h2>
+            <Button asChild variant="ghost"><Link to="/lands" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {lands.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {factoryListings.length > 0 && (
+        <section className="container-souqly py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("featured_factories")}</h2>
+            <Button asChild variant="ghost"><Link to="/factories" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {factoryListings.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {(rfqs.length > 0 || tenders.length > 0) && (
+        <section className="container-souqly py-10">
+          <div className="grid lg:grid-cols-2 gap-6">
+            {rfqs.length > 0 && (
+              <div className="rounded-[1.5rem] panel-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">{t("featured_rfqs")}</h3>
+                  <Button asChild variant="ghost" size="sm"><Link to="/rfq">{t("view_all")}</Link></Button>
+                </div>
+                <div className="space-y-3">
+                  {rfqs.map((r) => (
+                    <Link key={r.id} to="/rfq/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                      <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {r.governorate ?? "—"} · {r.budget_min ? `${r.budget_min.toLocaleString()} - ${(r.budget_max ?? r.budget_min).toLocaleString()} EGP` : "—"}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {tenders.length > 0 && (
+              <div className="rounded-[1.5rem] panel-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">{t("featured_tenders")}</h3>
+                  <Button asChild variant="ghost" size="sm"><Link to="/tenders">{t("view_all")}</Link></Button>
+                </div>
+                <div className="space-y-3">
+                  {tenders.map((r) => (
+                    <Link key={r.id} to="/tenders/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                      <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {r.governorate ?? "—"} · {r.budget ? `${r.budget.toLocaleString()} EGP` : "—"} {r.deadline ? `· ${r.deadline}` : ""}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+
 
       <section className="container-souqly py-16">
         <div className="hero-gradient rounded-2xl p-10 md:p-14 text-primary-foreground grid md:grid-cols-2 gap-6 items-center">
