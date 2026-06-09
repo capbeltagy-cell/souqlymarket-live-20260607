@@ -20,7 +20,7 @@ type Props = {
   titleEn: string;
 };
 
-type Row = ListingCardData & { area_sqm?: number | null; property_subtype?: string | null };
+type Row = ListingCardData & { area_sqm?: number | null; property_subtype?: string | null; purpose?: string | null };
 
 export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Props) {
   const { locale } = useI18n();
@@ -28,6 +28,7 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [subtype, setSubtype] = useState<string>("all");
+  const [purposeFilter, setPurposeFilter] = useState<"all" | "sale" | "rent">("all");
   const [governorate, setGovernorate] = useState("all");
   const [city, setCity] = useState("all");
   const [minPrice, setMinPrice] = useState("");
