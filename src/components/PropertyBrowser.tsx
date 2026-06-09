@@ -20,7 +20,7 @@ type Props = {
   titleEn: string;
 };
 
-type Row = ListingCardData & { area_sqm?: number | null; property_subtype?: string | null };
+type Row = ListingCardData & { area_sqm?: number | null; property_subtype?: string | null; purpose?: string | null };
 
 export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Props) {
   const { locale } = useI18n();
@@ -28,6 +28,7 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [subtype, setSubtype] = useState<string>("all");
+  const [purposeFilter, setPurposeFilter] = useState<"all" | "sale" | "rent">("all");
   const [governorate, setGovernorate] = useState("all");
   const [city, setCity] = useState("all");
   const [minPrice, setMinPrice] = useState("");
@@ -37,7 +38,7 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
   useEffect(() => {
     setLoading(true);
     supabase.from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, purpose, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
       .eq("type", listingType)
       .eq("status", "approved")
       .order("featured", { ascending: false })
@@ -50,13 +51,14 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
 
   const filtered = useMemo(() => rows.filter((r) => {
     if (subtype !== "all" && (r.property_subtype ?? "") !== subtype) return false;
+    if (purposeFilter !== "all" && (r.purpose ?? "") !== purposeFilter) return false;
     if (governorate !== "all" && normalizeEgyptGovernorate(r.governorate ?? null) !== governorate) return false;
     if (city !== "all" && normalizeEgyptCity(r.city ?? null) !== city) return false;
     if (minPrice && (Number(r.price) || 0) < Number(minPrice)) return false;
     if (maxPrice && (Number(r.price) || 0) > Number(maxPrice)) return false;
     if (minArea && (Number(r.area_sqm) || 0) < Number(minArea)) return false;
     return true;
-  }), [rows, subtype, governorate, city, minPrice, maxPrice, minArea]);
+  }), [rows, subtype, purposeFilter, governorate, city, minPrice, maxPrice, minArea]);
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -74,6 +76,13 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
               {ar ? s.label_ar : s.label_en}
             </Button>
           ))}
+          <div className="ms-auto flex gap-1">
+            {(["all", "sale", "rent"] as const).map((p) => (
+              <Button key={p} size="sm" variant={purposeFilter === p ? "default" : "outline"} onClick={() => setPurposeFilter(p)}>
+                {p === "all" ? (ar ? "كل الأغراض" : "All") : p === "sale" ? (ar ? "للبيع" : "Sale") : (ar ? "للإيجار" : "Rent")}
+              </Button>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6 p-4 rounded-lg border border-border bg-card">
@@ -103,8 +112,13 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
             {filtered.map((r) => (
               <div key={r.id} className="space-y-2">
                 <ListingCard l={r} />
-                {(r.area_sqm || r.property_subtype) && (
-                  <div className="px-2 flex items-center gap-3 text-xs text-muted-foreground">
+                {(r.area_sqm || r.property_subtype || r.purpose) && (
+                  <div className="px-2 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                    {r.purpose && (
+                      <Badge className="text-[10px] bg-primary/10 text-primary hover:bg-primary/10">
+                        {r.purpose === "sale" ? (ar ? "للبيع" : "For Sale") : (ar ? "للإيجار" : "For Rent")}
+                      </Badge>
+                    )}
                     {r.property_subtype && (
                       <Badge variant="secondary" className="text-[10px]">
                         {subtypes.find((s) => s.value === r.property_subtype)

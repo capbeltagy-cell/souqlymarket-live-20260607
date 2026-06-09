@@ -54,6 +54,9 @@ function NewListing() {
   const [areaSqm, setAreaSqm] = useState("");
   const [bedrooms, setBedrooms] = useState("");
   const [bathrooms, setBathrooms] = useState("");
+  const [purpose, setPurpose] = useState<"sale" | "rent" | "">("");
+  const [ownershipType, setOwnershipType] = useState("");
+  const [addressLine, setAddressLine] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [pdf_url, setPdf] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -140,6 +143,9 @@ function NewListing() {
           area_sqm: areaSqm ? Number(areaSqm) : null,
           bedrooms: bedrooms ? Number(bedrooms) : null,
           bathrooms: bathrooms ? Number(bathrooms) : null,
+          purpose: purpose || null,
+          ownership_type: ownershipType || null,
+          address_line: addressLine || null,
         } as never,
       });
       toast.success(t("listing_published"));
@@ -233,6 +239,30 @@ function NewListing() {
                     </Field>
                   </>
                 )}
+              </div>
+            )}
+            {(type === "real_estate" || type === "land") && (
+              <div className="grid sm:grid-cols-3 gap-4">
+                <Field label={locale === "ar" ? "الغرض" : "Purpose"}>
+                  <select value={purpose} onChange={(e) => setPurpose(e.target.value as "sale" | "rent" | "")}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="">—</option>
+                    <option value="sale">{locale === "ar" ? "للبيع" : "For Sale"}</option>
+                    <option value="rent">{locale === "ar" ? "للإيجار" : "For Rent"}</option>
+                  </select>
+                </Field>
+                <Field label={locale === "ar" ? "نوع الملكية" : "Ownership type"}>
+                  <select value={ownershipType} onChange={(e) => setOwnershipType(e.target.value)}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="">—</option>
+                    <option value="freehold">{locale === "ar" ? "تمليك" : "Freehold"}</option>
+                    <option value="leasehold">{locale === "ar" ? "إيجار طويل" : "Leasehold"}</option>
+                    <option value="shared">{locale === "ar" ? "مشترك" : "Shared"}</option>
+                  </select>
+                </Field>
+                <Field label={locale === "ar" ? "العنوان التفصيلي (يظهر للمالك فقط)" : "Detailed address (owner only)"}>
+                  <Input value={addressLine} onChange={(e) => setAddressLine(e.target.value)} maxLength={300} />
+                </Field>
               </div>
             )}
             <div className="grid sm:grid-cols-2 gap-4">

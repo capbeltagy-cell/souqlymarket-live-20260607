@@ -31,6 +31,9 @@ export const createListing = createServerFn({ method: "POST" })
       area_sqm: z.number().nonnegative().optional().nullable(),
       bedrooms: z.number().int().nonnegative().optional().nullable(),
       bathrooms: z.number().int().nonnegative().optional().nullable(),
+      purpose: z.enum(["sale", "rent"]).optional().nullable(),
+      ownership_type: z.string().max(40).optional().nullable(),
+      address_line: z.string().max(300).optional().nullable(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -80,6 +83,9 @@ export const createListing = createServerFn({ method: "POST" })
         area_sqm: data.area_sqm ?? null,
         bedrooms: data.bedrooms ?? null,
         bathrooms: data.bathrooms ?? null,
+        purpose: data.purpose ?? null,
+        ownership_type: data.ownership_type ?? null,
+        address_line: data.address_line ?? null,
         status: "approved", // auto-approve for beta; admin can flip later
       })
       .select("id")
