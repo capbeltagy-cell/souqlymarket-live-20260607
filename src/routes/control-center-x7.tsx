@@ -19,7 +19,7 @@ export const Route = createFileRoute("/control-center-x7")({
 });
 
 function ControlCenter() {
-  const { user, loading } = useAuth();
+  const { user, roles, loading } = useAuth();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [overview, setOverview] = useState<any>(null);
   const check = useServerFn(superCheck);
@@ -29,12 +29,13 @@ function ControlCenter() {
     if (loading) return;
     if (!user) { setAuthorized(false); return; }
     const email = (user.email ?? "").toLowerCase();
-    if (!ALLOWED.includes(email)) { setAuthorized(false); return; }
+    const isAdmin = roles.includes("admin");
+    if (!ALLOWED.includes(email) || !isAdmin) { setAuthorized(false); return; }
     check().then(() => {
       setAuthorized(true);
       ov().then(setOverview).catch(() => {});
     }).catch(() => setAuthorized(false));
-  }, [user, loading]);
+  }, [user, roles, loading]);
 
   if (loading || authorized === null) {
     return <div className="min-h-screen grid place-items-center"><Loader2 className="h-6 w-6 animate-spin" /></div>;

@@ -37,3 +37,25 @@ export const getAgentMeta = createServerFn({ method: "GET" })
       .select("full_name, avatar_url").eq("id", row.user_id).maybeSingle();
     return { ...row, full_name: prof?.full_name ?? null, avatar_url: prof?.avatar_url ?? null };
   });
+
+export const getRfqMeta = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("rfqs" as any)
+      .select("id, title, description, attachments, governorate")
+      .eq("id", data.id).maybeSingle();
+    return row as any;
+  });
+
+export const getTenderMeta = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("tenders" as any)
+      .select("id, title, description, governorate")
+      .eq("id", data.id).maybeSingle();
+    return row as any;
+  });

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sprout } from "lucide-react";
@@ -11,17 +11,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { seedEgyptDemo } from "@/lib/seed.functions";
 
 export const Route = createFileRoute("/_authenticated/seed")({
-  head: () => ({ meta: [{ title: "Seed demo data — Souqly" }] }),
+  head: () => ({ meta: [{ title: "Seed demo data — Souqly" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: SeedPage,
 });
 
 function SeedPage() {
   const { t } = useI18n();
-  const { roles } = useAuth();
+  const { roles, loading } = useAuth();
   const run = useServerFn(seedEgyptDemo);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const isAdmin = roles.includes("admin");
+
+  if (!loading && !isAdmin) return <Navigate to="/dashboard" replace />;
+
+
 
   async function onRun() {
     setBusy(true);
