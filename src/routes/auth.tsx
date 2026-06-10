@@ -29,7 +29,6 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"company" | "agent" | "buyer">("buyer");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { if (user) navigate({ to: "/dashboard" }); }, [user, navigate]);
@@ -45,7 +44,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { role, display_name: email.split("@")[0] } },
+          options: { data: { display_name: email.split("@")[0] } },
         });
         if (error) throw error;
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
@@ -97,23 +96,6 @@ function AuthPage() {
               {mode === "signup" ? (ar ? "أدخل بريدك وكلمة المرور" : "Enter your email and password") : (ar ? "مرحباً بعودتك" : "Welcome back")}
             </p>
 
-            {mode === "signup" && (
-              <div className="mb-5">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground">{ar ? "نوع الحساب" : "Account type"}</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {([
-                    { v: "buyer", l: ar ? "مشتري" : "Buyer" },
-                    { v: "company", l: ar ? "شركة" : "Company" },
-                    { v: "agent", l: ar ? "وكيل" : "Agent" },
-                  ] as const).map((o) => (
-                    <button type="button" key={o.v} onClick={() => setRole(o.v)}
-                      className={`rounded-md border p-2 text-sm transition ${role === o.v ? "border-primary bg-primary/5 text-primary font-medium" : "border-border hover:border-primary/30"}`}>
-                      {o.l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
