@@ -9,6 +9,33 @@ type ServerEntry = {
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
+// Production fix: the auto-generated Supabase server code reads
+// process.env.SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY at request time.
+// If the deployment env doesn't expose them, fall back to the worker env
+// bindings and finally to the build-time inlined VITE_ values (publishable,
+// safe to embed). This runs before every request.
+function ensureSupabaseEnv(env: unknown) {
+  if (typeof process === "undefined" || !process.env) return;
+  const bindings = (env ?? {}) as Record<string, string | undefined>;
+  const resolved: Record<string, string | undefined> = {
+    SUPABASE_URL:
+      process.env.SUPABASE_URL ||
+      bindings.SUPABASE_URL ||
+      process.env.VITE_SUPABASE_URL ||
+      bindings.VITE_SUPABASE_URL ||
+      import.meta.env.VITE_SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY:
+      process.env.SUPABASE_PUBLISHABLE_KEY ||
+      bindings.SUPABASE_PUBLISHABLE_KEY ||
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+      bindings.VITE_SUPABASE_PUBLISHABLE_KEY ||
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  };
+  for (const [key, value] of Object.entries(resolved)) {
+    if (value && !process.env[key]) process.env[key] = value;
+  }
+}
+
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {
     serverEntryPromise = import("@tanstack/react-start/server-entry").then(
@@ -40,6 +67,7 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      ensureSupabaseEnv(env);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
