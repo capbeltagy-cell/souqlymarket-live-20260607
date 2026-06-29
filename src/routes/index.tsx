@@ -96,76 +96,83 @@ function Landing() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden hero-gradient text-primary-foreground">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-          backgroundSize: "40px 40px, 60px 60px",
+      {/* Hero — Noir & Gold editorial */}
+      <section className="relative overflow-hidden hero-gradient">
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: "linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
         }} />
-        <div className="container-souqly relative py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
-              <Sparkles className="h-3 w-3" />{t("tagline")}
+        <div className="container-souqly relative py-20 md:py-28">
+          <div className="max-w-4xl">
+            <span className="status-pill mb-8">
+              <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
-              {ar ? "سوقلي يربط الشركات والموردين ومسوقي المبيعات في مصر." : "Souqly connects companies, suppliers and sales agents across Egypt."}
+            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6">
+              {ar ? (
+                <>
+                  حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />
+                  بالشركات الجادة.
+                </>
+              ) : (
+                <>
+                  Where serious <span className="gold-shine italic">deals</span><br />
+                  meet serious business.
+                </>
+              )}
             </h1>
-            <p className="text-base md:text-lg text-primary-foreground/85 max-w-xl">{t("hero_subtitle")}</p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "سجّل شركتك" : "Register Company"}<Arrow className="h-4 w-4" /></Link>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-10">
+              {ar
+                ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة، بمعايير فاخرة."
+                : "Souqly connects companies, suppliers, factories and professional agents across Egypt — one platform, premium standards."}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-7 font-semibold">
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً" : "Get Started"}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="bg-white/10 border-white/20 text-primary-foreground hover:bg-white/15">
-                <Link to="/auth" search={{ mode: "signup" }}>{ar ? "كن مسوّقاً" : "Become an Agent"}</Link>
+              <Button asChild size="lg" variant="outline" className="h-12 px-7 gold-border bg-transparent hover:bg-white/5 text-foreground">
+                <Link to="/marketplace" className="gap-2">{ar ? "استكشف السوق" : "Explore Marketplace"}</Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="text-primary-foreground hover:bg-white/10">
-                <Link to="/marketplace" className="gap-2">{t("cta_explore")}<Arrow className="h-4 w-4" /></Link>
-              </Button>
-            </div>
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: ar ? "شركة" : "Companies", value: counts.companies },
-                { label: ar ? "إعلان" : "Listings", value: counts.listings },
-                { label: ar ? "مسوّق" : "Agents", value: counts.agents },
-                { label: ar ? "صفقة/طلب" : "Deals & Leads", value: counts.leads },
-              ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-white/10 px-3 py-3 text-center backdrop-blur">
-                  <div className="text-2xl font-extrabold tabular-nums">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}</div>
-                  <div className="text-xs text-primary-foreground/75 mt-0.5">{item.label}</div>
-                </div>
-              ))}
             </div>
           </div>
-          <div className="hidden md:block relative">
-            <div className="absolute inset-0 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10" />
-            <div className="relative grid grid-cols-2 gap-4 p-6">
-              {(listings.length ? listings : Array.from({ length: 4 })).slice(0, 4).map((l, i) => (
-                <div key={(l as ListingCardData)?.id ?? i} className="rounded-lg overflow-hidden bg-white/10 border border-white/20">
-                  <div className="aspect-[4/3] w-full bg-white/5">
-                    {(l as ListingCardData)?.images?.[0] && <img src={(l as ListingCardData).images![0]} alt="" className="h-full w-full object-cover" />}
-                  </div>
-                  <div className="p-2 text-xs truncate">{(l as ListingCardData)?.type ? t(`cat_${(l as ListingCardData).type}` as never) : "—"}</div>
-                </div>
-              ))}
-            </div>
+
+          {/* Bento stats */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {[
+              { label: ar ? "شركة موثقة" : "Verified Companies", value: counts.companies },
+              { label: ar ? "إعلان نشط" : "Active Listings", value: counts.listings },
+              { label: ar ? "مسوّق محترف" : "Pro Agents", value: counts.agents },
+              { label: ar ? "صفقة مسجلة" : "Recorded Deals", value: counts.leads },
+            ].map((item) => (
+              <div key={item.label} className="premium-panel rounded-2xl p-5 md:p-6">
+                <div className="text-serif text-4xl md:text-5xl text-gold tabular-nums">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}<span className="text-gold-soft">+</span></div>
+                <div className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">{item.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="container-souqly py-10">
-        <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">{t("section_categories")}</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+      {/* Categories — bento */}
+      <section className="container-souqly py-16">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <span className="status-pill mb-3">{ar ? "التصنيفات" : "Categories"}</span>
+            <h2 className="text-serif text-3xl md:text-5xl mt-3">{t("section_categories")}</h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {categories.map(({ key, icon: Icon }) => (
-            <Link key={key} to="/marketplace" className="group rounded-2xl border border-white/10 bg-surface p-5 text-center hover:border-primary/30 hover:shadow-elev transition">
-              <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 text-primary grid place-items-center mb-2 group-hover:bg-primary group-hover:text-primary-foreground transition">
+            <Link key={key} to="/marketplace" className="group premium-panel rounded-2xl p-6 hover:border-primary/40 hover:shadow-gold transition-all duration-300">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 text-gold grid place-items-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition">
                 <Icon className="h-5 w-5" />
               </div>
               <div className="text-sm font-semibold text-foreground">{t(key)}</div>
+              <Arrow className="h-4 w-4 text-muted-foreground mt-3 group-hover:text-gold transition" />
             </Link>
           ))}
         </div>
       </section>
+
 
       {/* Featured listings */}
       <section className="container-souqly py-8">

@@ -16,13 +16,13 @@ export function SiteHeader() {
 
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 shadow-xl shadow-black/10 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <div className="container-souqly flex h-16 items-center gap-6">
-        <Link to="/" className="flex items-center gap-3 font-bold text-lg text-primary">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-            <Briefcase className="h-5 w-5" />
+        <Link to="/" className="flex items-center gap-3 font-bold text-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold">
+            <Briefcase className="h-4 w-4" />
           </div>
-          <span>{t("brand")}</span>
+          <span className="text-serif text-2xl text-foreground tracking-tight">{t("brand")}</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
