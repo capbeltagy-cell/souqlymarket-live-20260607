@@ -79,20 +79,21 @@ export function ListingCard({ l }: { l: ListingCardData }) {
   }
 
   return (
-    <div className="group overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface-2 shadow-elev transition-all duration-200 hover:-translate-y-1 hover:bg-surface">
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+    <div className="group overflow-hidden rounded-3xl premium-panel transition-all duration-300 hover:-translate-y-1 hover:shadow-gold hover:border-primary/40">
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
         <img src={image} alt={title} loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <Badge className="absolute top-3 start-3 bg-surface/95 text-foreground hover:bg-surface">
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+        <Badge className="absolute top-3 start-3 bg-background/80 text-foreground border border-primary/20 backdrop-blur-md hover:bg-background/80">
           {t(typeKey[l.type] as never)}
         </Badge>
         {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
-          <Badge className="absolute top-3 end-3 bg-accent text-accent-foreground hover:bg-accent">★ {t("feature_featured_listings")}</Badge>
+          <Badge className="absolute top-3 end-3 bg-primary text-primary-foreground hover:bg-primary font-semibold tracking-wider">★ {t("feature_featured_listings")}</Badge>
         )}
         <button onClick={toggleFav} disabled={favBusy}
-          className="absolute bottom-3 end-3 h-9 w-9 rounded-full bg-surface/95 grid place-items-center hover:bg-surface transition disabled:opacity-50"
+          className="absolute bottom-3 end-3 h-10 w-10 rounded-full bg-background/85 grid place-items-center hover:bg-background border border-primary/20 backdrop-blur-md transition disabled:opacity-50"
           aria-label={t("save_favorite")}>
-          <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />
+          <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : "text-foreground"}`} />
         </button>
       </div>
       <div className="p-4 space-y-3">
