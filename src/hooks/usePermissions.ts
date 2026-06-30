@@ -51,7 +51,7 @@ export function usePermissions(): PermissionState {
       const { data: permRows } = await supabase
         .from("role_permissions")
         .select("permission, role")
-        .in("role", roles as unknown as string[]);
+        .in("role", roles as never);
 
       const permissions = Array.from(
         new Set((permRows ?? []).map((p) => p.permission as string))
