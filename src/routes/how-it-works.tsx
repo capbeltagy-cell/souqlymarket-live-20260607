@@ -3,7 +3,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/how-it-works")({
-  head: () => ({ meta: [{ title: "كيف يعمل سوقلي" }] }),
+  head: () => ({
+    meta: [
+      { title: "كيف يعمل سوقلي — How Souqly Works" },
+      { name: "description", content: "خمس خطوات بسيطة لاستخدام سوقلي: سجّل حسابك، أنشئ ملف شركتك، انشر إعلاناتك، استقبل طلبات العملاء، وأبرم الصفقات بثقة." },
+      { property: "og:title", content: "كيف يعمل سوقلي" },
+      { property: "og:description", content: "دليل سريع لكيفية البدء على منصة سوقلي B2B." },
+      { property: "og:url", content: "https://souqlymarket.com/how-it-works" },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/how-it-works" }],
+  }),
   component: Page,
 });
 
