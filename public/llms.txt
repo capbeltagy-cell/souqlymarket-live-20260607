@@ -1,0 +1,34 @@
+# Souqly — سوقلي
+
+> Souqly is Egypt's professional B2B marketplace connecting companies, factories, wholesalers, sales agents and buyers across the Arab world.
+
+Souqly lets verified companies publish products, services, wholesale offers, real estate and lands, while buyers post RFQs and tenders. Sales agents earn commissions by referring deals.
+
+## Pages
+
+- [Home](/): Marketplace overview, featured companies, listings, RFQs and tenders.
+- [About](/about): Souqly's mission and vision for Egyptian B2B trade.
+- [How it works](/how-it-works): Five steps to start using Souqly.
+- [Pricing](/pricing): Free, Premium Company and Premium Agent plans.
+- [FAQ](/faq): Common questions about accounts, listings, verification and deals.
+- [Contact](/contact): Reach the Souqly team.
+
+## Marketplace
+
+- [Marketplace](/marketplace): Browse all approved listings.
+- [Companies](/companies): Directory of Egyptian companies.
+- [Factories](/factories): Manufacturers and production partners.
+- [Agents](/agents): Sales agents available for partnership.
+- [Wholesale](/wholesale): Bulk B2B offers.
+- [Real estate](/real-estate): Commercial and investment properties.
+- [Lands](/lands): Land plots for sale or development.
+- [RFQs](/rfq): Open buyer requests for quotation.
+- [Tenders](/tenders): Public and private tenders.
+- [Map](/map): Listings on the map.
+- [Search](/search-all): Cross-vertical search.
+
+## Optional
+
+- [Privacy](/privacy): Privacy policy.
+- [Terms](/terms): Terms of service.
+- [Refund policy](/refund-policy): Subscription refund terms.
