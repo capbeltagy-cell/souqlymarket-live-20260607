@@ -34,7 +34,7 @@ function Page() {
             <li key={s.n} className="flex gap-4 items-start rounded-lg border border-border bg-card p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">{s.n}</div>
               <div className="text-right flex-1">
-                <h3 className="font-semibold mb-1">{s.t}</h3>
+                <h2 className="font-semibold mb-1 text-base">{s.t}</h2>
                 <p className="text-sm text-muted-foreground">{s.d}</p>
               </div>
             </li>
