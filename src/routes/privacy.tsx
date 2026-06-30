@@ -3,7 +3,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({ meta: [{ title: "سياسة الخصوصية — سوقلي" }] }),
+  head: () => ({
+    meta: [
+      { title: "سياسة الخصوصية — سوقلي | Privacy Policy" },
+      { name: "description", content: "كيف يجمع سوقلي بيانات المستخدمين ويحميها: ما الذي نخزّنه، كيف نستخدمه، مع مَن نشاركه، وما هي حقوقك في التعديل أو الحذف." },
+      { property: "og:title", content: "سياسة الخصوصية — سوقلي" },
+      { property: "og:description", content: "التزامنا بحماية بياناتك على منصة سوقلي B2B — جمع، استخدام، ومشاركة المعلومات." },
+      { property: "og:url", content: "https://souqlymarket.com/privacy" },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/privacy" }],
+  }),
   component: Page,
 });
 
