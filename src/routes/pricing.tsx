@@ -73,7 +73,7 @@ function Pricing() {
                 {isCurrent && (
                   <Badge className="absolute -top-2 end-4 bg-success text-success-foreground hover:bg-success">{t("current_plan")}</Badge>
                 )}
-                <h3 className="font-bold text-lg">{t(p.titleKey as never)}</h3>
+                <h2 className="font-bold text-lg">{t(p.titleKey as never)}</h2>
                 <p className="text-sm text-muted-foreground mt-1 mb-4">{t(p.desc as never)}</p>
                 <div className="mb-6">
                   <span className="text-4xl font-extrabold">{p.price === 0 ? (locale === "ar" ? "مجاناً" : "Free") : (locale === "ar" ? `${p.price.toLocaleString("ar-EG")} جنيه` : `EGP ${p.price.toLocaleString()}`)}</span>
