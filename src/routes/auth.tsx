@@ -15,7 +15,17 @@ const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() })
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Sign in — Souqly" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in or create account — Souqly" },
+      { name: "description", content: "Sign in to Souqly or create a free account to publish listings, send RFQs, and connect with Egyptian companies, factories and sales agents." },
+      { property: "og:title", content: "Sign in to Souqly" },
+      { property: "og:description", content: "Access your Souqly B2B account or join free in seconds." },
+      { property: "og:url", content: "https://souqlymarket.com/auth" },
+      { name: "robots", content: "noindex,follow" },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/auth" }],
+  }),
   component: AuthPage,
 });
 

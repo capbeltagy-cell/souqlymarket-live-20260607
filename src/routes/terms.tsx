@@ -3,7 +3,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({ meta: [{ title: "شروط الاستخدام — سوقلي" }] }),
+  head: () => ({
+    meta: [
+      { title: "شروط الاستخدام — سوقلي | Terms of Service" },
+      { name: "description", content: "شروط استخدام منصة سوقلي B2B: قواعد نشر الإعلانات، حقوق وواجبات الشركات والوكلاء، حدود المسؤولية، وآلية تعديل الشروط." },
+      { property: "og:title", content: "شروط الاستخدام — سوقلي" },
+      { property: "og:description", content: "القواعد التي تحكم استخدام منصة سوقلي والعلاقة بين الشركات والوكلاء والمشترين." },
+      { property: "og:url", content: "https://souqlymarket.com/terms" },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/terms" }],
+  }),
   component: Page,
 });
 

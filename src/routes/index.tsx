@@ -10,12 +10,20 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 
+const HOME_OG_IMAGE = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Souqly — سوقلي | B2B Marketplace" },
-      { name: "description", content: "Connect companies with professional sales agents. Products, services, real estate, factories and investment opportunities." },
+      { title: "Souqly Marketplace — Egypt's B2B platform for companies & agents" },
+      { name: "description", content: "Discover Egyptian companies, factories, wholesale offers, real estate, RFQs and tenders on Souqly — the B2B marketplace built for serious buyers and sales agents." },
+      { property: "og:title", content: "Souqly Marketplace — Egypt's B2B platform for companies & agents" },
+      { property: "og:description", content: "Discover Egyptian companies, factories, wholesale offers, real estate, RFQs and tenders on one professional B2B platform." },
+      { property: "og:url", content: "https://souqlymarket.com/" },
+      { property: "og:image", content: HOME_OG_IMAGE },
+      { name: "twitter:image", content: HOME_OG_IMAGE },
     ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/" }],
   }),
   component: Landing,
 });
