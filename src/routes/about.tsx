@@ -3,10 +3,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({ meta: [
-    { title: "من نحن — سوقلي" },
-    { name: "description", content: "سوقلي - أول سوق B2B متخصص للشركات المصرية." },
-  ]}),
+  head: () => ({
+    meta: [
+      { title: "من نحن — سوقلي | About Souqly" },
+      { name: "description", content: "تعرّف على سوقلي، أول سوق B2B متخصص يربط الشركات المصرية والمصانع والموردين بالمشترين ووكلاء المبيعات في منصة واحدة موثوقة." },
+      { property: "og:title", content: "من نحن — سوقلي | About Souqly" },
+      { property: "og:description", content: "قصتنا ورسالتنا: تمكين الشركات المصرية بمنصة B2B احترافية تفتح أسواقاً جديدة وتسهّل الصفقات بين الشركات." },
+      { property: "og:url", content: "https://souqlymarket.com/about" },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/about" }],
+  }),
   component: AboutPage,
 });
 
