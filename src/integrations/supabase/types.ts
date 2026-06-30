@@ -167,6 +167,45 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       business_categories: {
         Row: {
           created_at: string
@@ -1005,6 +1044,27 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -1144,6 +1204,30 @@ export type Database = {
             referencedColumns: ["slug"]
           },
         ]
+      }
+      user_activity: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -1377,6 +1461,10 @@ export type Database = {
         }
         Returns: string
       }
+      has_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1394,7 +1482,21 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "company" | "agent" | "customer" | "buyer"
+      app_role:
+        | "admin"
+        | "company"
+        | "agent"
+        | "customer"
+        | "buyer"
+        | "super_admin"
+        | "moderator"
+        | "support"
+        | "factory"
+        | "service_provider"
+        | "wholesaler"
+        | "importer"
+        | "exporter"
+        | "distributor"
       application_status: "pending" | "accepted" | "rejected"
       commission_status: "pending" | "approved" | "paid"
       invoice_status: "pending" | "paid" | "failed" | "refunded" | "void"
@@ -1552,7 +1654,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "company", "agent", "customer", "buyer"],
+      app_role: [
+        "admin",
+        "company",
+        "agent",
+        "customer",
+        "buyer",
+        "super_admin",
+        "moderator",
+        "support",
+        "factory",
+        "service_provider",
+        "wholesaler",
+        "importer",
+        "exporter",
+        "distributor",
+      ],
       application_status: ["pending", "accepted", "rejected"],
       commission_status: ["pending", "approved", "paid"],
       invoice_status: ["pending", "paid", "failed", "refunded", "void"],
