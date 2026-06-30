@@ -1394,7 +1394,21 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "company" | "agent" | "customer" | "buyer"
+      app_role:
+        | "admin"
+        | "company"
+        | "agent"
+        | "customer"
+        | "buyer"
+        | "super_admin"
+        | "moderator"
+        | "support"
+        | "factory"
+        | "service_provider"
+        | "wholesaler"
+        | "importer"
+        | "exporter"
+        | "distributor"
       application_status: "pending" | "accepted" | "rejected"
       commission_status: "pending" | "approved" | "paid"
       invoice_status: "pending" | "paid" | "failed" | "refunded" | "void"
@@ -1552,7 +1566,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "company", "agent", "customer", "buyer"],
+      app_role: [
+        "admin",
+        "company",
+        "agent",
+        "customer",
+        "buyer",
+        "super_admin",
+        "moderator",
+        "support",
+        "factory",
+        "service_provider",
+        "wholesaler",
+        "importer",
+        "exporter",
+        "distributor",
+      ],
       application_status: ["pending", "accepted", "rejected"],
       commission_status: ["pending", "approved", "paid"],
       invoice_status: ["pending", "paid", "failed", "refunded", "void"],
