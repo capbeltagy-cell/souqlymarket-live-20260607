@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/i18n/I18nProvider";
 import { globalSearch } from "@/lib/global-search.functions";
 import { highlight } from "@/components/GlobalSearch";
@@ -33,10 +34,15 @@ function SearchAllPage() {
   useEffect(() => {
     const term = initialQ.trim();
     if (!term) { setRes(null); return; }
+    let cancelled = false;
     setLoading(true);
-    globalSearch({ data: { q: term, limit: 12 } })
-      .then(setRes).catch(() => setRes(null))
-      .finally(() => setLoading(false));
+    const handle = setTimeout(() => {
+      globalSearch({ data: { q: term, limit: 12 } })
+        .then((r) => { if (!cancelled) setRes(r); })
+        .catch(() => { if (!cancelled) setRes(null); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, 150);
+    return () => { cancelled = true; clearTimeout(handle); };
   }, [initialQ]);
 
   function submit(e: React.FormEvent) {
@@ -63,7 +69,23 @@ function SearchAllPage() {
         </form>
 
         {!initialQ && <div className="text-center text-muted-foreground py-10">{ar ? "اكتب كلمة للبحث" : "Type to search"}</div>}
-        {loading && <div className="text-center py-10 text-muted-foreground">{ar ? "جاري البحث…" : "Searching…"}</div>}
+        {loading && (
+          <div className="space-y-8">
+            {Array.from({ length: 3 }).map((_, s) => (
+              <section key={s}>
+                <Skeleton className="h-5 w-40 mb-3" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
         {res && total === 0 && !loading && (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">🔍</div>

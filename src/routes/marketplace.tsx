@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useDeferredValue } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
@@ -31,6 +32,7 @@ function Marketplace() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     const nowIso = new Date().toISOString();
     let query = supabase
@@ -41,8 +43,8 @@ function Marketplace() {
       .limit(120);
     if (type !== "all") query = query.eq("type", type);
     query.then(({ data }) => {
+      if (cancelled) return;
       const rows = (data ?? []) as unknown as (ListingCardData & { featured_until?: string | null; companies?: { is_verified?: boolean } | null })[];
-      // Sort: active-featured first, then verified-company listings, then newest
       const sorted = [...rows].sort((a, b) => {
         const af = a.featured && (!a.featured_until || a.featured_until > nowIso) ? 1 : 0;
         const bf = b.featured && (!b.featured_until || b.featured_until > nowIso) ? 1 : 0;
@@ -55,19 +57,24 @@ function Marketplace() {
       setItems(sorted);
       setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [type]);
 
   const governorates = EGYPT_GOVERNORATES.map((gov) => gov.value);
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
 
-  const filtered = items.filter((l) => {
-    if (type !== "all" && l.type !== type) return false;
-    if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate) return false;
-    if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
-    if (!q) return true;
-    const hay = `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
-    return hay.includes(q.toLowerCase());
-  });
+  const deferredQ = useDeferredValue(q);
+  const filtered = useMemo(() => {
+    const needle = deferredQ.trim().toLowerCase();
+    return items.filter((l) => {
+      if (type !== "all" && l.type !== type) return false;
+      if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate) return false;
+      if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
+      if (!needle) return true;
+      const hay = `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
+      return hay.includes(needle);
+    });
+  }, [items, deferredQ, type, governorate, city]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -165,7 +172,16 @@ function Marketplace() {
           </div>
         </div>
         {loading ? (
-          <div className="py-20 text-center text-muted-foreground">{t("loading")}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-border bg-card p-3 space-y-3">
+                <Skeleton className="h-40 w-full rounded-xl" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <EmptyState
             title={items.length === 0 ? t("no_listings_yet") : t("no_results")}
