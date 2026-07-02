@@ -32,6 +32,7 @@ function Marketplace() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     const nowIso = new Date().toISOString();
     let query = supabase
@@ -42,8 +43,8 @@ function Marketplace() {
       .limit(120);
     if (type !== "all") query = query.eq("type", type);
     query.then(({ data }) => {
+      if (cancelled) return;
       const rows = (data ?? []) as unknown as (ListingCardData & { featured_until?: string | null; companies?: { is_verified?: boolean } | null })[];
-      // Sort: active-featured first, then verified-company listings, then newest
       const sorted = [...rows].sort((a, b) => {
         const af = a.featured && (!a.featured_until || a.featured_until > nowIso) ? 1 : 0;
         const bf = b.featured && (!b.featured_until || b.featured_until > nowIso) ? 1 : 0;
@@ -56,19 +57,24 @@ function Marketplace() {
       setItems(sorted);
       setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [type]);
 
   const governorates = EGYPT_GOVERNORATES.map((gov) => gov.value);
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
 
-  const filtered = items.filter((l) => {
-    if (type !== "all" && l.type !== type) return false;
-    if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate) return false;
-    if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
-    if (!q) return true;
-    const hay = `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
-    return hay.includes(q.toLowerCase());
-  });
+  const deferredQ = useDeferredValue(q);
+  const filtered = useMemo(() => {
+    const needle = deferredQ.trim().toLowerCase();
+    return items.filter((l) => {
+      if (type !== "all" && l.type !== type) return false;
+      if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate) return false;
+      if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
+      if (!needle) return true;
+      const hay = `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
+      return hay.includes(needle);
+    });
+  }, [items, deferredQ, type, governorate, city]);
 
   return (
     <div className="min-h-screen flex flex-col">
