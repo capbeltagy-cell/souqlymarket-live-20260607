@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Sparkles, TrendingUp, Wrench } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Search, Sparkles, TrendingUp, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -15,10 +15,10 @@ const HOME_OG_IMAGE = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Souqly Marketplace — Egypt's B2B platform for companies & agents" },
-      { name: "description", content: "Discover Egyptian companies, factories, wholesale offers, real estate, RFQs and tenders on Souqly — the B2B marketplace built for serious buyers and sales agents." },
-      { property: "og:title", content: "Souqly Marketplace — Egypt's B2B platform for companies & agents" },
-      { property: "og:description", content: "Discover Egyptian companies, factories, wholesale offers, real estate, RFQs and tenders on one professional B2B platform." },
+      { title: "Souqly — سوقلي | منصة الأعمال الفاخرة في مصر" },
+      { name: "description", content: "سوقلي — منصة B2B فاخرة تربط الشركات والمصانع والموردين والمسوقين المحترفين في مصر. اكتشف الفرص، قدّم عروضك، ونمِّ أعمالك." },
+      { property: "og:title", content: "Souqly — سوقلي | Egypt's Premier B2B Marketplace" },
+      { property: "og:description", content: "One platform for companies, factories, wholesale, RFQs and tenders across Egypt." },
       { property: "og:url", content: "https://souqlymarket.com/" },
       { property: "og:image", content: HOME_OG_IMAGE },
       { name: "twitter:image", content: HOME_OG_IMAGE },
@@ -29,68 +29,62 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { key: "cat_product", icon: Package },
-  { key: "cat_service", icon: Wrench },
-  { key: "cat_real_estate", icon: Building2 },
-  { key: "cat_land", icon: Landmark },
-  { key: "cat_factory", icon: Factory },
-  { key: "cat_opportunity", icon: TrendingUp },
+  { key: "cat_product", icon: Package, type: "product" },
+  { key: "cat_service", icon: Wrench, type: "service" },
+  { key: "cat_real_estate", icon: Building2, type: "real_estate" },
+  { key: "cat_land", icon: Landmark, type: "land" },
+  { key: "cat_factory", icon: Factory, type: "factory" },
+  { key: "cat_opportunity", icon: TrendingUp, type: "opportunity" },
 ] as const;
 
-function EmptyState({ label, href }: { label: string; href: string }) {
+function Empty({ label, href }: { label: string; href: string }) {
   const { t } = useI18n();
   return (
     <div className="rounded-2xl border border-dashed border-white/10 bg-surface/50 p-8 text-center">
       <p className="text-sm text-muted-foreground mb-3">{t("empty_no_items")}</p>
-      <Button asChild variant="outline" size="sm">
-        <Link to={href}>{label}</Link>
-      </Button>
+      <Button asChild variant="outline" size="sm"><Link to={href}>{label}</Link></Button>
+    </div>
+  );
+}
+
+function Skeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="rounded-[1.5rem] border border-white/5 bg-surface-2/40 overflow-hidden animate-pulse">
+          <div className="aspect-[4/3] bg-white/[0.03]" />
+          <div className="p-4 space-y-2">
+            <div className="h-3 rounded bg-white/[0.05] w-3/4" />
+            <div className="h-3 rounded bg-white/[0.05] w-1/2" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
 function Landing() {
   const { t, dir, locale } = useI18n();
+  const navigate = useNavigate();
   const ar = locale === "ar";
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
-  const [listings, setListings] = useState<ListingCardData[]>([]);
-  const [products, setProducts] = useState<ListingCardData[]>([]);
-  const [properties, setProperties] = useState<ListingCardData[]>([]);
-  const [lands, setLands] = useState<ListingCardData[]>([]);
-  const [factoryListings, setFactoryListings] = useState<ListingCardData[]>([]);
-  const [companies, setCompanies] = useState<CompanyCardData[]>([]);
-  const [wholesale, setWholesale] = useState<any[]>([]);
-  const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }>>([]);
-  const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }>>([]);
+  const [query, setQuery] = useState("");
+  const [listings, setListings] = useState<ListingCardData[] | null>(null);
+  const [companies, setCompanies] = useState<CompanyCardData[] | null>(null);
+  const [wholesale, setWholesale] = useState<any[] | null>(null);
+  const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }> | null>(null);
+  const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }> | null>(null);
   const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0, leads: 0 });
 
   useEffect(() => {
+    // Fast: counts for hero
     (async () => {
-      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
-      const [lRes, pRes, reRes, landRes, facRes, cRes, wRes, rfqRes, tenderRes, cCount, lCount, aCount, leadCount] = await Promise.all([
-        supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "real_estate").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "land").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(4),
-        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "factory").order("created_at", { ascending: false }).limit(4),
-        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).limit(6),
-        supabase.from("wholesale_listings").select("*, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
-        supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(4),
-        supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(4),
+      const [cCount, lCount, aCount, leadCount] = await Promise.all([
         supabase.from("companies").select("id", { count: "exact", head: true }),
         supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
         supabase.from("agents").select("id", { count: "exact", head: true }),
         supabase.from("leads").select("id", { count: "exact", head: true }),
       ]);
-      setListings((lRes.data ?? []) as unknown as ListingCardData[]);
-      setProducts((pRes.data ?? []) as unknown as ListingCardData[]);
-      setProperties((reRes.data ?? []) as unknown as ListingCardData[]);
-      setLands((landRes.data ?? []) as unknown as ListingCardData[]);
-      setFactoryListings((facRes.data ?? []) as unknown as ListingCardData[]);
-      setCompanies((cRes.data ?? []) as CompanyCardData[]);
-      setWholesale((wRes.data ?? []) as any[]);
-      setRfqs((rfqRes.data ?? []) as never);
-      setTenders((tenderRes.data ?? []) as never);
       setCounts({
         companies: cCount.count ?? 0,
         listings: lCount.count ?? 0,
@@ -98,15 +92,39 @@ function Landing() {
         leads: leadCount.count ?? 0,
       });
     })();
+
+    // Deferred: content sections
+    (async () => {
+      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)";
+      const [lRes, cRes, wRes, rfqRes, tenderRes] = await Promise.all([
+        supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(8),
+        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).limit(6),
+        supabase.from("wholesale_listings").select("*, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
+        supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(5),
+        supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(5),
+      ]);
+      setListings((lRes.data ?? []) as unknown as ListingCardData[]);
+      setCompanies((cRes.data ?? []) as CompanyCardData[]);
+      setWholesale((wRes.data ?? []) as any[]);
+      setRfqs((rfqRes.data ?? []) as never);
+      setTenders((tenderRes.data ?? []) as never);
+    })();
   }, []);
+
+  function submitSearch(e: FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) { navigate({ to: "/marketplace" }); return; }
+    navigate({ to: "/search-all", search: { q } as never });
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      {/* Hero — Noir & Gold editorial */}
+      {/* Hero */}
       <section className="relative overflow-hidden hero-gradient">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
           backgroundImage: "linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px)",
           backgroundSize: "80px 80px",
         }} />
@@ -116,29 +134,38 @@ function Landing() {
               <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
             </span>
             <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6">
-              {ar ? (
-                <>
-                  حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />
-                  بالشركات الجادة.
-                </>
-              ) : (
-                <>
-                  Where serious <span className="gold-shine italic">deals</span><br />
-                  meet serious business.
-                </>
-              )}
+              {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />بالشركات الجادة.</>)
+                  : (<>Where serious <span className="gold-shine italic">deals</span><br />meet serious business.</>)}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-10">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8">
               {ar
                 ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة، بمعايير فاخرة."
                 : "Souqly connects companies, suppliers, factories and professional agents across Egypt — one platform, premium standards."}
             </p>
+
+            {/* Hero Search */}
+            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 transition">
+              <div className="flex items-center gap-2 flex-1 px-3">
+                <Search className="h-5 w-5 text-gold shrink-0" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={ar ? "ابحث عن منتج، شركة، مصنع، عقار…" : "Search products, companies, factories, real estate…"}
+                  className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground py-3 min-w-0"
+                  aria-label={ar ? "بحث" : "Search"}
+                />
+              </div>
+              <Button type="submit" size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-11 px-6 font-semibold shrink-0">
+                {ar ? "بحث" : "Search"}
+              </Button>
+            </form>
+
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-7 font-semibold">
+              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
                 <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً" : "Get Started"}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-7 gold-border bg-transparent hover:bg-white/5 text-foreground">
-                <Link to="/marketplace" className="gap-2">{ar ? "استكشف السوق" : "Explore Marketplace"}</Link>
+              <Button asChild size="lg" variant="ghost" className="h-11 px-6">
+                <Link to="/how-it-works">{ar ? "كيف يعمل سوقلي؟" : "How it works"}</Link>
               </Button>
             </div>
           </div>
@@ -160,7 +187,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Categories — bento */}
+      {/* Categories */}
       <section className="container-souqly py-16">
         <div className="flex items-end justify-between mb-8">
           <div>
@@ -181,151 +208,91 @@ function Landing() {
         </div>
       </section>
 
-
-      {/* Featured listings */}
+      {/* Featured Listings */}
       <section className="container-souqly py-8">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("section_featured")}</h2>
+          <h2 className="text-serif text-3xl md:text-4xl">{t("section_featured")}</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/marketplace" className="gap-1">{t("cta_explore")} <Arrow className="h-4 w-4" /></Link></Button>
         </div>
-        {listings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {listings.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("cta_explore")} href="/marketplace" />
-        )}
+        {listings === null ? <Skeleton count={8} />
+          : listings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {listings.map((l) => <ListingCard key={l.id} l={l} />)}
+            </div>
+          ) : <Empty label={t("cta_explore")} href="/marketplace" />}
       </section>
 
-      {/* Companies */}
+      {/* Top Companies */}
       <section className="container-souqly py-8">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("section_top_companies")}</h2>
+          <h2 className="text-serif text-3xl md:text-4xl">{t("section_top_companies")}</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/companies" className="gap-1">{t("nav_companies")} <Arrow className="h-4 w-4" /></Link></Button>
         </div>
-        {companies.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {companies.map((c) => <CompanyCard key={c.id} c={c} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("nav_companies")} href="/companies" />
-        )}
-      </section>
-
-      {/* Products */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("featured_products")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/marketplace" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {products.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("view_all")} href="/marketplace" />
-        )}
+        {companies === null ? <Skeleton count={6} />
+          : companies.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {companies.map((c) => <CompanyCard key={c.id} c={c} />)}
+            </div>
+          ) : <Empty label={t("nav_companies")} href="/companies" />}
       </section>
 
       {/* Wholesale */}
       <section className="container-souqly py-8">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{locale === "ar" ? "منتجات الجملة" : "Wholesale products"}</h2>
+          <h2 className="text-serif text-3xl md:text-4xl">{ar ? "عروض الجملة" : "Wholesale offers"}</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/wholesale" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
         </div>
-        {wholesale.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {wholesale.map((w) => {
-              const title = w.title ?? "";
-              const company = (locale === "ar" ? w.companies?.name_ar : w.companies?.name_en) ?? w.companies?.name_en ?? w.companies?.name_ar ?? "";
-              return (
-                <Link key={w.id} to="/wholesale/$id" params={{ id: w.id }} className="group overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface-2 shadow-elev transition-all duration-200 hover:-translate-y-1 hover:bg-surface">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                    {w.images?.[0] ? (
-                      <img src={w.images[0]} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    ) : (
-                      <div className="h-full w-full bg-muted grid place-items-center text-muted-foreground text-sm">{locale === "ar" ? "لا توجد صورة" : "No image"}</div>
-                    )}
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
-                    {company && <p className="text-xs text-muted-foreground">{company}</p>}
-                    <div className="flex items-center justify-between pt-2 border-t border-border">
-                      {w.price_per_unit ? (
-                        <div className="font-bold text-primary text-sm">{formatPrice(w.price_per_unit, locale)} <span className="text-xs text-muted-foreground font-normal">/ {locale === "ar" ? "وحدة" : "unit"}</span></div>
+        {wholesale === null ? <Skeleton count={4} />
+          : wholesale.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {wholesale.map((w) => {
+                const title = w.title ?? "";
+                const company = (ar ? w.companies?.name_ar : w.companies?.name_en) ?? w.companies?.name_en ?? w.companies?.name_ar ?? "";
+                return (
+                  <Link key={w.id} to="/wholesale/$id" params={{ id: w.id }} className="group overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface-2 shadow-elev transition-all duration-200 hover:-translate-y-1 hover:bg-surface">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      {w.images?.[0] ? (
+                        <img src={w.images[0]} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       ) : (
-                        <div className="text-xs text-muted-foreground">—</div>
+                        <div className="h-full w-full bg-muted grid place-items-center text-muted-foreground text-sm">{ar ? "لا توجد صورة" : "No image"}</div>
                       )}
-                      <div className="text-xs text-muted-foreground">{locale === "ar" ? "الحد الأدنى" : "MOQ"}: {w.moq}</div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        ) : (
-          <EmptyState label={locale === "ar" ? "تصفح الجملة" : "Browse wholesale"} href="/wholesale" />
-        )}
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
+                      {company && <p className="text-xs text-muted-foreground">{company}</p>}
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        {w.price_per_unit ? (
+                          <div className="font-bold text-primary text-sm">{formatPrice(w.price_per_unit, locale)} <span className="text-xs text-muted-foreground font-normal">/ {ar ? "وحدة" : "unit"}</span></div>
+                        ) : (<div className="text-xs text-muted-foreground">—</div>)}
+                        <div className="text-xs text-muted-foreground">{ar ? "الحد الأدنى" : "MOQ"}: {w.moq}</div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : <Empty label={ar ? "تصفح الجملة" : "Browse wholesale"} href="/wholesale" />}
       </section>
 
-      {/* Real Estate */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("featured_properties")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/real-estate" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
+      {/* Opportunities: RFQs & Tenders */}
+      <section className="container-souqly py-16">
+        <div className="mb-8">
+          <span className="status-pill mb-3">{ar ? "فرص أعمال" : "Business Opportunities"}</span>
+          <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "طلبات وعطاءات مفتوحة" : "Open RFQs & Tenders"}</h2>
         </div>
-        {properties.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {properties.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("view_all")} href="/real-estate" />
-        )}
-      </section>
-
-      {/* Lands */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("featured_lands")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/lands" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {lands.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {lands.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("view_all")} href="/lands" />
-        )}
-      </section>
-
-      {/* Factories */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl md:text-2xl font-bold">{t("featured_factories")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/factories" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {factoryListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {factoryListings.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        ) : (
-          <EmptyState label={t("view_all")} href="/factories" />
-        )}
-      </section>
-
-      {/* RFQs & Tenders */}
-      <section className="container-souqly py-8">
         <div className="grid lg:grid-cols-2 gap-5">
           {/* RFQs */}
-          <div className="rounded-[1.5rem] panel-card p-5">
+          <div className="rounded-[1.5rem] panel-card p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">{t("featured_rfqs")}</h3>
               <Button asChild variant="ghost" size="sm"><Link to="/rfq">{t("view_all")}</Link></Button>
             </div>
-            {rfqs.length > 0 ? (
+            {rfqs === null ? (
+              <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse" />)}</div>
+            ) : rfqs.length > 0 ? (
               <div className="space-y-3">
                 {rfqs.map((r) => (
-                  <Link key={r.id} to="/rfq/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                  <Link key={r.id} to="/rfq/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 hover:border-primary/30 transition">
                     <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {r.governorate ?? "—"} · {r.budget_min ? `${r.budget_min.toLocaleString()} - ${(r.budget_max ?? r.budget_min).toLocaleString()} EGP` : "—"}
@@ -333,21 +300,21 @@ function Landing() {
                   </Link>
                 ))}
               </div>
-            ) : (
-              <EmptyState label={t("view_all")} href="/rfq" />
-            )}
+            ) : <Empty label={t("view_all")} href="/rfq" />}
           </div>
 
           {/* Tenders */}
-          <div className="rounded-[1.5rem] panel-card p-5">
+          <div className="rounded-[1.5rem] panel-card p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">{t("featured_tenders")}</h3>
               <Button asChild variant="ghost" size="sm"><Link to="/tenders">{t("view_all")}</Link></Button>
             </div>
-            {tenders.length > 0 ? (
+            {tenders === null ? (
+              <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse" />)}</div>
+            ) : tenders.length > 0 ? (
               <div className="space-y-3">
                 {tenders.map((r) => (
-                  <Link key={r.id} to="/tenders/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 transition">
+                  <Link key={r.id} to="/tenders/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 hover:border-primary/30 transition">
                     <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {r.governorate ?? "—"} · {r.budget ? `${r.budget.toLocaleString()} EGP` : "—"} {r.deadline ? `· ${r.deadline}` : ""}
@@ -355,9 +322,27 @@ function Landing() {
                   </Link>
                 ))}
               </div>
-            ) : (
-              <EmptyState label={t("view_all")} href="/tenders" />
-            )}
+            ) : <Empty label={t("view_all")} href="/tenders" />}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="container-souqly py-20">
+        <div className="premium-panel rounded-[2rem] p-10 md:p-16 text-center overflow-hidden relative">
+          <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
+            background: "radial-gradient(circle at 50% 0%, rgba(201,168,76,0.15), transparent 60%)",
+          }} />
+          <div className="relative">
+            <h2 className="text-serif text-4xl md:text-6xl mb-4">
+              {ar ? <>جاهز تنقل أعمالك <span className="gold-shine italic">لمستوى تاني</span>؟</> : <>Ready to take your business <span className="gold-shine italic">further</span>?</>}
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto mb-8">
+              {ar ? "انضم لآلاف الشركات والمسوقين على سوقلي — تسجيل مجاني، بدون عمولات مخفية." : "Join thousands of companies and pro agents on Souqly — free signup, no hidden fees."}
+            </p>
+            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold">
+              <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
+            </Button>
           </div>
         </div>
       </section>
