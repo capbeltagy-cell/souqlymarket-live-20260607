@@ -34,10 +34,15 @@ function SearchAllPage() {
   useEffect(() => {
     const term = initialQ.trim();
     if (!term) { setRes(null); return; }
+    let cancelled = false;
     setLoading(true);
-    globalSearch({ data: { q: term, limit: 12 } })
-      .then(setRes).catch(() => setRes(null))
-      .finally(() => setLoading(false));
+    const handle = setTimeout(() => {
+      globalSearch({ data: { q: term, limit: 12 } })
+        .then((r) => { if (!cancelled) setRes(r); })
+        .catch(() => { if (!cancelled) setRes(null); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, 150);
+    return () => { cancelled = true; clearTimeout(handle); };
   }, [initialQ]);
 
   function submit(e: React.FormEvent) {
