@@ -69,7 +69,23 @@ function SearchAllPage() {
         </form>
 
         {!initialQ && <div className="text-center text-muted-foreground py-10">{ar ? "اكتب كلمة للبحث" : "Type to search"}</div>}
-        {loading && <div className="text-center py-10 text-muted-foreground">{ar ? "جاري البحث…" : "Searching…"}</div>}
+        {loading && (
+          <div className="space-y-8">
+            {Array.from({ length: 3 }).map((_, s) => (
+              <section key={s}>
+                <Skeleton className="h-5 w-40 mb-3" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
         {res && total === 0 && !loading && (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">🔍</div>
