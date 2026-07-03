@@ -209,8 +209,31 @@ function Landing() {
         </div>
       </section>
 
+      {/* How it works — 3 steps */}
+      <section className="container-souqly py-12">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="status-pill mb-3">{ar ? "بأربع خطوات" : "In 3 steps"}</span>
+          <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "من التسجيل لأول صفقة" : "From signup to your first deal"}</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            { n: "01", t: ar ? "سجّل شركتك" : "Register your company", d: ar ? "أنشئ ملفًا موثقًا خلال دقائق واعرض قدراتك." : "Create a verified profile in minutes and showcase your capabilities." },
+            { n: "02", t: ar ? "استقبل الفرص" : "Receive opportunities", d: ar ? "طلبات أسعار ومناقصات مطابقة لنشاطك تصلك مباشرة." : "Matched RFQs and tenders delivered straight to you." },
+            { n: "03", t: ar ? "أغلق الصفقة" : "Close the deal", d: ar ? "تفاوض، وقّع، وادفع بأمان — من داخل المنصة." : "Negotiate, sign, and pay securely — all inside the platform." },
+          ].map((s) => (
+            <div key={s.n} className="premium-panel rounded-2xl p-8 hover:border-primary/30 transition">
+              <div className="step-number mb-4">{s.n}</div>
+              <div className="divider-gold w-12 mb-4" />
+              <h3 className="text-serif text-2xl mb-2">{s.t}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Featured Listings */}
       <section className="container-souqly py-8">
+
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-serif text-3xl md:text-4xl">{t("section_featured")}</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/marketplace" className="gap-1">{t("cta_explore")} <Arrow className="h-4 w-4" /></Link></Button>
