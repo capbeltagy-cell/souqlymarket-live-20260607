@@ -17,30 +17,52 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <div className="container-souqly flex h-16 items-center gap-6">
-        <Link to="/" className="flex items-center gap-3 font-bold text-lg">
+      <div className="container-souqly flex h-16 items-center gap-4">
+        <Link to="/" className="flex items-center gap-3 font-bold text-lg shrink-0">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold">
             <Briefcase className="h-4 w-4" />
           </div>
           <span className="text-serif text-2xl text-foreground tracking-tight">{t("brand")}</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
-          <Link to="/marketplace" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_marketplace")}</Link>
-          <Link to="/real-estate" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">عقارات</Link>
-          <Link to="/lands" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">أراضي</Link>
-          <Link to="/wholesale" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">سوق الجملة</Link>
-          <Link to="/factories" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">المصانع</Link>
-          <Link to="/rfq" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">طلبات الأسعار</Link>
-          <Link to="/tenders" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">المناقصات</Link>
-          <Link to="/companies" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_companies")}</Link>
-          <Link to="/pricing" className="px-4 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_pricing")}</Link>
+        <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+                {t("nav_marketplace")}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem asChild><Link to="/marketplace">كل السوق</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/real-estate">عقارات</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/lands">أراضي</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/factories">المصانع</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/wholesale">سوق الجملة</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/agents">المسوقين</Link></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+                فرص أعمال
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem asChild><Link to="/rfq">طلبات الأسعار</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/tenders">المناقصات</Link></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Link to="/companies" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_companies")}</Link>
+          <Link to="/pricing" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_pricing")}</Link>
+          <Link to="/how-it-works" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">كيف يعمل</Link>
         </nav>
 
-        <div className="ms-auto flex items-center gap-3">
-          <div className="hidden md:block w-[260px] lg:w-[340px]">
+
+        <div className="ms-auto flex items-center gap-2">
+          <div className="hidden xl:block w-[260px]">
             <GlobalSearch compact />
           </div>
+
           <LanguageToggle />
           {user ? (
             <DropdownMenu>
