@@ -58,10 +58,11 @@ export function SiteHeader() {
         </nav>
 
 
-        <div className="ms-auto flex items-center gap-3">
-          <div className="hidden md:block w-[260px] lg:w-[340px]">
+        <div className="ms-auto flex items-center gap-2">
+          <div className="hidden xl:block w-[260px]">
             <GlobalSearch compact />
           </div>
+
           <LanguageToggle />
           {user ? (
             <DropdownMenu>
