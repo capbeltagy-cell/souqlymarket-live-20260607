@@ -130,21 +130,21 @@ function Landing() {
         }} />
         <div className="container-souqly relative py-20 md:py-28">
           <div className="max-w-4xl">
-            <span className="status-pill mb-8">
+            <span className="status-pill mb-8 fade-up">
               <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
             </span>
-            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6">
+            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6 fade-up-1">
               {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />بالشركات الجادة.</>)
                   : (<>Where serious <span className="gold-shine italic">deals</span><br />meet serious business.</>)}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8 fade-up-2">
               {ar
                 ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة، بمعايير فاخرة."
                 : "Souqly connects companies, suppliers, factories and professional agents across Egypt — one platform, premium standards."}
             </p>
 
             {/* Hero Search */}
-            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 transition">
+            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 focus-within:shadow-gold transition-all fade-up-3">
               <div className="flex items-center gap-2 flex-1 px-3">
                 <Search className="h-5 w-5 text-gold shrink-0" />
                 <input
@@ -160,15 +160,16 @@ function Landing() {
               </Button>
             </form>
 
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
+            <div className="flex flex-wrap gap-3 fade-up-3">
+              <Button asChild size="lg" className="h-11 px-6 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold shadow-gold">
                 <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً" : "Get Started"}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="h-11 px-6">
+              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
                 <Link to="/how-it-works">{ar ? "كيف يعمل سوقلي؟" : "How it works"}</Link>
               </Button>
             </div>
           </div>
+
 
           {/* Bento stats */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
