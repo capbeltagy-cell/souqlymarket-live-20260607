@@ -212,7 +212,7 @@ function Landing() {
       {/* How it works — 3 steps */}
       <section className="container-souqly py-12">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="status-pill mb-3">{ar ? "بأربع خطوات" : "In 3 steps"}</span>
+          <span className="status-pill mb-3">{ar ? "بثلاث خطوات" : "In 3 steps"}</span>
           <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "من التسجيل لأول صفقة" : "From signup to your first deal"}</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-5">
