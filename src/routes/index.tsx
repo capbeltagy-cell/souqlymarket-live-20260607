@@ -364,9 +364,15 @@ function Landing() {
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">
               {ar ? "انضم لآلاف الشركات والمسوقين على سوقلي — تسجيل مجاني، بدون عمولات مخفية." : "Join thousands of companies and pro agents on Souqly — free signup, no hidden fees."}
             </p>
-            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold">
-              <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
-            </Button>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold shadow-gold">
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-8 gold-border bg-transparent hover:bg-white/5">
+                <Link to="/pricing">{ar ? "شاهد الأسعار" : "See pricing"}</Link>
+              </Button>
+            </div>
+
           </div>
         </div>
       </section>
