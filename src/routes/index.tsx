@@ -130,21 +130,21 @@ function Landing() {
         }} />
         <div className="container-souqly relative py-20 md:py-28">
           <div className="max-w-4xl">
-            <span className="status-pill mb-8">
+            <span className="status-pill mb-8 fade-up">
               <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
             </span>
-            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6">
+            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6 fade-up-1">
               {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />بالشركات الجادة.</>)
                   : (<>Where serious <span className="gold-shine italic">deals</span><br />meet serious business.</>)}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8 fade-up-2">
               {ar
                 ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة، بمعايير فاخرة."
                 : "Souqly connects companies, suppliers, factories and professional agents across Egypt — one platform, premium standards."}
             </p>
 
             {/* Hero Search */}
-            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 transition">
+            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 focus-within:shadow-gold transition-all fade-up-3">
               <div className="flex items-center gap-2 flex-1 px-3">
                 <Search className="h-5 w-5 text-gold shrink-0" />
                 <input
@@ -160,15 +160,16 @@ function Landing() {
               </Button>
             </form>
 
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
+            <div className="flex flex-wrap gap-3 fade-up-3">
+              <Button asChild size="lg" className="h-11 px-6 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold shadow-gold">
                 <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً" : "Get Started"}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="h-11 px-6">
+              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
                 <Link to="/how-it-works">{ar ? "كيف يعمل سوقلي؟" : "How it works"}</Link>
               </Button>
             </div>
           </div>
+
 
           {/* Bento stats */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -208,8 +209,31 @@ function Landing() {
         </div>
       </section>
 
+      {/* How it works — 3 steps */}
+      <section className="container-souqly py-12">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="status-pill mb-3">{ar ? "بأربع خطوات" : "In 3 steps"}</span>
+          <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "من التسجيل لأول صفقة" : "From signup to your first deal"}</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            { n: "01", t: ar ? "سجّل شركتك" : "Register your company", d: ar ? "أنشئ ملفًا موثقًا خلال دقائق واعرض قدراتك." : "Create a verified profile in minutes and showcase your capabilities." },
+            { n: "02", t: ar ? "استقبل الفرص" : "Receive opportunities", d: ar ? "طلبات أسعار ومناقصات مطابقة لنشاطك تصلك مباشرة." : "Matched RFQs and tenders delivered straight to you." },
+            { n: "03", t: ar ? "أغلق الصفقة" : "Close the deal", d: ar ? "تفاوض، وقّع، وادفع بأمان — من داخل المنصة." : "Negotiate, sign, and pay securely — all inside the platform." },
+          ].map((s) => (
+            <div key={s.n} className="premium-panel rounded-2xl p-8 hover:border-primary/30 transition">
+              <div className="step-number mb-4">{s.n}</div>
+              <div className="divider-gold w-12 mb-4" />
+              <h3 className="text-serif text-2xl mb-2">{s.t}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Featured Listings */}
       <section className="container-souqly py-8">
+
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-serif text-3xl md:text-4xl">{t("section_featured")}</h2>
           <Button asChild variant="ghost" size="sm"><Link to="/marketplace" className="gap-1">{t("cta_explore")} <Arrow className="h-4 w-4" /></Link></Button>
@@ -340,9 +364,15 @@ function Landing() {
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">
               {ar ? "انضم لآلاف الشركات والمسوقين على سوقلي — تسجيل مجاني، بدون عمولات مخفية." : "Join thousands of companies and pro agents on Souqly — free signup, no hidden fees."}
             </p>
-            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold">
-              <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
-            </Button>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold shadow-gold">
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-8 gold-border bg-transparent hover:bg-white/5">
+                <Link to="/pricing">{ar ? "شاهد الأسعار" : "See pricing"}</Link>
+              </Button>
+            </div>
+
           </div>
         </div>
       </section>
