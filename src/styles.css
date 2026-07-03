@@ -172,6 +172,28 @@
     background-clip: text;
     color: transparent;
   }
+  .fade-up { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .fade-up-1 { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+  .fade-up-2 { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+  .fade-up-3 { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .step-number {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    line-height: 1;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold) 55%, rgba(201,168,76,0.15));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 400;
+  }
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+  }
 }
 
 @utility container-souqly {
