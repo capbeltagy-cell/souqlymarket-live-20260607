@@ -31,7 +31,7 @@ export function NotificationBell() {
 
   const markAllRead = async () => {
     if (!user || unread === 0) return;
-    await supabase.from("notifications" as never).update({ read_at: new Date().toISOString() }).is("read_at", null);
+    await (supabase.from("notifications" as never) as any).update({ read_at: new Date().toISOString() }).is("read_at", null);
     load();
   };
 
