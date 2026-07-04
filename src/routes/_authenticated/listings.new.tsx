@@ -98,8 +98,12 @@ function NewListing() {
       const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from("listing-media").upload(path, file);
       if (error) throw error;
-      const { data } = supabase.storage.from("listing-media").getPublicUrl(path);
-      return data.publicUrl;
+      // Bucket is private per workspace policy — use a long-lived signed URL so images render publicly.
+      const { data, error: signErr } = await supabase.storage
+        .from("listing-media")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10); // ~10 years
+      if (signErr || !data?.signedUrl) throw signErr ?? new Error("Sign URL failed");
+      return data.signedUrl;
     } catch (e) {
       toast.error((e as Error).message);
       return null;
@@ -433,26 +437,33 @@ function NewListing() {
                 <div className="text-sm font-semibold">
                   {locale === "ar" ? "الموقع على الخريطة (اختياري)" : "Map location (optional)"}
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
-                  {locale === "ar" ? "استخدم موقعي الحالي" : "Use my current location"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                    {locale === "ar" ? "استخدم موقعي الحالي" : "Use my current location"}
+                  </Button>
+                  {latitude && longitude && (
+                    <Button type="button" variant="ghost" size="sm" onClick={() => { setLatitude(""); setLongitude(""); }}>
+                      {locale === "ar" ? "مسح الموقع" : "Clear"}
+                    </Button>
+                  )}
+                </div>
               </div>
               {!latitude || !longitude ? (
                 <div className="rounded-md border border-warning/40 bg-warning/10 p-3 text-xs text-foreground">
                   {locale === "ar"
-                    ? "إضافة الموقع على الخريطة تزيد ثقة الإعلان وتساعد العملاء على الوصول إليك"
-                    : "Adding map location boosts trust and helps customers reach you"}
+                    ? "اضغط على الخريطة مرة واحدة لتحديد الموقع. لن يتغير الموقع بعد التحديد إلا لو ضغطت «مسح الموقع»."
+                    : "Tap the map once to set your location. It will not move on further taps until you press Clear."}
                 </div>
               ) : (
-                <div className="text-xs text-muted-foreground">
-                  {locale === "ar" ? "الإحداثيات" : "Coordinates"}: {latitude}, {longitude}
+                <div className="text-xs text-success font-medium">
+                  {locale === "ar" ? "تم تحديد الموقع ✓ الإحداثيات" : "Location set ✓ Coordinates"}: {latitude}, {longitude}
                 </div>
               )}
               <MapView
                 markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title: locale === "ar" ? title_ar : title_en || title_ar, description: [city, governorate, country].filter(Boolean).join(" · ") }] : []}
                 center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
                 zoom={latitude && longitude ? 12 : 6}
-                onMapClick={(coords) => {
+                onMapClick={latitude && longitude ? undefined : (coords) => {
                   setLatitude(coords.lat.toFixed(6));
                   setLongitude(coords.lng.toFixed(6));
                 }}
