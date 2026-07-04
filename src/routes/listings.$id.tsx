@@ -95,6 +95,8 @@ function ListingDetail() {
   const { user } = useAuth();
   const convert = useServerFn(convertReferral);
   const feature = useServerFn(featureMyListing);
+  const startConv = useServerFn(startConversationForListing);
+  const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +107,16 @@ function ListingDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [featuring, setFeaturing] = useState<7 | 30 | null>(null);
   const [fav, setFav] = useState(false);
+  const [msgLoading, setMsgLoading] = useState(false);
+
+  const onMessageSeller = async () => {
+    setMsgLoading(true);
+    try {
+      const { id: convId } = await startConv({ data: { listing_id: id } });
+      navigate({ to: "/messages", search: { c: convId } });
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setMsgLoading(false); }
+  };
 
   useEffect(() => {
     (async () => {
