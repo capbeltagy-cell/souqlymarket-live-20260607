@@ -92,6 +92,9 @@ export function SiteHeader() {
                   <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/messages" className="gap-2"><MessageSquare className="h-4 w-4" />الرسائل</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
