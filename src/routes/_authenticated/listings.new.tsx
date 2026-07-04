@@ -98,8 +98,12 @@ function NewListing() {
       const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from("listing-media").upload(path, file);
       if (error) throw error;
-      const { data } = supabase.storage.from("listing-media").getPublicUrl(path);
-      return data.publicUrl;
+      // Bucket is private per workspace policy — use a long-lived signed URL so images render publicly.
+      const { data, error: signErr } = await supabase.storage
+        .from("listing-media")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10); // ~10 years
+      if (signErr || !data?.signedUrl) throw signErr ?? new Error("Sign URL failed");
+      return data.signedUrl;
     } catch (e) {
       toast.error((e as Error).message);
       return null;
