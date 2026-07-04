@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { TrustBadge, profileCompletion } from "@/components/TrustBadges";
+import { CompanyReviews } from "@/components/CompanyReviews";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
