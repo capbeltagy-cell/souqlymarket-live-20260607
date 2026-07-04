@@ -290,6 +290,11 @@ function ListingDetail() {
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
+              {!isOwner && user && (
+                <Button className="w-full mt-3 gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
+                  <Sparkles className="h-4 w-4" />{ar ? "راسل البائع داخل المنصة" : "Message seller"}
+                </Button>
+              )}
             </div>
             {!isOwner && <LeadForm listingId={id} />}
             {isOwner && (
