@@ -65,6 +65,7 @@ export function SiteHeader() {
           </div>
 
           <LanguageToggle />
+          <NotificationBell />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
