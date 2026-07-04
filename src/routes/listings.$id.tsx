@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
+import { startConversationForListing } from "@/lib/messages.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
