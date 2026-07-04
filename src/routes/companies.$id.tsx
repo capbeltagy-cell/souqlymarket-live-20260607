@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { TrustBadge, profileCompletion } from "@/components/TrustBadges";
+import { CompanyReviews } from "@/components/CompanyReviews";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
@@ -137,15 +138,18 @@ function CompanyProfile() {
           </div>
           <Button asChild variant="outline" className="w-full"><Link to="/companies">← {t("nav_companies")}</Link></Button>
         </aside>
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold">{t("portfolio")}</h2>
-          {listings.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">{t("no_listings_yet")}</div>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-4">
-              {listings.map((l) => <ListingCard key={l.id} l={l} />)}
-            </div>
-          )}
+        <div className="lg:col-span-2 space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">{t("portfolio")}</h2>
+            {listings.length === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">{t("no_listings_yet")}</div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {listings.map((l) => <ListingCard key={l.id} l={l} />)}
+              </div>
+            )}
+          </div>
+          <CompanyReviews companyId={company.id} />
         </div>
       </section>
     </Shell>

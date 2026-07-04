@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, Sprout } from "lucide-react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { GlobalSearch } from "./GlobalSearch";
+import { NotificationBell } from "./NotificationBell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -64,6 +65,7 @@ export function SiteHeader() {
           </div>
 
           <LanguageToggle />
+          <NotificationBell />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -88,6 +90,9 @@ export function SiteHeader() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/messages" className="gap-2"><MessageSquare className="h-4 w-4" />الرسائل</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
@@ -118,9 +123,6 @@ export function SiteHeader() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/admin-overview" className="gap-2"><ShieldCheck className="h-4 w-4" />نظرة عامة للإدارة</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/seed" className="gap-2"><Sprout className="h-4 w-4" />{t("seed_title")}</Link>
                     </DropdownMenuItem>
                   </>
                 )}

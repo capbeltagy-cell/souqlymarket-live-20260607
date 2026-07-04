@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
+import { startConversationForListing } from "@/lib/messages.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
@@ -95,6 +96,8 @@ function ListingDetail() {
   const { user } = useAuth();
   const convert = useServerFn(convertReferral);
   const feature = useServerFn(featureMyListing);
+  const startConv = useServerFn(startConversationForListing);
+  const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +108,16 @@ function ListingDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [featuring, setFeaturing] = useState<7 | 30 | null>(null);
   const [fav, setFav] = useState(false);
+  const [msgLoading, setMsgLoading] = useState(false);
+
+  const onMessageSeller = async () => {
+    setMsgLoading(true);
+    try {
+      const { id: convId } = await startConv({ data: { listing_id: id } });
+      navigate({ to: "/messages", search: { c: convId } });
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setMsgLoading(false); }
+  };
 
   useEffect(() => {
     (async () => {
@@ -290,6 +303,11 @@ function ListingDetail() {
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
+              {!isOwner && user && (
+                <Button className="w-full mt-3 gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
+                  <Sparkles className="h-4 w-4" />{ar ? "راسل البائع داخل المنصة" : "Message seller"}
+                </Button>
+              )}
             </div>
             {!isOwner && <LeadForm listingId={id} />}
             {isOwner && (

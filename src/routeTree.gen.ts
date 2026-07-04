@@ -55,6 +55,7 @@ import { Route as AuthenticatedReferralsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_authenticated/referral-program'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
@@ -307,6 +308,11 @@ const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
   path: '/moderation',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -527,6 +534,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -596,6 +604,7 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -665,6 +674,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/messages'
     | '/moderation'
     | '/profile'
     | '/referral-program'
@@ -732,6 +742,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/messages'
     | '/moderation'
     | '/profile'
     | '/referral-program'
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
     | '/_authenticated/leads'
+    | '/_authenticated/messages'
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
     | '/_authenticated/referral-program'
@@ -1185,6 +1197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModerationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leads': {
       id: '/_authenticated/leads'
       path: '/leads'
@@ -1343,6 +1362,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
@@ -1373,6 +1393,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
