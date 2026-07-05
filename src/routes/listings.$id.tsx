@@ -100,6 +100,8 @@ function ListingDetail() {
   const feature = useServerFn(featureMyListing);
   const makeReferral = useServerFn(createReferral);
   const startConv = useServerFn(startConversationForListing);
+  const createOrder = useServerFn(createOrderFromListing);
+  const [ordering, setOrdering] = useState(false);
   const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
