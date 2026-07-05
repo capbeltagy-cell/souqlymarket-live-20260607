@@ -74,6 +74,7 @@ import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
@@ -83,9 +84,12 @@ import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
+import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authenticated/quotations.new'
+import { Route as AuthenticatedQuotationsIdRouteImport } from './routes/_authenticated/quotations.$id'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
+import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
 
 const WholesaleRoute = WholesaleRouteImport.update({
   id: '/wholesale',
@@ -418,6 +422,12 @@ const AuthenticatedAdminRevenueRoute =
     path: '/admin-revenue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/admin-payments',
+    path: '/admin-payments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOverviewRoute =
   AuthenticatedAdminOverviewRouteImport.update({
     id: '/admin-overview',
@@ -469,6 +479,18 @@ const AuthenticatedRfqMineRoute = AuthenticatedRfqMineRouteImport.update({
   path: '/rfq/mine',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedQuotationsNewRoute =
+  AuthenticatedQuotationsNewRouteImport.update({
+    id: '/quotations/new',
+    path: '/quotations/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedQuotationsIdRoute =
+  AuthenticatedQuotationsIdRouteImport.update({
+    id: '/quotations/$id',
+    path: '/quotations/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -485,6 +507,12 @@ const AuthenticatedCampaignsIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedCampaignsRoute,
+  } as any)
+const AuthenticatedOrdersIdPayRoute =
+  AuthenticatedOrdersIdPayRouteImport.update({
+    id: '/pay',
+    path: '/pay',
+    getParentRoute: () => AuthenticatedOrdersIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -521,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -558,12 +587,15 @@ export interface FileRoutesByFullPath {
   '/companies/': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
-  '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
+  '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
+  '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -599,6 +631,7 @@ export interface FileRoutesByTo {
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -636,12 +669,15 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
-  '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
+  '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
+  '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -679,6 +715,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
+  '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -716,12 +753,15 @@ export interface FileRoutesById {
   '/companies/': typeof CompaniesIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
-  '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
+  '/_authenticated/quotations/$id': typeof AuthenticatedQuotationsIdRoute
+  '/_authenticated/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -759,6 +799,7 @@ export interface FileRouteTypes {
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
+    | '/admin-payments'
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
@@ -797,11 +838,14 @@ export interface FileRouteTypes {
     | '/campaigns/$id'
     | '/listings/new'
     | '/orders/$id'
+    | '/quotations/$id'
+    | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/orders/$id/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -837,6 +881,7 @@ export interface FileRouteTypes {
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
+    | '/admin-payments'
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
@@ -875,11 +920,14 @@ export interface FileRouteTypes {
     | '/campaigns/$id'
     | '/listings/new'
     | '/orders/$id'
+    | '/quotations/$id'
+    | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/orders/$id/pay'
   id:
     | '__root__'
     | '/'
@@ -916,6 +964,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-overview'
+    | '/_authenticated/admin-payments'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
@@ -954,11 +1003,14 @@ export interface FileRouteTypes {
     | '/_authenticated/campaigns/$id'
     | '/_authenticated/listings/new'
     | '/_authenticated/orders/$id'
+    | '/_authenticated/quotations/$id'
+    | '/_authenticated/quotations/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
     | '/_authenticated/tenders/mine'
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
+    | '/_authenticated/orders/$id/pay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1455,6 +1507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRevenueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-payments': {
+      id: '/_authenticated/admin-payments'
+      path: '/admin-payments'
+      fullPath: '/admin-payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-overview': {
       id: '/_authenticated/admin-overview'
       path: '/admin-overview'
@@ -1518,6 +1577,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRfqMineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/quotations/new': {
+      id: '/_authenticated/quotations/new'
+      path: '/quotations/new'
+      fullPath: '/quotations/new'
+      preLoaderRoute: typeof AuthenticatedQuotationsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/quotations/$id': {
+      id: '/_authenticated/quotations/$id'
+      path: '/quotations/$id'
+      fullPath: '/quotations/$id'
+      preLoaderRoute: typeof AuthenticatedQuotationsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/$id': {
       id: '/_authenticated/orders/$id'
       path: '/$id'
@@ -1539,6 +1612,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsIdRouteImport
       parentRoute: typeof AuthenticatedCampaignsRoute
     }
+    '/_authenticated/orders/$id/pay': {
+      id: '/_authenticated/orders/$id/pay'
+      path: '/pay'
+      fullPath: '/orders/$id/pay'
+      preLoaderRoute: typeof AuthenticatedOrdersIdPayRouteImport
+      parentRoute: typeof AuthenticatedOrdersIdRoute
+    }
   }
 }
 
@@ -1556,12 +1636,25 @@ const AuthenticatedCampaignsRouteWithChildren =
     AuthenticatedCampaignsRouteChildren,
   )
 
+interface AuthenticatedOrdersIdRouteChildren {
+  AuthenticatedOrdersIdPayRoute: typeof AuthenticatedOrdersIdPayRoute
+}
+
+const AuthenticatedOrdersIdRouteChildren: AuthenticatedOrdersIdRouteChildren = {
+  AuthenticatedOrdersIdPayRoute: AuthenticatedOrdersIdPayRoute,
+}
+
+const AuthenticatedOrdersIdRouteWithChildren =
+  AuthenticatedOrdersIdRoute._addFileChildren(
+    AuthenticatedOrdersIdRouteChildren,
+  )
+
 interface AuthenticatedOrdersRouteChildren {
-  AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
+  AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRouteWithChildren
 }
 
 const AuthenticatedOrdersRouteChildren: AuthenticatedOrdersRouteChildren = {
-  AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
+  AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRouteWithChildren,
 }
 
 const AuthenticatedOrdersRouteWithChildren =
@@ -1572,6 +1665,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
@@ -1597,6 +1691,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
+  AuthenticatedQuotationsIdRoute: typeof AuthenticatedQuotationsIdRoute
+  AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
@@ -1609,6 +1705,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
@@ -1634,6 +1731,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
+  AuthenticatedQuotationsIdRoute: AuthenticatedQuotationsIdRoute,
+  AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,

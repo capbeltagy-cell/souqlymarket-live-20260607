@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FileSignature } from "lucide-react";
 import { Send, Paperclip, Mic, Square, Image as ImageIcon, FileText, Play, Pause, X } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -212,6 +213,14 @@ function MessagesPage() {
                   {msgs.map((m) => <MessageBubble key={m.id} m={m} mine={m.sender_id === user?.id} />)}
                   {msgs.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">ابدأ المحادثة الآن</p>}
                 </div>
+                {active && user && active.seller_id === user.id && (
+                  <div className="px-3 pt-2">
+                    <Link to="/quotations/new" search={{ c: active.id }}
+                      className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md border border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary">
+                      <FileSignature className="h-3.5 w-3.5" /> إرسال عرض سعر
+                    </Link>
+                  </div>
+                )}
                 <form onSubmit={(e) => { e.preventDefault(); send(); }} className="p-3 border-t border-border flex gap-2 items-center">
                   <label className="cursor-pointer p-2 rounded-md hover:bg-muted" title="مرفق">
                     <Paperclip className="h-4 w-4" />
@@ -235,6 +244,7 @@ function MessagesPage() {
                   <Button type="submit" size="icon" disabled={!text.trim() || uploading}><Send className="h-4 w-4" /></Button>
                 </form>
               </>
+
             ) : (
               <div className="flex-1 grid place-items-center text-muted-foreground text-sm">اختر محادثة للبدء</div>
             )}
@@ -279,7 +289,24 @@ function MessageBubble({ m, mine }: { m: Msg; mine: boolean }) {
             <audio ref={audioRef} src={m.attachment_url} onEnded={() => setPlaying(false)} className="hidden" />
           </div>
         )}
-        {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+        {(() => {
+          const qm = m.body?.match(/^\[\[quotation:([0-9a-f-]{36})\]\]\s*(.*)/i);
+          const om = m.body?.match(/^\[\[order:([0-9a-f-]{36})\]\]\s*(.*)/i);
+          if (qm) return (
+            <Link to="/quotations/$id" params={{ id: qm[1] }} className={`block rounded-md p-3 mb-1 border ${mine ? "bg-primary-foreground/10 border-primary-foreground/30" : "bg-background border-border"}`}>
+              <div className="flex items-center gap-2 font-semibold mb-1"><FileSignature className="h-4 w-4" /> عرض سعر</div>
+              <div className="text-xs opacity-80">{qm[2] || "افتح للعرض والتفاصيل"}</div>
+              <div className={`text-[10px] mt-1 ${mine ? "opacity-80" : "text-primary"}`}>افتح العرض ←</div>
+            </Link>
+          );
+          if (om) return (
+            <Link to="/orders/$id" params={{ id: om[1] }} className={`block rounded-md p-3 mb-1 border ${mine ? "bg-primary-foreground/10 border-primary-foreground/30" : "bg-background border-border"}`}>
+              <div className="font-semibold mb-1">📦 طلب جديد</div>
+              <div className="text-xs opacity-80">{om[2] || "افتح لمتابعة الطلب"}</div>
+            </Link>
+          );
+          return m.body ? <p className="whitespace-pre-wrap">{m.body}</p> : null;
+        })()}
         <div className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-80" : "text-muted-foreground"}`}>
           {new Date(m.created_at).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}
           {mine && (m.read_at ? <span title="مقروء">✓✓</span> : <span title="مُرسل">✓</span>)}
@@ -289,5 +316,3 @@ function MessageBubble({ m, mine }: { m: Msg; mine: boolean }) {
   );
 }
 
-// silence unused import warnings when tree-shaken
-void X;

@@ -131,6 +131,9 @@ export function SiteHeader() {
                     <DropdownMenuItem asChild>
                       <Link to="/admin-overview" className="gap-2"><ShieldCheck className="h-4 w-4" />نظرة عامة للإدارة</Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin-payments" className="gap-2"><ShieldCheck className="h-4 w-4" />إدارة المدفوعات</Link>
+                    </DropdownMenuItem>
                   </>
                 )}
 
