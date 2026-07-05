@@ -41,6 +41,7 @@ function ReferralsPage() {
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [qrFor, setQrFor] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
