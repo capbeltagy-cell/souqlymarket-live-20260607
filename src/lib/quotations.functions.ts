@@ -33,6 +33,7 @@ export const createQuotation = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: conv, error: cErr } = await (supabase.from("conversations" as never) as any)
       .select("id, buyer_id, seller_id, listing_id").eq("id", data.conversation_id).maybeSingle();
     if (cErr) throw new Error(cErr.message);
