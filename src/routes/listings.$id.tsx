@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral, createReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
+import { createOrderFromListing } from "@/lib/orders.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
