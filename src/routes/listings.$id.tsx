@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { convertReferral, createReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
+import { createOrderFromListing } from "@/lib/orders.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
@@ -99,6 +100,8 @@ function ListingDetail() {
   const feature = useServerFn(featureMyListing);
   const makeReferral = useServerFn(createReferral);
   const startConv = useServerFn(startConversationForListing);
+  const createOrder = useServerFn(createOrderFromListing);
+  const [ordering, setOrdering] = useState(false);
   const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [l, setL] = useState<Listing | null>(null);
@@ -136,6 +139,16 @@ function ListingDetail() {
       navigate({ to: "/messages", search: { c: convId } });
     } catch (e) { toast.error((e as Error).message); }
     finally { setMsgLoading(false); }
+  };
+
+  const onOrder = async () => {
+    setOrdering(true);
+    try {
+      const { id: orderId } = await createOrder({ data: { listing_id: id, quantity: 1 } });
+      toast.success(ar ? "تم إنشاء الطلب — انتقل لصفحة الطلب لإكمال البيانات" : "Order created");
+      navigate({ to: "/orders/$id", params: { id: orderId } });
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setOrdering(false); }
   };
 
   useEffect(() => {
@@ -323,9 +336,15 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
               {!isOwner && user && (
-                <Button className="w-full mt-3 gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
-                  <Sparkles className="h-4 w-4" />{ar ? "راسل البائع داخل المنصة" : "Message seller"}
-                </Button>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Button className="gap-2 bg-primary hover:bg-primary-hover" onClick={onOrder} disabled={ordering}>
+                    {ordering ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {ar ? "اطلب الآن" : "Order now"}
+                  </Button>
+                  <Button className="gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
+                    <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                  </Button>
+                </div>
               )}
             </div>
             {!isOwner && <LeadForm listingId={id} />}

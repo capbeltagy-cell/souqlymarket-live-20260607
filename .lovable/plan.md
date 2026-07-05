@@ -1,107 +1,119 @@
+# Souqly Simplification & Journey Completion Plan
 
-# Souqly Enterprise Upgrade — Phased Plan
-
-The brief covers ~6 months of engineering. To deliver it safely **without breaking the live platform**, the work must be split into phases. Each phase is shippable on its own, keeps the site online, and adds real value before the next one starts.
-
-Below is the proposed phasing. After you approve, I'll execute **Phase 1** end-to-end in the next turn, then check in before starting Phase 2.
+Scope: improve existing pages in place. No redesign, no duplicate tables, no new pages unless a journey step is entirely missing. Keep current design language and all functionality.
 
 ---
 
-## Guardrails applied to every phase
+## 1. Publish Flow (`src/routes/_authenticated/listings.new.tsx`, `rfq.new.tsx`, `tenders.new.tsx`, `wholesale.new.tsx`)
 
-- No table dropped, no route removed, no auth change.
-- All new tables ship with RLS + GRANTs in the same migration.
-- New code is additive: new files/routes, existing routes only get extensions.
-- Every phase ends with: build green, TypeScript clean, smoke test of key routes, security scan.
+- Collapse form to **6 required fields only**: Title, Price, Category, Description, City, Images.
+- Wrap everything else (governorate detail, coordinates, phone/whatsapp, video, PDF, property specs, commission %, address line, purpose, ownership) in a single `<Collapsible>` "خيارات متقدمة / More Options" — default collapsed.
+- Auto-fill governorate from city where possible; default `commission_percentage` server-side.
+- Submit button sticky at bottom on mobile; single primary CTA.
+- Target: < 60s to publish.
 
----
+## 2. Image Upload (`src/components/` — new small shared `ImageUploader.tsx` reused across publish forms)
 
-## Phase 1 — Roles, Permissions & Audit Foundation
-Adds the 13-role permission system the rest of the upgrade depends on.
+Improve, do not duplicate. One shared component that:
+- Drag & drop + click + camera capture (`<input capture="environment">` on mobile).
+- Multi-select, instant upload to `listing-media` bucket via signed upload.
+- Client-side compression using `browser-image-compression` (max 1600px, ~0.7 quality).
+- Per-file progress bars, thumb previews, drag-to-reorder (dnd-kit already available? — otherwise plain HTML5 DnD), delete, primary-image marker.
+- Persists URLs to form state as it uploads so navigation doesn't lose them; localStorage draft fallback.
+- Returns `{ url, source: 'uploaded' | 'live_capture' }[]`.
 
-- Extend `app_role` enum with the missing roles (super_admin, moderator, support, factory, service_provider, wholesaler, importer, exporter, distributor — buyer/admin/customer/agent already exist).
-- New tables: `role_permissions`, `audit_logs`, `user_activity`.
-- `has_permission(uid, key)` SQL helper + React `usePermissions()` hook.
-- Wrap sensitive admin routes with permission gates (no behavior change for existing users).
-- Audit trigger on critical tables (companies, listings, commissions, wallets).
+Replace ad-hoc uploaders in `listings.new.tsx`, `wholesale.new.tsx`, `rfq.new.tsx` with this component.
 
-## Phase 2 — Company Workspace (Dashboard v2)
-Turns the existing company page into a full workspace, without removing the current one.
+## 3. Buyer Journey — keep in-platform
 
-- New `/_authenticated/workspace/*` subtree: overview, branches, employees, documents, catalogs, certificates, gallery, videos.
-- New tables: `company_branches`, `company_employees`, `company_documents`, `company_certifications`.
-- Document/catalog/certificate uploads use the existing `company-catalogs` bucket with folder-scoped RLS.
-- Existing `/company` route stays as a redirect/alias.
+Product → Chat → Quote → Order → Payment → Shipping → Delivery → Review.
 
-## Phase 3 — Factory, Service Provider, Wholesaler verticals
-Adds dedicated profile + listing flows per vertical (extends, doesn't replace, current factory/wholesale tables).
+Existing surfaces used:
+- Product: `listings.$id.tsx` (add "اطلب الآن / Order" button next to existing message CTA).
+- Chat: `messages.tsx` (extended, see §4).
+- Order: new lightweight surface `_authenticated/orders.tsx` + `orders.$id.tsx` reading existing `wholesale_orders` table repurposed as generic orders (extend, do not duplicate).
+- Payment: existing `wallet.tsx` + `payments` table.
+- Review: existing `reviews` table via `CompanyReviews` after `status='completed'`.
 
-- Extend `factories` with MOQ, OEM, ODM, export_countries, production_capacity_detail.
-- New `service_packages`, `service_portfolio_items` for service providers.
-- Vertical-specific publish wizards reusing the current `listings.new` form.
+## 4. Real-time Chat (`src/routes/_authenticated/messages.tsx` + `messages` table)
 
-## Phase 4 — Commission Engine v2
-Replaces the flat-percentage model with the rules engine specified.
+Extend, don't rebuild:
+- Realtime subscription on `messages` and `conversations` (already Supabase realtime capable — enable via migration `ALTER PUBLICATION`).
+- Attachment types via new columns on `messages`: `attachment_url text`, `attachment_type text` (image/file/pdf/voice), `duration_ms int`. Migration only if columns missing.
+- Typing indicator via Supabase Broadcast channel (no table).
+- Read receipts: `read_at timestamptz` column on messages.
+- Voice: `MediaRecorder` → upload to `listing-media/voice/`.
+- Inline "Send Quotation" button → creates draft order row and posts a system message linking to it.
 
-- New tables: `commission_rules` (type: percent/fixed/tiered/volume/revenue/category/campaign/country/recurring/bonus), `commission_settlements`.
-- Pure-function `calculateCommission(order, rules)` server function, fully unit-tested.
-- Existing `commissions` table keeps working; new orders go through the engine, old rows untouched.
-- Approval workflow UI for finance.
+## 5. Order Workflow
 
-## Phase 5 — CRM, Messaging & Notifications
-Brings sales pipeline + realtime chat in line with the brief.
+Reuse `wholesale_orders`. Add columns via migration only if missing:
+- `status` enum extended: draft, awaiting_seller, accepted, packed, shipped, delivered, completed, cancelled, returned.
+- `tracking_number text`, `shipping_address jsonb`, `buyer_id uuid`, `listing_id uuid nullable`.
 
-- Extend `leads` with `pipeline_stage`, `opportunity_value`, `next_followup_at`, `notes` (JSONB).
-- New tables: `conversations`, `messages`, `message_attachments`, `notifications`.
-- Realtime via existing Supabase Realtime channel; typing/read receipts.
-- Notification center in the header (replaces the current empty placeholder).
+Add server fns in new `src/lib/orders.functions.ts`: `createOrderFromListing`, `updateOrderStatus`, `listMyOrders` (buyer/seller scoped by RLS).
 
-## Phase 6 — Payments Architecture & Wallet v2
-Prepares the rails for Stripe/Paymob/Fawry/USDT/Bank without enabling live keys.
+Add pages `orders.tsx` (list, buyer+seller tabs) and `orders.$id.tsx` (timeline + actions per role).
 
-- New `payment_methods`, `payouts`, `wallet_holds`, `wallet_splits` tables.
-- Provider-agnostic `PaymentProvider` interface; stubs for Paymob/Fawry; existing Stripe BYOK path stays.
-- Automatic split: agent / company / platform on settlement.
-- Invoice generator already exists — extended with refund + dispute records.
+## 6. Payments
 
-## Phase 7 — AI Assistant Suite
-All AI features use Lovable AI Gateway (no extra keys).
+No new provider now. Ensure existing `wallets`, `payments`, `invoices`, `payout_requests` plumbing is exposed:
+- Order payment: debit buyer wallet → credit escrow (platform wallet, reason 'escrow_hold') → on delivered+completed release to seller. Add SQL fn `release_order_escrow(order_id)`.
+- Admin approval fallback: if no gateway configured, order stays `awaiting_payment_approval` and admin marks paid in `admin-revenue.tsx`.
 
-- `/api/ai/*` server routes: description, SEO, marketing post, translation, email, WhatsApp message, quotation, tags, image-suggestions.
-- "Generate with AI" buttons added to existing forms (listings.new, company profile, RFQ, tender, quotations).
-- Streamed responses, per-company rate limits via `audit_logs`.
+## 7. Company Dashboard (`_authenticated/dashboard.tsx`, `company.tsx`)
 
-## Phase 8 — Admin Control Center, Analytics & Polish
-Final polish layer.
+Consolidate existing widgets into a single tabbed view: Orders · Customers · Messages · Products · Analytics · Wallet · Invoices · Notifications. Do not create new pages — link/embed existing routes as tabs where practical.
 
-- Promotes `/control-center-x7` into a full Super Admin shell: users, companies, factories, agents, categories, subscriptions, commission rules, ads, CMS, feature flags, audit logs, security, system settings.
-- Executive analytics dashboard: revenue, GMV, conversion, top performers, exports (CSV/PDF).
-- Design polish across the app: enterprise sidebar shell for `_authenticated` routes, dark/light toggle, glassmorphism cards, motion-reduced animations, full accessibility pass, Lighthouse target ≥ 90 mobile.
+## 8. Customer Dashboard (`_authenticated/profile.tsx` extension or `dashboard.tsx` role-branch)
 
----
+Tabs: Orders · Saved · Messages · Invoices · Wishlist · Addresses · Tracking. Wishlist = existing `favorites`. Addresses = new small `user_addresses` table (only if genuinely missing).
 
-## What I will NOT do
+## 9. Search (`src/components/GlobalSearch.tsx`, `src/lib/global-search.functions.ts`)
 
-- Not deleting any existing route, table, column, or integration.
-- Not creating demo/seed data (you cleaned it; it stays clean).
-- Not enabling live payment keys — that's an owner action with secrets.
-- Not changing the current auth flow (email/password + Google through Lovable broker).
+- Normalize Arabic (strip tashkeel, alef variants) both query + stored strings via SQL immutable fn.
+- Trigram indexes (`pg_trgm`) on titles for typo tolerance.
+- Add voice input (Web Speech API) and image search (Lovable AI vision → keyword extraction → existing search).
+- Barcode/QR via `@zxing/browser` on mobile.
 
----
+## 10. Notifications (`NotificationBell.tsx`, `notifications` table)
 
-## Technical notes (for review)
+Enable realtime on `notifications`. Toast on new arrival. Existing table covers messages/orders/payments/shipping/approvals — just wire triggers for order status changes.
 
-- All new tables follow the strict template: `CREATE TABLE` → `GRANT` → `ENABLE RLS` → `CREATE POLICY`.
-- Permissions use `has_role` + new `has_permission` security-definer functions to avoid RLS recursion.
-- Realtime tables added to `supabase_realtime` publication explicitly.
-- New server logic uses `createServerFn` with `requireSupabaseAuth`; admin endpoints additionally verify `has_role('super_admin' | 'admin')`.
-- File uploads continue using existing storage buckets with folder-scoped RLS — no new public buckets.
-- All new UI uses the existing Noir & Gold design tokens; no hardcoded colors.
+## 11. Simplification Sweep
+
+- Move rare admin/config toggles behind "Advanced" collapsibles.
+- Reduce nav items in `SiteHeader.tsx` to: Home · Marketplace · Companies · Messages · Sell · Menu (rest under dropdown).
+- Merge `referrals.tsx` + `campaigns.tsx` links under Marketing Center menu (already exists).
+
+## 12. Cleanup (no deletions of features, just relocation)
+
+- Consolidate duplicate "post" entry points into single `/sell` chooser.
+- Remove dead imports flagged by `bunx tsgo --noEmit`.
 
 ---
 
-## What I need from you
+## Technical execution order
 
-1. **Approve the phasing** (or tell me to merge/reorder phases).
-2. **Confirm priority order** — default is 1 → 8 sequentially. If you want, e.g., Commission Engine before Company Workspace, say so.
-3. After approval, I start **Phase 1** immediately and ship it. Each subsequent phase begins only after you confirm the previous one is good in production.
+1. Migration: add missing columns (messages attachments/read, orders status/tracking/buyer, notifications realtime publication, pg_trgm + indexes).
+2. Shared `ImageUploader` component + `browser-image-compression` dep.
+3. Refactor 4 publish pages to use uploader + collapsible advanced.
+4. Extend messages page with realtime + attachments + quote button.
+5. Orders pages + server fns + escrow SQL fn.
+6. Dashboard tab consolidation (company + customer).
+7. Search enhancements.
+8. Notification realtime + toast.
+9. Nav simplification.
+10. Typecheck + smoke test key flows.
+
+## Non-goals
+
+- No new payment provider integration.
+- No new database tables where an existing one fits (extend instead).
+- No visual redesign — same tokens, same shadcn components.
+- No changes to auth, RLS model, or admin/security policies from the previous turn.
+
+## Risks
+
+- Large surface — will land as a series of focused edits in one turn per subsystem; if a subsystem takes too long, ship it standalone and continue next turn rather than leave half-broken code.
+- Realtime cost — filter subscriptions by conversation_id / user_id only.

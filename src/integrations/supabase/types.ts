@@ -957,26 +957,41 @@ export type Database = {
       }
       messages: {
         Row: {
-          body: string
+          attachment_name: string | null
+          attachment_type: string | null
+          attachment_url: string | null
+          body: string | null
           conversation_id: string
           created_at: string
+          duration_ms: number | null
           id: string
+          order_ref: string | null
           read_at: string | null
           sender_id: string
         }
         Insert: {
-          body: string
+          attachment_name?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
           conversation_id: string
           created_at?: string
+          duration_ms?: number | null
           id?: string
+          order_ref?: string | null
           read_at?: string | null
           sender_id: string
         }
         Update: {
-          body?: string
+          attachment_name?: string | null
+          attachment_type?: string | null
+          attachment_url?: string | null
+          body?: string | null
           conversation_id?: string
           created_at?: string
+          duration_ms?: number | null
           id?: string
+          order_ref?: string | null
           read_at?: string | null
           sender_id?: string
         }
@@ -1625,6 +1640,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_addresses: {
+        Row: {
+          address_line: string
+          city: string
+          created_at: string
+          governorate: string
+          id: string
+          is_default: boolean
+          label: string | null
+          phone: string
+          recipient_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line: string
+          city: string
+          created_at?: string
+          governorate: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          phone: string
+          recipient_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line?: string
+          city?: string
+          created_at?: string
+          governorate?: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          phone?: string
+          recipient_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1795,43 +1852,93 @@ export type Database = {
       wholesale_orders: {
         Row: {
           buyer_id: string
+          cancelled_reason: string | null
+          completed_at: string | null
           contact_phone: string | null
+          conversation_id: string | null
           created_at: string
+          currency: string
+          delivered_at: string | null
           id: string
-          listing_id: string
+          listing_id: string | null
           notes: string | null
+          payment_status: string
+          product_listing_id: string | null
           quantity: number
+          shipping_address: Json | null
           status: string
+          total_amount: number | null
+          tracking_carrier: string | null
+          tracking_number: string | null
+          unit_price: number | null
           updated_at: string
         }
         Insert: {
           buyer_id: string
+          cancelled_reason?: string | null
+          completed_at?: string | null
           contact_phone?: string | null
+          conversation_id?: string | null
           created_at?: string
+          currency?: string
+          delivered_at?: string | null
           id?: string
-          listing_id: string
+          listing_id?: string | null
           notes?: string | null
-          quantity: number
+          payment_status?: string
+          product_listing_id?: string | null
+          quantity?: number
+          shipping_address?: Json | null
           status?: string
+          total_amount?: number | null
+          tracking_carrier?: string | null
+          tracking_number?: string | null
+          unit_price?: number | null
           updated_at?: string
         }
         Update: {
           buyer_id?: string
+          cancelled_reason?: string | null
+          completed_at?: string | null
           contact_phone?: string | null
+          conversation_id?: string | null
           created_at?: string
+          currency?: string
+          delivered_at?: string | null
           id?: string
-          listing_id?: string
+          listing_id?: string | null
           notes?: string | null
+          payment_status?: string
+          product_listing_id?: string | null
           quantity?: number
+          shipping_address?: Json | null
           status?: string
+          total_amount?: number | null
+          tracking_carrier?: string | null
+          tracking_number?: string | null
+          unit_price?: number | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "wholesale_orders_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wholesale_orders_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "wholesale_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_orders_product_listing_id_fkey"
+            columns: ["product_listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           },
         ]
@@ -1888,6 +1995,8 @@ export type Database = {
           listing_id: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       app_role:
