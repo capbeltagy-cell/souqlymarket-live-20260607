@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Camera, Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
+import { ChevronDown, Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import { getMyPlan } from "@/lib/billing.functions";
@@ -21,9 +22,10 @@ import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locatio
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MapView } from "@/components/MapView";
+import { ImageUploader, type UploadedImage, toLegacyShape } from "@/components/ImageUploader";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
-  head: () => ({ meta: [{ title: "New Listing — Souqly" }] }),
+  head: () => ({ meta: [{ title: "إعلان جديد — Souqly" }] }),
   component: NewListing,
 });
 
@@ -37,20 +39,22 @@ function NewListing() {
   const checkDup = useServerFn(checkListingDuplicate);
   const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
 
+  // Required
   const [type, setType] = useState<ListingType>("product");
-  const [title_ar, setTitleAr] = useState("");
-  const [title_en, setTitleEn] = useState("");
-  const [description_ar, setDescAr] = useState("");
-  const [description_en, setDescEn] = useState("");
-  const [country] = useState("Egypt");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [city, setCity] = useState("");
   const [governorate, setGovernorate] = useState("");
+  const [price, setPrice] = useState("");
+  const [images, setImages] = useState<UploadedImage[]>([]);
+
+  // Advanced
+  const [title_en, setTitleEn] = useState("");
+  const [description_en, setDescEn] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [price, setPrice] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-
   const [commission, setCommission] = useState("5");
   const [propertySubtype, setPropertySubtype] = useState("");
   const [areaSqm, setAreaSqm] = useState("");
@@ -59,10 +63,9 @@ function NewListing() {
   const [purpose, setPurpose] = useState<"sale" | "rent" | "">("");
   const [ownershipType, setOwnershipType] = useState("");
   const [addressLine, setAddressLine] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [imageSources, setImageSources] = useState<("live_capture" | "uploaded")[]>([]);
   const [pdf_url, setPdf] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [pdfUploading, setPdfUploading] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
   const [forceDup, setForceDup] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
@@ -90,40 +93,30 @@ function NewListing() {
 
   const atLimit = planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
 
-  const uploadFile = async (file: File, kind: "image" | "video" | "pdf") => {
-    if (!user) return null;
-    setUploading(true);
+  const onPdfUpload = async (file: File) => {
+    if (!user) return;
+    setPdfUploading(true);
     try {
-      const ext = file.name.split(".").pop() ?? "bin";
-      const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
+      const path = `${user.id}/pdf-${Date.now()}.pdf`;
       const { error } = await supabase.storage.from("listing-media").upload(path, file);
       if (error) throw error;
-      // Bucket is private per workspace policy — use a long-lived signed URL so images render publicly.
-      const { data, error: signErr } = await supabase.storage
-        .from("listing-media")
-        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10); // ~10 years
-      if (signErr || !data?.signedUrl) throw signErr ?? new Error("Sign URL failed");
-      return data.signedUrl;
-    } catch (e) {
-      toast.error((e as Error).message);
-      return null;
-    } finally { setUploading(false); }
+      const { data, error: sErr } = await supabase.storage.from("listing-media").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (sErr || !data?.signedUrl) throw sErr ?? new Error("Sign URL failed");
+      setPdf(data.signedUrl);
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setPdfUploading(false); }
   };
 
-  const onImageUpload = async (file: File, source: "live_capture" | "uploaded" = "uploaded") => {
-    const url = await uploadFile(file, "image");
-    if (url) {
-      setImages((prev) => [...prev, url]);
-      setImageSources((prev) => [...prev, source]);
-    }
-  };
-  const onPdfUpload = async (file: File) => {
-    const url = await uploadFile(file, "pdf");
-    if (url) setPdf(url);
-  };
-  const removeImage = (i: number) => {
-    setImages((prev) => prev.filter((_, j) => j !== i));
-    setImageSources((prev) => prev.filter((_, j) => j !== i));
+  const useMyLocation = () => {
+    if (!navigator.geolocation) { toast.error("الموقع غير مدعوم"); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatitude(pos.coords.latitude.toFixed(6));
+        setLongitude(pos.coords.longitude.toFixed(6));
+        toast.success("تم تحديد موقعك");
+      },
+      () => toast.error("تعذّر الحصول على الموقع"),
+    );
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -131,74 +124,50 @@ function NewListing() {
     if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
     if (atLimit) { navigate({ to: "/subscribe" }); return; }
 
-    if (!title_ar.trim() && !title_en.trim()) {
-      toast.error(locale === "ar" ? "من فضلك أدخل عنوان الإعلان" : "Please enter a title");
-      return;
-    }
-    if (!governorate) {
-      toast.error(locale === "ar" ? "اختر المحافظة" : "Select a governorate");
-      return;
-    }
-    if (!city) {
-      toast.error(locale === "ar" ? "اختر المدينة" : "Select a city");
-      return;
-    }
-
-    if (!phone.trim() && !whatsapp.trim()) {
-      toast.error(locale === "ar" ? "أضف رقم هاتف أو واتساب للتواصل" : "Add a phone or WhatsApp number");
-      return;
-    }
+    if (!title.trim()) { toast.error("أدخل عنوان الإعلان"); return; }
+    if (!governorate || !city) { toast.error("اختر المحافظة والمدينة"); return; }
+    if (images.length === 0) { toast.error("أضف صورة واحدة على الأقل"); return; }
 
     setSubmitting(true);
     try {
-      // Pre-publish duplicate check (warn-only; server enforces exact)
       if (!forceDup) {
         try {
           const dup = await checkDup({ data: {
-            title_ar: title_ar || title_en,
-            title_en: title_en || title_ar,
-            governorate,
+            title_ar: title, title_en: title_en || title, governorate,
             phone: phone || whatsapp || null,
             latitude: latitude ? Number(latitude) : null,
             longitude: longitude ? Number(longitude) : null,
           } });
           if (dup.severity === "exact") {
-            toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل ولا يمكن نشره" : "Exact duplicate — cannot publish");
-            setSubmitting(false);
-            return;
+            toast.error("هذا الإعلان مكرر بالفعل"); setSubmitting(false); return;
           }
           if (dup.severity === "similar") {
             setForceDup(true);
-            toast.warning(
-              locale === "ar"
-                ? "تنبيه: يوجد إعلان مشابه. اضغط نشر مرة أخرى للمتابعة كمراجعة"
-                : "Similar listing found. Press publish again to send for review",
-            );
-            setSubmitting(false);
-            return;
+            toast.warning("يوجد إعلان مشابه — اضغط نشر مرة أخرى للمتابعة كمراجعة");
+            setSubmitting(false); return;
           }
         } catch { /* non-fatal */ }
       }
 
+      const legacy = toLegacyShape(images);
       const res = await create({
         data: {
           type,
-          title_ar: title_ar || title_en,
-          title_en: title_en || title_ar,
-          description_ar: description_ar || null,
-          description_en: description_en || null,
-          country: country || null,
-          city,
-          governorate,
-          location: [city, governorate, country].filter(Boolean).join(" · ") || null,
+          title_ar: title,
+          title_en: title_en || title,
+          description_ar: description || null,
+          description_en: description_en || description || null,
+          country: "Egypt",
+          city, governorate,
+          location: [city, governorate, "Egypt"].filter(Boolean).join(" · "),
           latitude: latitude ? Number(latitude) : null,
           longitude: longitude ? Number(longitude) : null,
           category: null,
           price: price ? Number(price) : null,
           currency: "EGP",
           commission_percentage: Number(commission || 5),
-          images,
-          image_sources: imageSources,
+          images: legacy.images,
+          image_sources: legacy.image_sources,
           phone: phone || null,
           whatsapp: whatsapp || null,
           video_url: null,
@@ -214,57 +183,31 @@ function NewListing() {
         } as never,
       });
       const pending = (res as { status?: string }).status === "pending_review";
-      toast.success(
-        pending
-          ? (locale === "ar" ? "تم استلام إعلانك وسيتم مراجعته قريبًا" : "Listing submitted for review")
-          : (locale === "ar" ? "تم نشر الإعلان بنجاح" : "Listing published successfully"),
-      );
-      try {
-        await navigate({ to: "/listings/$id", params: { id: res.id } });
-      } catch {
-        await navigate({ to: "/marketplace" });
-      }
+      toast.success(pending ? "تم استلام إعلانك للمراجعة" : "تم نشر الإعلان بنجاح");
+      try { await navigate({ to: "/listings/$id", params: { id: res.id } }); }
+      catch { await navigate({ to: "/marketplace" }); }
     } catch (e) {
       const msg = (e as Error).message;
-      if (msg.includes("LISTING_LIMIT_REACHED")) { navigate({ to: "/subscribe" }); }
-      else if (msg.includes("DUPLICATE_EXACT")) {
-        toast.error(locale === "ar" ? "هذا الإعلان مكرر بالفعل" : "Exact duplicate listing");
-      }
-      else { toast.error(msg || (locale === "ar" ? "تعذّر نشر الإعلان" : "Could not publish listing")); }
+      if (msg.includes("LISTING_LIMIT_REACHED")) navigate({ to: "/subscribe" });
+      else if (msg.includes("DUPLICATE_EXACT")) toast.error("هذا الإعلان مكرر");
+      else toast.error(msg || "تعذّر نشر الإعلان");
     }
     finally { setSubmitting(false); }
   };
-
-  const useMyLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error(locale === "ar" ? "الموقع غير مدعوم في المتصفح" : "Geolocation not supported");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLatitude(pos.coords.latitude.toFixed(6));
-        setLongitude(pos.coords.longitude.toFixed(6));
-        toast.success(locale === "ar" ? "تم تحديد موقعك" : "Location set");
-      },
-      () => toast.error(locale === "ar" ? "تعذّر الحصول على الموقع" : "Could not get location"),
-    );
-  };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-8 flex-1">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between gap-2 mb-6 flex-wrap">
             <div className="flex items-center gap-2">
               <PlusCircle className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold">{t("new_listing_title")}</h1>
+              <h1 className="text-2xl font-bold">إعلان جديد</h1>
             </div>
             {planInfo && (
               <div className="text-xs text-muted-foreground">
-                {t("current_plan")}: <span className="font-semibold capitalize">{planInfo.plan.replace("_", " ")}</span>
-                {" · "}{planInfo.currentListings}/{planInfo.maxListings === -1 ? "∞" : planInfo.maxListings}
+                {planInfo.currentListings}/{planInfo.maxListings === -1 ? "∞" : planInfo.maxListings}
               </div>
             )}
           </div>
@@ -285,7 +228,6 @@ function NewListing() {
             <div className="rounded-lg border border-warning/40 bg-warning/10 p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="text-sm">
                 <div className="font-semibold">{t("plan_limits_reached")}</div>
-                <div className="text-muted-foreground">{t("upgrade_to_unlock")} — 499 EGP / شهر</div>
               </div>
               <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
                 <Link to="/subscribe"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
@@ -293,214 +235,170 @@ function NewListing() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
-            <div className="grid sm:grid-cols-1 gap-4">
-              <Field label={t("field_type")}>
-                <Select value={type} onValueChange={(v) => setType(v as ListingType)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {LISTING_TYPES.map((tp) => (
-                      <SelectItem key={tp} value={tp}>{t(`cat_${tp}` as never)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-6 shadow-card space-y-5">
+            {/* Type */}
+            <Field label="نوع الإعلان" required>
+              <Select value={type} onValueChange={(v) => setType(v as ListingType)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {LISTING_TYPES.map((tp) => (
+                    <SelectItem key={tp} value={tp}>{t(`cat_${tp}` as never)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+
+            {/* Title */}
+            <Field label="العنوان" required>
+              <Input maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="اكتب عنوان واضح ومختصر" />
+            </Field>
+
+            {/* Price */}
+            <Field label="السعر (جنيه)" required>
+              <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="السعر بالجنيه المصري" />
+            </Field>
+
+            {/* Description */}
+            <Field label="الوصف">
+              <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="اكتب تفاصيل مفيدة للمشتري" />
+            </Field>
+
+            {/* Location */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="المحافظة" required>
+                <select required value={governorate}
+                  onChange={(e) => { setGovernorate(e.target.value); setCity(""); }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  <option value="">اختر المحافظة</option>
+                  {EGYPT_GOVERNORATES.map((gov) => (
+                    <option key={gov.value} value={gov.value}>{locale === "ar" ? gov.label_ar : gov.label_en}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="المدينة" required>
+                <select required disabled={!governorate} value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  <option value="">اختر المدينة</option>
+                  {getCitiesForGovernorate(governorate).map((ct) => (
+                    <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
+                  ))}
+                </select>
               </Field>
             </div>
-            {(type === "real_estate" || type === "land") && (
-              <div className="grid sm:grid-cols-4 gap-4">
-                <Field label={locale === "ar" ? "النوع الفرعي" : "Subtype"}>
-                  <select value={propertySubtype} onChange={(e) => setPropertySubtype(e.target.value)}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                    <option value="">—</option>
-                    {(type === "real_estate"
-                      ? [["apartment","شقة","Apartment"],["villa","فيلا","Villa"],["shop","محل","Shop"],["office","مكتب","Office"],["warehouse","مخزن","Warehouse"]]
-                      : [["agricultural","زراعية","Agricultural"],["industrial","صناعية","Industrial"],["investment","استثمارية","Investment"],["building","بناء","Building"]]
-                    ).map(([v, ar, en]) => <option key={v} value={v}>{locale === "ar" ? ar : en}</option>)}
-                  </select>
+
+            {/* Images */}
+            <div className="space-y-2">
+              <Label>الصور *</Label>
+              <ImageUploader value={images} onChange={setImages} max={10} folder="listings" />
+            </div>
+
+            {/* Advanced */}
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full py-3 border-t border-border text-sm font-semibold hover:text-primary transition">
+                <span>خيارات متقدمة (اختياري)</span>
+                <ChevronDown className="h-4 w-4" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-3">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Field label="العنوان بالإنجليزية">
+                    <Input maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} />
+                  </Field>
+                  <Field label="الوصف بالإنجليزية">
+                    <Textarea rows={2} value={description_en} onChange={(e) => setDescEn(e.target.value)} />
+                  </Field>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Field label="هاتف">
+                    <Input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="01XXXXXXXXX" />
+                  </Field>
+                  <Field label="واتساب">
+                    <Input type="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="01XXXXXXXXX" />
+                  </Field>
+                </div>
+
+                <Field label="نسبة العمولة للمسوقين (%)">
+                  <Input type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
                 </Field>
-                <Field label={locale === "ar" ? "المساحة (م²)" : "Area (m²)"}>
-                  <Input type="number" min="0" value={areaSqm} onChange={(e) => setAreaSqm(e.target.value)} />
-                </Field>
-                {type === "real_estate" && (
+
+                {(type === "real_estate" || type === "land") && (
                   <>
-                    <Field label={locale === "ar" ? "غرف النوم" : "Bedrooms"}>
-                      <Input type="number" min="0" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
-                    </Field>
-                    <Field label={locale === "ar" ? "الحمامات" : "Bathrooms"}>
-                      <Input type="number" min="0" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
-                    </Field>
+                    <div className="grid sm:grid-cols-4 gap-4">
+                      <Field label="النوع الفرعي">
+                        <select value={propertySubtype} onChange={(e) => setPropertySubtype(e.target.value)}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                          <option value="">—</option>
+                          {(type === "real_estate"
+                            ? [["apartment","شقة"],["villa","فيلا"],["shop","محل"],["office","مكتب"],["warehouse","مخزن"]]
+                            : [["agricultural","زراعية"],["industrial","صناعية"],["investment","استثمارية"],["building","بناء"]]
+                          ).map(([v, ar]) => <option key={v} value={v}>{ar}</option>)}
+                        </select>
+                      </Field>
+                      <Field label="المساحة (م²)"><Input type="number" min="0" value={areaSqm} onChange={(e) => setAreaSqm(e.target.value)} /></Field>
+                      {type === "real_estate" && (
+                        <>
+                          <Field label="غرف النوم"><Input type="number" min="0" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} /></Field>
+                          <Field label="الحمامات"><Input type="number" min="0" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} /></Field>
+                        </>
+                      )}
+                    </div>
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <Field label="الغرض">
+                        <select value={purpose} onChange={(e) => setPurpose(e.target.value as "sale" | "rent" | "")}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                          <option value="">—</option><option value="sale">للبيع</option><option value="rent">للإيجار</option>
+                        </select>
+                      </Field>
+                      <Field label="نوع الملكية">
+                        <select value={ownershipType} onChange={(e) => setOwnershipType(e.target.value)}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                          <option value="">—</option><option value="freehold">تمليك</option><option value="leasehold">إيجار طويل</option><option value="shared">مشترك</option>
+                        </select>
+                      </Field>
+                      <Field label="العنوان التفصيلي (خاص)">
+                        <Input value={addressLine} onChange={(e) => setAddressLine(e.target.value)} maxLength={300} />
+                      </Field>
+                    </div>
                   </>
                 )}
-              </div>
-            )}
-            {(type === "real_estate" || type === "land") && (
-              <div className="grid sm:grid-cols-3 gap-4">
-                <Field label={locale === "ar" ? "الغرض" : "Purpose"}>
-                  <select value={purpose} onChange={(e) => setPurpose(e.target.value as "sale" | "rent" | "")}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                    <option value="">—</option>
-                    <option value="sale">{locale === "ar" ? "للبيع" : "For Sale"}</option>
-                    <option value="rent">{locale === "ar" ? "للإيجار" : "For Rent"}</option>
-                  </select>
-                </Field>
-                <Field label={locale === "ar" ? "نوع الملكية" : "Ownership type"}>
-                  <select value={ownershipType} onChange={(e) => setOwnershipType(e.target.value)}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                    <option value="">—</option>
-                    <option value="freehold">{locale === "ar" ? "تمليك" : "Freehold"}</option>
-                    <option value="leasehold">{locale === "ar" ? "إيجار طويل" : "Leasehold"}</option>
-                    <option value="shared">{locale === "ar" ? "مشترك" : "Shared"}</option>
-                  </select>
-                </Field>
-                <Field label={locale === "ar" ? "العنوان التفصيلي (يظهر للمالك فقط)" : "Detailed address (owner only)"}>
-                  <Input value={addressLine} onChange={(e) => setAddressLine(e.target.value)} maxLength={300} />
-                </Field>
-              </div>
-            )}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={`${t("field_title")} (AR)`}>
-                <Input dir="rtl" maxLength={200} value={title_ar} onChange={(e) => setTitleAr(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
-              </Field>
-              <Field label={`${t("field_title")} (EN)`}>
-                <Input maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} placeholder={locale === "ar" ? "أدخل أحد العنوانين على الأقل" : "Enter at least one title"} />
-              </Field>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={`${t("field_description")} (AR)`}>
-                <Textarea dir="rtl" rows={4} value={description_ar} onChange={(e) => setDescAr(e.target.value)} />
-              </Field>
-              <Field label={`${t("field_description")} (EN)`}>
-                <Textarea rows={4} value={description_en} onChange={(e) => setDescEn(e.target.value)} />
-              </Field>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Field label={t("field_country")} required>
-                <Input value={country} readOnly />
-              </Field>
-              <Field label={t("field_governorate")} required>
-                <select
-                  required
-                  value={governorate}
-                  onChange={(e) => {
-                    setGovernorate(e.target.value);
-                    setCity("");
-                  }}
 
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="">{t("field_governorate")}</option>
-                  {EGYPT_GOVERNORATES.map((gov) => (
-                    <option key={gov.value} value={gov.value}>
-                      {locale === "ar" ? gov.label_ar : gov.label_en}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label={t("field_city")} required>
-                <select
-                  required
-                  disabled={!governorate}
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="">{t("field_city")}</option>
-                  {getCitiesForGovernorate(governorate).map((ct) => (
-                    <option key={ct.value} value={ct.value}>
-                      {locale === "ar" ? ct.label_ar : ct.label_en}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={locale === "ar" ? "السعر (جنيه)" : "Price (EGP)"}>
-                <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder={locale === "ar" ? "السعر بالجنيه المصري" : "Price in EGP"} />
-              </Field>
-              <Field label={t("field_commission")}>
-                <Input type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
-              </Field>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label={locale === "ar" ? "رقم الهاتف" : "Phone"} required>
-                <Input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="01XXXXXXXXX" />
-              </Field>
-              <Field label={locale === "ar" ? "رقم واتساب (اختياري)" : "WhatsApp (optional)"}>
-                <Input type="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="01XXXXXXXXX" />
-              </Field>
-            </div>
-
-            <div className="pt-2 space-y-2">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="text-sm font-semibold">
-                  {locale === "ar" ? "الموقع على الخريطة (اختياري)" : "Map location (optional)"}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
-                    {locale === "ar" ? "استخدم موقعي الحالي" : "Use my current location"}
-                  </Button>
-                  {latitude && longitude && (
-                    <Button type="button" variant="ghost" size="sm" onClick={() => { setLatitude(""); setLongitude(""); }}>
-                      {locale === "ar" ? "مسح الموقع" : "Clear"}
-                    </Button>
-                  )}
-                </div>
-              </div>
-              {!latitude || !longitude ? (
-                <div className="rounded-md border border-warning/40 bg-warning/10 p-3 text-xs text-foreground">
-                  {locale === "ar"
-                    ? "اضغط على الخريطة مرة واحدة لتحديد الموقع. لن يتغير الموقع بعد التحديد إلا لو ضغطت «مسح الموقع»."
-                    : "Tap the map once to set your location. It will not move on further taps until you press Clear."}
-                </div>
-              ) : (
-                <div className="text-xs text-success font-medium">
-                  {locale === "ar" ? "تم تحديد الموقع ✓ الإحداثيات" : "Location set ✓ Coordinates"}: {latitude}, {longitude}
-                </div>
-              )}
-              <MapView
-                markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title: locale === "ar" ? title_ar : title_en || title_ar, description: [city, governorate, country].filter(Boolean).join(" · ") }] : []}
-                center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
-                zoom={latitude && longitude ? 12 : 6}
-                onMapClick={latitude && longitude ? undefined : (coords) => {
-                  setLatitude(coords.lat.toFixed(6));
-                  setLongitude(coords.lng.toFixed(6));
-                }}
-                className="mb-4"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t("field_images")}</Label>
-              <div className="flex flex-wrap gap-2">
-                {images.map((url, i) => (
-                  <div key={url} className="relative">
-                    <img src={url} alt="" className="h-20 w-20 object-cover rounded border border-border" />
-                    <span className={`absolute bottom-0 inset-x-0 text-[9px] text-center py-0.5 ${imageSources[i] === "live_capture" ? "bg-success/90 text-success-foreground" : "bg-muted/90 text-muted-foreground"}`}>
-                      {imageSources[i] === "live_capture" ? (locale === "ar" ? "تصوير مباشر" : "Live") : (locale === "ar" ? "مرفوعة" : "Upload")}
-                    </span>
-                    <button type="button" onClick={() => removeImage(i)}
-                      className="absolute -top-1 -end-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground grid place-items-center"><X className="h-3 w-3" /></button>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <Label>الموقع على الخريطة</Label>
+                    <div className="flex items-center gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>استخدم موقعي</Button>
+                      {latitude && longitude && (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => { setLatitude(""); setLongitude(""); }}>مسح</Button>
+                      )}
+                    </div>
                   </div>
-                ))}
-                <label className="h-20 w-20 rounded border-2 border-dashed border-input grid place-items-center cursor-pointer hover:bg-muted">
-                  {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "uploaded")} />
-                </label>
-                <label className="h-20 w-20 rounded border-2 border-dashed border-success/60 grid place-items-center cursor-pointer hover:bg-success/5" title={locale === "ar" ? "تصوير مباشر" : "Live capture"}>
-                  {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5 text-success" />}
-                  <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => e.target.files?.[0] && onImageUpload(e.target.files[0], "live_capture")} />
-                </label>
-              </div>
-            </div>
+                  {latitude && longitude && (
+                    <div className="text-xs text-success font-medium">تم تحديد الموقع ✓ {latitude}, {longitude}</div>
+                  )}
+                  <MapView
+                    markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title, description: [city, governorate].filter(Boolean).join(" · ") }] : []}
+                    center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
+                    zoom={latitude && longitude ? 12 : 6}
+                    onMapClick={latitude && longitude ? undefined : (coords) => {
+                      setLatitude(coords.lat.toFixed(6));
+                      setLongitude(coords.lng.toFixed(6));
+                    }}
+                  />
+                </div>
 
-
-            <div className="grid sm:grid-cols-1 gap-4">
-              <Field label={t("field_pdf") }>
-                <UploadButton url={pdf_url} accept="application/pdf" onChange={onPdfUpload} onClear={() => setPdf("")} />
-              </Field>
-            </div>
+                <Field label="PDF (كتالوج / مواصفات)">
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 inline-flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-input bg-background cursor-pointer hover:bg-muted">
+                      {pdfUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      <span className="truncate">{pdf_url ? pdf_url.split("/").pop() : "رفع ملف PDF"}</span>
+                      <input type="file" accept="application/pdf" className="hidden" onChange={(e) => e.target.files?.[0] && onPdfUpload(e.target.files[0])} />
+                    </label>
+                    {pdf_url && <Button type="button" size="sm" variant="ghost" onClick={() => setPdf("")}><X className="h-4 w-4" /></Button>}
+                  </div>
+                </Field>
+              </CollapsibleContent>
+            </Collapsible>
 
             <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-card/95 backdrop-blur border-t border-border sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:pt-2">
               {planError && (
@@ -508,11 +406,9 @@ function NewListing() {
                   {planError}
                 </div>
               )}
-              <Button type="submit" disabled={submitting || uploading} className="w-full sm:w-auto h-12 sm:h-10 bg-primary hover:bg-primary-hover">
+              <Button type="submit" disabled={submitting} className="w-full h-12 bg-primary hover:bg-primary-hover text-base">
                 {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                {uploading
-                  ? (locale === "ar" ? "جارٍ رفع الملفات…" : "Uploading files…")
-                  : (locale === "ar" ? "نشر الإعلان" : t("submit_listing"))}
+                نشر الإعلان
               </Button>
             </div>
           </form>
@@ -525,17 +421,4 @@ function NewListing() {
 
 function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return <div className="space-y-1.5"><Label>{label}{required && " *"}</Label>{children}</div>;
-}
-
-function UploadButton({ url, accept, onChange, onClear }: { url: string; accept: string; onChange: (f: File) => void; onClear: () => void }) {
-  return (
-    <div className="flex items-center gap-2">
-      <label className="flex-1 inline-flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-input bg-background cursor-pointer hover:bg-muted">
-        <Upload className="h-4 w-4" />
-        <span className="truncate">{url ? url.split("/").pop() : "Upload"}</span>
-        <input type="file" accept={accept} className="hidden" onChange={(e) => e.target.files?.[0] && onChange(e.target.files[0])} />
-      </label>
-      {url && <Button type="button" size="sm" variant="ghost" onClick={onClear}><X className="h-4 w-4" /></Button>}
-    </div>
-  );
 }
