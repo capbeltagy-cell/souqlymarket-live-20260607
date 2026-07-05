@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 const itemSchema = z.object({
   listing_id: z.string().uuid().optional().nullable(),
