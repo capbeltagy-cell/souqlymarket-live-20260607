@@ -201,6 +201,7 @@ function CompanyEdit() {
       };
       const res = await save({ data: { ...payload, website, email: email || null } as never });
       toast.success(res.created ? t("company_created") : t("company_updated"));
+      clearDraft();
       navigate({ to: "/companies/$id", params: { id: res.id } });
     } catch (e) { toast.error((e as Error).message); }
     finally { setSubmitting(false); }
