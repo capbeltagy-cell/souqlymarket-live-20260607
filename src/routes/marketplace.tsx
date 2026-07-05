@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useDeferredValue } from "react";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
@@ -30,6 +31,7 @@ function Marketplace() {
   const [city, setCity] = useState("all");
   const [items, setItems] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,7 +62,6 @@ function Marketplace() {
     return () => { cancelled = true; };
   }, [type]);
 
-  const governorates = EGYPT_GOVERNORATES.map((gov) => gov.value);
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
 
   const deferredQ = useDeferredValue(q);
@@ -76,59 +77,13 @@ function Marketplace() {
     });
   }, [items, deferredQ, type, governorate, city]);
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <section className="bg-surface-2 border-b border-border">
-        <div className="container-souqly py-10">
-          <h1 className="text-3xl font-bold mb-4">{t("nav_marketplace")}</h1>
-          <div className="rounded-[2rem] border border-white/10 bg-surface p-6 shadow-elev">
-            <div className="relative max-w-2xl">
-              <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="ps-11 h-14 bg-surface" />
-            </div>
-            <div className="mt-6 grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr]">
-              <div className="flex flex-wrap gap-2">
-                {TYPES.map((tp) => (
-                  <Button key={tp.value} size="sm" variant={type === tp.value ? "default" : "outline"}
-                    onClick={() => setType(tp.value)}
-                    className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}>
-                    {t(tp.key as never)}
-                  </Button>
-                ))}
-              </div>
-              <select
-                className="h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
-                value={governorate}
-                onChange={(e) => {
-                  setGovernorate(e.target.value);
-                  setCity("all");
-                }}
-              >
-                <option value="all">{t("filter_governorate")}</option>
-                {EGYPT_GOVERNORATES.map((gov) => (
-                  <option key={gov.value} value={gov.value}>
-                    {locale === "ar" ? gov.label_ar : gov.label_en}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                disabled={governorate === "all"}
-              >
-                <option value="all">{t("filter_city")}</option>
-                {cities.map((ct) => (
-                  <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="container-souqly py-8 flex-1">
-        <div className="mb-6">
+  const activeCount = (type !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
+
+  const filterBody = (
+    <div className="space-y-5">
+      <div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_type")}</div>
+        <div className="flex flex-wrap gap-2">
           {TYPES.map((tp) => (
             <Button key={tp.value} size="sm" variant={type === tp.value ? "default" : "outline"}
               onClick={() => setType(tp.value)}
@@ -136,23 +91,26 @@ function Marketplace() {
               {t(tp.key as never)}
             </Button>
           ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_governorate")}</div>
           <select
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            className="w-full h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
             value={governorate}
-            onChange={(e) => {
-              setGovernorate(e.target.value);
-              setCity("all");
-            }}
+            onChange={(e) => { setGovernorate(e.target.value); setCity("all"); }}
           >
             <option value="all">{t("filter_governorate")}</option>
             {EGYPT_GOVERNORATES.map((gov) => (
-              <option key={gov.value} value={gov.value}>
-                {locale === "ar" ? gov.label_ar : gov.label_en}
-              </option>
+              <option key={gov.value} value={gov.value}>{locale === "ar" ? gov.label_ar : gov.label_en}</option>
             ))}
           </select>
+        </div>
+        <div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_city")}</div>
           <select
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            className="w-full h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             disabled={governorate === "all"}
@@ -163,19 +121,63 @@ function Marketplace() {
             ))}
           </select>
         </div>
-        <div className="rounded-[2rem] glass-card p-6 mb-8">
-          <div className="text-xs uppercase tracking-[0.28em] text-accent mb-4">{t("section_categories")}</div>
-          <div className="flex flex-wrap gap-2">
-            {TYPES.filter((tp) => tp.value !== "all").map((tp) => (
-              <span key={tp.value} className="status-pill">{t(tp.key as never)}</span>
-            ))}
+      </div>
+      {activeCount > 0 && (
+        <Button variant="ghost" size="sm" className="text-muted-foreground"
+          onClick={() => { setType("all"); setGovernorate("all"); setCity("all"); }}>
+          <X className="h-4 w-4" /> {t("filter_all")}
+        </Button>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <section className="bg-surface-2 border-b border-border">
+        <div className="container-souqly py-6 md:py-10">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">{t("nav_marketplace")}</h1>
+
+          {/* Search + mobile filter trigger */}
+          <div className="flex items-center gap-2 max-w-2xl">
+            <div className="relative flex-1">
+              <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="ps-11 h-12 bg-surface" />
+            </div>
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="lg" className="lg:hidden h-12 shrink-0 relative">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {activeCount > 0 && (
+                    <span className="absolute -top-1 -end-1 h-5 min-w-[20px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold grid place-items-center px-1">{activeCount}</span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>{t("filter_type")}</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">{filterBody}</div>
+                <Button className="w-full mt-6 bg-primary hover:bg-primary-hover" onClick={() => setFiltersOpen(false)}>
+                  {t("view_all")} ({filtered.length})
+                </Button>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Desktop inline filters */}
+          <div className="hidden lg:block mt-6 rounded-2xl border border-white/10 bg-surface p-5">
+            {filterBody}
           </div>
         </div>
+      </section>
+
+      <section className="container-souqly py-6 md:py-8 flex-1">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="rounded-2xl border border-border bg-card p-3 space-y-3">
-                <Skeleton className="h-40 w-full rounded-xl" />
+                <Skeleton className="h-32 md:h-40 w-full rounded-xl" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
                 <Skeleton className="h-8 w-full" />
@@ -188,7 +190,7 @@ function Marketplace() {
             cta={items.length === 0 ? { label: t("be_the_first"), to: "/listings/new" } : undefined}
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {filtered.map((l) => <ListingCard key={l.id} l={l} />)}
           </div>
         )}
@@ -211,3 +213,4 @@ function EmptyState({ title, cta }: { title: string; cta?: { label: string; to: 
     </div>
   );
 }
+
