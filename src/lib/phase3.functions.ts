@@ -47,15 +47,17 @@ export const listRfqs = createServerFn({ method: "POST" })
     z.object({
       category_slug: z.string().max(60).optional(),
       governorate: z.string().max(80).optional(),
-      status: z.enum(["open", "closed", "awarded"]).optional(),
     }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from(T("rfqs")).select("*").order("created_at", { ascending: false }).limit(200);
+    // Public projection only — exclude buyer_id and attachments; only open RFQs.
+    let q = supabaseAdmin.from(T("rfqs"))
+      .select("id, title, description, category_slug, quantity, unit, budget_min, budget_max, governorate, status, created_at")
+      .eq("status", "open")
+      .order("created_at", { ascending: false }).limit(200);
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     if (data.governorate) q = q.eq("governorate", data.governorate);
-    if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return { rfqs: (rows ?? []) as any[] };
@@ -65,7 +67,9 @@ export const getRfq = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rfq } = await supabaseAdmin.from(T("rfqs")).select("*").eq("id", data.id).maybeSingle();
+    const { data: rfq } = await supabaseAdmin.from(T("rfqs"))
+      .select("id, title, description, category_slug, quantity, unit, budget_min, budget_max, governorate, status, created_at")
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     if (!rfq) throw new Error("RFQ not found");
     return { rfq };
   });
