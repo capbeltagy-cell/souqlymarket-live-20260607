@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Search, Sparkles, TrendingUp, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Factory, Landmark, Package, Search, Sparkles, TrendingUp, Wrench, BadgeCheck, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -29,31 +29,29 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { key: "cat_product", icon: Package, type: "product" },
-  { key: "cat_service", icon: Wrench, type: "service" },
-  { key: "cat_real_estate", icon: Building2, type: "real_estate" },
-  { key: "cat_land", icon: Landmark, type: "land" },
-  { key: "cat_factory", icon: Factory, type: "factory" },
-  { key: "cat_opportunity", icon: TrendingUp, type: "opportunity" },
+  { key: "cat_product", icon: Package, to: "/marketplace" },
+  { key: "cat_factory", icon: Factory, to: "/factories" },
+  { key: "cat_real_estate", icon: Building2, to: "/real-estate" },
+  { key: "cat_land", icon: Landmark, to: "/lands" },
+  { key: "cat_service", icon: Wrench, to: "/marketplace" },
+  { key: "cat_opportunity", icon: TrendingUp, to: "/marketplace" },
 ] as const;
 
-function Empty({ label, href }: { label: string; href: string }) {
-  const { t } = useI18n();
-  return (
-    <div className="rounded-2xl border border-dashed border-white/10 bg-surface/50 p-8 text-center">
-      <p className="text-sm text-muted-foreground mb-3">{t("empty_no_items")}</p>
-      <Button asChild variant="outline" size="sm"><Link to={href}>{label}</Link></Button>
-    </div>
-  );
-}
+type FactoryRow = {
+  company_id: string;
+  production_capacity: string | null;
+  employees_range: string | null;
+  verified: boolean;
+  companies: { id: string; name_ar: string | null; name_en: string | null; industry: string | null; governorate: string | null; logo_url: string | null; is_verified: boolean | null } | null;
+};
 
-function Skeleton({ count = 4 }: { count?: number }) {
+function CardSkeleton({ count = 4, aspect = "aspect-[4/3]" }: { count?: number; aspect?: string }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-[1.5rem] border border-white/5 bg-surface-2/40 overflow-hidden animate-pulse">
-          <div className="aspect-[4/3] bg-white/[0.03]" />
-          <div className="p-4 space-y-2">
+        <div key={i} className="rounded-2xl border border-white/5 bg-surface-2/40 overflow-hidden animate-pulse">
+          <div className={`${aspect} bg-white/[0.03]`} />
+          <div className="p-3 space-y-2">
             <div className="h-3 rounded bg-white/[0.05] w-3/4" />
             <div className="h-3 rounded bg-white/[0.05] w-1/2" />
           </div>
@@ -63,51 +61,63 @@ function Skeleton({ count = 4 }: { count?: number }) {
   );
 }
 
+function SectionHead({ title, href, cta }: { title: string; href: string; cta: string }) {
+  return (
+    <div className="flex items-end justify-between gap-3 mb-4">
+      <h2 className="text-serif text-2xl md:text-4xl leading-tight">{title}</h2>
+      <Link to={href} className="text-xs md:text-sm text-gold hover:text-gold-soft whitespace-nowrap font-medium">{cta} →</Link>
+    </div>
+  );
+}
+
+function Empty({ label, href }: { label: string; href: string }) {
+  const { t } = useI18n();
+  return (
+    <div className="rounded-2xl border border-dashed border-white/10 bg-surface/40 p-6 text-center">
+      <p className="text-sm text-muted-foreground mb-3">{t("empty_no_items")}</p>
+      <Button asChild variant="outline" size="sm"><Link to={href}>{label}</Link></Button>
+    </div>
+  );
+}
+
 function Landing() {
   const { t, dir, locale } = useI18n();
   const navigate = useNavigate();
   const ar = locale === "ar";
   const Arrow = dir === "rtl" ? ArrowLeft : ArrowRight;
+
   const [query, setQuery] = useState("");
   const [listings, setListings] = useState<ListingCardData[] | null>(null);
   const [companies, setCompanies] = useState<CompanyCardData[] | null>(null);
+  const [factories, setFactories] = useState<FactoryRow[] | null>(null);
+  const [opportunities, setOpportunities] = useState<ListingCardData[] | null>(null);
   const [wholesale, setWholesale] = useState<any[] | null>(null);
-  const [rfqs, setRfqs] = useState<Array<{ id: string; title: string; governorate: string | null; budget_min: number | null; budget_max: number | null }> | null>(null);
-  const [tenders, setTenders] = useState<Array<{ id: string; title: string; governorate: string | null; budget: number | null; deadline: string | null }> | null>(null);
-  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0, leads: 0 });
+  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0 });
 
   useEffect(() => {
-    // Fast: counts for hero
     (async () => {
-      const [cCount, lCount, aCount, leadCount] = await Promise.all([
+      const [cCount, lCount, aCount] = await Promise.all([
         supabase.from("companies").select("id", { count: "exact", head: true }),
         supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "approved"),
         supabase.from("agents").select("id", { count: "exact", head: true }),
-        supabase.from("leads").select("id", { count: "exact", head: true }),
       ]);
-      setCounts({
-        companies: cCount.count ?? 0,
-        listings: lCount.count ?? 0,
-        agents: aCount.count ?? 0,
-        leads: leadCount.count ?? 0,
-      });
+      setCounts({ companies: cCount.count ?? 0, listings: lCount.count ?? 0, agents: aCount.count ?? 0 });
     })();
 
-    // Deferred: content sections
     (async () => {
       const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, is_verified)";
-      const [lRes, cRes, wRes, rfqRes, tenderRes] = await Promise.all([
-        supabase.from("listings").select(listingSelect).eq("status", "approved").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(8),
-        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).limit(6),
-        supabase.from("wholesale_listings").select("*, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
-        supabase.from("rfqs").select("id, title, governorate, budget_min, budget_max").eq("status", "open").order("created_at", { ascending: false }).limit(5),
-        supabase.from("tenders").select("id, title, governorate, budget, deadline").eq("status", "open").order("created_at", { ascending: false }).limit(5),
+      const [lRes, oRes, cRes, fRes, wRes] = await Promise.all([
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(8),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "opportunity").order("created_at", { ascending: false }).limit(4),
+        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).order("created_at", { ascending: false }).limit(6),
+        supabase.from("factories").select("company_id, production_capacity, employees_range, verified, companies(id, name_ar, name_en, industry, governorate, logo_url, is_verified)").order("verified", { ascending: false }).limit(6),
+        supabase.from("wholesale_listings").select("id, title, images, price_per_unit, currency, moq, governorate, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
       ]);
       setListings((lRes.data ?? []) as unknown as ListingCardData[]);
+      setOpportunities((oRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
+      setFactories((fRes.data ?? []) as unknown as FactoryRow[]);
       setWholesale((wRes.data ?? []) as any[]);
-      setRfqs((rfqRes.data ?? []) as never);
-      setTenders((tenderRes.data ?? []) as never);
     })();
   }, []);
 
@@ -122,173 +132,161 @@ function Landing() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      {/* Hero */}
+      {/* 1. HERO + SEARCH */}
       <section className="relative overflow-hidden hero-gradient">
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
-          backgroundImage: "linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-        }} />
-        <div className="container-souqly relative py-20 md:py-28">
-          <div className="max-w-4xl">
-            <span className="status-pill mb-8 fade-up">
-              <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
-            </span>
-            <h1 className="text-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-foreground mb-6 fade-up-1">
-              {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span><br />بالشركات الجادة.</>)
-                  : (<>Where serious <span className="gold-shine italic">deals</span><br />meet serious business.</>)}
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8 fade-up-2">
-              {ar
-                ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة، بمعايير فاخرة."
-                : "Souqly connects companies, suppliers, factories and professional agents across Egypt — one platform, premium standards."}
-            </p>
+        <div className="container-souqly relative pt-8 pb-10 md:pt-20 md:pb-16">
+          <span className="status-pill mb-4 fade-up text-[10px] md:text-xs">
+            <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
+          </span>
+          <h1 className="text-serif text-[2.25rem] leading-[1.05] md:text-6xl lg:text-8xl tracking-tight text-foreground mb-4 md:mb-6 fade-up-1">
+            {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span> بالشركات الجادة.</>)
+                : (<>Where serious <span className="gold-shine italic">deals</span> meet serious business.</>)}
+          </h1>
+          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl leading-relaxed mb-6 fade-up-2">
+            {ar
+              ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة."
+              : "Souqly connects companies, suppliers, factories and pro agents across Egypt — one platform."}
+          </p>
 
-            {/* Hero Search */}
-            <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-2 flex items-center gap-2 max-w-2xl mb-6 focus-within:border-primary/40 focus-within:shadow-gold transition-all fade-up-3">
-              <div className="flex items-center gap-2 flex-1 px-3">
-                <Search className="h-5 w-5 text-gold shrink-0" />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={ar ? "ابحث عن منتج، شركة، مصنع، عقار…" : "Search products, companies, factories, real estate…"}
-                  className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground py-3 min-w-0"
-                  aria-label={ar ? "بحث" : "Search"}
-                />
-              </div>
-              <Button type="submit" size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-11 px-6 font-semibold shrink-0">
-                {ar ? "بحث" : "Search"}
-              </Button>
-            </form>
-
-            <div className="flex flex-wrap gap-3 fade-up-3">
-              <Button asChild size="lg" className="h-11 px-6 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold shadow-gold">
-                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً" : "Get Started"}<Arrow className="h-4 w-4" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-11 px-6 gold-border bg-transparent hover:bg-white/5 text-foreground">
-                <Link to="/how-it-works">{ar ? "كيف يعمل سوقلي؟" : "How it works"}</Link>
-              </Button>
+          <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-1.5 md:p-2 flex items-center gap-2 max-w-2xl focus-within:border-primary/40 focus-within:shadow-gold transition-all fade-up-3">
+            <div className="flex items-center gap-2 flex-1 px-3 min-w-0">
+              <Search className="h-4 w-4 md:h-5 md:w-5 text-gold shrink-0" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={ar ? "ابحث عن منتج، شركة، مصنع…" : "Search products, companies, factories…"}
+                className="flex-1 bg-transparent border-0 outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground py-2.5 md:py-3 min-w-0"
+                aria-label={ar ? "بحث" : "Search"}
+              />
             </div>
-          </div>
+            <Button type="submit" size="sm" className="bg-primary text-primary-foreground hover:bg-primary-hover md:h-11 md:px-6 md:text-base font-semibold shrink-0">
+              {ar ? "بحث" : "Search"}
+            </Button>
+          </form>
 
-
-          {/* Bento stats */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {/* Compact stats — mobile: 3 tight tiles */}
+          <div className="mt-6 md:mt-12 grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4 max-w-2xl">
             {[
-              { label: ar ? "شركة موثقة" : "Verified Companies", value: counts.companies },
-              { label: ar ? "إعلان نشط" : "Active Listings", value: counts.listings },
-              { label: ar ? "مسوّق محترف" : "Pro Agents", value: counts.agents },
-              { label: ar ? "صفقة مسجلة" : "Recorded Deals", value: counts.leads },
+              { label: ar ? "شركة" : "Companies", value: counts.companies },
+              { label: ar ? "إعلان" : "Listings", value: counts.listings },
+              { label: ar ? "مسوّق" : "Agents", value: counts.agents },
             ].map((item) => (
-              <div key={item.label} className="premium-panel rounded-2xl p-5 md:p-6">
-                <div className="text-serif text-4xl md:text-5xl text-gold tabular-nums">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}<span className="text-gold-soft">+</span></div>
-                <div className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">{item.label}</div>
+              <div key={item.label} className="premium-panel rounded-xl px-3 py-3 md:p-6">
+                <div className="text-serif text-xl md:text-4xl text-gold tabular-nums leading-none">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}<span className="text-gold-soft">+</span></div>
+                <div className="text-[10px] md:text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">{item.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="container-souqly py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <span className="status-pill mb-3">{ar ? "التصنيفات" : "Categories"}</span>
-            <h2 className="text-serif text-3xl md:text-5xl mt-3">{t("section_categories")}</h2>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {categories.map(({ key, icon: Icon }) => (
-            <Link key={key} to="/marketplace" className="group premium-panel rounded-2xl p-6 hover:border-primary/40 hover:shadow-gold transition-all duration-300">
-              <div className="h-12 w-12 rounded-xl bg-primary/10 text-gold grid place-items-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition">
-                <Icon className="h-5 w-5" />
+      {/* 2. MAIN CATEGORIES — one clean strip */}
+      <section className="container-souqly py-8 md:py-14">
+        <h2 className="text-serif text-2xl md:text-4xl mb-4 md:mb-6">{t("section_categories")}</h2>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
+          {categories.map(({ key, icon: Icon, to }) => (
+            <Link key={key} to={to} className="group premium-panel rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/40 hover:shadow-gold transition-all min-h-[92px]">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-primary/10 text-gold grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition">
+                <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
-              <div className="text-sm font-semibold text-foreground">{t(key)}</div>
-              <Arrow className="h-4 w-4 text-muted-foreground mt-3 group-hover:text-gold transition" />
+              <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">{t(key)}</div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* How it works — 3 steps */}
-      <section className="container-souqly py-12">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="status-pill mb-3">{ar ? "بثلاث خطوات" : "In 3 steps"}</span>
-          <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "من التسجيل لأول صفقة" : "From signup to your first deal"}</h2>
-        </div>
-        <div className="grid md:grid-cols-3 gap-5">
-          {[
-            { n: "01", t: ar ? "سجّل شركتك" : "Register your company", d: ar ? "أنشئ ملفًا موثقًا خلال دقائق واعرض قدراتك." : "Create a verified profile in minutes and showcase your capabilities." },
-            { n: "02", t: ar ? "استقبل الفرص" : "Receive opportunities", d: ar ? "طلبات أسعار ومناقصات مطابقة لنشاطك تصلك مباشرة." : "Matched RFQs and tenders delivered straight to you." },
-            { n: "03", t: ar ? "أغلق الصفقة" : "Close the deal", d: ar ? "تفاوض، وقّع، وادفع بأمان — من داخل المنصة." : "Negotiate, sign, and pay securely — all inside the platform." },
-          ].map((s) => (
-            <div key={s.n} className="premium-panel rounded-2xl p-8 hover:border-primary/30 transition">
-              <div className="step-number mb-4">{s.n}</div>
-              <div className="divider-gold w-12 mb-4" />
-              <h3 className="text-serif text-2xl mb-2">{s.t}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Listings */}
-      <section className="container-souqly py-8">
-
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-serif text-3xl md:text-4xl">{t("section_featured")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/marketplace" className="gap-1">{t("cta_explore")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {listings === null ? <Skeleton count={8} />
-          : listings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {listings.map((l) => <ListingCard key={l.id} l={l} />)}
-            </div>
-          ) : <Empty label={t("cta_explore")} href="/marketplace" />}
-      </section>
-
-      {/* Top Companies */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-serif text-3xl md:text-4xl">{t("section_top_companies")}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/companies" className="gap-1">{t("nav_companies")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {companies === null ? <Skeleton count={6} />
+      {/* 3. FEATURED COMPANIES */}
+      <section className="container-souqly py-6 md:py-10">
+        <SectionHead title={t("section_top_companies")} href="/companies" cta={ar ? "الكل" : "All"} />
+        {companies === null ? <CardSkeleton count={6} aspect="aspect-square" />
           : companies.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {companies.map((c) => <CompanyCard key={c.id} c={c} />)}
             </div>
           ) : <Empty label={t("nav_companies")} href="/companies" />}
       </section>
 
-      {/* Wholesale */}
-      <section className="container-souqly py-8">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-serif text-3xl md:text-4xl">{ar ? "عروض الجملة" : "Wholesale offers"}</h2>
-          <Button asChild variant="ghost" size="sm"><Link to="/wholesale" className="gap-1">{t("view_all")} <Arrow className="h-4 w-4" /></Link></Button>
-        </div>
-        {wholesale === null ? <Skeleton count={4} />
+      {/* 4. FEATURED FACTORIES */}
+      <section className="container-souqly py-6 md:py-10">
+        <SectionHead title={ar ? "المصانع المميزة" : "Featured factories"} href="/factories" cta={ar ? "الكل" : "All"} />
+        {factories === null ? <CardSkeleton count={4} aspect="aspect-[4/3]" />
+          : factories.filter(f => f.companies).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+              {factories.filter(f => f.companies).map((f) => {
+                const c = f.companies!;
+                const name = (ar ? c.name_ar : c.name_en) ?? c.name_en ?? c.name_ar ?? "—";
+                return (
+                  <Link key={f.company_id} to="/factories/$id" params={{ id: f.company_id }} className="premium-panel rounded-2xl p-4 md:p-5 hover:border-primary/40 hover:shadow-gold transition group">
+                    <div className="flex items-start gap-3">
+                      {c.logo_url ? (
+                        <img src={c.logo_url} alt="" className="h-12 w-12 rounded-xl object-cover shrink-0" loading="lazy" />
+                      ) : (
+                        <div className="h-12 w-12 rounded-xl bg-primary/10 text-gold grid place-items-center shrink-0"><Factory className="h-5 w-5" /></div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <h3 className="font-semibold text-sm md:text-base truncate">{name}</h3>
+                          {(c.is_verified || f.verified) && <BadgeCheck className="h-3.5 w-3.5 text-gold shrink-0" />}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">{c.industry ?? "—"}</div>
+                        <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground">
+                          {c.governorate && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{c.governorate}</span>}
+                          {f.employees_range && <span>· {f.employees_range}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : <Empty label={ar ? "تصفح المصانع" : "Browse factories"} href="/factories" />}
+      </section>
+
+      {/* 5. LATEST PRODUCTS */}
+      <section className="container-souqly py-6 md:py-10">
+        <SectionHead title={ar ? "أحدث المنتجات" : "Latest products"} href="/marketplace" cta={ar ? "الكل" : "All"} />
+        {listings === null ? <CardSkeleton count={8} />
+          : listings.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              {listings.map((l) => <ListingCard key={l.id} l={l} />)}
+            </div>
+          ) : <Empty label={t("cta_explore")} href="/marketplace" />}
+      </section>
+
+      {/* 6. INVESTMENT OPPORTUNITIES */}
+      {opportunities !== null && opportunities.length > 0 && (
+        <section className="container-souqly py-6 md:py-10">
+          <SectionHead title={ar ? "فرص استثمارية" : "Investment opportunities"} href="/marketplace" cta={ar ? "الكل" : "All"} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            {opportunities.map((l) => <ListingCard key={l.id} l={l} />)}
+          </div>
+        </section>
+      )}
+
+      {/* 7. WHOLESALE OFFERS */}
+      <section className="container-souqly py-6 md:py-10">
+        <SectionHead title={ar ? "عروض الجملة" : "Wholesale offers"} href="/wholesale" cta={ar ? "الكل" : "All"} />
+        {wholesale === null ? <CardSkeleton count={4} />
           : wholesale.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {wholesale.map((w) => {
                 const title = w.title ?? "";
-                const company = (ar ? w.companies?.name_ar : w.companies?.name_en) ?? w.companies?.name_en ?? w.companies?.name_ar ?? "";
                 return (
-                  <Link key={w.id} to="/wholesale/$id" params={{ id: w.id }} className="group overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface-2 shadow-elev transition-all duration-200 hover:-translate-y-1 hover:bg-surface">
+                  <Link key={w.id} to="/wholesale/$id" params={{ id: w.id }} className="group overflow-hidden rounded-2xl border border-white/10 bg-surface-2 shadow-elev transition-all hover:-translate-y-0.5 hover:border-primary/30">
                     <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                       {w.images?.[0] ? (
                         <img src={w.images[0]} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       ) : (
-                        <div className="h-full w-full bg-muted grid place-items-center text-muted-foreground text-sm">{ar ? "لا توجد صورة" : "No image"}</div>
+                        <div className="h-full w-full bg-muted grid place-items-center text-muted-foreground text-xs">{ar ? "لا توجد صورة" : "No image"}</div>
                       )}
                     </div>
-                    <div className="p-4 space-y-2">
-                      <h3 className="font-semibold text-foreground line-clamp-2 leading-snug">{title}</h3>
-                      {company && <p className="text-xs text-muted-foreground">{company}</p>}
-                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <div className="p-3 space-y-1.5">
+                      <h3 className="font-semibold text-sm text-foreground line-clamp-2 leading-snug">{title}</h3>
+                      <div className="flex items-center justify-between pt-1.5 border-t border-border text-[11px]">
                         {w.price_per_unit ? (
-                          <div className="font-bold text-primary text-sm">{formatPrice(w.price_per_unit, locale)} <span className="text-xs text-muted-foreground font-normal">/ {ar ? "وحدة" : "unit"}</span></div>
-                        ) : (<div className="text-xs text-muted-foreground">—</div>)}
-                        <div className="text-xs text-muted-foreground">{ar ? "الحد الأدنى" : "MOQ"}: {w.moq}</div>
+                          <div className="font-bold text-primary text-xs md:text-sm">{formatPrice(w.price_per_unit, locale)}</div>
+                        ) : (<div className="text-muted-foreground">—</div>)}
+                        <div className="text-muted-foreground">MOQ {w.moq}</div>
                       </div>
                     </div>
                   </Link>
@@ -298,81 +296,49 @@ function Landing() {
           ) : <Empty label={ar ? "تصفح الجملة" : "Browse wholesale"} href="/wholesale" />}
       </section>
 
-      {/* Opportunities: RFQs & Tenders */}
-      <section className="container-souqly py-16">
-        <div className="mb-8">
-          <span className="status-pill mb-3">{ar ? "فرص أعمال" : "Business Opportunities"}</span>
-          <h2 className="text-serif text-3xl md:text-5xl mt-3">{ar ? "طلبات وعطاءات مفتوحة" : "Open RFQs & Tenders"}</h2>
+      {/* 8. HOW SOUQLY WORKS */}
+      <section className="container-souqly py-10 md:py-16">
+        <div className="text-center max-w-2xl mx-auto mb-6 md:mb-10">
+          <span className="status-pill mb-3 text-[10px]">{ar ? "بثلاث خطوات" : "In 3 steps"}</span>
+          <h2 className="text-serif text-2xl md:text-5xl mt-3">{ar ? "من التسجيل لأول صفقة" : "From signup to your first deal"}</h2>
         </div>
-        <div className="grid lg:grid-cols-2 gap-5">
-          {/* RFQs */}
-          <div className="rounded-[1.5rem] panel-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">{t("featured_rfqs")}</h3>
-              <Button asChild variant="ghost" size="sm"><Link to="/rfq">{t("view_all")}</Link></Button>
+        <div className="grid md:grid-cols-3 gap-3 md:gap-5">
+          {[
+            { n: "01", t: ar ? "سجّل شركتك" : "Register your company", d: ar ? "أنشئ ملفًا موثقًا خلال دقائق واعرض قدراتك." : "Create a verified profile in minutes." },
+            { n: "02", t: ar ? "استقبل الفرص" : "Receive opportunities", d: ar ? "طلبات أسعار ومناقصات مطابقة لنشاطك." : "Matched RFQs and tenders delivered to you." },
+            { n: "03", t: ar ? "أغلق الصفقة" : "Close the deal", d: ar ? "تفاوض، وقّع، وادفع بأمان من داخل المنصة." : "Negotiate, sign, and pay securely on-platform." },
+          ].map((s) => (
+            <div key={s.n} className="premium-panel rounded-2xl p-5 md:p-8">
+              <div className="step-number mb-3 md:mb-4 text-4xl md:text-6xl">{s.n}</div>
+              <div className="divider-gold w-10 mb-3" />
+              <h3 className="text-serif text-lg md:text-2xl mb-1.5">{s.t}</h3>
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{s.d}</p>
             </div>
-            {rfqs === null ? (
-              <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse" />)}</div>
-            ) : rfqs.length > 0 ? (
-              <div className="space-y-3">
-                {rfqs.map((r) => (
-                  <Link key={r.id} to="/rfq/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 hover:border-primary/30 transition">
-                    <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {r.governorate ?? "—"} · {r.budget_min ? `${r.budget_min.toLocaleString()} - ${(r.budget_max ?? r.budget_min).toLocaleString()} EGP` : "—"}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : <Empty label={t("view_all")} href="/rfq" />}
-          </div>
-
-          {/* Tenders */}
-          <div className="rounded-[1.5rem] panel-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">{t("featured_tenders")}</h3>
-              <Button asChild variant="ghost" size="sm"><Link to="/tenders">{t("view_all")}</Link></Button>
-            </div>
-            {tenders === null ? (
-              <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse" />)}</div>
-            ) : tenders.length > 0 ? (
-              <div className="space-y-3">
-                {tenders.map((r) => (
-                  <Link key={r.id} to="/tenders/$id" params={{ id: r.id }} className="block rounded-xl border border-white/10 bg-surface p-4 hover:bg-surface-2 hover:border-primary/30 transition">
-                    <div className="font-semibold text-sm line-clamp-1">{r.title}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {r.governorate ?? "—"} · {r.budget ? `${r.budget.toLocaleString()} EGP` : "—"} {r.deadline ? `· ${r.deadline}` : ""}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : <Empty label={t("view_all")} href="/tenders" />}
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="container-souqly py-20">
-        <div className="premium-panel rounded-[2rem] p-10 md:p-16 text-center overflow-hidden relative">
+      {/* 9. CTA FOR COMPANIES */}
+      <section className="container-souqly py-10 md:py-16">
+        <div className="premium-panel rounded-2xl md:rounded-[2rem] p-6 md:p-14 text-center overflow-hidden relative">
           <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
             background: "radial-gradient(circle at 50% 0%, rgba(201,168,76,0.15), transparent 60%)",
           }} />
           <div className="relative">
-            <h2 className="text-serif text-4xl md:text-6xl mb-4">
-              {ar ? <>جاهز تنقل أعمالك <span className="gold-shine italic">لمستوى تاني</span>؟</> : <>Ready to take your business <span className="gold-shine italic">further</span>?</>}
+            <h2 className="text-serif text-2xl md:text-5xl mb-3 md:mb-4 leading-tight">
+              {ar ? <>سجّل شركتك على سوقلي <span className="gold-shine italic">مجاناً</span></> : <>List your company on Souqly <span className="gold-shine italic">for free</span></>}
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-              {ar ? "انضم لآلاف الشركات والمسوقين على سوقلي — تسجيل مجاني، بدون عمولات مخفية." : "Join thousands of companies and pro agents on Souqly — free signup, no hidden fees."}
+            <p className="text-xs md:text-base text-muted-foreground max-w-xl mx-auto mb-5 md:mb-8">
+              {ar ? "انضم لآلاف الشركات والمصانع على سوقلي — بدون رسوم تسجيل، بدون عمولات مخفية." : "Join thousands of companies and factories on Souqly — no signup fees, no hidden charges."}
             </p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover h-12 px-8 font-semibold shadow-gold">
-                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "ابدأ مجاناً الآن" : "Start Free Now"}<Arrow className="h-4 w-4" /></Link>
+            <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover font-semibold shadow-gold">
+                <Link to="/auth" search={{ mode: "signup" }} className="gap-2">{ar ? "سجّل شركتك الآن" : "Register your company"}<Arrow className="h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-8 gold-border bg-transparent hover:bg-white/5">
+              <Button asChild size="lg" variant="outline" className="gold-border bg-transparent hover:bg-white/5">
                 <Link to="/pricing">{ar ? "شاهد الأسعار" : "See pricing"}</Link>
               </Button>
             </div>
-
           </div>
         </div>
       </section>
