@@ -20,13 +20,13 @@ export function SiteHeader() {
   const isPureAgent = isAgent && !isCompany && !isAdmin;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <div className="container-souqly flex h-16 items-center gap-4">
-        <Link to="/" className="flex items-center gap-3 font-bold text-lg shrink-0">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      <div className="container-souqly flex h-14 lg:h-16 items-center gap-2 lg:gap-4">
+        <Link to="/" className="flex items-center gap-2 lg:gap-3 font-bold text-lg shrink-0">
+          <div className="flex h-9 w-9 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold">
             <Briefcase className="h-4 w-4" />
           </div>
-          <span className="text-serif text-2xl text-foreground tracking-tight">{t("brand")}</span>
+          <span className="text-serif text-xl lg:text-2xl text-foreground tracking-tight">{t("brand")}</span>
         </Link>
 
         {/* Primary nav — only the essentials */}
@@ -77,7 +77,7 @@ export function SiteHeader() {
           </DropdownMenu>
         </nav>
 
-        <div className="ms-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-1.5 lg:gap-2">
           <div className="hidden xl:block w-[260px]">
             <GlobalSearch compact />
           </div>
@@ -207,6 +207,10 @@ export function SiteHeader() {
             </>
           )}
         </div>
+      </div>
+      {/* Mobile inline search */}
+      <div className="xl:hidden border-t border-border/60 bg-background/70 px-3 py-2">
+        <GlobalSearch compact />
       </div>
     </header>
   );
