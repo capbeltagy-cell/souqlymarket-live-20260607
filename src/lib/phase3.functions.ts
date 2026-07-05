@@ -27,6 +27,7 @@ export const createRfq = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: row, error } = await supabase.from(T("rfqs")).insert({
       buyer_id: userId,
       title: data.title,
