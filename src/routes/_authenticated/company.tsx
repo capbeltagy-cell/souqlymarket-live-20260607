@@ -68,6 +68,7 @@ const STEPS: { id: StepId; ar: string; en: string; icon: typeof Building2 }[] = 
 ];
 
 function CompanyEdit() {
+  useMarketerGuard();
   const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();

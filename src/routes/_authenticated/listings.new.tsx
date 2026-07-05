@@ -32,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/listings/new")({
 });
 
 function NewListing() {
+  useMarketerGuard();
   const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();

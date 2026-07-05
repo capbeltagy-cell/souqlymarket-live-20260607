@@ -13,6 +13,7 @@ import { createRfq, listCategories } from "@/lib/phase3.functions";
 export const Route = createFileRoute("/_authenticated/rfq/new")({ component: NewRfq });
 
 function NewRfq() {
+  useMarketerGuard();
   const { locale } = useI18n();
   const ar = locale === "ar";
   const nav = useNavigate();

@@ -13,6 +13,7 @@ import { createTender, listCategories } from "@/lib/phase3.functions";
 export const Route = createFileRoute("/_authenticated/tenders/new")({ component: NewTender });
 
 function NewTender() {
+  useMarketerGuard();
   const { locale } = useI18n();
   const ar = locale === "ar";
   const nav = useNavigate();

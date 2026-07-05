@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/quotations/new")({
 type Item = { title: string; quantity: number; unit_price: number; discount: number; listing_id?: string | null };
 
 function NewQuotationPage() {
+  useMarketerGuard();
   const { c: conversationId } = Route.useSearch();
   const navigate = useNavigate();
   const create = useServerFn(createQuotation);

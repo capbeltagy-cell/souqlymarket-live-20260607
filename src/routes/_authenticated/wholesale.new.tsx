@@ -13,6 +13,7 @@ import { createWholesale, listCategories } from "@/lib/phase3.functions";
 export const Route = createFileRoute("/_authenticated/wholesale/new")({ component: NewWholesale });
 
 function NewWholesale() {
+  useMarketerGuard();
   const { locale } = useI18n();
   const ar = locale === "ar";
   const nav = useNavigate();
