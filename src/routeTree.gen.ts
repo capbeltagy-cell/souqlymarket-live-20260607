@@ -76,6 +76,7 @@ import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_aut
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin-withdrawals'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
+import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
@@ -435,6 +436,12 @@ const AuthenticatedAdminRevenueRoute =
     path: '/admin-revenue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPlatformSettingsRoute =
+  AuthenticatedAdminPlatformSettingsRouteImport.update({
+    id: '/admin-platform-settings',
+    path: '/admin-platform-settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPaymentsRoute =
   AuthenticatedAdminPaymentsRouteImport.update({
     id: '/admin-payments',
@@ -563,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
@@ -647,6 +655,7 @@ export interface FileRoutesByTo {
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
+  '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
@@ -733,6 +742,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
+  '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
@@ -819,6 +829,7 @@ export interface FileRouteTypes {
     | '/admin-executive'
     | '/admin-overview'
     | '/admin-payments'
+    | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-withdrawals'
     | '/agent'
@@ -903,6 +914,7 @@ export interface FileRouteTypes {
     | '/admin-executive'
     | '/admin-overview'
     | '/admin-payments'
+    | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-withdrawals'
     | '/agent'
@@ -988,6 +1000,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-overview'
     | '/_authenticated/admin-payments'
+    | '/_authenticated/admin-platform-settings'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/admin-withdrawals'
     | '/_authenticated/agent'
@@ -1546,6 +1559,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRevenueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-platform-settings': {
+      id: '/_authenticated/admin-platform-settings'
+      path: '/admin-platform-settings'
+      fullPath: '/admin-platform-settings'
+      preLoaderRoute: typeof AuthenticatedAdminPlatformSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-payments': {
       id: '/_authenticated/admin-payments'
       path: '/admin-payments'
@@ -1705,6 +1725,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
+  AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
@@ -1747,6 +1768,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
+  AuthenticatedAdminPlatformSettingsRoute:
+    AuthenticatedAdminPlatformSettingsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
