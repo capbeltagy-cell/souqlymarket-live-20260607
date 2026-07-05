@@ -141,6 +141,16 @@ function ListingDetail() {
     finally { setMsgLoading(false); }
   };
 
+  const onOrder = async () => {
+    setOrdering(true);
+    try {
+      const { id: orderId } = await createOrder({ data: { listing_id: id, quantity: 1 } });
+      toast.success(ar ? "تم إنشاء الطلب — انتقل لصفحة الطلب لإكمال البيانات" : "Order created");
+      navigate({ to: "/orders/$id", params: { id: orderId } });
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setOrdering(false); }
+  };
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
