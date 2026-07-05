@@ -316,5 +316,3 @@ function MessageBubble({ m, mine }: { m: Msg; mine: boolean }) {
   );
 }
 
-// silence unused import warnings when tree-shaken
-void X;
