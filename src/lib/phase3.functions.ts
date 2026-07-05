@@ -165,8 +165,9 @@ export const getWholesale = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Do not expose company phone to anonymous visitors.
     const { data: row } = await supabaseAdmin.from(T("wholesale_listings"))
-      .select("*, companies(id, name_ar, name_en, logo_url, is_verified, phone)")
+      .select("*, companies(id, name_ar, name_en, logo_url, is_verified)")
       .eq("id", data.id).maybeSingle();
     if (!row) throw new Error("Not found");
     return { item: row };
