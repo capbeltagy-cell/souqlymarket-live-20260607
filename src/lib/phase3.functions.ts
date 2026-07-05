@@ -190,6 +190,7 @@ export const createWholesale = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: c } = await supabase.from("companies").select("id").eq("owner_id", userId).maybeSingle();
     if (!c) throw new Error("Create a company first");
     const { data: row, error } = await supabase.from(T("wholesale_listings")).insert({
