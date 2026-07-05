@@ -69,7 +69,7 @@ export const updateCampaign = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
-    const patch: Record<string, unknown> = {};
+    const patch: any = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.description !== undefined) patch.description = data.description;
     if (data.category !== undefined) patch.category = data.category;
