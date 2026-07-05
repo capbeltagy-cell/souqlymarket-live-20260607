@@ -519,7 +519,7 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from("companies").select("*").limit(200);
+    let q = supabaseAdmin.from("companies").select("id, name_ar, name_en, logo_url, cover_url, industry, city, governorate, country, company_type, category_slug, is_verified, is_premium, subscription_plan, subscription_expires_at, export_available, production_capacity, description_ar, description_en, created_at").limit(200);
     if (data.q) q = q.or(`name_ar.ilike.%${data.q}%,name_en.ilike.%${data.q}%`);
     if (data.city) {
       const cityValues = getCityVariants(data.city);
