@@ -132,6 +132,7 @@ function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
+      <FeaturedAdBar />
 
       {/* 1. HERO + SEARCH */}
       <section className="relative overflow-hidden hero-gradient">
