@@ -65,6 +65,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
+import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
@@ -363,6 +364,11 @@ const AuthenticatedCommissionsRoute =
     path: '/commissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -473,6 +479,7 @@ export interface FileRoutesByFullPath {
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -543,6 +550,7 @@ export interface FileRoutesByTo {
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -615,6 +623,7 @@ export interface FileRoutesById {
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -687,6 +696,7 @@ export interface FileRouteTypes {
     | '/agent'
     | '/agent-performance'
     | '/analytics'
+    | '/campaigns'
     | '/commissions'
     | '/company'
     | '/company-profile-extra'
@@ -757,6 +767,7 @@ export interface FileRouteTypes {
     | '/agent'
     | '/agent-performance'
     | '/analytics'
+    | '/campaigns'
     | '/commissions'
     | '/company'
     | '/company-profile-extra'
@@ -828,6 +839,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
     | '/_authenticated/analytics'
+    | '/_authenticated/campaigns'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
     | '/_authenticated/company-profile-extra'
@@ -1293,6 +1305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommissionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns': {
+      id: '/_authenticated/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
@@ -1395,6 +1414,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
@@ -1427,6 +1447,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
