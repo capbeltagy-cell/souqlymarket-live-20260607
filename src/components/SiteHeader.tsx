@@ -96,6 +96,9 @@ export function SiteHeader() {
                   <Link to="/messages" className="gap-2"><MessageSquare className="h-4 w-4" />الرسائل</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/orders" className="gap-2"><ShoppingBag className="h-4 w-4" />طلباتي</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
