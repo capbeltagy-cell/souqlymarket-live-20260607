@@ -144,10 +144,12 @@ function CompanyEdit() {
     try {
       const ext = file.name.split(".").pop() ?? "bin";
       const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
+      const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
-      const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
-      setForm((f) => ({ ...f, [kind === "logo" ? "logo_url" : "cover_url"]: data.publicUrl }));
+      // Bucket is private; use a long-lived signed URL so the logo renders everywhere.
+      const { data, error: sErr } = await supabase.storage.from("company-assets").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (sErr || !data?.signedUrl) throw sErr ?? new Error("Sign URL failed");
+      setForm((f) => ({ ...f, [kind === "logo" ? "logo_url" : "cover_url"]: data.signedUrl }));
       toast.success(locale === "ar" ? "تم الرفع" : "Uploaded");
     } catch (e) { toast.error((e as Error).message); }
     finally { setUploading(null); }
