@@ -42,10 +42,11 @@ export const getRfqMeta = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Public projection — exclude buyer_id and attachments; only open RFQs.
     const { data: row } = await supabaseAdmin
       .from("rfqs" as any)
-      .select("id, title, description, attachments, governorate")
-      .eq("id", data.id).maybeSingle();
+      .select("id, title, description, governorate")
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     return row as any;
   });
 
@@ -53,9 +54,10 @@ export const getTenderMeta = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Only open tenders — exclude publisher_id.
     const { data: row } = await supabaseAdmin
       .from("tenders" as any)
       .select("id, title, description, governorate")
-      .eq("id", data.id).maybeSingle();
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     return row as any;
   });
