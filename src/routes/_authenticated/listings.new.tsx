@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { useEffect, useState } from "react";
 import { ChevronDown, Loader2, PlusCircle, Sparkles, Upload, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
