@@ -419,8 +419,10 @@ export const getCompanyProfileExtra = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Public projection only — exclude whatsapp (contact detail).
     const { data: row } = await supabaseAdmin.from(T("company_profiles_extra"))
-      .select("*").eq("company_id", data.companyId).maybeSingle();
+      .select("company_id, cover_url, website, achievements, catalog_pdfs, gallery, downloads_count")
+      .eq("company_id", data.companyId).maybeSingle();
     return { extra: row as any };
   });
 
