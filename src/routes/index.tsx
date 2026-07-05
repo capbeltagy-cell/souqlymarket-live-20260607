@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
+import { FeaturedAdBar } from "@/components/FeaturedAdBar";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
