@@ -24,6 +24,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LandsRouteImport } from './routes/lands'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -55,8 +56,10 @@ import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/s
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_authenticated/referral-program'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPayoutsRouteImport } from './routes/_authenticated/payouts'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedMarketingCenterRouteImport } from './routes/_authenticated/marketing-center'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
@@ -64,19 +67,23 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
+import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticated/ai-tools'
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
+import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
+import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 
 const WholesaleRoute = WholesaleRouteImport.update({
   id: '/wholesale',
@@ -151,6 +158,11 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandsRoute = LandsRouteImport.update({
@@ -309,6 +321,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPayoutsRoute = AuthenticatedPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
   id: '/moderation',
   path: '/moderation',
@@ -319,6 +336,12 @@ const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMarketingCenterRoute =
+  AuthenticatedMarketingCenterRouteImport.update({
+    id: '/marketing-center',
+    path: '/marketing-center',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -356,9 +379,19 @@ const AuthenticatedCommissionsRoute =
     path: '/commissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAiToolsRoute = AuthenticatedAiToolsRouteImport.update({
+  id: '/ai-tools',
+  path: '/ai-tools',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAgentPerformanceRoute =
@@ -396,6 +429,12 @@ const AuthenticatedAdminCompaniesRoute =
     path: '/admin-companies',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAchievementsRoute =
+  AuthenticatedAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedWholesaleNewRoute =
   AuthenticatedWholesaleNewRouteImport.update({
     id: '/wholesale/new',
@@ -429,6 +468,12 @@ const AuthenticatedListingsNewRoute =
     path: '/listings/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsIdRoute =
+  AuthenticatedCampaignsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedCampaignsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -444,6 +489,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -459,13 +505,16 @@ export interface FileRoutesByFullPath {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -473,8 +522,10 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
@@ -492,6 +543,7 @@ export interface FileRoutesByFullPath {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -513,6 +565,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -528,13 +581,16 @@ export interface FileRoutesByTo {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -542,8 +598,10 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
@@ -561,6 +619,7 @@ export interface FileRoutesByTo {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -584,6 +643,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -599,13 +659,16 @@ export interface FileRoutesById {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/_authenticated/ai-tools': typeof AuthenticatedAiToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -613,8 +676,10 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
+  '/_authenticated/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
+  '/_authenticated/payouts': typeof AuthenticatedPayoutsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
@@ -632,6 +697,7 @@ export interface FileRoutesById {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -655,6 +721,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -670,13 +737,16 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/achievements'
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
+    | '/ai-tools'
     | '/analytics'
+    | '/campaigns'
     | '/commissions'
     | '/company'
     | '/company-profile-extra'
@@ -684,8 +754,10 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/marketing-center'
     | '/messages'
     | '/moderation'
+    | '/payouts'
     | '/profile'
     | '/referral-program'
     | '/referrals'
@@ -703,6 +775,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/campaigns/$id'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -724,6 +797,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -739,13 +813,16 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/achievements'
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
+    | '/ai-tools'
     | '/analytics'
+    | '/campaigns'
     | '/commissions'
     | '/company'
     | '/company-profile-extra'
@@ -753,8 +830,10 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/marketing-center'
     | '/messages'
     | '/moderation'
+    | '/payouts'
     | '/profile'
     | '/referral-program'
     | '/referrals'
@@ -772,6 +851,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies'
+    | '/campaigns/$id'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -794,6 +874,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -809,13 +890,16 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/_authenticated/achievements'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-overview'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
+    | '/_authenticated/ai-tools'
     | '/_authenticated/analytics'
+    | '/_authenticated/campaigns'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
     | '/_authenticated/company-profile-extra'
@@ -823,8 +907,10 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
     | '/_authenticated/leads'
+    | '/_authenticated/marketing-center'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
+    | '/_authenticated/payouts'
     | '/_authenticated/profile'
     | '/_authenticated/referral-program'
     | '/_authenticated/referrals'
@@ -842,6 +928,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/_authenticated/campaigns/$id'
     | '/_authenticated/listings/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
@@ -865,6 +952,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LandsRoute: typeof LandsRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   MapRoute: typeof MapRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
@@ -991,6 +1079,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lands': {
@@ -1210,6 +1305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/payouts': {
+      id: '/_authenticated/payouts'
+      path: '/payouts'
+      fullPath: '/payouts'
+      preLoaderRoute: typeof AuthenticatedPayoutsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/moderation': {
       id: '/_authenticated/moderation'
       path: '/moderation'
@@ -1222,6 +1324,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marketing-center': {
+      id: '/_authenticated/marketing-center'
+      path: '/marketing-center'
+      fullPath: '/marketing-center'
+      preLoaderRoute: typeof AuthenticatedMarketingCenterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/leads': {
@@ -1273,11 +1382,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommissionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns': {
+      id: '/_authenticated/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ai-tools': {
+      id: '/_authenticated/ai-tools'
+      path: '/ai-tools'
+      fullPath: '/ai-tools'
+      preLoaderRoute: typeof AuthenticatedAiToolsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/agent-performance': {
@@ -1322,6 +1445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/achievements': {
+      id: '/_authenticated/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wholesale/new': {
       id: '/_authenticated/wholesale/new'
       path: '/wholesale/new'
@@ -1364,17 +1494,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedListingsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns/$id': {
+      id: '/_authenticated/campaigns/$id'
+      path: '/$id'
+      fullPath: '/campaigns/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsIdRouteImport
+      parentRoute: typeof AuthenticatedCampaignsRoute
+    }
   }
 }
 
+interface AuthenticatedCampaignsRouteChildren {
+  AuthenticatedCampaignsIdRoute: typeof AuthenticatedCampaignsIdRoute
+}
+
+const AuthenticatedCampaignsRouteChildren: AuthenticatedCampaignsRouteChildren =
+  {
+    AuthenticatedCampaignsIdRoute: AuthenticatedCampaignsIdRoute,
+  }
+
+const AuthenticatedCampaignsRouteWithChildren =
+  AuthenticatedCampaignsRoute._addFileChildren(
+    AuthenticatedCampaignsRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
+  AuthenticatedAiToolsRoute: typeof AuthenticatedAiToolsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
@@ -1382,8 +1536,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
+  AuthenticatedMarketingCenterRoute: typeof AuthenticatedMarketingCenterRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
+  AuthenticatedPayoutsRoute: typeof AuthenticatedPayoutsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
@@ -1399,13 +1555,16 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
+  AuthenticatedAiToolsRoute: AuthenticatedAiToolsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
@@ -1413,8 +1572,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
+  AuthenticatedMarketingCenterRoute: AuthenticatedMarketingCenterRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
+  AuthenticatedPayoutsRoute: AuthenticatedPayoutsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
@@ -1525,6 +1686,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
   LandsRoute: LandsRoute,
+  LeaderboardRoute: LeaderboardRoute,
   MapRoute: MapRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
