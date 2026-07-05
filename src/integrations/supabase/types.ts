@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_achievements: {
+        Row: {
+          agent_id: string
+          code: string
+          description_ar: string | null
+          description_en: string | null
+          earned_at: string
+          icon: string | null
+          id: string
+          title_ar: string
+          title_en: string
+        }
+        Insert: {
+          agent_id: string
+          code: string
+          description_ar?: string | null
+          description_en?: string | null
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          title_ar: string
+          title_en: string
+        }
+        Update: {
+          agent_id?: string
+          code?: string
+          description_ar?: string | null
+          description_en?: string | null
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          title_ar?: string
+          title_en?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_achievements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_achievements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       agent_applications: {
         Row: {
           agent_id: string
@@ -51,10 +102,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "agent_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
+          },
+          {
             foreignKeyName: "agent_applications_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_campaigns: {
+        Row: {
+          agent_id: string
+          budget: number | null
+          category: string | null
+          created_at: string
+          description: string | null
+          end_at: string | null
+          id: string
+          listing_id: string | null
+          name: string
+          start_at: string | null
+          status: Database["public"]["Enums"]["campaign_status"]
+          target_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          budget?: number | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          listing_id?: string | null
+          name: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          target_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          budget?: number | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          listing_id?: string | null
+          name?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          target_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_campaigns_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_campaigns_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "agent_campaigns_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           },
         ]
@@ -100,6 +228,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "agents"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_landing_pages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
           },
           {
             foreignKeyName: "agent_landing_pages_listing_id_fkey"
@@ -280,6 +415,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "agents"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
           },
           {
             foreignKeyName: "commissions_company_id_fkey"
@@ -944,6 +1086,102 @@ export type Database = {
           },
         ]
       }
+      payout_methods: {
+        Row: {
+          created_at: string
+          details: Json
+          id: string
+          is_default: boolean
+          kind: string
+          label: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          id?: string
+          is_default?: boolean
+          kind: string
+          label: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          id?: string
+          is_default?: boolean
+          kind?: string
+          label?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payout_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          payout_method_id: string | null
+          processed_at: string | null
+          requested_at: string
+          status: Database["public"]["Enums"]["payout_status"]
+          updated_at: string
+          user_id: string
+          wallet_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          payout_method_id?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+          user_id: string
+          wallet_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          payout_method_id?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+          user_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_requests_payout_method_id_fkey"
+            columns: ["payout_method_id"]
+            isOneToOne: false
+            referencedRelation: "payout_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payout_requests_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -986,6 +1224,7 @@ export type Database = {
       referrals: {
         Row: {
           agent_id: string
+          campaign_id: string | null
           clicks: number
           code: string
           conversions: number
@@ -995,6 +1234,7 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          campaign_id?: string | null
           clicks?: number
           code: string
           conversions?: number
@@ -1004,6 +1244,7 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          campaign_id?: string | null
           clicks?: number
           code?: string
           conversions?: number
@@ -1017,6 +1258,20 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "marketer_leaderboard"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "referrals_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "agent_campaigns"
             referencedColumns: ["id"]
           },
           {
@@ -1583,7 +1838,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      marketer_leaderboard: {
+        Row: {
+          achievements_count: number | null
+          agent_id: string | null
+          avatar_url: string | null
+          balance: number | null
+          deals_closed: number | null
+          name: string | null
+          total_earned: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       convert_referral: {
@@ -1639,6 +1906,7 @@ export type Database = {
         | "exporter"
         | "distributor"
       application_status: "pending" | "accepted" | "rejected"
+      campaign_status: "draft" | "active" | "paused" | "ended"
       commission_status: "pending" | "approved" | "paid"
       invoice_status: "pending" | "paid" | "failed" | "refunded" | "void"
       listing_status:
@@ -1657,6 +1925,7 @@ export type Database = {
         | "company"
         | "market"
         | "fish_shed"
+      payout_status: "pending" | "approved" | "rejected" | "paid" | "cancelled"
       subscription_plan: "free" | "premium_company" | "premium_agent"
       wallet_kind: "company" | "agent" | "platform"
       wallet_tx_reason:
@@ -1812,6 +2081,7 @@ export const Constants = {
         "distributor",
       ],
       application_status: ["pending", "accepted", "rejected"],
+      campaign_status: ["draft", "active", "paused", "ended"],
       commission_status: ["pending", "approved", "paid"],
       invoice_status: ["pending", "paid", "failed", "refunded", "void"],
       listing_status: [
@@ -1832,6 +2102,7 @@ export const Constants = {
         "market",
         "fish_shed",
       ],
+      payout_status: ["pending", "approved", "rejected", "paid", "cancelled"],
       subscription_plan: ["free", "premium_company", "premium_agent"],
       wallet_kind: ["company", "agent", "platform"],
       wallet_tx_reason: [
