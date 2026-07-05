@@ -79,7 +79,11 @@ function CompanyEdit() {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
   const [hasExisting, setHasExisting] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const draftKey = user ? `souqly.company-wizard.${user.id}` : null;
 
+  // Load: prefer live company row; otherwise restore local draft.
   useEffect(() => {
     fetchMine().then((r) => {
       if (r.company) {
@@ -87,9 +91,52 @@ function CompanyEdit() {
         setForm({ ...empty, ...Object.fromEntries(Object.entries(c).map(([k, v]) => [k, v ?? ""])) as Form });
         if (c.governorate) setGov(c.governorate);
         setHasExisting(true);
+        return;
       }
+      if (!draftKey || typeof window === "undefined") return;
+      try {
+        const raw = window.localStorage.getItem(draftKey);
+        if (!raw) return;
+        const draft = JSON.parse(raw) as { form?: Form; gov?: string; step?: StepId; savedAt?: number };
+        if (draft.form) setForm({ ...empty, ...draft.form });
+        if (draft.gov) setGov(draft.gov);
+        if (draft.step && draft.step >= 1 && draft.step <= 5) setStep(draft.step as StepId);
+        if (draft.savedAt) setSavedAt(draft.savedAt);
+        // Only announce restoration if there's meaningful content saved.
+        const hasContent = !!(draft.form && (draft.form.name_ar || draft.form.name_en || draft.form.description_ar || draft.form.description_en || draft.form.city || draft.form.logo_url));
+        if (hasContent) setDraftRestored(true);
+      } catch { /* ignore malformed draft */ }
     }).finally(() => setLoading(false));
-  }, [fetchMine]);
+  }, [fetchMine, draftKey]);
+
+  // Autosave: debounced write of form + gov + step to localStorage while editing.
+  useEffect(() => {
+    if (loading || !draftKey || typeof window === "undefined") return;
+    const t = window.setTimeout(() => {
+      try {
+        const ts = Date.now();
+        window.localStorage.setItem(draftKey, JSON.stringify({ form, gov, step, savedAt: ts }));
+        setSavedAt(ts);
+      } catch { /* quota/private-mode: ignore */ }
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, [form, gov, step, loading, draftKey]);
+
+  const clearDraft = () => {
+    if (!draftKey || typeof window === "undefined") return;
+    try { window.localStorage.removeItem(draftKey); } catch { /* ignore */ }
+    setDraftRestored(false);
+    setSavedAt(null);
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setForm(empty);
+    setGov("");
+    setStep(1);
+    toast.success(locale === "ar" ? "تم مسح المسودة" : "Draft cleared");
+  };
+
 
   const upload = async (kind: "logo" | "cover", file: File) => {
     if (!user) return;
