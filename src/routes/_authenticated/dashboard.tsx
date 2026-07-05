@@ -27,14 +27,30 @@ type Counts = {
 };
 
 function Dashboard() {
-  const { user, roles } = useAuth();
+  const { user, roles, loading } = useAuth();
   const { t, locale } = useI18n();
   const ar = locale === "ar";
+  const navigate = useNavigate();
+  const hasAppRole = roles.includes("admin") || roles.includes("company") || roles.includes("agent");
   const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [sub, setSub] = useState<CompanySubscriptionInfo | null>(null);
   const fetchSub = useServerFn(getMyCompanySubscription);
+
+  // Route users to the correct next step based on onboarding state.
+  useEffect(() => {
+    if (loading || !user) return;
+    if (hasAppRole) return;
+    let choice: string | null = null;
+    try { choice = localStorage.getItem("souqly:role_choice"); } catch {}
+    if (choice === "customer") {
+      navigate({ to: "/marketplace", replace: true });
+    } else {
+      navigate({ to: "/choose-role", replace: true });
+    }
+  }, [loading, user, hasAppRole, navigate]);
+
 
   useEffect(() => {
     if (!user) return;
