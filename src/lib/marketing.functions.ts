@@ -122,7 +122,7 @@ export const listMyPayoutMethods = createServerFn({ method: "GET" })
 export const createPayoutMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({
-    kind: z.enum(["bank","vodafone_cash","instapay","orange_money","etisalat_cash","wallet"]),
+    kind: z.enum(["bank","vodafone_cash","instapay","orange_money","etisalat_cash","wallet","usdt_binance","usdt_bybit"]),
     label: z.string().min(2).max(120),
     details: z.record(z.string(), z.any()).default({}),
     isDefault: z.boolean().default(false),
