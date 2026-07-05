@@ -223,7 +223,20 @@ function CompanyEdit() {
           <h1 className="text-2xl font-bold">{hasExisting ? t("company_profile") : msg("إنشاء شركتك", "Create your company")}</h1>
         </div>
 
+        {draftRestored && !hasExisting && (
+          <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm flex items-center justify-between gap-3">
+            <span className="text-foreground">
+              {msg("تم استعادة مسودتك السابقة.", "Your previous draft was restored.")}
+            </span>
+            <button type="button" onClick={discardDraft} className="text-xs font-medium text-primary hover:underline">
+              {msg("ابدأ من جديد", "Start over")}
+            </button>
+          </div>
+        )}
+
         <Stepper current={step} onJump={(id) => id < step && setStep(id)} locale={locale} />
+
+
 
         <form onSubmit={onFormSubmit} className="mt-5 rounded-xl border border-border bg-card p-6 shadow-card space-y-5">
           {step === 1 && (
