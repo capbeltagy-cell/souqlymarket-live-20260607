@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -12,6 +13,7 @@ import { createTender, listCategories } from "@/lib/phase3.functions";
 export const Route = createFileRoute("/_authenticated/tenders/new")({ component: NewTender });
 
 function NewTender() {
+  useMarketerGuard();
   const { locale } = useI18n();
   const ar = locale === "ar";
   const nav = useNavigate();

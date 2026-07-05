@@ -17,6 +17,7 @@ export function SiteHeader() {
   const isAdmin = roles.includes("admin");
   const isCompany = roles.includes("company");
   const isAgent = roles.includes("agent");
+  const isPureAgent = isAgent && !isCompany && !isAdmin;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
@@ -97,62 +98,83 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="gap-2"><LayoutDashboard className="h-4 w-4" />{t("nav_dashboard")}</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
-                </DropdownMenuItem>
+                {!isPureAgent && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/listings/new" className="gap-2"><PlusCircle className="h-4 w-4" />{t("nav_new_listing")}</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/messages" className="gap-2"><MessageSquare className="h-4 w-4" />الرسائل</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/orders" className="gap-2"><ShoppingBag className="h-4 w-4" />طلباتي</Link>
-                </DropdownMenuItem>
+                {!isPureAgent && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders" className="gap-2"><ShoppingBag className="h-4 w-4" />طلباتي</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator />
-
-                {/* Account submenu */}
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="gap-2"><UserIcon className="h-4 w-4" />الحساب<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-56">
-                    <DropdownMenuItem asChild><Link to="/profile" className="gap-2"><UserIcon className="h-4 w-4" />{t("nav_profile")}</Link></DropdownMenuItem>
-                    {isCompany && (
-                      <>
-                        <DropdownMenuItem asChild><Link to="/company" className="gap-2"><Building2 className="h-4 w-4" />{t("nav_company_profile")}</Link></DropdownMenuItem>
-                        <DropdownMenuItem asChild><Link to="/company-profile-extra" className="gap-2"><Building2 className="h-4 w-4" />تخصيص ملف الشركة</Link></DropdownMenuItem>
-                      </>
-                    )}
-                    {isAgent && (
-                      <DropdownMenuItem asChild><Link to="/agent" className="gap-2"><UserCircle2 className="h-4 w-4" />{t("nav_agent_profile")}</Link></DropdownMenuItem>
-                    )}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-
-                {/* Business submenu — company/agent tools */}
-                {(isCompany || isAgent) && (
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="gap-2"><Briefcase className="h-4 w-4" />الأعمال<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="w-56">
-                      {isCompany && (
-                        <>
-                          <DropdownMenuItem asChild><Link to="/rfq/mine" className="gap-2"><ListChecks className="h-4 w-4" />طلباتي للأسعار</Link></DropdownMenuItem>
-                          <DropdownMenuItem asChild><Link to="/tenders/mine" className="gap-2"><ListChecks className="h-4 w-4" />مناقصاتي</Link></DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuItem asChild><Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link></DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
+                {isPureAgent && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-xs uppercase text-muted-foreground">المسوّق</DropdownMenuLabel>
+                    <DropdownMenuItem asChild><Link to="/campaigns" className="gap-2"><Briefcase className="h-4 w-4" />تصفح الفرص</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/referrals" className="gap-2"><Link2 className="h-4 w-4" />روابط الإحالة</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/wallet" className="gap-2"><DollarSign className="h-4 w-4" />المحفظة</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/payouts" className="gap-2"><DollarSign className="h-4 w-4" />طلب سحب</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />سجل العمولات</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/agent" className="gap-2"><UserCircle2 className="h-4 w-4" />ملفي كمسوق</Link></DropdownMenuItem>
+                  </>
                 )}
 
-                {/* Marketing submenu */}
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="gap-2"><Link2 className="h-4 w-4" />التسويق<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-56">
-                    <DropdownMenuItem asChild><Link to="/marketing-center" className="gap-2"><Link2 className="h-4 w-4" />مركز التسويق</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/referral-program" className="gap-2"><Link2 className="h-4 w-4" />برنامج الإحالات</Link></DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                {!isPureAgent && (
+                  <>
+                    <DropdownMenuSeparator />
+
+                    {/* Account submenu */}
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2"><UserIcon className="h-4 w-4" />الحساب<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="w-56">
+                        <DropdownMenuItem asChild><Link to="/profile" className="gap-2"><UserIcon className="h-4 w-4" />{t("nav_profile")}</Link></DropdownMenuItem>
+                        {isCompany && (
+                          <>
+                            <DropdownMenuItem asChild><Link to="/company" className="gap-2"><Building2 className="h-4 w-4" />{t("nav_company_profile")}</Link></DropdownMenuItem>
+                            <DropdownMenuItem asChild><Link to="/company-profile-extra" className="gap-2"><Building2 className="h-4 w-4" />تخصيص ملف الشركة</Link></DropdownMenuItem>
+                          </>
+                        )}
+                        {isAgent && (
+                          <DropdownMenuItem asChild><Link to="/agent" className="gap-2"><UserCircle2 className="h-4 w-4" />{t("nav_agent_profile")}</Link></DropdownMenuItem>
+                        )}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+
+                    {/* Business submenu — company/agent tools */}
+                    {(isCompany || isAgent) && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="gap-2"><Briefcase className="h-4 w-4" />الأعمال<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="w-56">
+                          {isCompany && (
+                            <>
+                              <DropdownMenuItem asChild><Link to="/rfq/mine" className="gap-2"><ListChecks className="h-4 w-4" />طلباتي للأسعار</Link></DropdownMenuItem>
+                              <DropdownMenuItem asChild><Link to="/tenders/mine" className="gap-2"><ListChecks className="h-4 w-4" />مناقصاتي</Link></DropdownMenuItem>
+                            </>
+                          )}
+                          <DropdownMenuItem asChild><Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link></DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
+
+                    {/* Marketing submenu */}
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2"><Link2 className="h-4 w-4" />التسويق<ChevronRight className="ms-auto h-4 w-4 opacity-60" /></DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="w-56">
+                        <DropdownMenuItem asChild><Link to="/marketing-center" className="gap-2"><Link2 className="h-4 w-4" />مركز التسويق</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link to="/referral-program" className="gap-2"><Link2 className="h-4 w-4" />برنامج الإحالات</Link></DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </>
+                )}
 
                 {isAdmin && (
                   <>

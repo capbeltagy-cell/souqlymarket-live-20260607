@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { DollarSign, Share2, TrendingUp, Wallet, ShieldCheck, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -31,6 +33,15 @@ function EarnPage() {
   const { locale } = useI18n();
   const { user } = useAuth();
   const ar = locale === "ar";
+  const navigate = useNavigate();
+
+  // If logged-in user already has a marketer profile, send them straight to dashboard.
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      if (data?.id) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

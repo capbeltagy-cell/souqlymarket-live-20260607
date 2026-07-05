@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Building2, Check, ImageIcon, Loader2, MapPin, Phone, Sparkles, Upload } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -67,6 +68,7 @@ const STEPS: { id: StepId; ar: string; en: string; icon: typeof Building2 }[] = 
 ];
 
 function CompanyEdit() {
+  useMarketerGuard();
   const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();

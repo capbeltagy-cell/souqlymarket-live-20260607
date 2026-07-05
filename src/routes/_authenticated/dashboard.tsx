@@ -257,34 +257,74 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
 }
 
 function AgentDash({ counts }: { counts: Counts }) {
-  const { t } = useI18n();
+  const { user } = useAuth();
+  const [stats, setStats] = useState<{
+    balance: number; pending: number; earned: number; withdrawn: number;
+    pendingC: number; approvedC: number; paidC: number;
+    clicks: number; leads: number; deals: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
+      if (!ag) return;
+      const [w, cP, cA, cPaid, refs] = await Promise.all([
+        supabase.from("wallets").select("balance,pending_balance,total_earned,total_paid_out").eq("user_id", user.id).eq("kind", "agent").maybeSingle(),
+        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
+        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "approved"),
+        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "paid"),
+        supabase.from("referrals").select("clicks,conversions").eq("agent_id", ag.id),
+      ]);
+      const clicks = (refs.data ?? []).reduce((s, r) => s + (r.clicks ?? 0), 0);
+      const deals = (refs.data ?? []).reduce((s, r) => s + (r.conversions ?? 0), 0);
+      setStats({
+        balance: Number(w.data?.balance ?? 0),
+        pending: Number(w.data?.pending_balance ?? 0),
+        earned: Number(w.data?.total_earned ?? 0),
+        withdrawn: Number(w.data?.total_paid_out ?? 0),
+        pendingC: cP.count ?? 0,
+        approvedC: cA.count ?? 0,
+        paidC: cPaid.count ?? 0,
+        clicks,
+        leads: deals,
+        deals,
+      });
+    })();
+  }, [user, counts.referrals]);
+
+  const s = stats ?? { balance: 0, pending: 0, earned: 0, withdrawn: 0, pendingC: 0, approvedC: 0, paidC: 0, clicks: 0, leads: 0, deals: 0 };
+  const convRate = s.clicks > 0 ? Math.round((s.deals / s.clicks) * 100) : 0;
   return (
     <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Stat icon={Link2} label={t("active_referrals")} value={String(counts.referrals)} />
-        <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
-        <Stat icon={Settings} label={t("nav_agent_profile")} value="—" />
-        <Stat icon={ClipboardList} label={t("dashboard_referrals")} value={String(counts.referrals)} />
+        <Stat icon={DollarSign} label="رصيد المحفظة" value={`${s.balance.toFixed(2)} ج.م`} />
+        <Stat icon={DollarSign} label="عمولات معلقة" value={`${s.pending.toFixed(2)} ج.م`} />
+        <Stat icon={DollarSign} label="إجمالي الأرباح" value={`${s.earned.toFixed(2)} ج.م`} />
+        <Stat icon={DollarSign} label="تم سحبه" value={`${s.withdrawn.toFixed(2)} ج.م`} />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Stat icon={ClipboardList} label="عمولات قيد المراجعة" value={String(s.pendingC)} />
+        <Stat icon={ClipboardList} label="عمولات معتمدة" value={String(s.approvedC)} />
+        <Stat icon={ClipboardList} label="عمولات مدفوعة" value={String(s.paidC)} />
+        <Stat icon={Activity} label="معدل التحويل" value={`${convRate}%`} />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Stat icon={Link2} label="نقرات الروابط" value={String(s.clicks)} />
+        <Stat icon={Users} label="عملاء محتملون" value={String(s.leads)} />
+        <Stat icon={ClipboardList} label="صفقات مكتملة" value={String(s.deals)} />
+        <Stat icon={Link2} label="روابط الإحالة" value={String(counts.referrals)} />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/referrals">{t("create_referral")}</Link></Button>
-        <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
-        <Button asChild variant="outline"><Link to="/wallet">Wallet</Link></Button>
+        <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/campaigns"><Sparkles className="h-4 w-4" />تصفح الفرص</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/referrals"><Link2 className="h-4 w-4" />روابط الإحالة</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/wallet"><DollarSign className="h-4 w-4" />المحفظة</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/payouts"><DollarSign className="h-4 w-4" />طلب سحب</Link></Button>
+        <Button asChild variant="outline"><Link to="/commissions">سجل العمولات</Link></Button>
+        <Button asChild variant="outline"><Link to="/messages">الرسائل</Link></Button>
+        <Button asChild variant="outline"><Link to="/agent">ملفي الشخصي</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />الأداء</Link></Button>
       </div>
-      <Collapsible className="mt-4">
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-            More tools <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3">
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
-            <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />Performance</Link></Button>
-            <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
     </>
   );
 }
