@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 const schema = z.object({
   name_ar: z.string().min(2).max(200),
