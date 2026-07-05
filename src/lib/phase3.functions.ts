@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getCityVariants, getGovernorateVariants } from "@/lib/egypt.locations";
+import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const T = (s: string) => s as any; // bypass generated types for new tables
@@ -26,6 +27,7 @@ export const createRfq = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: row, error } = await supabase.from(T("rfqs")).insert({
       buyer_id: userId,
       title: data.title,
@@ -188,6 +190,7 @@ export const createWholesale = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: c } = await supabase.from("companies").select("id").eq("owner_id", userId).maybeSingle();
     if (!c) throw new Error("Create a company first");
     const { data: row, error } = await supabase.from(T("wholesale_listings")).insert({
@@ -263,6 +266,7 @@ export const upsertMyFactory = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: c } = await supabase.from("companies").select("id").eq("owner_id", userId).maybeSingle();
     if (!c) throw new Error("Create a company first");
     const { error } = await supabase.from(T("factories")).upsert({
@@ -304,6 +308,7 @@ export const createTender = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
+    await assertNotPureMarketer(context.supabase as never, context.userId);
     const { data: row, error } = await context.supabase.from(T("tenders")).insert({
       publisher_id: context.userId,
       title: data.title,

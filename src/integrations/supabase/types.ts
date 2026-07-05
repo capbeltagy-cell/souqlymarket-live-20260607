@@ -2407,6 +2407,7 @@ export type Database = {
           listing_id: string
         }[]
       }
+      is_pure_marketer: { Args: { _user_id: string }; Returns: boolean }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
