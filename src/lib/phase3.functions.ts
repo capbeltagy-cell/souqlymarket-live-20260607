@@ -320,14 +320,16 @@ export const createTender = createServerFn({ method: "POST" })
 export const listTenders = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
-      status: z.enum(["open", "closed", "awarded"]).optional(),
       category_slug: z.string().max(60).optional(),
     }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from(T("tenders")).select("*").order("created_at", { ascending: false }).limit(200);
-    if (data.status) q = q.eq("status", data.status);
+    // Public projection — only open tenders, exclude publisher_id.
+    let q = supabaseAdmin.from(T("tenders"))
+      .select("id, title, description, category_slug, governorate, budget, deadline, status, created_at")
+      .eq("status", "open")
+      .order("created_at", { ascending: false }).limit(200);
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -338,7 +340,9 @@ export const getTender = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin.from(T("tenders")).select("*").eq("id", data.id).maybeSingle();
+    const { data: row } = await supabaseAdmin.from(T("tenders"))
+      .select("id, title, description, category_slug, governorate, budget, deadline, status, created_at")
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     if (!row) throw new Error("Not found");
     return { tender: row };
   });
