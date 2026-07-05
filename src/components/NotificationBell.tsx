@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +23,16 @@ export function NotificationBell() {
   useEffect(() => {
     if (!user) return;
     load();
-    const iv = setInterval(load, 30000);
-    return () => clearInterval(iv);
+    // Realtime subscription
+    const ch = supabase
+      .channel(`notif-${user.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, (payload) => {
+        const n = payload.new as Notif;
+        setItems((prev) => prev.some((x) => x.id === n.id) ? prev : [n, ...prev]);
+        toast(n.title, { description: n.body ?? undefined, action: n.link ? { label: "فتح", onClick: () => { window.location.href = n.link!; } } : undefined });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
