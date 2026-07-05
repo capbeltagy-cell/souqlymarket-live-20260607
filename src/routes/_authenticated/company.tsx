@@ -333,8 +333,14 @@ function CompanyEdit() {
             <Button type="button" variant="outline" onClick={goBack} disabled={step === 1} className="gap-2">
               <ArrowLeft className="h-4 w-4" />{msg("السابق", "Back")}
             </Button>
-            <div className="text-xs text-muted-foreground">
-              {msg(`الخطوة ${step} من 5`, `Step ${step} of 5`)}
+            <div className="text-xs text-muted-foreground flex flex-col items-center gap-0.5">
+              <span>{msg(`الخطوة ${step} من 5`, `Step ${step} of 5`)}</span>
+              {savedAt && !hasExisting && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-primary/80">
+                  <Check className="h-2.5 w-2.5" />
+                  {msg("تم الحفظ تلقائياً", "Autosaved")}
+                </span>
+              )}
             </div>
             {step < 5 ? (
               <Button type="submit" className="bg-primary hover:bg-primary-hover gap-2">
