@@ -336,9 +336,15 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
               </div>
               {!isOwner && user && (
-                <Button className="w-full mt-3 gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
-                  <Sparkles className="h-4 w-4" />{ar ? "راسل البائع داخل المنصة" : "Message seller"}
-                </Button>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Button className="gap-2 bg-primary hover:bg-primary-hover" onClick={onOrder} disabled={ordering}>
+                    {ordering ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {ar ? "اطلب الآن" : "Order now"}
+                  </Button>
+                  <Button className="gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
+                    <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                  </Button>
+                </div>
               )}
             </div>
             {!isOwner && <LeadForm listingId={id} />}
