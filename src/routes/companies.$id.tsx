@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Mail, Globe, Phone, MessageCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { CompanyReviews } from "@/components/CompanyReviews";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
+import { getCompanyContact } from "@/lib/companies.functions";
 
 export const Route = createFileRoute("/companies/$id")({
   loader: async ({ params }) => {
@@ -43,34 +45,49 @@ type Company = {
   id: string; name_ar: string; name_en: string;
   description_ar: string | null; description_en: string | null;
   industry: string | null; country: string | null; city: string | null;
-  email: string | null; website: string | null; phone: string | null;
   logo_url: string | null; cover_url: string | null;
   is_verified: boolean; is_premium: boolean | null;
 };
+
+type Contact = { email: string | null; phone: string | null; website: string | null };
+
+const COMPANY_PUBLIC_COLS =
+  "id, name_ar, name_en, description_ar, description_en, industry, country, city, logo_url, cover_url, is_verified, is_premium";
 
 function CompanyProfile() {
   const { id } = Route.useParams();
   const { locale, t } = useI18n();
   const [company, setCompany] = useState<Company | null>(null);
+  const [contact, setContact] = useState<Contact>({ email: null, phone: null, website: null });
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const loadContact = useServerFn(getCompanyContact);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("companies").select("*").eq("id", id).maybeSingle();
+      const { data } = await supabase.from("companies").select(COMPANY_PUBLIC_COLS).eq("id", id).maybeSingle();
       setCompany(data as Company | null);
       if (data) {
         const { data: items } = await supabase
           .from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
+          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en)")
           .eq("company_id", id)
           .eq("status", "approved")
           .order("created_at", { ascending: false });
         setListings((items ?? []) as unknown as ListingCardData[]);
+        // Reveal contact only to authenticated users; anon gets a graceful fallback.
+        try {
+          const { data: sess } = await supabase.auth.getSession();
+          if (sess.session) {
+            const c = await loadContact({ data: { id } });
+            setContact(c);
+          }
+        } catch { /* ignore — anon or transient */ }
       }
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, loadContact]);
+
 
   if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
   if (!company) return <Shell><div className="p-10 text-center">Company not found</div></Shell>;
