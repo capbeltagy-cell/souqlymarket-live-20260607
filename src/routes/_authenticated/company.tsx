@@ -151,10 +151,11 @@ function CompanyEdit() {
 
           <LocationPicker
             required
-            governorate={form.country === "Egypt" ? form.city.split("|")[0] ?? "" : ""}
+            governorate={gov}
             city={form.city}
-            onChange={({ governorate, city }) => setForm({ ...form, country: "Egypt", city, industry: form.industry })}
+            onChange={({ governorate, city }) => { setGov(governorate); setForm({ ...form, country: "Egypt", city }); }}
           />
+
 
           <BilingualField
             label={locale === "ar" ? "نبذة عن الشركة" : "About the company"}
