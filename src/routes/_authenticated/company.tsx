@@ -13,6 +13,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getMyCompany, upsertMyCompany } from "@/lib/companies.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { LocationPicker } from "@/components/LocationPicker";
+import { BilingualField } from "@/components/BilingualField";
 
 export const Route = createFileRoute("/_authenticated/company")({
   head: () => ({ meta: [{ title: "My Company — Souqly" }] }),
