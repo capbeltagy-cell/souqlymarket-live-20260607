@@ -122,7 +122,7 @@ export const listMyPayoutMethods = createServerFn({ method: "GET" })
 export const createPayoutMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({
-    kind: z.enum(["bank","vodafone_cash","instapay","orange_money","etisalat_cash","wallet"]),
+    kind: z.enum(["bank","vodafone_cash","instapay","orange_money","etisalat_cash","wallet","usdt_binance","usdt_bybit"]),
     label: z.string().min(2).max(120),
     details: z.record(z.string(), z.any()).default({}),
     isDefault: z.boolean().default(false),
@@ -172,6 +172,12 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    const { data: settings } = await (supabase.from("platform_settings" as never) as any).select("min_withdrawal_amount").maybeSingle();
+    const minAmount = Number(settings?.min_withdrawal_amount ?? 100);
+    if (data.amount < minAmount) throw new Error(`الحد الأدنى للسحب ${minAmount} ج.م`);
+    if (!data.payoutMethodId) throw new Error("اختر طريقة السحب أولاً");
+    const { data: dup } = await supabase.from("payout_requests").select("id").eq("user_id", userId).eq("status", "pending").limit(1);
+    if (dup && dup.length > 0) throw new Error("لديك طلب سحب قيد المراجعة بالفعل");
     const { data: wallet } = await supabase.from("wallets").select("id, balance").eq("user_id", userId).eq("kind", data.walletKind).maybeSingle();
     if (!wallet) throw new Error("Wallet not found");
     if (Number(wallet.balance) < data.amount) throw new Error("Insufficient balance");
@@ -185,6 +191,69 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
+
+// ============ Platform settings & admin withdrawals ============
+export const getPlatformSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await (context.supabase.from("platform_settings" as never) as any).select("*").maybeSingle();
+    if (error) throw new Error(error.message);
+    return { settings: data };
+  });
+
+export const updatePlatformSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    marketer_commission_pct: z.number().min(0).max(100),
+    platform_commission_pct: z.number().min(0).max(100),
+    min_withdrawal_amount: z.number().nonnegative(),
+    withdrawal_review_mode: z.enum(["manual","auto"]).default("manual"),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error } = await (context.supabase.from("platform_settings" as never) as any)
+      .update({ ...data, updated_by: context.userId, updated_at: new Date().toISOString() })
+      .eq("id", true);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListWithdrawals = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    status: z.enum(["pending","approved","paid","rejected","cancelled","all"]).default("pending"),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    let q = context.supabase.from("payout_requests")
+      .select("*, payout_methods(label, kind, details), profiles!payout_requests_user_id_fkey(full_name, display_name)")
+      .order("created_at", { ascending: false }).limit(500);
+    if (data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return { payouts: rows ?? [] };
+  });
+
+export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    id: z.string().uuid(),
+    action: z.enum(["approve","reject","paid"]),
+    admin_notes: z.string().max(500).optional().nullable(),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const status = data.action === "approve" ? "approved" : data.action === "reject" ? "rejected" : "paid";
+    const { error } = await context.supabase.from("payout_requests")
+      .update({ status, admin_notes: data.admin_notes ?? null })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 
 export const cancelWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

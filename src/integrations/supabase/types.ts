@@ -1366,6 +1366,39 @@ export type Database = {
           },
         ]
       }
+      platform_settings: {
+        Row: {
+          currency: string
+          id: boolean
+          marketer_commission_pct: number
+          min_withdrawal_amount: number
+          platform_commission_pct: number
+          updated_at: string
+          updated_by: string | null
+          withdrawal_review_mode: string
+        }
+        Insert: {
+          currency?: string
+          id?: boolean
+          marketer_commission_pct?: number
+          min_withdrawal_amount?: number
+          platform_commission_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+          withdrawal_review_mode?: string
+        }
+        Update: {
+          currency?: string
+          id?: boolean
+          marketer_commission_pct?: number
+          min_withdrawal_amount?: number
+          platform_commission_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+          withdrawal_review_mode?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
