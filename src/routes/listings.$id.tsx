@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, FileText, Heart, Loader2, MapPin, Share2, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Share2, Sparkles, Star, TrendingUp } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { convertReferral } from "@/lib/referrals.functions";
+import { convertReferral, createReferral } from "@/lib/referrals.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
