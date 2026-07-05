@@ -42,6 +42,7 @@ function CompanyEdit() {
   const fetchMine = useServerFn(getMyCompany);
   const save = useServerFn(upsertMyCompany);
   const [form, setForm] = useState<Form>(empty);
+  const [gov, setGov] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
@@ -49,8 +50,9 @@ function CompanyEdit() {
   useEffect(() => {
     fetchMine().then((r) => {
       if (r.company) {
-        const c = r.company as Partial<Form>;
+        const c = r.company as Partial<Form> & { governorate?: string };
         setForm({ ...empty, ...Object.fromEntries(Object.entries(c).map(([k, v]) => [k, v ?? ""])) as Form });
+        if (c.governorate) setGov(c.governorate);
       }
     }).finally(() => setLoading(false));
   }, [fetchMine]);
