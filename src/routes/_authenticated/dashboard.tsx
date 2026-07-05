@@ -252,12 +252,23 @@ function AgentDash({ counts }: { counts: Counts }) {
       </div>
       <div className="flex flex-wrap gap-2">
         <Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/referrals">{t("create_referral")}</Link></Button>
-        <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
         <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />Performance</Link></Button>
         <Button asChild variant="outline"><Link to="/wallet">Wallet</Link></Button>
-        <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
       </div>
+      <Collapsible className="mt-4">
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            More tools <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline"><Link to="/agent">{t("nav_agent_profile")}</Link></Button>
+            <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />Performance</Link></Button>
+            <Button asChild variant="outline"><Link to="/invoices">Invoices</Link></Button>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </>
   );
 }
