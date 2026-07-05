@@ -17,6 +17,7 @@ export function SiteHeader() {
   const isAdmin = roles.includes("admin");
   const isCompany = roles.includes("company");
   const isAgent = roles.includes("agent");
+  const isPureAgent = isAgent && !isCompany && !isAdmin;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
