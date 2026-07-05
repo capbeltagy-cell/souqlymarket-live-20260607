@@ -47,15 +47,17 @@ export const listRfqs = createServerFn({ method: "POST" })
     z.object({
       category_slug: z.string().max(60).optional(),
       governorate: z.string().max(80).optional(),
-      status: z.enum(["open", "closed", "awarded"]).optional(),
     }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from(T("rfqs")).select("*").order("created_at", { ascending: false }).limit(200);
+    // Public projection only — exclude buyer_id and attachments; only open RFQs.
+    let q = supabaseAdmin.from(T("rfqs"))
+      .select("id, title, description, category_slug, quantity, unit, budget_min, budget_max, governorate, status, created_at")
+      .eq("status", "open")
+      .order("created_at", { ascending: false }).limit(200);
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     if (data.governorate) q = q.eq("governorate", data.governorate);
-    if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return { rfqs: (rows ?? []) as any[] };
@@ -65,7 +67,9 @@ export const getRfq = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rfq } = await supabaseAdmin.from(T("rfqs")).select("*").eq("id", data.id).maybeSingle();
+    const { data: rfq } = await supabaseAdmin.from(T("rfqs"))
+      .select("id, title, description, category_slug, quantity, unit, budget_min, budget_max, governorate, status, created_at")
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     if (!rfq) throw new Error("RFQ not found");
     return { rfq };
   });
@@ -161,8 +165,9 @@ export const getWholesale = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Do not expose company phone to anonymous visitors.
     const { data: row } = await supabaseAdmin.from(T("wholesale_listings"))
-      .select("*, companies(id, name_ar, name_en, logo_url, is_verified, phone)")
+      .select("*, companies(id, name_ar, name_en, logo_url, is_verified)")
       .eq("id", data.id).maybeSingle();
     if (!row) throw new Error("Not found");
     return { item: row };
@@ -315,14 +320,16 @@ export const createTender = createServerFn({ method: "POST" })
 export const listTenders = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
-      status: z.enum(["open", "closed", "awarded"]).optional(),
       category_slug: z.string().max(60).optional(),
     }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from(T("tenders")).select("*").order("created_at", { ascending: false }).limit(200);
-    if (data.status) q = q.eq("status", data.status);
+    // Public projection — only open tenders, exclude publisher_id.
+    let q = supabaseAdmin.from(T("tenders"))
+      .select("id, title, description, category_slug, governorate, budget, deadline, status, created_at")
+      .eq("status", "open")
+      .order("created_at", { ascending: false }).limit(200);
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -333,7 +340,9 @@ export const getTender = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin.from(T("tenders")).select("*").eq("id", data.id).maybeSingle();
+    const { data: row } = await supabaseAdmin.from(T("tenders"))
+      .select("id, title, description, category_slug, governorate, budget, deadline, status, created_at")
+      .eq("id", data.id).eq("status", "open").maybeSingle();
     if (!row) throw new Error("Not found");
     return { tender: row };
   });
@@ -410,8 +419,10 @@ export const getCompanyProfileExtra = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Public projection only — exclude whatsapp (contact detail).
     const { data: row } = await supabaseAdmin.from(T("company_profiles_extra"))
-      .select("*").eq("company_id", data.companyId).maybeSingle();
+      .select("company_id, cover_url, website, achievements, catalog_pdfs, gallery, downloads_count")
+      .eq("company_id", data.companyId).maybeSingle();
     return { extra: row as any };
   });
 
@@ -508,7 +519,7 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from("companies").select("*").limit(200);
+    let q = supabaseAdmin.from("companies").select("id, name_ar, name_en, logo_url, cover_url, industry, city, governorate, country, company_type, category_slug, is_verified, is_premium, subscription_plan, subscription_expires_at, export_available, production_capacity, description_ar, description_en, created_at").limit(200);
     if (data.q) q = q.or(`name_ar.ilike.%${data.q}%,name_en.ilike.%${data.q}%`);
     if (data.city) {
       const cityValues = getCityVariants(data.city);
