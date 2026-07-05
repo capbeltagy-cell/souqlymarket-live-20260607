@@ -33,6 +33,15 @@ function EarnPage() {
   const { locale } = useI18n();
   const { user } = useAuth();
   const ar = locale === "ar";
+  const navigate = useNavigate();
+
+  // If logged-in user already has a marketer profile, send them straight to dashboard.
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      if (data?.id) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
