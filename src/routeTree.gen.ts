@@ -24,6 +24,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LandsRouteImport } from './routes/lands'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -155,6 +156,11 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandsRoute = LandsRouteImport.update({
@@ -470,6 +476,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -543,6 +550,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -618,6 +626,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
@@ -693,6 +702,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -766,6 +776,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -840,6 +851,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/how-it-works'
     | '/lands'
+    | '/leaderboard'
     | '/map'
     | '/marketplace'
     | '/pricing'
@@ -915,6 +927,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LandsRoute: typeof LandsRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   MapRoute: typeof MapRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
@@ -1041,6 +1054,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lands': {
@@ -1623,6 +1643,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
   LandsRoute: LandsRoute,
+  LeaderboardRoute: LeaderboardRoute,
   MapRoute: MapRoute,
   MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
