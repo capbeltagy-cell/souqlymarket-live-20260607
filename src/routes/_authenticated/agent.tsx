@@ -13,6 +13,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getMyAgent, upsertMyAgent } from "@/lib/agents.functions";
 import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
+import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
+import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
 
 export const Route = createFileRoute("/_authenticated/agent")({
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
@@ -22,12 +24,12 @@ export const Route = createFileRoute("/_authenticated/agent")({
 type Form = {
   headline_ar: string; headline_en: string;
   bio_ar: string; bio_en: string;
-  country: string; city: string;
-  specialties: string; languages: string;
+  governorate: string; city: string;
+  specialties: string[]; languages: string[];
 };
 const empty: Form = {
   headline_ar: "", headline_en: "", bio_ar: "", bio_en: "",
-  country: "", city: "", specialties: "", languages: "",
+  governorate: "", city: "", specialties: [], languages: [],
 };
 
 function AgentEdit() {
