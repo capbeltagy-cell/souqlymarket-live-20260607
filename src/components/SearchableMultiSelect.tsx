@@ -65,7 +65,8 @@ export function SearchableMultiSelect({
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
           <Command
             filter={(val, search) => {
-              const opt = options.find((o) => o.value === val);
+              // cmdk lowercases `val`; match options case-insensitively.
+              const opt = options.find((o) => o.value.toLowerCase() === val);
               if (!opt) return 0;
               const hay = `${opt.label_en} ${opt.label_ar}`.toLowerCase();
               return hay.includes(search.toLowerCase()) ? 1 : 0;
