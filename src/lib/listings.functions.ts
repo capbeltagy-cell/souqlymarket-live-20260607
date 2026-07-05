@@ -46,6 +46,7 @@ export const createListing = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const { data: company, error: cErr } = await supabase
       .from("companies")
       .select("id, subscription_plan, subscription_expires_at")
