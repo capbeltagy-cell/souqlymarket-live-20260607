@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 const LISTING_TYPE = z.enum(["product", "service", "real_estate", "land", "factory", "company", "opportunity", "market", "fish_shed"]);
 const IMAGE_SOURCE = z.enum(["live_capture", "uploaded"]);
