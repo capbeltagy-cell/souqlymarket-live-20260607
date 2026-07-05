@@ -86,32 +86,54 @@ function AgentEdit() {
           <h1 className="text-2xl font-bold">{t("agent_profile")}</h1>
         </div>
         <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
+          <BilingualField
+            label={locale === "ar" ? "التخصص المختصر" : "Short headline"}
+            hasSecondary={!!(locale === "ar" ? form.headline_en : form.headline_ar)}
+            primary={
+              locale === "ar" ? (
+                <Input dir="rtl" value={form.headline_ar} onChange={(e) => setForm({ ...form, headline_ar: e.target.value })} placeholder="مسوق عقاري في القاهرة" />
+              ) : (
+                <Input value={form.headline_en} onChange={(e) => setForm({ ...form, headline_en: e.target.value })} placeholder="Real estate marketer in Cairo" />
+              )
+            }
+            secondary={
+              locale === "ar"
+                ? <Input value={form.headline_en} onChange={(e) => setForm({ ...form, headline_en: e.target.value })} placeholder="Headline in English" />
+                : <Input dir="rtl" value={form.headline_ar} onChange={(e) => setForm({ ...form, headline_ar: e.target.value })} placeholder="العنوان بالعربية" />
+            }
+          />
+
+          <LocationPicker
+            governorate={form.country && form.country !== "Egypt" ? "" : form.country || ""}
+            city={form.city}
+            onChange={({ governorate, city }) => setForm({ ...form, country: governorate, city })}
+            labels={{ governorate: locale === "ar" ? "المحافظة" : "Governorate", city: locale === "ar" ? "المدينة" : "City" }}
+          />
+
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label={t("agent_headline_ar")}>
-              <Input dir="rtl" value={form.headline_ar} onChange={(e) => setForm({ ...form, headline_ar: e.target.value })} />
-            </Field>
-            <Field label={t("agent_headline_en")}>
-              <Input value={form.headline_en} onChange={(e) => setForm({ ...form, headline_en: e.target.value })} />
-            </Field>
-            <Field label={t("field_country")}>
-              <Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
-            </Field>
-            <Field label={t("field_city")}>
-              <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-            </Field>
             <Field label={t("agent_specialties")}>
-              <Input placeholder="Real estate, SaaS" value={form.specialties} onChange={(e) => setForm({ ...form, specialties: e.target.value })} />
+              <Input placeholder={locale === "ar" ? "مثال: عقارات، سيارات، أثاث" : "e.g. Real estate, Cars, Furniture"} value={form.specialties} onChange={(e) => setForm({ ...form, specialties: e.target.value })} />
             </Field>
             <Field label={t("agent_languages")}>
-              <Input placeholder="Arabic, English" value={form.languages} onChange={(e) => setForm({ ...form, languages: e.target.value })} />
+              <Input placeholder={locale === "ar" ? "العربية، الإنجليزية" : "Arabic, English"} value={form.languages} onChange={(e) => setForm({ ...form, languages: e.target.value })} />
             </Field>
           </div>
-          <Field label={t("agent_bio_ar")}>
-            <Textarea dir="rtl" rows={4} value={form.bio_ar} onChange={(e) => setForm({ ...form, bio_ar: e.target.value })} />
-          </Field>
-          <Field label={t("agent_bio_en")}>
-            <Textarea rows={4} value={form.bio_en} onChange={(e) => setForm({ ...form, bio_en: e.target.value })} />
-          </Field>
+
+          <BilingualField
+            label={locale === "ar" ? "نبذة عنك" : "Short bio"}
+            hasSecondary={!!(locale === "ar" ? form.bio_en : form.bio_ar)}
+            primary={
+              locale === "ar"
+                ? <Textarea dir="rtl" rows={4} value={form.bio_ar} onChange={(e) => setForm({ ...form, bio_ar: e.target.value })} placeholder="خبرتك، أهم إنجازاتك، وأنواع العملاء الذين تخدمهم" />
+                : <Textarea rows={4} value={form.bio_en} onChange={(e) => setForm({ ...form, bio_en: e.target.value })} placeholder="Your experience, key achievements, and the clients you serve" />
+            }
+            secondary={
+              locale === "ar"
+                ? <Textarea rows={3} value={form.bio_en} onChange={(e) => setForm({ ...form, bio_en: e.target.value })} placeholder="Bio in English" />
+                : <Textarea rows={3} dir="rtl" value={form.bio_ar} onChange={(e) => setForm({ ...form, bio_ar: e.target.value })} placeholder="النبذة بالعربية" />
+            }
+          />
+
           <div className="flex gap-2 pt-2">
             <Button type="submit" disabled={submitting} className="bg-primary hover:bg-primary-hover">
               {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("profile_save")}
