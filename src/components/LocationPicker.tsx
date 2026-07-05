@@ -89,7 +89,8 @@ function SearchableSelect({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command
           filter={(val, search) => {
-            const opt = options.find((o) => o.value === val);
+            // cmdk lowercases `val`; match options case-insensitively.
+            const opt = options.find((o) => o.value.toLowerCase() === val);
             if (!opt) return 0;
             const hay = `${opt.label_en} ${opt.label_ar}`.toLowerCase();
             return hay.includes(search.toLowerCase()) ? 1 : 0;
@@ -103,7 +104,7 @@ function SearchableSelect({
                 <CommandItem
                   key={o.value}
                   value={o.value}
-                  onSelect={(v) => { onChange(v); setOpen(false); }}
+                  onSelect={() => { onChange(o.value); setOpen(false); }}
                 >
                   <Check className={cn("me-2 h-4 w-4", value === o.value ? "opacity-100" : "opacity-0")} />
                   {locale === "ar" ? o.label_ar : o.label_en}
@@ -113,6 +114,7 @@ function SearchableSelect({
           </CommandList>
         </Command>
       </PopoverContent>
+
     </Popover>
   );
 }
