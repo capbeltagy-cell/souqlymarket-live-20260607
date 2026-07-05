@@ -269,13 +269,12 @@ function AgentDash({ counts }: { counts: Counts }) {
     (async () => {
       const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
       if (!ag) return;
-      const [w, cP, cA, cPaid, refs, leadsCount] = await Promise.all([
+      const [w, cP, cA, cPaid, refs] = await Promise.all([
         supabase.from("wallets").select("balance,pending_balance,total_earned,total_paid_out").eq("user_id", user.id).eq("kind", "agent").maybeSingle(),
         supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
         supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "approved"),
         supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "paid"),
         supabase.from("referrals").select("clicks,conversions").eq("agent_id", ag.id),
-        supabase.from("leads").select("id", { count: "exact", head: true }).eq("agent_id", ag.id),
       ]);
       const clicks = (refs.data ?? []).reduce((s, r) => s + (r.clicks ?? 0), 0);
       const deals = (refs.data ?? []).reduce((s, r) => s + (r.conversions ?? 0), 0);
@@ -288,7 +287,7 @@ function AgentDash({ counts }: { counts: Counts }) {
         approvedC: cA.count ?? 0,
         paidC: cPaid.count ?? 0,
         clicks,
-        leads: leadsCount.count ?? 0,
+        leads: deals,
         deals,
       });
     })();
