@@ -93,9 +93,11 @@ function ListingDetail() {
   const { id } = Route.useParams();
   const { t, locale, dir } = useI18n();
   const ar = locale === "ar";
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
+  const isAgent = roles.includes("agent");
   const convert = useServerFn(convertReferral);
   const feature = useServerFn(featureMyListing);
+  const makeReferral = useServerFn(createReferral);
   const startConv = useServerFn(startConversationForListing);
   const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
@@ -109,6 +111,23 @@ function ListingDetail() {
   const [featuring, setFeaturing] = useState<7 | 30 | null>(null);
   const [fav, setFav] = useState(false);
   const [msgLoading, setMsgLoading] = useState(false);
+  const [myShareLink, setMyShareLink] = useState<string | null>(null);
+  const [generatingLink, setGeneratingLink] = useState(false);
+
+  const onGetShareLink = async () => {
+    setGeneratingLink(true);
+    try {
+      const res = await makeReferral({ data: { listingId: id } });
+      const url = `${window.location.origin}/r/${res.code}`;
+      setMyShareLink(url);
+      try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
+      toast.success(ar ? "تم توليد رابطك ونسخه — شاركه واكسب عمولتك عند إتمام الصفقة." : "Your link is ready & copied. Share it to earn on every closed deal.");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setGeneratingLink(false);
+    }
+  };
 
   const onMessageSeller = async () => {
     setMsgLoading(true);
