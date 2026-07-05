@@ -75,6 +75,7 @@ import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
+import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
@@ -422,6 +423,12 @@ const AuthenticatedAdminCompaniesRoute =
     path: '/admin-companies',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAchievementsRoute =
+  AuthenticatedAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedWholesaleNewRoute =
   AuthenticatedWholesaleNewRouteImport.update({
     id: '/wholesale/new',
@@ -492,6 +499,7 @@ export interface FileRoutesByFullPath {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -566,6 +574,7 @@ export interface FileRoutesByTo {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -642,6 +651,7 @@ export interface FileRoutesById {
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -718,6 +728,7 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/achievements'
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
@@ -792,6 +803,7 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/achievements'
     | '/admin-companies'
     | '/admin-executive'
     | '/admin-overview'
@@ -867,6 +879,7 @@ export interface FileRouteTypes {
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/_authenticated/achievements'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-overview'
@@ -1413,6 +1426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/achievements': {
+      id: '/_authenticated/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wholesale/new': {
       id: '/_authenticated/wholesale/new'
       path: '/wholesale/new'
@@ -1480,6 +1500,7 @@ const AuthenticatedCampaignsRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
@@ -1514,6 +1535,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
