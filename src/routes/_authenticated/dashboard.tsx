@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, Briefcase, Building2, ChevronDown, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,17 +27,33 @@ type Counts = {
 };
 
 function Dashboard() {
-  const { user, roles } = useAuth();
+  const { user, roles, loading } = useAuth();
   const { t, locale } = useI18n();
   const ar = locale === "ar";
+  const navigate = useNavigate();
+  const hasAppRole = roles.includes("admin") || roles.includes("company") || roles.includes("agent");
   const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [sub, setSub] = useState<CompanySubscriptionInfo | null>(null);
   const fetchSub = useServerFn(getMyCompanySubscription);
 
+  // Route users to the correct next step based on onboarding state.
   useEffect(() => {
-    if (!user) return;
+    if (loading || !user) return;
+    if (hasAppRole) return;
+    let choice: string | null = null;
+    try { choice = localStorage.getItem("souqly:role_choice"); } catch {}
+    if (choice === "customer") {
+      navigate({ to: "/marketplace", replace: true });
+    } else {
+      navigate({ to: "/choose-role", replace: true });
+    }
+  }, [loading, user, hasAppRole, navigate]);
+
+
+  useEffect(() => {
+    if (!user || !hasAppRole) return;
     const zero: Counts = { listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 };
     (async () => {
       try {
