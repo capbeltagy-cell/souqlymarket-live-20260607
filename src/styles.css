@@ -97,7 +97,11 @@
 
 @layer base {
   *, *::before, *::after { box-sizing: border-box; border-color: var(--color-border); }
-  html { font-family: var(--font-body); }
+  html {
+    font-family: var(--font-body);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     min-height: 100vh;
     background-color: var(--color-background);
@@ -107,9 +111,13 @@
     background-image:
       radial-gradient(ellipse at top, rgba(201,168,76,0.06), transparent 60%),
       radial-gradient(ellipse at bottom right, rgba(201,168,76,0.04), transparent 50%);
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    overscroll-behavior-y: none;
   }
-  a { color: inherit; }
+  @media (min-width: 1024px) { body { padding-bottom: 0; } }
+  a { color: inherit; -webkit-tap-highlight-color: transparent; }
   button, input, textarea, select { font: inherit; }
+  button, [role="button"], a { touch-action: manipulation; }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.015em;

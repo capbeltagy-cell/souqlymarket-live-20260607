@@ -9,6 +9,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
+import { MobileTabBar } from "@/components/MobileTabBar";
 
 function NotFoundComponent() {
   return (
@@ -117,6 +118,7 @@ function RootComponent() {
       <I18nProvider>
         <AuthProvider>
           <Outlet />
+          <MobileTabBar />
           <Toaster />
         </AuthProvider>
       </I18nProvider>
