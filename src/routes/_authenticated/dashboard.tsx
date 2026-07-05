@@ -53,7 +53,7 @@ function Dashboard() {
 
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !hasAppRole) return;
     const zero: Counts = { listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 };
     (async () => {
       try {
