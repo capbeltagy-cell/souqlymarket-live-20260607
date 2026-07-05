@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw } from "lucide-react";
+import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw, CreditCard } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
