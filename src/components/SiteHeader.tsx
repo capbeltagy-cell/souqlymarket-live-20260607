@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, MessageSquare } from "lucide-react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, MessageSquare, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { GlobalSearch } from "./GlobalSearch";
