@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getMyAgent, upsertMyAgent } from "@/lib/agents.functions";
+import { LocationPicker } from "@/components/LocationPicker";
+import { BilingualField } from "@/components/BilingualField";
 
 export const Route = createFileRoute("/_authenticated/agent")({
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
