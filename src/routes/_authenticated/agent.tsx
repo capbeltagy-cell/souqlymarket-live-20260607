@@ -13,6 +13,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getMyAgent, upsertMyAgent } from "@/lib/agents.functions";
 import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
+import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
+import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
 
 export const Route = createFileRoute("/_authenticated/agent")({
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
@@ -22,12 +24,12 @@ export const Route = createFileRoute("/_authenticated/agent")({
 type Form = {
   headline_ar: string; headline_en: string;
   bio_ar: string; bio_en: string;
-  country: string; city: string;
-  specialties: string; languages: string;
+  governorate: string; city: string;
+  specialties: string[]; languages: string[];
 };
 const empty: Form = {
   headline_ar: "", headline_en: "", bio_ar: "", bio_en: "",
-  country: "", city: "", specialties: "", languages: "",
+  governorate: "", city: "", specialties: [], languages: [],
 };
 
 function AgentEdit() {
@@ -46,9 +48,9 @@ function AgentEdit() {
         setForm({
           headline_ar: a.headline_ar ?? "", headline_en: a.headline_en ?? "",
           bio_ar: a.bio_ar ?? "", bio_en: a.bio_en ?? "",
-          country: a.country ?? "", city: a.city ?? "",
-          specialties: (a.specialties ?? []).join(", "),
-          languages: (a.languages ?? []).join(", "),
+          governorate: a.country ?? "", city: a.city ?? "",
+          specialties: (a.specialties ?? []) as string[],
+          languages: (a.languages ?? []) as string[],
         });
       }
     }).finally(() => setLoading(false));
@@ -64,10 +66,10 @@ function AgentEdit() {
           headline_en: form.headline_en || null,
           bio_ar: form.bio_ar || null,
           bio_en: form.bio_en || null,
-          country: form.country || null,
+          country: form.governorate || null,
           city: form.city || null,
-          specialties: form.specialties.split(",").map((s) => s.trim()).filter(Boolean),
-          languages: form.languages.split(",").map((s) => s.trim()).filter(Boolean),
+          specialties: form.specialties,
+          languages: form.languages,
         } as never,
       });
       toast.success(res.created ? t("agent_created") : t("agent_updated"));
@@ -104,20 +106,31 @@ function AgentEdit() {
           />
 
           <LocationPicker
-            governorate={form.country && form.country !== "Egypt" ? "" : form.country || ""}
+            governorate={form.governorate}
             city={form.city}
-            onChange={({ governorate, city }) => setForm({ ...form, country: governorate, city })}
+            onChange={({ governorate, city }) => setForm({ ...form, governorate, city })}
             labels={{ governorate: locale === "ar" ? "المحافظة" : "Governorate", city: locale === "ar" ? "المدينة" : "City" }}
           />
 
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label={t("agent_specialties")}>
-              <Input placeholder={locale === "ar" ? "مثال: عقارات، سيارات، أثاث" : "e.g. Real estate, Cars, Furniture"} value={form.specialties} onChange={(e) => setForm({ ...form, specialties: e.target.value })} />
+              <SearchableMultiSelect
+                value={form.specialties}
+                options={MARKETER_SPECIALTIES}
+                onChange={(v) => setForm({ ...form, specialties: v })}
+                placeholder={locale === "ar" ? "اختر تخصصاتك" : "Choose your specialties"}
+              />
             </Field>
             <Field label={t("agent_languages")}>
-              <Input placeholder={locale === "ar" ? "العربية، الإنجليزية" : "Arabic, English"} value={form.languages} onChange={(e) => setForm({ ...form, languages: e.target.value })} />
+              <SearchableMultiSelect
+                value={form.languages}
+                options={MARKETER_LANGUAGES}
+                onChange={(v) => setForm({ ...form, languages: v })}
+                placeholder={locale === "ar" ? "اختر اللغات" : "Choose languages"}
+              />
             </Field>
           </div>
+
 
           <BilingualField
             label={locale === "ar" ? "نبذة عنك" : "Short bio"}
