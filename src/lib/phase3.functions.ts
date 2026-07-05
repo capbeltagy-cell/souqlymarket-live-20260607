@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getCityVariants, getGovernorateVariants } from "@/lib/egypt.locations";
+import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const T = (s: string) => s as any; // bypass generated types for new tables
