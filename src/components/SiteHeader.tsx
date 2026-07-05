@@ -99,6 +99,9 @@ export function SiteHeader() {
                   <Link to="/favorites" className="gap-2"><Heart className="h-4 w-4" />{t("nav_favorites")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/marketing-center" className="gap-2"><Link2 className="h-4 w-4" />مركز التسويق</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/commissions" className="gap-2"><DollarSign className="h-4 w-4" />{t("nav_commissions")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
