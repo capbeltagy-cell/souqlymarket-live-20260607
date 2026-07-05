@@ -44,7 +44,7 @@ function OrderDetailPage() {
   const isBuyer = order.buyer_id === user?.id;
   const activeIdx = TIMELINE.findIndex((s) => s.key === order.status);
 
-  const act = async (patch: Parameters<typeof update>[0]["data"]) => {
+  const act = async (patch: { id: string; status: any; tracking_number?: string | null; tracking_carrier?: string | null; cancelled_reason?: string | null }) => {
     setBusy(true);
     try { await update({ data: patch }); toast.success("تم التحديث"); reload(); }
     catch (e) { toast.error((e as Error).message); }

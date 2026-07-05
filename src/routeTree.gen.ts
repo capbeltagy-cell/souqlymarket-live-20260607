@@ -83,6 +83,7 @@ import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
+import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 
@@ -468,6 +469,11 @@ const AuthenticatedRfqMineRoute = AuthenticatedRfqMineRouteImport.update({
   path: '/rfq/mine',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedOrdersRoute,
+} as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
     id: '/listings/new',
@@ -531,7 +537,7 @@ export interface FileRoutesByFullPath {
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
-  '/orders': typeof AuthenticatedOrdersRoute
+  '/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -552,6 +558,7 @@ export interface FileRoutesByFullPath {
   '/companies/': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -608,7 +615,7 @@ export interface FileRoutesByTo {
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
-  '/orders': typeof AuthenticatedOrdersRoute
+  '/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -629,6 +636,7 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -687,7 +695,7 @@ export interface FileRoutesById {
   '/_authenticated/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
-  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/_authenticated/payouts': typeof AuthenticatedPayoutsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
@@ -708,6 +716,7 @@ export interface FileRoutesById {
   '/companies/': typeof CompaniesIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
+  '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -787,6 +796,7 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/campaigns/$id'
     | '/listings/new'
+    | '/orders/$id'
     | '/rfq/mine'
     | '/rfq/new'
     | '/tenders/mine'
@@ -864,6 +874,7 @@ export interface FileRouteTypes {
     | '/companies'
     | '/campaigns/$id'
     | '/listings/new'
+    | '/orders/$id'
     | '/rfq/mine'
     | '/rfq/new'
     | '/tenders/mine'
@@ -942,6 +953,7 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/_authenticated/campaigns/$id'
     | '/_authenticated/listings/new'
+    | '/_authenticated/orders/$id'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
     | '/_authenticated/tenders/mine'
@@ -1506,6 +1518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRfqMineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders/$id': {
+      id: '/_authenticated/orders/$id'
+      path: '/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof AuthenticatedOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedOrdersRoute
+    }
     '/_authenticated/listings/new': {
       id: '/_authenticated/listings/new'
       path: '/listings/new'
@@ -1537,6 +1556,17 @@ const AuthenticatedCampaignsRouteWithChildren =
     AuthenticatedCampaignsRouteChildren,
   )
 
+interface AuthenticatedOrdersRouteChildren {
+  AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
+}
+
+const AuthenticatedOrdersRouteChildren: AuthenticatedOrdersRouteChildren = {
+  AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
+}
+
+const AuthenticatedOrdersRouteWithChildren =
+  AuthenticatedOrdersRoute._addFileChildren(AuthenticatedOrdersRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
@@ -1558,7 +1588,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketingCenterRoute: typeof AuthenticatedMarketingCenterRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
-  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRouteWithChildren
   AuthenticatedPayoutsRoute: typeof AuthenticatedPayoutsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
@@ -1595,7 +1625,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketingCenterRoute: AuthenticatedMarketingCenterRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
-  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRouteWithChildren,
   AuthenticatedPayoutsRoute: AuthenticatedPayoutsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
