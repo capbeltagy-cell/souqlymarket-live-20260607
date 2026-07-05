@@ -69,6 +69,7 @@ import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticated/ai-tools'
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
@@ -388,6 +389,11 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAiToolsRoute = AuthenticatedAiToolsRouteImport.update({
+  id: '/ai-tools',
+  path: '/ai-tools',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAgentPerformanceRoute =
   AuthenticatedAgentPerformanceRouteImport.update({
     id: '/agent-performance',
@@ -506,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
@@ -581,6 +588,7 @@ export interface FileRoutesByTo {
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
@@ -658,6 +666,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
+  '/_authenticated/ai-tools': typeof AuthenticatedAiToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
@@ -735,6 +744,7 @@ export interface FileRouteTypes {
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
+    | '/ai-tools'
     | '/analytics'
     | '/campaigns'
     | '/commissions'
@@ -810,6 +820,7 @@ export interface FileRouteTypes {
     | '/admin-revenue'
     | '/agent'
     | '/agent-performance'
+    | '/ai-tools'
     | '/analytics'
     | '/campaigns'
     | '/commissions'
@@ -886,6 +897,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-revenue'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
+    | '/_authenticated/ai-tools'
     | '/_authenticated/analytics'
     | '/_authenticated/campaigns'
     | '/_authenticated/commissions'
@@ -1384,6 +1396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai-tools': {
+      id: '/_authenticated/ai-tools'
+      path: '/ai-tools'
+      fullPath: '/ai-tools'
+      preLoaderRoute: typeof AuthenticatedAiToolsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agent-performance': {
       id: '/_authenticated/agent-performance'
       path: '/agent-performance'
@@ -1507,6 +1526,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
+  AuthenticatedAiToolsRoute: typeof AuthenticatedAiToolsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
@@ -1542,6 +1562,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
+  AuthenticatedAiToolsRoute: AuthenticatedAiToolsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,

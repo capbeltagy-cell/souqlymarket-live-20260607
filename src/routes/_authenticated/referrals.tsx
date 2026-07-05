@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Link2, Copy, TrendingUp, MousePointerClick, PlusCircle, UserPlus, DollarSign } from "lucide-react";
+import { Link2, Copy, TrendingUp, MousePointerClick, PlusCircle, UserPlus, DollarSign, QrCode, Download } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
