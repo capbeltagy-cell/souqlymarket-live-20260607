@@ -29,6 +29,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FactoriesRouteImport } from './routes/factories'
+import { Route as EarnRouteImport } from './routes/earn'
 import { Route as ControlCenterX7RouteImport } from './routes/control-center-x7'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -175,6 +176,11 @@ const FaqRoute = FaqRouteImport.update({
 const FactoriesRoute = FactoriesRouteImport.update({
   id: '/factories',
   path: '/factories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnRoute = EarnRouteImport.update({
+  id: '/earn',
+  path: '/earn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ControlCenterX7Route = ControlCenterX7RouteImport.update({
@@ -432,6 +438,7 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
+  '/earn': typeof EarnRoute
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -500,6 +507,7 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
+  '/earn': typeof EarnRoute
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -570,6 +578,7 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
+  '/earn': typeof EarnRoute
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -640,6 +649,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/control-center-x7'
+    | '/earn'
     | '/factories'
     | '/faq'
     | '/forgot-password'
@@ -708,6 +718,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/control-center-x7'
+    | '/earn'
     | '/factories'
     | '/faq'
     | '/forgot-password'
@@ -777,6 +788,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/control-center-x7'
+    | '/earn'
     | '/factories'
     | '/faq'
     | '/forgot-password'
@@ -847,6 +859,7 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRouteWithChildren
   ContactRoute: typeof ContactRoute
   ControlCenterX7Route: typeof ControlCenterX7Route
+  EarnRoute: typeof EarnRoute
   FactoriesRoute: typeof FactoriesRouteWithChildren
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -1013,6 +1026,13 @@ declare module '@tanstack/react-router' {
       path: '/factories'
       fullPath: '/factories'
       preLoaderRoute: typeof FactoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn': {
+      id: '/earn'
+      path: '/earn'
+      fullPath: '/earn'
+      preLoaderRoute: typeof EarnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/control-center-x7': {
@@ -1499,6 +1519,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRouteWithChildren,
   ContactRoute: ContactRoute,
   ControlCenterX7Route: ControlCenterX7Route,
+  EarnRoute: EarnRoute,
   FactoriesRoute: FactoriesRouteWithChildren,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
