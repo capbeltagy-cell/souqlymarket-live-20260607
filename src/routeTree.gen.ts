@@ -52,7 +52,6 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
-import { Route as AuthenticatedSeedRouteImport } from './routes/_authenticated/seed'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_authenticated/referral-program'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -309,11 +308,6 @@ const AuthenticatedVerificationRoute =
     path: '/verification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedSeedRoute = AuthenticatedSeedRouteImport.update({
-  id: '/seed',
-  path: '/seed',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -594,7 +588,6 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
-  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -679,7 +672,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
-  '/seed': typeof AuthenticatedSeedRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -766,7 +758,6 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
-  '/_authenticated/seed': typeof AuthenticatedSeedRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -853,7 +844,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/referral-program'
     | '/referrals'
-    | '/seed'
     | '/verification'
     | '/wallet'
     | '/agents/$id'
@@ -938,7 +928,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/referral-program'
     | '/referrals'
-    | '/seed'
     | '/verification'
     | '/wallet'
     | '/agents/$id'
@@ -1024,7 +1013,6 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/referral-program'
     | '/_authenticated/referrals'
-    | '/_authenticated/seed'
     | '/_authenticated/verification'
     | '/_authenticated/wallet'
     | '/agents/$id'
@@ -1391,13 +1379,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/seed': {
-      id: '/_authenticated/seed'
-      path: '/seed'
-      fullPath: '/seed'
-      preLoaderRoute: typeof AuthenticatedSeedRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/referrals': {
       id: '/_authenticated/referrals'
       path: '/referrals'
@@ -1749,7 +1730,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
-  AuthenticatedSeedRoute: typeof AuthenticatedSeedRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
@@ -1793,7 +1773,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
-  AuthenticatedSeedRoute: AuthenticatedSeedRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
