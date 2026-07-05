@@ -36,7 +36,7 @@ const empty: Form = {
 };
 
 function CompanyEdit() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchMine = useServerFn(getMyCompany);
