@@ -130,7 +130,20 @@ function ReferralsPage() {
                       <Button size="sm" variant="ghost" onClick={() => copy(r.code)} className="gap-1">
                         <Copy className="h-3.5 w-3.5" />{t("copy_link")}
                       </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setQrFor(qrFor === r.code ? null : r.code)} className="gap-1">
+                        <QrCode className="h-3.5 w-3.5" />QR
+                      </Button>
                     </div>
+                    {qrFor === r.code && (
+                      <div className="flex flex-col items-center gap-2 py-3 border-t border-border mt-2">
+                        <div className="bg-white p-3 rounded-lg" id={`qr-${r.code}`}>
+                          <QRCodeCanvas value={url} size={180} includeMargin={false} />
+                        </div>
+                        <Button size="sm" variant="outline" onClick={() => downloadQR(r.code)} className="gap-1">
+                          <Download className="h-3.5 w-3.5" />{ar ? "تحميل QR" : "Download QR"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -141,6 +154,15 @@ function ReferralsPage() {
       <SiteFooter />
     </div>
   );
+}
+
+function downloadQR(code: string) {
+  const canvas = document.querySelector(`#qr-${code} canvas`) as HTMLCanvasElement | null;
+  if (!canvas) return;
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = `referral-${code}.png`;
+  a.click();
 }
 
 function KPI({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Link2 }) {
