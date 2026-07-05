@@ -65,12 +65,12 @@ function OrdersPage() {
           </TabsList>
           <TabsContent value="buyer" className="mt-4">
             {loading ? <div className="text-sm text-muted-foreground">جارٍ التحميل…</div>
-              : buyer.length === 0 ? <EmptyState icon={Package} title="لا توجد طلبات" description="ابدأ التسوق من السوق الآن" />
+              : buyer.length === 0 ? <EmptyState icon={<Package className="h-7 w-7" />} title="لا توجد طلبات" description="ابدأ التسوق من السوق الآن" />
               : <OrderList orders={buyer} />}
           </TabsContent>
           <TabsContent value="seller" className="mt-4">
             {loading ? <div className="text-sm text-muted-foreground">جارٍ التحميل…</div>
-              : seller.length === 0 ? <EmptyState icon={Truck} title="لا توجد مبيعات بعد" description="أضف منتجاتك وابدأ البيع" />
+              : seller.length === 0 ? <EmptyState icon={<Truck className="h-7 w-7" />} title="لا توجد مبيعات بعد" description="أضف منتجاتك وابدأ البيع" />
               : <OrderList orders={seller} />}
           </TabsContent>
         </Tabs>
