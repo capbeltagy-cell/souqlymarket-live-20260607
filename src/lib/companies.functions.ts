@@ -40,6 +40,7 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => schema.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
     const payload = {
       ...data,
       website: data.website || null,
