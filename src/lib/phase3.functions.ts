@@ -308,6 +308,7 @@ export const createTender = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
+    await assertNotPureMarketer(context.supabase as never, context.userId);
     const { data: row, error } = await context.supabase.from(T("tenders")).insert({
       publisher_id: context.userId,
       title: data.title,
