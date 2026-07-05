@@ -31,7 +31,7 @@ const empty: Form = {
 };
 
 function AgentEdit() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const fetchMine = useServerFn(getMyAgent);
   const save = useServerFn(upsertMyAgent);
