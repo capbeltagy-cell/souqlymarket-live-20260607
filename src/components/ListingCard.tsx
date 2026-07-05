@@ -27,7 +27,7 @@ export type ListingCardData = {
   featured?: boolean | null;
   featured_until?: string | null;
   company_id?: string | null;
-  companies?: { name_ar: string | null; name_en: string | null; phone?: string | null; is_verified?: boolean | null } | null;
+  companies?: { name_ar: string | null; name_en: string | null; is_verified?: boolean | null } | null;
 };
 
 const typeKey: Record<ListingType, string> = {
@@ -53,7 +53,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
   const title = (locale === "ar" ? l.title_ar : l.title_en) ?? l.title_en ?? l.title_ar ?? "";
   const company = (locale === "ar" ? l.companies?.name_ar : l.companies?.name_en) ?? l.companies?.name_en ?? l.companies?.name_ar ?? "";
   const image = l.images?.[0] ?? placeholder;
-  const wa = l.companies?.phone?.replace(/[^0-9]/g, "") ?? "";
+  const wa = "";
 
   useEffect(() => {
     if (!user) return;

@@ -17,11 +17,18 @@ const schema = z.object({
   cover_url: z.string().optional().nullable(),
 });
 
+/**
+ * Owner-only read. Uses the service-role client so we can read the
+ * privileged contact columns (email/phone/website) that are revoked
+ * from anon/authenticated on the base table. Row scope is enforced
+ * explicitly via `owner_id = userId`.
+ */
 export const getMyCompany = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
       .from("companies").select("*").eq("owner_id", userId).maybeSingle();
     if (error) throw new Error(error.message);
     return { company: data };
@@ -48,4 +55,28 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
     const { data: row, error } = await supabase.from("companies").insert(payload).select("id").single();
     if (error) throw new Error(error.message);
     return { ok: true, id: row.id, created: true };
+  });
+
+/**
+ * Contact-info reveal for a company profile. Only authenticated users
+ * can see email/phone/website; anon visitors get nulls. Runs through
+ * the service-role client because those columns are no longer readable
+ * via the Data API.
+ */
+export const getCompanyContact = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("companies")
+      .select("email, phone, website")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return {
+      email: row?.email ?? null,
+      phone: row?.phone ?? null,
+      website: row?.website ?? null,
+    };
   });

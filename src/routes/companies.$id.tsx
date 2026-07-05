@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Mail, Globe, Phone, MessageCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { CompanyReviews } from "@/components/CompanyReviews";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
+import { getCompanyContact } from "@/lib/companies.functions";
 
 export const Route = createFileRoute("/companies/$id")({
   loader: async ({ params }) => {
@@ -43,34 +45,49 @@ type Company = {
   id: string; name_ar: string; name_en: string;
   description_ar: string | null; description_en: string | null;
   industry: string | null; country: string | null; city: string | null;
-  email: string | null; website: string | null; phone: string | null;
   logo_url: string | null; cover_url: string | null;
   is_verified: boolean; is_premium: boolean | null;
 };
+
+type Contact = { email: string | null; phone: string | null; website: string | null };
+
+const COMPANY_PUBLIC_COLS =
+  "id, name_ar, name_en, description_ar, description_en, industry, country, city, logo_url, cover_url, is_verified, is_premium";
 
 function CompanyProfile() {
   const { id } = Route.useParams();
   const { locale, t } = useI18n();
   const [company, setCompany] = useState<Company | null>(null);
+  const [contact, setContact] = useState<Contact>({ email: null, phone: null, website: null });
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const loadContact = useServerFn(getCompanyContact);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("companies").select("*").eq("id", id).maybeSingle();
+      const { data } = await supabase.from("companies").select(COMPANY_PUBLIC_COLS).eq("id", id).maybeSingle();
       setCompany(data as Company | null);
       if (data) {
         const { data: items } = await supabase
           .from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone)")
+          .select("id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en)")
           .eq("company_id", id)
           .eq("status", "approved")
           .order("created_at", { ascending: false });
         setListings((items ?? []) as unknown as ListingCardData[]);
+        // Reveal contact only to authenticated users; anon gets a graceful fallback.
+        try {
+          const { data: sess } = await supabase.auth.getSession();
+          if (sess.session) {
+            const c = await loadContact({ data: { id } });
+            setContact(c);
+          }
+        } catch { /* ignore — anon or transient */ }
       }
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, loadContact]);
+
 
   if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
   if (!company) return <Shell><div className="p-10 text-center">Company not found</div></Shell>;
@@ -100,22 +117,28 @@ function CompanyProfile() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {company.phone && (
+            {contact.phone && (
               <>
                 <Button asChild className="gap-2 bg-success hover:bg-success/90">
-                  <a href={`https://wa.me/${company.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{t("contact_whatsapp")}</a>
+                  <a href={`https://wa.me/${contact.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{t("contact_whatsapp")}</a>
                 </Button>
                 <Button asChild variant="secondary" className="gap-2">
-                  <a href={`tel:${company.phone}`}><Phone className="h-4 w-4" />{t("call_now")}</a>
+                  <a href={`tel:${contact.phone}`}><Phone className="h-4 w-4" />{t("call_now")}</a>
                 </Button>
               </>
             )}
-            {!company.phone && company.email && (
+            {!contact.phone && contact.email && (
               <Button asChild variant="secondary" className="gap-2">
-                <a href={`mailto:${company.email}`}><Mail className="h-4 w-4" />{t("contact_company")}</a>
+                <a href={`mailto:${contact.email}`}><Mail className="h-4 w-4" />{t("contact_company")}</a>
+              </Button>
+            )}
+            {!contact.phone && !contact.email && (
+              <Button asChild variant="secondary" className="gap-2">
+                <Link to="/auth"><MessageCircle className="h-4 w-4" />{locale === "ar" ? "سجّل الدخول للتواصل" : "Sign in to contact"}</Link>
               </Button>
             )}
           </div>
+
         </div>
       </section>
       <section className="container-souqly py-8 flex-1 grid lg:grid-cols-3 gap-6">
@@ -131,10 +154,14 @@ function CompanyProfile() {
             <h2 className="font-semibold mb-2">{t("about")}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{desc ?? "—"}</p>
             <div className="mt-4 space-y-2 text-sm">
-              {company.website && <div className="flex items-center gap-2 text-muted-foreground"><Globe className="h-4 w-4" /> <a href={company.website} target="_blank" rel="noreferrer" className="hover:text-primary truncate">{company.website}</a></div>}
-              {company.email && <div className="flex items-center gap-2 text-muted-foreground"><Mail className="h-4 w-4" /> {company.email}</div>}
-              {company.phone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="h-4 w-4" />{company.phone}</div>}
+              {contact.website && <div className="flex items-center gap-2 text-muted-foreground"><Globe className="h-4 w-4" /> <a href={contact.website} target="_blank" rel="noreferrer" className="hover:text-primary truncate">{contact.website}</a></div>}
+              {contact.email && <div className="flex items-center gap-2 text-muted-foreground"><Mail className="h-4 w-4" /> {contact.email}</div>}
+              {contact.phone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="h-4 w-4" />{contact.phone}</div>}
+              {!contact.website && !contact.email && !contact.phone && (
+                <div className="text-muted-foreground text-xs">{locale === "ar" ? "سجّل الدخول لرؤية بيانات التواصل." : "Sign in to view contact details."}</div>
+              )}
             </div>
+
           </div>
           <Button asChild variant="outline" className="w-full"><Link to="/companies">← {t("nav_companies")}</Link></Button>
         </aside>

@@ -37,7 +37,7 @@ function Marketplace() {
     const nowIso = new Date().toISOString();
     let query = supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, is_verified)")
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(120);

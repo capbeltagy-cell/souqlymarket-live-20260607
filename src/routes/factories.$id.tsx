@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getCompanyContact } from "@/lib/companies.functions";
 
 export const Route = createFileRoute("/factories/$id")({
   notFoundComponent: () => <Fallback msg="Factory not found" />,
@@ -21,19 +23,31 @@ function FactoryProfile() {
   const ar = locale === "ar";
   const [factory, setFactory] = useState<any>(null);
   const [company, setCompany] = useState<any>(null);
+  const [phone, setPhone] = useState<string | null>(null);
+  const loadContact = useServerFn(getCompanyContact);
 
   useEffect(() => {
     (async () => {
       const { data: f } = await (supabase.from as any)("factories").select("*").eq("company_id", id).maybeSingle();
       setFactory(f);
-      const { data: c } = await supabase.from("companies").select("*").eq("id", id).maybeSingle();
+      const { data: c } = await supabase
+        .from("companies")
+        .select("id, name_ar, name_en, logo_url, cover_url, industry, is_verified")
+        .eq("id", id).maybeSingle();
       setCompany(c);
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        if (sess.session) {
+          const contact = await loadContact({ data: { id } });
+          setPhone(contact.phone);
+        }
+      } catch { /* anon */ }
     })();
-  }, [id]);
+  }, [id, loadContact]);
 
   if (!company) return <div className="p-10 text-center">…</div>;
 
-  const wa = company.phone?.replace(/[^0-9]/g, "");
+  const wa = phone?.replace(/[^0-9]/g, "");
 
   return (
     <div className="min-h-screen flex flex-col">

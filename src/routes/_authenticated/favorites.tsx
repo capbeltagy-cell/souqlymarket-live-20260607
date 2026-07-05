@@ -25,7 +25,7 @@ function FavoritesPage() {
     (async () => {
       const { data } = await supabase
         .from("favorites")
-        .select("listing_id, listings(id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en, phone))")
+        .select("listing_id, listings(id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en))")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       const rows = (data ?? []).map((r: any) => r.listings).filter(Boolean) as ListingCardData[];

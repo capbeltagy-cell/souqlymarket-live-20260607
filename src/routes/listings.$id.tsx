@@ -70,7 +70,7 @@ type Listing = {
   company_id: string;
   companies: {
     id: string; name_ar: string; name_en: string;
-    is_verified: boolean; is_premium?: boolean | null; phone: string | null; email: string | null;
+    is_verified: boolean; is_premium?: boolean | null;
   } | null;
 };
 
@@ -154,7 +154,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium, phone, email)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
@@ -218,8 +218,8 @@ function ListingDetail() {
   const company = l.companies;
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
-  const contactPhone = (l.phone || l.whatsapp || company?.phone || "").replace(/[^0-9]/g, "");
-  const whatsappNum = (l.whatsapp || l.phone || company?.phone || "").replace(/[^0-9]/g, "");
+  const contactPhone = (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "");
+  const whatsappNum = (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "");
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
@@ -324,11 +324,8 @@ function ListingDetail() {
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
-              ) : company?.email ? (
-                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                  <a href={`mailto:${company.email}?subject=${encodeURIComponent(title)}`}>{t("contact_company")}</a>
-                </Button>
               ) : null}
+
               <div className="grid grid-cols-2 gap-2 mt-3">
                 <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
                   <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}

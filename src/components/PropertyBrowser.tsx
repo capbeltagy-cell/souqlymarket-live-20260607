@@ -38,7 +38,7 @@ export function PropertyBrowser({ listingType, subtypes, titleAr, titleEn }: Pro
   useEffect(() => {
     setLoading(true);
     supabase.from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, purpose, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, phone, is_verified)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, area_sqm, property_subtype, purpose, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, is_verified)")
       .eq("type", listingType)
       .eq("status", "approved")
       .order("featured", { ascending: false })
