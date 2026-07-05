@@ -289,7 +289,24 @@ function MessageBubble({ m, mine }: { m: Msg; mine: boolean }) {
             <audio ref={audioRef} src={m.attachment_url} onEnded={() => setPlaying(false)} className="hidden" />
           </div>
         )}
-        {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+        {(() => {
+          const qm = m.body?.match(/^\[\[quotation:([0-9a-f-]{36})\]\]\s*(.*)/i);
+          const om = m.body?.match(/^\[\[order:([0-9a-f-]{36})\]\]\s*(.*)/i);
+          if (qm) return (
+            <Link to="/quotations/$id" params={{ id: qm[1] }} className={`block rounded-md p-3 mb-1 border ${mine ? "bg-primary-foreground/10 border-primary-foreground/30" : "bg-background border-border"}`}>
+              <div className="flex items-center gap-2 font-semibold mb-1"><FileSignature className="h-4 w-4" /> عرض سعر</div>
+              <div className="text-xs opacity-80">{qm[2] || "افتح للعرض والتفاصيل"}</div>
+              <div className={`text-[10px] mt-1 ${mine ? "opacity-80" : "text-primary"}`}>افتح العرض ←</div>
+            </Link>
+          );
+          if (om) return (
+            <Link to="/orders/$id" params={{ id: om[1] }} className={`block rounded-md p-3 mb-1 border ${mine ? "bg-primary-foreground/10 border-primary-foreground/30" : "bg-background border-border"}`}>
+              <div className="font-semibold mb-1">📦 طلب جديد</div>
+              <div className="text-xs opacity-80">{om[2] || "افتح لمتابعة الطلب"}</div>
+            </Link>
+          );
+          return m.body ? <p className="whitespace-pre-wrap">{m.body}</p> : null;
+        })()}
         <div className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-80" : "text-muted-foreground"}`}>
           {new Date(m.created_at).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}
           {mine && (m.read_at ? <span title="مقروء">✓✓</span> : <span title="مُرسل">✓</span>)}
