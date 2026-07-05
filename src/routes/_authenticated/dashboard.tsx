@@ -209,18 +209,33 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
         <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
         <Stat icon={Users} label={t("active_referrals")} value={String(counts.referrals)} />
       </div>
+      {/* Primary actions — the ones a company owner needs first */}
       <div className="flex flex-wrap gap-2">
         <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/listings/new"><PlusCircle className="h-4 w-4" />{t("new_listing")}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
-        <Button asChild variant="outline"><Link to="/company">{t("nav_company_profile")}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/company-profile-extra"><Building2 className="h-4 w-4" />{ar ? "تخصيص الملف" : "Profile extras"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
-        <FactoryDirectoryButton ar={ar} />
-        <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
         <Button asChild variant="outline"><Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link></Button>
-        <Button asChild variant="outline"><Link to="/invoices">{ar ? "الفواتير" : "Invoices"}</Link></Button>
       </div>
+
+      {/* Advanced tools — hidden by default */}
+      <Collapsible className="mt-4">
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            {ar ? "أدوات إضافية" : "More tools"}
+            <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline"><Link to="/company">{t("nav_company_profile")}</Link></Button>
+            <Button asChild variant="outline" className="gap-2"><Link to="/company-profile-extra"><Building2 className="h-4 w-4" />{ar ? "تخصيص الملف" : "Profile extras"}</Link></Button>
+            <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
+            <FactoryDirectoryButton ar={ar} />
+            <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
+            <Button asChild variant="outline"><Link to="/invoices">{ar ? "الفواتير" : "Invoices"}</Link></Button>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </>
   );
 }
