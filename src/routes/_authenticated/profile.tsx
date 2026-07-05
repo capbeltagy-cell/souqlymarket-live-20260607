@@ -83,7 +83,7 @@ function ProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>{t("profile_phone")}</Label>
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+20 1X XXX XXXX" inputMode="tel" />
             </div>
             <div className="space-y-2">
               <Label>{t("profile_bio")}</Label>

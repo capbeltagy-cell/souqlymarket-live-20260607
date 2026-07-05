@@ -13,6 +13,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getMyCompany, upsertMyCompany } from "@/lib/companies.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { LocationPicker } from "@/components/LocationPicker";
+import { BilingualField } from "@/components/BilingualField";
 
 export const Route = createFileRoute("/_authenticated/company")({
   head: () => ({ meta: [{ title: "My Company — Souqly" }] }),
@@ -34,12 +36,13 @@ const empty: Form = {
 };
 
 function CompanyEdit() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchMine = useServerFn(getMyCompany);
   const save = useServerFn(upsertMyCompany);
   const [form, setForm] = useState<Form>(empty);
+  const [gov, setGov] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
@@ -47,8 +50,9 @@ function CompanyEdit() {
   useEffect(() => {
     fetchMine().then((r) => {
       if (r.company) {
-        const c = r.company as Partial<Form>;
+        const c = r.company as Partial<Form> & { governorate?: string };
         setForm({ ...empty, ...Object.fromEntries(Object.entries(c).map(([k, v]) => [k, v ?? ""])) as Form });
+        if (c.governorate) setGov(c.governorate);
       }
     }).finally(() => setLoading(false));
   }, [fetchMine]);
@@ -110,40 +114,68 @@ function CompanyEdit() {
           <h1 className="text-2xl font-bold">{t("company_profile")}</h1>
         </div>
         <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label={t("company_name_ar")} required>
-              <Input value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} required dir="rtl" />
-            </Field>
-            <Field label={t("company_name_en")} required>
-              <Input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} required />
-            </Field>
-          </div>
+          <BilingualField
+            label={locale === "ar" ? "اسم الشركة" : "Company name"}
+            required
+            hasSecondary={!!form.name_en && locale === "ar"}
+            primary={
+              locale === "ar" ? (
+                <Input value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value, name_en: form.name_en || e.target.value })} required dir="rtl" placeholder="مثال: مصنع النور للأثاث" />
+              ) : (
+                <Input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value, name_ar: form.name_ar || e.target.value })} required placeholder="e.g. Al-Nour Furniture Factory" />
+              )
+            }
+            secondary={
+              locale === "ar" ? (
+                <Input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} placeholder="Company name in English" />
+              ) : (
+                <Input value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} dir="rtl" placeholder="اسم الشركة بالعربية" />
+              )
+            }
+          />
+
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label={t("field_industry")}>
-              <Input value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} />
-            </Field>
-            <Field label={t("field_country")}>
-              <Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
-            </Field>
-            <Field label={t("field_city")}>
-              <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              <Input value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} placeholder={locale === "ar" ? "مثال: أثاث، ملابس، أغذية" : "e.g. Furniture, Clothing, Food"} />
             </Field>
             <Field label={t("profile_phone")}>
-              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+20 1X XXX XXXX" />
             </Field>
             <Field label="Email">
-              <Input type="text" inputMode="email" placeholder="name@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Input type="text" inputMode="email" placeholder={locale === "ar" ? "info@yourcompany.com" : "info@yourcompany.com"} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
             <Field label="Website">
-              <Input type="text" inputMode="url" placeholder="example.com" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+              <Input type="text" inputMode="url" placeholder="yourcompany.com" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
             </Field>
           </div>
-          <Field label={t("company_about_ar")}>
-            <Textarea rows={4} dir="rtl" value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value })} />
-          </Field>
-          <Field label={t("company_about_en")}>
-            <Textarea rows={4} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} />
-          </Field>
+
+          <LocationPicker
+            required
+            governorate={gov}
+            city={form.city}
+            onChange={({ governorate, city }) => { setGov(governorate); setForm({ ...form, country: "Egypt", city }); }}
+          />
+
+
+          <BilingualField
+            label={locale === "ar" ? "نبذة عن الشركة" : "About the company"}
+            hasSecondary={!!form.description_en && locale === "ar"}
+            primary={
+              locale === "ar" ? (
+                <Textarea rows={4} dir="rtl" value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value })} placeholder="اكتب وصفاً قصيراً عن نشاط شركتك وما يميزها" />
+              ) : (
+                <Textarea rows={4} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} placeholder="Briefly describe what your company does and what makes it unique" />
+              )
+            }
+            secondary={
+              locale === "ar" ? (
+                <Textarea rows={3} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} placeholder="English description" />
+              ) : (
+                <Textarea rows={3} dir="rtl" value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value })} placeholder="وصف بالعربية" />
+              )
+            }
+          />
+
           <div className="grid sm:grid-cols-2 gap-4">
             <FileField label={t("company_logo")} url={form.logo_url} busy={uploading === "logo"} onChange={(f) => upload("logo", f)} />
             <FileField label={t("company_cover")} url={form.cover_url} busy={uploading === "cover"} onChange={(f) => upload("cover", f)} />
