@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, Briefcase, Building2, ChevronDown, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
