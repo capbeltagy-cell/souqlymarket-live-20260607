@@ -115,6 +115,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "agent_applications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       agent_campaigns: {
@@ -431,6 +438,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commissions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "commissions_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
@@ -571,6 +585,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "company_profiles_extra_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       company_referrals: {
@@ -676,6 +697,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "factories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -816,6 +844,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "leads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "leads_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
@@ -953,6 +988,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "listings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       messages: {
@@ -1038,6 +1080,126 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          account_details: Json
+          code: string
+          created_at: string
+          icon: string | null
+          id: string
+          instructions_ar: string | null
+          instructions_en: string | null
+          is_active: boolean
+          name_ar: string
+          name_en: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          account_details?: Json
+          code: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          instructions_ar?: string | null
+          instructions_en?: string | null
+          is_active?: boolean
+          name_ar: string
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          account_details?: Json
+          code?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          instructions_ar?: string | null
+          instructions_en?: string | null
+          is_active?: boolean
+          name_ar?: string
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payment_proofs: {
+        Row: {
+          amount: number
+          buyer_id: string
+          created_at: string
+          currency: string
+          id: string
+          note: string | null
+          order_id: string
+          payment_method_code: string | null
+          payment_method_id: string | null
+          proof_url: string | null
+          reference: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          seller_id: string | null
+          status: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          buyer_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          note?: string | null
+          order_id: string
+          payment_method_code?: string | null
+          payment_method_id?: string | null
+          proof_url?: string | null
+          reference?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          note?: string | null
+          order_id?: string
+          payment_method_code?: string | null
+          payment_method_id?: string | null
+          proof_url?: string | null
+          reference?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["payment_proof_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_proofs_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1091,6 +1253,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "payments_listing_id_fkey"
@@ -1236,6 +1405,139 @@ export type Database = {
         }
         Relationships: []
       }
+      quotation_items: {
+        Row: {
+          created_at: string
+          discount: number
+          id: string
+          listing_id: string | null
+          quantity: number
+          quotation_id: string
+          title: string
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          discount?: number
+          id?: string
+          listing_id?: string | null
+          quantity?: number
+          quotation_id: string
+          title: string
+          total?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          id?: string
+          listing_id?: string | null
+          quantity?: number
+          quotation_id?: string
+          title?: string
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          buyer_id: string
+          conversation_id: string | null
+          created_at: string
+          currency: string
+          discount: number
+          expiry_date: string | null
+          id: string
+          notes: string | null
+          order_id: string | null
+          seller_company_id: string | null
+          seller_id: string
+          shipping: number
+          status: Database["public"]["Enums"]["quotation_status"]
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          discount?: number
+          expiry_date?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          seller_company_id?: string | null
+          seller_id: string
+          shipping?: number
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          discount?: number
+          expiry_date?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          seller_company_id?: string | null
+          seller_id?: string
+          shipping?: number
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotations_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_seller_company_id_fkey"
+            columns: ["seller_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_seller_company_id_fkey"
+            columns: ["seller_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           agent_id: string
@@ -1334,6 +1636,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reviews_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       rfq_offers: {
@@ -1380,6 +1689,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rfq_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "rfq_offers_rfq_id_fkey"
@@ -1550,6 +1866,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tender_proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "tender_proposals_tender_id_fkey"
@@ -1847,6 +2170,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "wholesale_listings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       wholesale_orders: {
@@ -1854,6 +2184,7 @@ export type Database = {
           buyer_id: string
           cancelled_reason: string | null
           completed_at: string | null
+          confirmed_at: string | null
           contact_phone: string | null
           conversation_id: string | null
           created_at: string
@@ -1865,6 +2196,7 @@ export type Database = {
           payment_status: string
           product_listing_id: string | null
           quantity: number
+          quotation_id: string | null
           shipping_address: Json | null
           status: string
           total_amount: number | null
@@ -1877,6 +2209,7 @@ export type Database = {
           buyer_id: string
           cancelled_reason?: string | null
           completed_at?: string | null
+          confirmed_at?: string | null
           contact_phone?: string | null
           conversation_id?: string | null
           created_at?: string
@@ -1888,6 +2221,7 @@ export type Database = {
           payment_status?: string
           product_listing_id?: string | null
           quantity?: number
+          quotation_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number | null
@@ -1900,6 +2234,7 @@ export type Database = {
           buyer_id?: string
           cancelled_reason?: string | null
           completed_at?: string | null
+          confirmed_at?: string | null
           contact_phone?: string | null
           conversation_id?: string | null
           created_at?: string
@@ -1911,6 +2246,7 @@ export type Database = {
           payment_status?: string
           product_listing_id?: string | null
           quantity?: number
+          quotation_id?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number | null
@@ -1941,10 +2277,53 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "wholesale_orders_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
+      companies_trust: {
+        Row: {
+          avg_rating: number | null
+          company_id: string | null
+          completed_orders: number | null
+          is_premium: boolean | null
+          is_verified: boolean | null
+          name_ar: string | null
+          name_en: string | null
+          reviews_count: number | null
+          trust_score: number | null
+        }
+        Insert: {
+          avg_rating?: never
+          company_id?: string | null
+          completed_orders?: never
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          name_ar?: string | null
+          name_en?: string | null
+          reviews_count?: never
+          trust_score?: never
+        }
+        Update: {
+          avg_rating?: never
+          company_id?: string | null
+          completed_orders?: never
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          name_ar?: string | null
+          name_en?: string | null
+          reviews_count?: never
+          trust_score?: never
+        }
+        Relationships: []
+      }
       marketer_leaderboard: {
         Row: {
           achievements_count: number | null
@@ -2034,7 +2413,16 @@ export type Database = {
         | "company"
         | "market"
         | "fish_shed"
+      payment_proof_status: "pending" | "approved" | "rejected"
       payout_status: "pending" | "approved" | "rejected" | "paid" | "cancelled"
+      quotation_status:
+        | "draft"
+        | "sent"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "cancelled"
+        | "converted"
       subscription_plan: "free" | "premium_company" | "premium_agent"
       wallet_kind: "company" | "agent" | "platform"
       wallet_tx_reason:
@@ -2211,7 +2599,17 @@ export const Constants = {
         "market",
         "fish_shed",
       ],
+      payment_proof_status: ["pending", "approved", "rejected"],
       payout_status: ["pending", "approved", "rejected", "paid", "cancelled"],
+      quotation_status: [
+        "draft",
+        "sent",
+        "accepted",
+        "rejected",
+        "expired",
+        "cancelled",
+        "converted",
+      ],
       subscription_plan: ["free", "premium_company", "premium_agent"],
       wallet_kind: ["company", "agent", "platform"],
       wallet_tx_reason: [
