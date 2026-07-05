@@ -286,14 +286,7 @@ function NewListing() {
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-4 pt-3">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Field label="العنوان بالإنجليزية">
-                    <Input maxLength={200} value={title_en} onChange={(e) => setTitleEn(e.target.value)} />
-                  </Field>
-                  <Field label="الوصف بالإنجليزية">
-                    <Textarea rows={2} value={description_en} onChange={(e) => setDescEn(e.target.value)} />
-                  </Field>
-                </div>
+
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Field label="هاتف">
