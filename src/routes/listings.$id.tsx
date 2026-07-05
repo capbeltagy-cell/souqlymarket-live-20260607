@@ -70,7 +70,7 @@ type Listing = {
   company_id: string;
   companies: {
     id: string; name_ar: string; name_en: string;
-    is_verified: boolean; is_premium?: boolean | null; phone: string | null; email: string | null;
+    is_verified: boolean; is_premium?: boolean | null;
   } | null;
 };
 
@@ -324,11 +324,8 @@ function ListingDetail() {
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
-              ) : company?.email ? (
-                <Button asChild className="w-full bg-primary hover:bg-primary-hover" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                  <a href={`mailto:${company.email}?subject=${encodeURIComponent(title)}`}>{t("contact_company")}</a>
-                </Button>
               ) : null}
+
               <div className="grid grid-cols-2 gap-2 mt-3">
                 <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
                   <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
