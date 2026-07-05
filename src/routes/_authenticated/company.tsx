@@ -79,7 +79,11 @@ function CompanyEdit() {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
   const [hasExisting, setHasExisting] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const draftKey = user ? `souqly.company-wizard.${user.id}` : null;
 
+  // Load: prefer live company row; otherwise restore local draft.
   useEffect(() => {
     fetchMine().then((r) => {
       if (r.company) {
@@ -87,9 +91,52 @@ function CompanyEdit() {
         setForm({ ...empty, ...Object.fromEntries(Object.entries(c).map(([k, v]) => [k, v ?? ""])) as Form });
         if (c.governorate) setGov(c.governorate);
         setHasExisting(true);
+        return;
       }
+      if (!draftKey || typeof window === "undefined") return;
+      try {
+        const raw = window.localStorage.getItem(draftKey);
+        if (!raw) return;
+        const draft = JSON.parse(raw) as { form?: Form; gov?: string; step?: StepId; savedAt?: number };
+        if (draft.form) setForm({ ...empty, ...draft.form });
+        if (draft.gov) setGov(draft.gov);
+        if (draft.step && draft.step >= 1 && draft.step <= 5) setStep(draft.step as StepId);
+        if (draft.savedAt) setSavedAt(draft.savedAt);
+        // Only announce restoration if there's meaningful content saved.
+        const hasContent = !!(draft.form && (draft.form.name_ar || draft.form.name_en || draft.form.description_ar || draft.form.description_en || draft.form.city || draft.form.logo_url));
+        if (hasContent) setDraftRestored(true);
+      } catch { /* ignore malformed draft */ }
     }).finally(() => setLoading(false));
-  }, [fetchMine]);
+  }, [fetchMine, draftKey]);
+
+  // Autosave: debounced write of form + gov + step to localStorage while editing.
+  useEffect(() => {
+    if (loading || !draftKey || typeof window === "undefined") return;
+    const t = window.setTimeout(() => {
+      try {
+        const ts = Date.now();
+        window.localStorage.setItem(draftKey, JSON.stringify({ form, gov, step, savedAt: ts }));
+        setSavedAt(ts);
+      } catch { /* quota/private-mode: ignore */ }
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, [form, gov, step, loading, draftKey]);
+
+  const clearDraft = () => {
+    if (!draftKey || typeof window === "undefined") return;
+    try { window.localStorage.removeItem(draftKey); } catch { /* ignore */ }
+    setDraftRestored(false);
+    setSavedAt(null);
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setForm(empty);
+    setGov("");
+    setStep(1);
+    toast.success(locale === "ar" ? "تم مسح المسودة" : "Draft cleared");
+  };
+
 
   const upload = async (kind: "logo" | "cover", file: File) => {
     if (!user) return;
@@ -154,6 +201,7 @@ function CompanyEdit() {
       };
       const res = await save({ data: { ...payload, website, email: email || null } as never });
       toast.success(res.created ? t("company_created") : t("company_updated"));
+      clearDraft();
       navigate({ to: "/companies/$id", params: { id: res.id } });
     } catch (e) { toast.error((e as Error).message); }
     finally { setSubmitting(false); }
@@ -175,7 +223,20 @@ function CompanyEdit() {
           <h1 className="text-2xl font-bold">{hasExisting ? t("company_profile") : msg("إنشاء شركتك", "Create your company")}</h1>
         </div>
 
+        {draftRestored && !hasExisting && (
+          <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm flex items-center justify-between gap-3">
+            <span className="text-foreground">
+              {msg("تم استعادة مسودتك السابقة.", "Your previous draft was restored.")}
+            </span>
+            <button type="button" onClick={discardDraft} className="text-xs font-medium text-primary hover:underline">
+              {msg("ابدأ من جديد", "Start over")}
+            </button>
+          </div>
+        )}
+
         <Stepper current={step} onJump={(id) => id < step && setStep(id)} locale={locale} />
+
+
 
         <form onSubmit={onFormSubmit} className="mt-5 rounded-xl border border-border bg-card p-6 shadow-card space-y-5">
           {step === 1 && (
@@ -272,8 +333,14 @@ function CompanyEdit() {
             <Button type="button" variant="outline" onClick={goBack} disabled={step === 1} className="gap-2">
               <ArrowLeft className="h-4 w-4" />{msg("السابق", "Back")}
             </Button>
-            <div className="text-xs text-muted-foreground">
-              {msg(`الخطوة ${step} من 5`, `Step ${step} of 5`)}
+            <div className="text-xs text-muted-foreground flex flex-col items-center gap-0.5">
+              <span>{msg(`الخطوة ${step} من 5`, `Step ${step} of 5`)}</span>
+              {savedAt && !hasExisting && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-primary/80">
+                  <Check className="h-2.5 w-2.5" />
+                  {msg("تم الحفظ تلقائياً", "Autosaved")}
+                </span>
+              )}
             </div>
             {step < 5 ? (
               <Button type="submit" className="bg-primary hover:bg-primary-hover gap-2">
