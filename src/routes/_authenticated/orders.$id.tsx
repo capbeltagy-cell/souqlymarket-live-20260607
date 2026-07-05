@@ -122,6 +122,19 @@ function OrderDetailPage() {
 
           {/* Actions */}
           <div className="border-t border-border pt-4 flex flex-wrap gap-2">
+            {isBuyer && order.payment_status !== "paid" && ["accepted","awaiting_seller","packed"].includes(order.status) && (
+              <Button asChild className="bg-primary hover:bg-primary-hover">
+                <Link to="/orders/$id/pay" params={{ id: order.id }}>
+                  <CreditCard className="h-4 w-4 me-2" /> ادفع الآن
+                </Link>
+              </Button>
+            )}
+            {order.payment_status === "paid" && (
+              <Badge className="bg-success text-white"><ShieldCheck className="h-3 w-3 me-1" /> مدفوع — محفوظ لدى المنصة</Badge>
+            )}
+            {order.payment_status === "pending_review" && (
+              <Badge variant="secondary">⏳ إثبات الدفع قيد المراجعة</Badge>
+            )}
             {!isBuyer && order.status === "awaiting_seller" && (
               <>
                 <Button onClick={() => act({ id: order.id, status: "accepted" })} disabled={busy} className="bg-primary hover:bg-primary-hover">قبول الطلب</Button>
