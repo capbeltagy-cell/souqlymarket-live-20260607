@@ -57,6 +57,7 @@ import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_auth
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedMarketingCenterRouteImport } from './routes/_authenticated/marketing-center'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
@@ -319,6 +320,12 @@ const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMarketingCenterRoute =
+  AuthenticatedMarketingCenterRouteImport.update({
+    id: '/marketing-center',
+    path: '/marketing-center',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -473,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -542,6 +550,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -613,6 +622,7 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
+  '/_authenticated/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -684,6 +694,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/marketing-center'
     | '/messages'
     | '/moderation'
     | '/profile'
@@ -753,6 +764,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/marketing-center'
     | '/messages'
     | '/moderation'
     | '/profile'
@@ -823,6 +835,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
     | '/_authenticated/leads'
+    | '/_authenticated/marketing-center'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
@@ -1224,6 +1237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/marketing-center': {
+      id: '/_authenticated/marketing-center'
+      path: '/marketing-center'
+      fullPath: '/marketing-center'
+      preLoaderRoute: typeof AuthenticatedMarketingCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leads': {
       id: '/_authenticated/leads'
       path: '/leads'
@@ -1382,6 +1402,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
+  AuthenticatedMarketingCenterRoute: typeof AuthenticatedMarketingCenterRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -1413,6 +1434,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
+  AuthenticatedMarketingCenterRoute: AuthenticatedMarketingCenterRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
