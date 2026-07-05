@@ -79,6 +79,7 @@ import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenti
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
+import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 
 const WholesaleRoute = WholesaleRouteImport.update({
   id: '/wholesale',
@@ -442,6 +443,12 @@ const AuthenticatedListingsNewRoute =
     path: '/listings/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsIdRoute =
+  AuthenticatedCampaignsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedCampaignsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -479,7 +486,7 @@ export interface FileRoutesByFullPath {
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
-  '/campaigns': typeof AuthenticatedCampaignsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -507,6 +514,7 @@ export interface FileRoutesByFullPath {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -550,7 +558,7 @@ export interface FileRoutesByTo {
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
-  '/campaigns': typeof AuthenticatedCampaignsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -578,6 +586,7 @@ export interface FileRoutesByTo {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -623,7 +632,7 @@ export interface FileRoutesById {
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
-  '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
+  '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
@@ -651,6 +660,7 @@ export interface FileRoutesById {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
@@ -724,6 +734,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/campaigns/$id'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -795,6 +806,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies'
+    | '/campaigns/$id'
     | '/listings/new'
     | '/rfq/mine'
     | '/rfq/new'
@@ -867,6 +879,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/_authenticated/campaigns/$id'
     | '/_authenticated/listings/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
@@ -1403,8 +1416,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedListingsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns/$id': {
+      id: '/_authenticated/campaigns/$id'
+      path: '/$id'
+      fullPath: '/campaigns/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsIdRouteImport
+      parentRoute: typeof AuthenticatedCampaignsRoute
+    }
   }
 }
+
+interface AuthenticatedCampaignsRouteChildren {
+  AuthenticatedCampaignsIdRoute: typeof AuthenticatedCampaignsIdRoute
+}
+
+const AuthenticatedCampaignsRouteChildren: AuthenticatedCampaignsRouteChildren =
+  {
+    AuthenticatedCampaignsIdRoute: AuthenticatedCampaignsIdRoute,
+  }
+
+const AuthenticatedCampaignsRouteWithChildren =
+  AuthenticatedCampaignsRoute._addFileChildren(
+    AuthenticatedCampaignsRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
@@ -1414,7 +1448,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
-  AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
+  AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
@@ -1447,7 +1481,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
-  AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
+  AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
