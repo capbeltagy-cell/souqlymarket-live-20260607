@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Activity, Briefcase, Building2, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Activity, Briefcase, Building2, ChevronDown, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
