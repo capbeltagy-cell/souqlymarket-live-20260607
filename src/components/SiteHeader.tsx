@@ -54,6 +54,7 @@ export function SiteHeader() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/companies" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_companies")}</Link>
+          <Link to="/earn" className="px-3 py-2 rounded-full text-accent hover:text-foreground hover:bg-accent/10 transition font-semibold">اربح معنا</Link>
           <Link to="/pricing" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">{t("nav_pricing")}</Link>
           <Link to="/how-it-works" className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">كيف يعمل</Link>
         </nav>
