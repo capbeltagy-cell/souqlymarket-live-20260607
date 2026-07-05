@@ -19,6 +19,7 @@ import { getMyPlan } from "@/lib/billing.functions";
 import { getMyCompanySubscription } from "@/lib/subscription.functions";
 import { createListing, checkListingDuplicate } from "@/lib/listings.functions";
 import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locations";
+import { LocationPicker } from "@/components/LocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MapView } from "@/components/MapView";
@@ -264,28 +265,13 @@ function NewListing() {
             </Field>
 
             {/* Location */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="المحافظة" required>
-                <select required value={governorate}
-                  onChange={(e) => { setGovernorate(e.target.value); setCity(""); }}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                  <option value="">اختر المحافظة</option>
-                  {EGYPT_GOVERNORATES.map((gov) => (
-                    <option key={gov.value} value={gov.value}>{locale === "ar" ? gov.label_ar : gov.label_en}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="المدينة" required>
-                <select required disabled={!governorate} value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                  <option value="">اختر المدينة</option>
-                  {getCitiesForGovernorate(governorate).map((ct) => (
-                    <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
-                  ))}
-                </select>
-              </Field>
-            </div>
+            <LocationPicker
+              required
+              governorate={governorate}
+              city={city}
+              onChange={({ governorate: g, city: c }) => { setGovernorate(g); setCity(c); }}
+            />
+
 
             {/* Images */}
             <div className="space-y-2">
