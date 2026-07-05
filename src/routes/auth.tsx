@@ -58,7 +58,8 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
-        navigate({ to: "/dashboard" });
+        // New users must pick a role before any dashboard makes sense.
+        navigate({ to: "/choose-role" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
