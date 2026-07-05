@@ -132,22 +132,21 @@ function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <FeaturedAdBar />
 
-      {/* 1. HERO + SEARCH */}
+      {/* 1. HERO + SEARCH — compact */}
       <section className="relative overflow-hidden hero-gradient">
-        <div className="container-souqly relative pt-8 pb-10 md:pt-20 md:pb-16">
-          <span className="status-pill mb-4 fade-up text-[10px] md:text-xs">
+        <div className="container-souqly relative pt-6 pb-8 md:pt-14 md:pb-12">
+          <span className="status-pill mb-3 fade-up text-[10px] md:text-xs">
             <Sparkles className="h-3 w-3" />{ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
           </span>
-          <h1 className="text-serif text-[2.25rem] leading-[1.05] md:text-6xl lg:text-8xl tracking-tight text-foreground mb-4 md:mb-6 fade-up-1">
+          <h1 className="text-serif text-[2rem] leading-[1.05] md:text-5xl lg:text-7xl tracking-tight text-foreground mb-3 md:mb-4 fade-up-1">
             {ar ? (<>حيث تلتقي <span className="gold-shine italic">الصفقات</span> بالشركات الجادة.</>)
                 : (<>Where serious <span className="gold-shine italic">deals</span> meet serious business.</>)}
           </h1>
-          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl leading-relaxed mb-6 fade-up-2">
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-5 fade-up-2">
             {ar
-              ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر — في منصة واحدة."
-              : "Souqly connects companies, suppliers, factories and pro agents across Egypt — one platform."}
+              ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر."
+              : "Souqly connects companies, suppliers, factories and pro agents across Egypt."}
           </p>
 
           <form onSubmit={submitSearch} className="premium-panel rounded-2xl p-1.5 md:p-2 flex items-center gap-2 max-w-2xl focus-within:border-primary/40 focus-within:shadow-gold transition-all fade-up-3">
@@ -166,29 +165,32 @@ function Landing() {
             </Button>
           </form>
 
-          {/* Compact stats — mobile: 3 tight tiles */}
-          <div className="mt-6 md:mt-12 grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4 max-w-2xl">
+          {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
+          <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
             {[
               { label: ar ? "شركة" : "Companies", value: counts.companies },
               { label: ar ? "إعلان" : "Listings", value: counts.listings },
               { label: ar ? "مسوّق" : "Agents", value: counts.agents },
             ].map((item) => (
-              <div key={item.label} className="premium-panel rounded-xl px-3 py-3 md:p-6">
-                <div className="text-serif text-xl md:text-4xl text-gold tabular-nums leading-none">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}<span className="text-gold-soft">+</span></div>
-                <div className="text-[10px] md:text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">{item.label}</div>
+              <div key={item.label} className="premium-panel rounded-xl p-6">
+                <div className="text-serif text-4xl text-gold tabular-nums leading-none">{item.value.toLocaleString(ar ? "ar-EG" : "en-US")}<span className="text-gold-soft">+</span></div>
+                <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">{item.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 2. MAIN CATEGORIES — one clean strip */}
-      <section className="container-souqly py-8 md:py-14">
-        <h2 className="text-serif text-2xl md:text-4xl mb-4 md:mb-6">{t("section_categories")}</h2>
+      {/* 2. FEATURED ADVERTISEMENT BAR */}
+      <FeaturedAdBar />
+
+      {/* 3. MAIN CATEGORIES */}
+      <section className="container-souqly py-6 md:py-10">
+        <h2 className="text-serif text-xl md:text-3xl mb-3 md:mb-5">{t("section_categories")}</h2>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
           {categories.map(({ key, icon: Icon, to }) => (
-            <Link key={key} to={to} className="group premium-panel rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/40 hover:shadow-gold transition-all min-h-[92px]">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-primary/10 text-gold grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition">
+            <Link key={key} to={to} className="group premium-panel rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/40 hover:shadow-gold transition-all min-h-[88px]">
+              <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-primary/10 text-gold grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition">
                 <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">{t(key)}</div>
@@ -197,8 +199,8 @@ function Landing() {
         </div>
       </section>
 
-      {/* 3. FEATURED COMPANIES */}
-      <section className="container-souqly py-6 md:py-10">
+      {/* 4. LATEST COMPANIES */}
+      <section className="container-souqly py-6 md:py-8">
         <SectionHead title={t("section_top_companies")} href="/companies" cta={ar ? "الكل" : "All"} />
         {companies === null ? <CardSkeleton count={6} aspect="aspect-square" />
           : companies.length > 0 ? (
@@ -208,44 +210,8 @@ function Landing() {
           ) : <Empty label={t("nav_companies")} href="/companies" />}
       </section>
 
-      {/* 4. FEATURED FACTORIES */}
-      <section className="container-souqly py-6 md:py-10">
-        <SectionHead title={ar ? "المصانع المميزة" : "Featured factories"} href="/factories" cta={ar ? "الكل" : "All"} />
-        {factories === null ? <CardSkeleton count={4} aspect="aspect-[4/3]" />
-          : factories.filter(f => f.companies).length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {factories.filter(f => f.companies).map((f) => {
-                const c = f.companies!;
-                const name = (ar ? c.name_ar : c.name_en) ?? c.name_en ?? c.name_ar ?? "—";
-                return (
-                  <Link key={f.company_id} to="/factories/$id" params={{ id: f.company_id }} className="premium-panel rounded-2xl p-4 md:p-5 hover:border-primary/40 hover:shadow-gold transition group">
-                    <div className="flex items-start gap-3">
-                      {c.logo_url ? (
-                        <img src={c.logo_url} alt="" className="h-12 w-12 rounded-xl object-cover shrink-0" loading="lazy" />
-                      ) : (
-                        <div className="h-12 w-12 rounded-xl bg-primary/10 text-gold grid place-items-center shrink-0"><Factory className="h-5 w-5" /></div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <h3 className="font-semibold text-sm md:text-base truncate">{name}</h3>
-                          {(c.is_verified || f.verified) && <BadgeCheck className="h-3.5 w-3.5 text-gold shrink-0" />}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">{c.industry ?? "—"}</div>
-                        <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground">
-                          {c.governorate && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{c.governorate}</span>}
-                          {f.employees_range && <span>· {f.employees_range}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : <Empty label={ar ? "تصفح المصانع" : "Browse factories"} href="/factories" />}
-      </section>
-
       {/* 5. LATEST PRODUCTS */}
-      <section className="container-souqly py-6 md:py-10">
+      <section className="container-souqly py-6 md:py-8">
         <SectionHead title={ar ? "أحدث المنتجات" : "Latest products"} href="/marketplace" cta={ar ? "الكل" : "All"} />
         {listings === null ? <CardSkeleton count={8} />
           : listings.length > 0 ? (
@@ -255,48 +221,6 @@ function Landing() {
           ) : <Empty label={t("cta_explore")} href="/marketplace" />}
       </section>
 
-      {/* 6. INVESTMENT OPPORTUNITIES */}
-      {opportunities !== null && opportunities.length > 0 && (
-        <section className="container-souqly py-6 md:py-10">
-          <SectionHead title={ar ? "فرص استثمارية" : "Investment opportunities"} href="/marketplace" cta={ar ? "الكل" : "All"} />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            {opportunities.map((l) => <ListingCard key={l.id} l={l} />)}
-          </div>
-        </section>
-      )}
-
-      {/* 7. WHOLESALE OFFERS */}
-      <section className="container-souqly py-6 md:py-10">
-        <SectionHead title={ar ? "عروض الجملة" : "Wholesale offers"} href="/wholesale" cta={ar ? "الكل" : "All"} />
-        {wholesale === null ? <CardSkeleton count={4} />
-          : wholesale.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              {wholesale.map((w) => {
-                const title = w.title ?? "";
-                return (
-                  <Link key={w.id} to="/wholesale/$id" params={{ id: w.id }} className="group overflow-hidden rounded-2xl border border-white/10 bg-surface-2 shadow-elev transition-all hover:-translate-y-0.5 hover:border-primary/30">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                      {w.images?.[0] ? (
-                        <img src={w.images[0]} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                      ) : (
-                        <div className="h-full w-full bg-muted grid place-items-center text-muted-foreground text-xs">{ar ? "لا توجد صورة" : "No image"}</div>
-                      )}
-                    </div>
-                    <div className="p-3 space-y-1.5">
-                      <h3 className="font-semibold text-sm text-foreground line-clamp-2 leading-snug">{title}</h3>
-                      <div className="flex items-center justify-between pt-1.5 border-t border-border text-[11px]">
-                        {w.price_per_unit ? (
-                          <div className="font-bold text-primary text-xs md:text-sm">{formatPrice(w.price_per_unit, locale)}</div>
-                        ) : (<div className="text-muted-foreground">—</div>)}
-                        <div className="text-muted-foreground">MOQ {w.moq}</div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : <Empty label={ar ? "تصفح الجملة" : "Browse wholesale"} href="/wholesale" />}
-      </section>
 
       {/* 8. HOW SOUQLY WORKS */}
       <section className="container-souqly py-10 md:py-16">
