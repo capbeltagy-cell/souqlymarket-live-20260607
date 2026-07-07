@@ -296,6 +296,16 @@ function ListingDetail() {
                   <span className="text-xs">{t("last_updated")}: {new Date(l.updated_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}</span>
                 )}
               </div>
+              {l.source_name && (
+                <div className="mt-2 rounded-md border border-border bg-muted/30 p-2 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
+                  <span>{ar ? "المصدر" : "Source"}: <span className="font-medium text-foreground">{l.source_name}</span></span>
+                  {l.source_url && (
+                    <a href={l.source_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                      {ar ? "عرض الإعلان الأصلي" : "View original listing"}
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
             {l.latitude !== null && l.longitude !== null && (
               <div className="rounded-xl overflow-hidden border border-border bg-card mb-4">
