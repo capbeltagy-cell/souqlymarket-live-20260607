@@ -37,27 +37,42 @@ export const getMyCompany = createServerFn({ method: "GET" })
 
 export const upsertMyCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => schema.parse(d))
+  .inputValidator((d: unknown) => schema.extend({
+    referral_code: z.string().trim().min(4).max(40).optional().or(z.literal("")).transform((v) => v || undefined),
+  }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await assertNotPureMarketer(supabase as never, userId);
+    const { referral_code, ...companyData } = data;
     const payload = {
-      ...data,
-      website: data.website || null,
-      email: data.email || null,
+      ...companyData,
+      website: companyData.website || null,
+      email: companyData.email || null,
       owner_id: userId,
     };
     const { data: existing } = await supabase
       .from("companies").select("id").eq("owner_id", userId).maybeSingle();
+    let companyId: string;
+    let created: boolean;
     if (existing) {
       const { error } = await supabase.from("companies").update(payload).eq("id", existing.id);
       if (error) throw new Error(error.message);
-      return { ok: true, id: existing.id, created: false };
+      companyId = existing.id;
+      created = false;
+    } else {
+      const { data: row, error } = await supabase.from("companies").insert(payload).select("id").single();
+      if (error) throw new Error(error.message);
+      companyId = row.id;
+      created = true;
     }
-    const { data: row, error } = await supabase.from("companies").insert(payload).select("id").single();
-    if (error) throw new Error(error.message);
-    return { ok: true, id: row.id, created: true };
+    if (referral_code) {
+      // Best-effort attribution; RPC rejects self-referral, unknown codes,
+      // and companies that are already attributed.
+      await supabase.rpc("set_company_referrer", { _code: referral_code });
+    }
+    return { ok: true, id: companyId, created };
   });
+
 
 /**
  * Contact-info reveal for a company profile. Only authenticated users
