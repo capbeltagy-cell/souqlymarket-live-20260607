@@ -52,10 +52,12 @@ function AdminWithdrawals() {
       <div className="container-souqly py-8 flex-1 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h1 className="text-2xl font-bold flex items-center gap-2"><Banknote className="h-6 w-6 text-primary" />{ar ? "طلبات السحب" : "Withdrawal requests"}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button asChild variant="outline" size="sm" className="gap-2"><Link to="/admin-commissions"><Award className="h-4 w-4" />{ar ? "العمولات" : "Commissions"}</Link></Button>
             <Button asChild variant="outline" size="sm" className="gap-2"><Link to="/admin-platform-settings"><Settings2 className="h-4 w-4" />{ar ? "إعدادات المنصة" : "Platform settings"}</Link></Button>
             <Button asChild variant="outline" size="sm" className="gap-2"><Link to="/admin-revenue"><DollarSign className="h-4 w-4" />{ar ? "الإيرادات" : "Revenue"}</Link></Button>
           </div>
+
         </div>
 
         <div className="flex flex-wrap gap-2">
