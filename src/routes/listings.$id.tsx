@@ -161,7 +161,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
