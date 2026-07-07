@@ -213,6 +213,8 @@ export const updatePlatformSettings = createServerFn({ method: "POST" })
     platform_commission_pct: z.number().min(0).max(100),
     min_withdrawal_amount: z.number().nonnegative(),
     withdrawal_review_mode: z.enum(["manual","auto"]).default("manual"),
+    subscription_marketer_commission_pct: z.number().min(0).max(100).optional(),
+    subscription_plan_price_egp: z.number().nonnegative().optional(),
   }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
@@ -223,6 +225,7 @@ export const updatePlatformSettings = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 export const adminListWithdrawals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
