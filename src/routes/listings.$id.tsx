@@ -68,6 +68,7 @@ type Listing = {
   marketer_promotion_enabled: boolean | null;
   promotion_status: string | null;
   phone: string | null; whatsapp: string | null;
+  source_name: string | null; source_url: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
   updated_at: string | null;
