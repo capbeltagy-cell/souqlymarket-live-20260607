@@ -24,6 +24,7 @@ function ReferralRedirect() {
         if (typeof window !== "undefined") {
           try { localStorage.setItem("souqly.ref", code); } catch { /* noop */ }
         }
+        // Try listing-referral first (redirects to the listing).
         const { data, error } = await supabase.rpc("increment_referral_click", { _code: code });
         if (cancelled) return;
         const listingId = data?.[0]?.listing_id;
@@ -31,6 +32,11 @@ function ReferralRedirect() {
           navigate({ to: "/listings/$id", params: { id: listingId }, replace: true });
           return;
         }
+        // Fallback: company-referral code (marketer sending signups). Track click.
+        try {
+          const { trackReferralClick } = await import("@/lib/phase3.functions");
+          await trackReferralClick({ data: { code } });
+        } catch { /* noop */ }
         navigate({ to: "/marketplace", replace: true });
       } catch {
         navigate({ to: "/marketplace", replace: true });
@@ -38,6 +44,7 @@ function ReferralRedirect() {
     })();
     return () => { cancelled = true; };
   }, [code, navigate]);
+
 
   return (
     <div className="min-h-screen flex flex-col">
