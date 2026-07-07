@@ -59,6 +59,12 @@ function NewListing() {
   const [phone, setPhone] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [commission, setCommission] = useState("5");
+  const [promoEnabled, setPromoEnabled] = useState(false);
+  const [commissionType, setCommissionType] = useState<"percentage" | "fixed">("percentage");
+  const [commissionFixed, setCommissionFixed] = useState("");
+  const [conversionGoal, setConversionGoal] = useState<string>("order_paid");
+  const [promoConditions, setPromoConditions] = useState("");
+  const [promoStatus, setPromoStatus] = useState<"active" | "paused" | "ended">("active");
   const [propertySubtype, setPropertySubtype] = useState("");
   const [areaSqm, setAreaSqm] = useState("");
   const [bedrooms, setBedrooms] = useState("");
@@ -169,6 +175,12 @@ function NewListing() {
           price: price ? Number(price) : null,
           currency: "EGP",
           commission_percentage: Number(commission || 5),
+          marketer_promotion_enabled: promoEnabled,
+          commission_type: commissionType,
+          commission_fixed_amount: promoEnabled && commissionType === "fixed" ? Number(commissionFixed || 0) : 0,
+          conversion_goal: promoEnabled ? conversionGoal : null,
+          promotion_conditions: promoEnabled ? (promoConditions || null) : null,
+          promotion_status: promoEnabled ? promoStatus : "ended",
           images: legacy.images,
           image_sources: legacy.image_sources,
           phone: phone || null,
@@ -299,9 +311,84 @@ function NewListing() {
                   </Field>
                 </div>
 
-                <Field label="نسبة العمولة للمسوقين (%)">
-                  <Input type="number" min={0} max={100} step="0.1" value={commission} onChange={(e) => setCommission(e.target.value)} />
-                </Field>
+                {/* Marketer promotion block */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 accent-primary"
+                      checked={promoEnabled}
+                      onChange={(e) => setPromoEnabled(e.target.checked)}
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-sm">السماح للمسوقين بتسويق هذا المنتج</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        عند التفعيل: يظهر منتجك في "فرص الربح" للمسوقين، وسيتم إخفاء بيانات التواصل المباشرة من الصفحة العامة لضمان إتمام الطلبات عبر سوقلي.
+                      </div>
+                    </div>
+                  </label>
+
+                  {promoEnabled && (
+                    <div className="space-y-3 pt-2 border-t border-primary/20">
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <Field label="نوع العمولة *">
+                          <select
+                            value={commissionType}
+                            onChange={(e) => setCommissionType(e.target.value as "percentage" | "fixed")}
+                            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            <option value="percentage">نسبة مئوية من قيمة الطلب</option>
+                            <option value="fixed">مبلغ ثابت لكل تحويل</option>
+                          </select>
+                        </Field>
+                        {commissionType === "percentage" ? (
+                          <Field label="نسبة العمولة (%) *">
+                            <Input type="number" min={0} max={100} step="0.1"
+                              value={commission} onChange={(e) => setCommission(e.target.value)} required />
+                          </Field>
+                        ) : (
+                          <Field label="قيمة العمولة الثابتة (جنيه) *">
+                            <Input type="number" min={0} step="1"
+                              value={commissionFixed} onChange={(e) => setCommissionFixed(e.target.value)} required />
+                          </Field>
+                        )}
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <Field label="هدف التحويل *">
+                          <select
+                            value={conversionGoal}
+                            onChange={(e) => setConversionGoal(e.target.value)}
+                            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            <option value="order_paid">طلب مدفوع (Order Paid)</option>
+                            <option value="lead">استفسار / عميل محتمل (Lead)</option>
+                            <option value="quotation">طلب عرض سعر</option>
+                          </select>
+                        </Field>
+                        <Field label="حالة الحملة">
+                          <select
+                            value={promoStatus}
+                            onChange={(e) => setPromoStatus(e.target.value as "active" | "paused" | "ended")}
+                            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            <option value="active">نشطة</option>
+                            <option value="paused">موقوفة مؤقتاً</option>
+                            <option value="ended">منتهية</option>
+                          </select>
+                        </Field>
+                      </div>
+                      <Field label="شروط العمولة (اختياري)">
+                        <Textarea
+                          value={promoConditions}
+                          onChange={(e) => setPromoConditions(e.target.value)}
+                          placeholder="مثال: العمولة تُدفع بعد تأكيد استلام العميل للطلب. لا تُحتسب العمولة للطلبات الملغاة."
+                          rows={2}
+                          maxLength={1000}
+                        />
+                      </Field>
+                    </div>
+                  )}
+                </div>
 
                 {(type === "real_estate" || type === "land") && (
                   <>

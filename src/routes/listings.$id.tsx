@@ -63,6 +63,10 @@ type Listing = {
   country: string | null; city: string | null; governorate: string | null;
   latitude: number | null; longitude: number | null;
   commission_percentage: number | null;
+  commission_type: string | null;
+  commission_fixed_amount: number | null;
+  marketer_promotion_enabled: boolean | null;
+  promotion_status: string | null;
   phone: string | null; whatsapp: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
@@ -157,7 +161,7 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, phone, whatsapp, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
       // Track view (fire and forget)
@@ -221,8 +225,11 @@ function ListingDetail() {
   const company = l.companies;
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
-  const contactPhone = (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "");
-  const whatsappNum = (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "");
+  const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
+  // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
+  const showContact = !isPromoted || isOwner;
+  const contactPhone = showContact ? (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "") : "";
+  const whatsappNum = showContact ? (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
@@ -326,6 +333,12 @@ function ListingDetail() {
                   <Button asChild variant="outline" className="w-full" size="lg">
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
+                </div>
+              ) : isPromoted && !isOwner ? (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
+                  {ar
+                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. استخدم الأزرار أدناه لإرسال استفسار أو طلب عرض سعر."
+                    : "For your protection, orders and contact happen through Souqly. Use the actions below to send an inquiry or request a quote."}
                 </div>
               ) : null}
 

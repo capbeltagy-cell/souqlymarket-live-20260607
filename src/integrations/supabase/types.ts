@@ -192,6 +192,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "agent_campaigns_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       agent_landing_pages: {
@@ -248,6 +255,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_landing_pages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -452,6 +466,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -666,6 +687,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       factories: {
@@ -741,6 +769,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -869,6 +904,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listings: {
@@ -880,8 +922,11 @@ export type Database = {
           category: string | null
           city: string | null
           clicks_count: number
+          commission_fixed_amount: number
           commission_percentage: number | null
+          commission_type: string
           company_id: string
+          conversion_goal: string | null
           country: string | null
           created_at: string
           currency: string | null
@@ -897,10 +942,13 @@ export type Database = {
           leads_count: number
           location: string | null
           longitude: number | null
+          marketer_promotion_enabled: boolean
           ownership_type: string | null
           pdf_url: string | null
           phone: string | null
           price: number | null
+          promotion_conditions: string | null
+          promotion_status: string
           property_subtype: string | null
           purpose: string | null
           status: Database["public"]["Enums"]["listing_status"]
@@ -920,8 +968,11 @@ export type Database = {
           category?: string | null
           city?: string | null
           clicks_count?: number
+          commission_fixed_amount?: number
           commission_percentage?: number | null
+          commission_type?: string
           company_id: string
+          conversion_goal?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
@@ -937,10 +988,13 @@ export type Database = {
           leads_count?: number
           location?: string | null
           longitude?: number | null
+          marketer_promotion_enabled?: boolean
           ownership_type?: string | null
           pdf_url?: string | null
           phone?: string | null
           price?: number | null
+          promotion_conditions?: string | null
+          promotion_status?: string
           property_subtype?: string | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -960,8 +1014,11 @@ export type Database = {
           category?: string | null
           city?: string | null
           clicks_count?: number
+          commission_fixed_amount?: number
           commission_percentage?: number | null
+          commission_type?: string
           company_id?: string
+          conversion_goal?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
@@ -977,10 +1034,13 @@ export type Database = {
           leads_count?: number
           location?: string | null
           longitude?: number | null
+          marketer_promotion_enabled?: boolean
           ownership_type?: string | null
           pdf_url?: string | null
           phone?: string | null
           price?: number | null
+          promotion_conditions?: string | null
+          promotion_status?: string
           property_subtype?: string | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
@@ -1280,6 +1340,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       payout_methods: {
@@ -1499,6 +1566,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "quotation_items_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "quotation_items_quotation_id_fkey"
             columns: ["quotation_id"]
             isOneToOne: false
@@ -1647,6 +1721,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -2332,6 +2413,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "wholesale_orders_product_listing_id_fkey"
+            columns: ["product_listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public_contacts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "wholesale_orders_quotation_id_fkey"
             columns: ["quotation_id"]
             isOneToOne: false
@@ -2375,6 +2463,30 @@ export type Database = {
           name_en?: string | null
           reviews_count?: never
           trust_score?: never
+        }
+        Relationships: []
+      }
+      listings_public_contacts: {
+        Row: {
+          id: string | null
+          marketer_promotion_enabled: boolean | null
+          phone: string | null
+          promotion_status: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          id?: string | null
+          marketer_promotion_enabled?: boolean | null
+          phone?: never
+          promotion_status?: string | null
+          whatsapp?: never
+        }
+        Update: {
+          id?: string | null
+          marketer_promotion_enabled?: boolean | null
+          phone?: never
+          promotion_status?: string | null
+          whatsapp?: never
         }
         Relationships: []
       }
