@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -31,7 +31,15 @@ function AdminOverview() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <section className="container-souqly py-10 flex-1 space-y-8">
-        <h1 className="text-3xl font-bold">{ar ? "لوحة الإدارة - نظرة عامة" : "Admin Overview"}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-3xl font-bold">{ar ? "لوحة الإدارة - نظرة عامة" : "Admin Overview"}</h1>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link to="/admin-launch-content" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "محتوى الإطلاق" : "Launch content"}</Link>
+            <Link to="/admin-commissions" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "العمولات" : "Commissions"}</Link>
+            <Link to="/admin-withdrawals" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "طلبات السحب" : "Withdrawals"}</Link>
+            <Link to="/admin-companies" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "الشركات" : "Companies"}</Link>
+          </div>
+        </div>
         <div>
           <h2 className="font-semibold mb-3">{ar ? "الشركات" : "Companies"}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
