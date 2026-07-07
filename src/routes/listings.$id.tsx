@@ -334,6 +334,12 @@ function ListingDetail() {
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
+              ) : isPromoted && !isOwner ? (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
+                  {ar
+                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. استخدم الأزرار أدناه لإرسال استفسار أو طلب عرض سعر."
+                    : "For your protection, orders and contact happen through Souqly. Use the actions below to send an inquiry or request a quote."}
+                </div>
               ) : null}
 
               <div className="grid grid-cols-2 gap-2 mt-3">
