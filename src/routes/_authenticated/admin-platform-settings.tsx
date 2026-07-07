@@ -40,6 +40,8 @@ function SettingsPage() {
         marketer_commission_pct: marketer,
         min_withdrawal_amount: Number(s.min_withdrawal_amount),
         withdrawal_review_mode: s.withdrawal_review_mode,
+        subscription_marketer_commission_pct: Number(s.subscription_marketer_commission_pct ?? 15),
+        subscription_plan_price_egp: Number(s.subscription_plan_price_egp ?? 499),
       }});
       toast.success(ar ? "تم الحفظ" : "Saved");
     } catch (e) { toast.error((e as Error).message); }
@@ -72,8 +74,18 @@ function SettingsPage() {
                 <option value="auto">{ar ? "تلقائي" : "Auto"}</option>
               </select>
             </div>
+            <div>
+              <Label>{ar ? "نسبة عمولة المسوق على اشتراك الشركة %" : "Subscription referral commission %"}</Label>
+              <Input type="number" min={0} max={100} step="0.01" value={s.subscription_marketer_commission_pct ?? 15} onChange={(e) => setS({ ...s, subscription_marketer_commission_pct: e.target.value })} />
+              <p className="text-xs text-muted-foreground mt-1">{ar ? "تُحسب على سعر الاشتراك عند التفعيل." : "Applied to the subscription price when a company activates the paid plan."}</p>
+            </div>
+            <div>
+              <Label>{ar ? "سعر اشتراك الشركة (جنيه)" : "Company subscription price (EGP)"}</Label>
+              <Input type="number" min={0} step="1" value={s.subscription_plan_price_egp ?? 499} onChange={(e) => setS({ ...s, subscription_plan_price_egp: e.target.value })} />
+            </div>
           </div>
           <Button type="submit" disabled={busy}>{ar ? "حفظ" : "Save"}</Button>
+
         </form>
       </div>
       <SiteFooter />
