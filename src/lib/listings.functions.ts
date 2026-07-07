@@ -183,7 +183,7 @@ export const updateListing = createServerFn({ method: "POST" })
     const patch: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(rest)) if (v !== undefined) patch[k] = v;
     if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await supabase.from("listings").update(patch).eq("id", id);
+    const { error } = await supabase.from("listings").update(patch as never).eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
