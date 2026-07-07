@@ -148,6 +148,7 @@ export const listWholesale = createServerFn({ method: "POST" })
       category_slug: z.string().max(60).optional(),
       governorate: z.string().max(80).optional(),
       q: z.string().max(200).optional(),
+      kind: z.enum(["product", "storage"]).optional(),
     }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
@@ -157,11 +158,13 @@ export const listWholesale = createServerFn({ method: "POST" })
       .eq("active", true).order("created_at", { ascending: false }).limit(200);
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     if (data.governorate) q = q.eq("governorate", data.governorate);
+    if (data.kind) q = q.eq("kind", data.kind);
     if (data.q) q = q.ilike("title", `%${data.q}%`);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return { items: (rows ?? []) as any[] };
   });
+
 
 export const getWholesale = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
