@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Share2, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ShareMenu } from "@/components/ShareMenu";
+import { listingCaption } from "@/lib/share-captions";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
