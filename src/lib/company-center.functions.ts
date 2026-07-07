@@ -154,12 +154,12 @@ export const getCompanyCommandCenter = createServerFn({ method: "GET" })
 
     // Recent activity — merge last leads / commissions / referrals for this company
     const [{ data: recentLeads }, { data: recentComms }] = await Promise.all([
-      supabase.from("leads").select("id, name, created_at").eq("company_id", cid).order("created_at", { ascending: false }).limit(5),
+      supabase.from("leads").select("id, buyer_name, created_at").eq("company_id", cid).order("created_at", { ascending: false }).limit(5),
       supabase.from("commissions").select("id, amount, currency, status, created_at").eq("company_id", cid).order("created_at", { ascending: false }).limit(5),
     ]);
     const activity: CommandCenterPayload["activity"] = [];
     for (const l of (recentLeads ?? [])) {
-      activity.push({ id: `lead-${l.id}`, kind: "lead", at: l.created_at, title_ar: `عميل محتمل جديد: ${l.name ?? "غير معروف"}`, title_en: `New lead: ${l.name ?? "unknown"}`, link: "/leads" });
+      activity.push({ id: `lead-${l.id}`, kind: "lead", at: l.created_at, title_ar: `عميل محتمل جديد: ${l.buyer_name ?? "غير معروف"}`, title_en: `New lead: ${l.buyer_name ?? "unknown"}`, link: "/leads" });
     }
     for (const c of (recentComms ?? [])) {
       activity.push({
