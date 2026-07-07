@@ -63,6 +63,10 @@ type Listing = {
   country: string | null; city: string | null; governorate: string | null;
   latitude: number | null; longitude: number | null;
   commission_percentage: number | null;
+  commission_type: string | null;
+  commission_fixed_amount: number | null;
+  marketer_promotion_enabled: boolean | null;
+  promotion_status: string | null;
   phone: string | null; whatsapp: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
