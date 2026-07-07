@@ -42,8 +42,40 @@ function WholesalePage() {
             </select>
             <Input placeholder={ar ? "المحافظة" : "Governorate"} value={gov} onChange={(e) => setGov(e.target.value)} />
           </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              { slug: "food-wholesale", ar: "مواد غذائية", en: "Food wholesale" },
+              { slug: "oils", ar: "زيوت", en: "Oils" },
+              { slug: "ghee", ar: "سمن", en: "Ghee" },
+              { slug: "sugar", ar: "سكر", en: "Sugar" },
+              { slug: "rice", ar: "أرز", en: "Rice" },
+              { slug: "flour", ar: "دقيق", en: "Flour" },
+              { slug: "grains", ar: "حبوب", en: "Grains" },
+              { slug: "legumes", ar: "بقوليات", en: "Legumes" },
+              { slug: "pasta", ar: "مكرونة", en: "Pasta" },
+              { slug: "beverages", ar: "مشروبات", en: "Beverages" },
+              { slug: "frozen", ar: "مجمدات", en: "Frozen" },
+              { slug: "detergents", ar: "منظفات", en: "Detergents" },
+              { slug: "paper-goods", ar: "ورقيات", en: "Paper" },
+              { slug: "animal-feed", ar: "أعلاف", en: "Feed" },
+              { slug: "packaging", ar: "تعبئة وتغليف", en: "Packaging" },
+              { slug: "food-supplies", ar: "سلع تموينية", en: "Food supplies" },
+              { slug: "warehouses", ar: "مخازن ومستودعات", en: "Warehouses" },
+              { slug: "storage-services", ar: "خدمات تخزين", en: "Storage services" },
+            ].map((s) => (
+              <button
+                key={s.slug}
+                type="button"
+                onClick={() => setCat(cat === s.slug ? "" : s.slug)}
+                className={`px-3 py-1 rounded-full border text-xs transition ${cat === s.slug ? "bg-primary text-primary-foreground border-primary" : "border-border bg-card hover:bg-muted"}`}
+              >
+                {ar ? s.ar : s.en}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
+
       <section className="container-souqly py-8 flex-1">
         <div className="flex justify-end mb-4"><Button asChild className="bg-primary hover:bg-primary-hover"><Link to="/wholesale/new">{ar ? "+ أضف منتج جملة" : "+ Add wholesale product"}</Link></Button></div>
         {items.length === 0 ? (
