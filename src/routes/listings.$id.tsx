@@ -225,8 +225,11 @@ function ListingDetail() {
   const company = l.companies;
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
-  const contactPhone = (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "");
-  const whatsappNum = (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "");
+  const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
+  // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
+  const showContact = !isPromoted || isOwner;
+  const contactPhone = showContact ? (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "") : "";
+  const whatsappNum = showContact ? (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
