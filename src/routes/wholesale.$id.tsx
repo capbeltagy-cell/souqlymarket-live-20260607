@@ -31,11 +31,14 @@ function WholesaleDetail() {
   async function order(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await submitWholesaleOrder({ data: { listingId: id, quantity: Number(qty), contact_phone: phone || undefined, notes: notes || undefined } });
+      let referral_code: string | undefined;
+      try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
+      await submitWholesaleOrder({ data: { listingId: id, quantity: Number(qty), contact_phone: phone || undefined, notes: notes || undefined, referral_code } });
       toast.success(ar ? "تم إرسال الطلب" : "Order submitted");
       setQty(""); setPhone(""); setNotes("");
     } catch (e: any) { toast.error(e.message); }
   }
+
 
   if (!item) return <div className="p-10 text-center">…</div>;
   return (

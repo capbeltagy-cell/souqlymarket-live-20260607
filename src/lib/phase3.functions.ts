@@ -215,6 +215,7 @@ export const submitWholesaleOrder = createServerFn({ method: "POST" })
       quantity: z.number().int().positive(),
       contact_phone: z.string().max(40).optional(),
       notes: z.string().max(2000).optional(),
+      referral_code: z.string().min(4).max(32).optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -224,10 +225,12 @@ export const submitWholesaleOrder = createServerFn({ method: "POST" })
       quantity: data.quantity,
       contact_phone: data.contact_phone ?? null,
       notes: data.notes ?? null,
-    });
+      referral_code: data.referral_code ?? null,
+    } as never);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 // =========================================================================
 // Factories

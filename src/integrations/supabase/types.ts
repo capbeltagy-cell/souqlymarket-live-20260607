@@ -806,6 +806,7 @@ export type Database = {
           id: string
           listing_id: string
           message: string | null
+          referral_code: string | null
           status: string
           updated_at: string
         }
@@ -819,6 +820,7 @@ export type Database = {
           id?: string
           listing_id: string
           message?: string | null
+          referral_code?: string | null
           status?: string
           updated_at?: string
         }
@@ -832,6 +834,7 @@ export type Database = {
           id?: string
           listing_id?: string
           message?: string | null
+          referral_code?: string | null
           status?: string
           updated_at?: string
         }
@@ -2230,6 +2233,7 @@ export type Database = {
           product_listing_id: string | null
           quantity: number
           quotation_id: string | null
+          referral_code: string | null
           shipping_address: Json | null
           status: string
           total_amount: number | null
@@ -2255,6 +2259,7 @@ export type Database = {
           product_listing_id?: string | null
           quantity?: number
           quotation_id?: string | null
+          referral_code?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number | null
@@ -2280,6 +2285,7 @@ export type Database = {
           product_listing_id?: string | null
           quantity?: number
           quotation_id?: string | null
+          referral_code?: string | null
           shipping_address?: Json | null
           status?: string
           total_amount?: number | null
@@ -2372,6 +2378,16 @@ export type Database = {
       }
     }
     Functions: {
+      attribute_referral_from_code: {
+        Args: {
+          _amount?: number
+          _code: string
+          _currency?: string
+          _listing_id: string
+          _notes?: string
+        }
+        Returns: string
+      }
       convert_referral: {
         Args: {
           _amount: number

@@ -22,8 +22,10 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
         address_line: z.string(),
       }).optional().nullable(),
       conversation_id: z.string().uuid().optional().nullable(),
+      referral_code: z.string().min(4).max(32).optional().nullable(),
     }).parse(d),
   )
+
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: listing, error } = await supabase
@@ -49,7 +51,9 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       shipping_address: data.shipping_address ?? null,
       conversation_id: data.conversation_id ?? null,
       payment_status: "unpaid",
+      referral_code: data.referral_code ?? null,
     } as Record<string, unknown>;
+
 
     const { data: created, error: iErr } = await (supabase.from("wholesale_orders" as never) as any)
       .insert(insertPayload)

@@ -67,6 +67,7 @@ export const submitLead = createServerFn({ method: "POST" })
       buyer_email: z.string().trim().email().max(255).optional().or(z.literal("")).transform((v) => v || undefined),
       buyer_phone: z.string().trim().max(40).optional().or(z.literal("")).transform((v) => v || undefined),
       message: z.string().trim().max(2000).optional().or(z.literal("")).transform((v) => v || undefined),
+      referral_code: z.string().trim().min(4).max(32).optional().or(z.literal("")).transform((v) => v || undefined),
     }).parse(d),
   )
   .handler(async ({ data }) => {
@@ -90,10 +91,12 @@ export const submitLead = createServerFn({ method: "POST" })
       buyer_email: data.buyer_email ?? null,
       buyer_phone: data.buyer_phone ?? null,
       message: data.message ?? null,
-    });
+      referral_code: data.referral_code ?? null,
+    } as never);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 // ---------- Company: my leads ----------
 export const listMyLeads = createServerFn({ method: "GET" })
