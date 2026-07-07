@@ -16,6 +16,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral, createReferral } from "@/lib/referrals.functions";
+import { getListingContact } from "@/lib/listings.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
 import { createOrderFromListing } from "@/lib/orders.functions";
@@ -67,7 +68,7 @@ type Listing = {
   commission_fixed_amount: number | null;
   marketer_promotion_enabled: boolean | null;
   promotion_status: string | null;
-  phone: string | null; whatsapp: string | null;
+  // phone/whatsapp intentionally NOT selected in public query — loaded via server fn.
   source_name: string | null; source_url: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
