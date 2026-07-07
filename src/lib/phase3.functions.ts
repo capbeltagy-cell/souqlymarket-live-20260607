@@ -186,6 +186,14 @@ export const createWholesale = createServerFn({ method: "POST" })
       price_per_unit: z.number().positive().optional(),
       governorate: z.string().max(80).optional(),
       images: z.array(z.string().url().max(2048)).max(10).optional(),
+      kind: z.enum(["product", "storage"]).optional(),
+      unit: z.string().trim().max(40).optional(),
+      wholesale_price: z.number().positive().optional(),
+      available_quantity: z.number().int().nonnegative().optional(),
+      city: z.string().max(80).optional(),
+      delivery_available: z.boolean().optional(),
+      shipping_available: z.boolean().optional(),
+      attributes: z.record(z.string(), z.any()).optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -202,10 +210,19 @@ export const createWholesale = createServerFn({ method: "POST" })
       price_per_unit: data.price_per_unit ?? null,
       governorate: data.governorate ?? null,
       images: data.images ?? [],
-    }).select("id").single();
+      kind: data.kind ?? "product",
+      unit: data.unit ?? null,
+      wholesale_price: data.wholesale_price ?? null,
+      available_quantity: data.available_quantity ?? null,
+      city: data.city ?? null,
+      delivery_available: data.delivery_available ?? false,
+      shipping_available: data.shipping_available ?? false,
+      attributes: data.attributes ?? {},
+    } as never).select("id").single();
     if (error) throw new Error(error.message);
     return { id: (row as any).id };
   });
+
 
 export const submitWholesaleOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
