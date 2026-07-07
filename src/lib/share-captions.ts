@@ -23,7 +23,7 @@ export function listingCaption(input: {
   const { locale } = input;
   const ar = locale === "ar";
   const title = (ar ? input.titleAr : input.titleEn) ?? input.titleAr ?? input.titleEn ?? "";
-  const price = input.price != null ? formatPrice(input.price, locale, { currency: input.currency ?? "EGP" }) : null;
+  const price = input.price != null ? formatPrice(input.price, locale) : null;
   const where = loc(locale, input.governorate, input.city);
 
   const isRealEstateLike = input.type === "real_estate" || input.type === "land";
