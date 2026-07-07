@@ -368,7 +368,13 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
                   <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
+                <ShareMenu
+                  url={`/listings/${id}`}
+                  title={title}
+                  caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                  variant="button"
+                  className="w-full"
+                />
               </div>
               {!isOwner && user && (
                 <div className="mt-3 grid grid-cols-2 gap-2">
