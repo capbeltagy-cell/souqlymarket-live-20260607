@@ -122,6 +122,8 @@ function ListingDetail() {
   const [msgLoading, setMsgLoading] = useState(false);
   const [myShareLink, setMyShareLink] = useState<string | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({ phone: null, whatsapp: null });
+  const loadContact = useServerFn(getListingContact);
 
   const onGetShareLink = async () => {
     setGeneratingLink(true);
@@ -163,11 +165,12 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, phone, whatsapp, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
-      // Track view (fire and forget)
       supabase.rpc("increment_listing_view", { _id: id });
+      // Contact is served by a secured server fn (mask on promoted listings).
+      loadContact({ data: { id } }).then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp })).catch(() => {});
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
@@ -180,7 +183,7 @@ function ListingDetail() {
       }
       setLoading(false);
     })();
-  }, [id, user]);
+  }, [id, user, loadContact]);
 
   const onFeature = async (days: 7 | 30) => {
     setFeaturing(days);
