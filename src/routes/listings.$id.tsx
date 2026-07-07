@@ -271,6 +271,11 @@ function ListingDetail() {
                 {company?.is_verified && <TrustBadge kind="verified_company" />}
                 {company?.is_premium && <TrustBadge kind="premium_company" />}
                 {isOwner && <TrustBadge kind="owner" />}
+                {isOwner && (
+                  <Button asChild size="sm" variant="outline" className="ml-2 h-7 text-xs">
+                    <Link to="/listings/$id/edit" params={{ id }}>{ar ? "تعديل الإعلان" : "Edit listing"}</Link>
+                  </Button>
+                )}
                 {hasLive && (
                   <Badge className="bg-success/15 text-success border border-success/30">
                     {ar ? "موثق بالتصوير المباشر" : "Verified live photo"}
