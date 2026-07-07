@@ -51,7 +51,9 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       shipping_address: data.shipping_address ?? null,
       conversation_id: data.conversation_id ?? null,
       payment_status: "unpaid",
+      referral_code: data.referral_code ?? null,
     } as Record<string, unknown>;
+
 
     const { data: created, error: iErr } = await (supabase.from("wholesale_orders" as never) as any)
       .insert(insertPayload)
