@@ -387,6 +387,7 @@ export type Database = {
           notes: string | null
           paid_at: string | null
           payout_requested_at: string | null
+          source: string
           status: Database["public"]["Enums"]["commission_status"]
         }
         Insert: {
@@ -400,6 +401,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           payout_requested_at?: string | null
+          source?: string
           status?: Database["public"]["Enums"]["commission_status"]
         }
         Update: {
@@ -413,6 +415,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           payout_requested_at?: string | null
+          source?: string
           status?: Database["public"]["Enums"]["commission_status"]
         }
         Relationships: [
@@ -476,6 +479,8 @@ export type Database = {
           owner_id: string
           phone: string | null
           production_capacity: string | null
+          referred_by_code: string | null
+          referred_by_user_id: string | null
           subscription_expires_at: string | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at: string | null
@@ -504,6 +509,8 @@ export type Database = {
           owner_id: string
           phone?: string | null
           production_capacity?: string | null
+          referred_by_code?: string | null
+          referred_by_user_id?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -532,6 +539,8 @@ export type Database = {
           owner_id?: string
           phone?: string | null
           production_capacity?: string | null
+          referred_by_code?: string | null
+          referred_by_user_id?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -1376,6 +1385,8 @@ export type Database = {
           marketer_commission_pct: number
           min_withdrawal_amount: number
           platform_commission_pct: number
+          subscription_marketer_commission_pct: number
+          subscription_plan_price_egp: number
           updated_at: string
           updated_by: string | null
           withdrawal_review_mode: string
@@ -1386,6 +1397,8 @@ export type Database = {
           marketer_commission_pct?: number
           min_withdrawal_amount?: number
           platform_commission_pct?: number
+          subscription_marketer_commission_pct?: number
+          subscription_plan_price_egp?: number
           updated_at?: string
           updated_by?: string | null
           withdrawal_review_mode?: string
@@ -1396,6 +1409,8 @@ export type Database = {
           marketer_commission_pct?: number
           min_withdrawal_amount?: number
           platform_commission_pct?: number
+          subscription_marketer_commission_pct?: number
+          subscription_plan_price_egp?: number
           updated_at?: string
           updated_by?: string | null
           withdrawal_review_mode?: string
@@ -2424,6 +2439,7 @@ export type Database = {
         }[]
       }
       is_pure_marketer: { Args: { _user_id: string }; Returns: boolean }
+      set_company_referrer: { Args: { _code: string }; Returns: boolean }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

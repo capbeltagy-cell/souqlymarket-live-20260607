@@ -203,7 +203,10 @@ function CompanyEdit() {
         name_en: form.name_en || form.name_ar,
         name_ar: form.name_ar || form.name_en,
       };
-      const res = await save({ data: { ...payload, website, email: email || null } as never });
+      let referral_code: string | undefined;
+      try { referral_code = window.localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
+      const res = await save({ data: { ...payload, website, email: email || null, referral_code } as never });
+
       toast.success(res.created ? t("company_created") : t("company_updated"));
       clearDraft();
       navigate({ to: "/companies/$id", params: { id: res.id } });
