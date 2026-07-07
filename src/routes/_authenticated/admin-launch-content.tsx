@@ -255,7 +255,7 @@ function AdminLaunchContent() {
                   <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">—</SelectItem>
-                    {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{g.ar}</SelectItem>)}
+                    {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{g.label_ar}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -304,7 +304,7 @@ function AdminLaunchContent() {
                   <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">الكل</SelectItem>
-                    {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{g.ar}</SelectItem>)}
+                    {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{g.label_ar}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
