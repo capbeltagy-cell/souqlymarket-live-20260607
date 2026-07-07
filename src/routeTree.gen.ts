@@ -94,6 +94,7 @@ import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
+import { Route as AuthenticatedListingsIdEditRouteImport } from './routes/_authenticated/listings.$id.edit'
 
 const WholesaleRoute = WholesaleRouteImport.update({
   id: '/wholesale',
@@ -542,6 +543,12 @@ const AuthenticatedOrdersIdPayRoute =
     path: '/pay',
     getParentRoute: () => AuthenticatedOrdersIdRoute,
   } as any)
+const AuthenticatedListingsIdEditRoute =
+  AuthenticatedListingsIdEditRouteImport.update({
+    id: '/listings/$id/edit',
+    path: '/listings/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -627,6 +634,7 @@ export interface FileRoutesByFullPath {
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesByTo {
@@ -713,6 +721,7 @@ export interface FileRoutesByTo {
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesById {
@@ -801,6 +810,7 @@ export interface FileRoutesById {
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/_authenticated/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRouteTypes {
@@ -889,6 +899,7 @@ export interface FileRouteTypes {
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/listings/$id/edit'
     | '/orders/$id/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -975,6 +986,7 @@ export interface FileRouteTypes {
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/listings/$id/edit'
     | '/orders/$id/pay'
   id:
     | '__root__'
@@ -1062,6 +1074,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tenders/mine'
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
+    | '/_authenticated/listings/$id/edit'
     | '/_authenticated/orders/$id/pay'
   fileRoutesById: FileRoutesById
 }
@@ -1699,6 +1712,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersIdPayRouteImport
       parentRoute: typeof AuthenticatedOrdersIdRoute
     }
+    '/_authenticated/listings/$id/edit': {
+      id: '/_authenticated/listings/$id/edit'
+      path: '/listings/$id/edit'
+      fullPath: '/listings/$id/edit'
+      preLoaderRoute: typeof AuthenticatedListingsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -1782,6 +1802,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
   AuthenticatedTendersNewRoute: typeof AuthenticatedTendersNewRoute
   AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
+  AuthenticatedListingsIdEditRoute: typeof AuthenticatedListingsIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1827,6 +1848,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
   AuthenticatedTendersNewRoute: AuthenticatedTendersNewRoute,
   AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
+  AuthenticatedListingsIdEditRoute: AuthenticatedListingsIdEditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
