@@ -30,8 +30,6 @@ type ListingMarker = {
   latitude: number | null;
   longitude: number | null;
   price: number | null;
-  phone: string | null;
-  whatsapp: string | null;
 };
 
 const TYPES: { value: ListingType | "all"; key: string }[] = [
@@ -51,7 +49,7 @@ function MapPage() {
     setLoading(true);
     supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price, phone, whatsapp")
+      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price")
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(500)
