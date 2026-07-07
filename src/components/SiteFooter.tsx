@@ -1,9 +1,46 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Briefcase, Mail } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 
+// Routes where the full marketing footer is appropriate.
+// Everywhere else (dashboards, marketplace browsing, search, transactional,
+// admin, company/marketer tools, auth flows) renders no footer to avoid
+// repeating a giant marketing block on internal application pages.
+const MARKETING_FOOTER_ROUTES = new Set<string>([
+  "/",
+  "/about",
+  "/how-it-works",
+  "/pricing",
+  "/contact",
+  "/faq",
+  "/terms",
+  "/privacy",
+  "/refund-policy",
+  "/earn",
+]);
+
 export function SiteFooter() {
   const { t } = useI18n();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const showFull = MARKETING_FOOTER_ROUTES.has(pathname);
+
+  if (!showFull) {
+    // Minimal legal strip on internal pages — keeps copyright + essential links
+    // without the large marketing block.
+    return (
+      <footer className="mt-16 border-t border-border bg-background">
+        <div className="container-souqly py-4 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          <span>© {new Date().getFullYear()} {t("brand")}</span>
+          <nav className="flex flex-wrap items-center gap-4">
+            <Link to="/terms" className="hover:text-gold transition">شروط الاستخدام</Link>
+            <Link to="/privacy" className="hover:text-gold transition">الخصوصية</Link>
+            <Link to="/contact" className="hover:text-gold transition">تواصل معنا</Link>
+          </nav>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="mt-24 border-t border-border bg-background">
       <div className="container-souqly py-12">
