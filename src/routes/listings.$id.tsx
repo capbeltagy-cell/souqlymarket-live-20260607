@@ -418,26 +418,20 @@ function ListingDetail() {
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button asChild variant="outline" size="sm">
-                        <a
-                          href={`https://wa.me/?text=${encodeURIComponent(`${title}\n${myShareLink}`)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          WhatsApp
-                        </a>
-                      </Button>
-                      <Button asChild variant="outline" size="sm">
-                        <a
-                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(myShareLink)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Facebook
-                        </a>
-                      </Button>
-                    </div>
+                    <ShareMenu
+                      url={myShareLink}
+                      title={title}
+                      earning
+                      caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                      triggerLabel={ar ? "شارك رابطك واربح" : "Share your link & earn"}
+                      className="w-full"
+                    />
+                    <ol className="text-[11px] text-muted-foreground list-decimal ps-4 space-y-0.5 pt-1">
+                      <li>{ar ? "انسخ رابطك" : "Copy your link"}</li>
+                      <li>{ar ? "انشره على واتساب أو فيسبوك أو تيك توك" : "Share it on WhatsApp, Facebook, or TikTok"}</li>
+                      <li>{ar ? "العميل يطلب من خلال الرابط" : "Customer orders through your link"}</li>
+                      <li>{ar ? "العمولة تظهر بعد التحويل المؤهل" : "Commission appears after qualified conversion"}</li>
+                    </ol>
                   </div>
                 ) : (
                   <Button
@@ -447,7 +441,6 @@ function ListingDetail() {
                     disabled={generatingLink}
                   >
                     {generatingLink && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                    <Share2 className="h-4 w-4 me-2" />
                     {ar ? "احصل على رابطي واربح" : "Get my link & earn"}
                   </Button>
                 )}
