@@ -76,6 +76,7 @@ function WholesaleDetail() {
               {item.attributes.loading_unloading && <div className="col-span-2 text-xs text-emerald-600">✓ {ar ? "تحميل / تفريغ" : "Loading / unloading"}</div>}
             </div>
           )}
+          {user ? (
             <form onSubmit={order} className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3">
               <h3 className="font-semibold">{ar ? "اطلب بالجملة" : "Place bulk order"}</h3>
               <Input type="number" min={item.moq} required placeholder={`${ar ? "الكمية" : "Quantity"} ≥ ${item.moq}`} value={qty} onChange={(e) => setQty(e.target.value)} />
