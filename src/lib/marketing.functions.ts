@@ -178,8 +178,13 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     if (!data.payoutMethodId) throw new Error("اختر طريقة السحب أولاً");
     const { data: dup } = await supabase.from("payout_requests").select("id").eq("user_id", userId).eq("status", "pending").limit(1);
     if (dup && dup.length > 0) throw new Error("لديك طلب سحب قيد المراجعة بالفعل");
-    const { data: wallet } = await supabase.from("wallets").select("id, balance").eq("user_id", userId).eq("kind", data.walletKind).maybeSingle();
-    if (!wallet) throw new Error("Wallet not found");
+    // Guarantee the wallet exists (creates a zero-balance row on first use)
+    const { data: walletId, error: ensureErr } = await supabase.rpc("ensure_wallet", {
+      _user_id: userId, _kind: data.walletKind,
+    });
+    if (ensureErr) throw new Error(ensureErr.message);
+    const { data: wallet } = await supabase.from("wallets").select("id, balance").eq("id", walletId as string).maybeSingle();
+    if (!wallet) throw new Error("Wallet could not be created");
     if (Number(wallet.balance) < data.amount) throw new Error("Insufficient balance");
     const { data: row, error } = await supabase.from("payout_requests").insert({
       user_id: userId,
