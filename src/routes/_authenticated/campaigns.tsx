@@ -41,7 +41,14 @@ function CampaignsPage() {
   const load = () => { setLoading(true); fList().then((r) => setRows(r.campaigns)).finally(() => setLoading(false)); };
   useEffect(() => {
     load();
-    supabase.from("listings").select("id,title_ar,title_en").eq("status","approved").limit(100).then(({ data }) => setListings(data ?? []));
+    // Only listings whose owners opted-in to marketer promotion appear as earning opportunities.
+    supabase.from("listings")
+      .select("id,title_ar,title_en")
+      .eq("status","approved")
+      .eq("marketer_promotion_enabled", true)
+      .eq("promotion_status", "active")
+      .limit(100)
+      .then(({ data }) => setListings(data ?? []));
   }, []);
 
   const onCreate = async (e: React.FormEvent) => {
