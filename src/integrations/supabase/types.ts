@@ -491,8 +491,12 @@ export type Database = {
           export_available: boolean
           governorate: string | null
           id: string
+          import_batch_id: string | null
+          imported_by: string | null
           industry: string | null
+          is_launch_content: boolean
           is_premium: boolean
+          is_system: boolean
           is_verified: boolean
           logo_url: string | null
           name_ar: string
@@ -502,6 +506,8 @@ export type Database = {
           production_capacity: string | null
           referred_by_code: string | null
           referred_by_user_id: string | null
+          source_name: string | null
+          source_url: string | null
           subscription_expires_at: string | null
           subscription_plan: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at: string | null
@@ -521,8 +527,12 @@ export type Database = {
           export_available?: boolean
           governorate?: string | null
           id?: string
+          import_batch_id?: string | null
+          imported_by?: string | null
           industry?: string | null
+          is_launch_content?: boolean
           is_premium?: boolean
+          is_system?: boolean
           is_verified?: boolean
           logo_url?: string | null
           name_ar: string
@@ -532,6 +542,8 @@ export type Database = {
           production_capacity?: string | null
           referred_by_code?: string | null
           referred_by_user_id?: string | null
+          source_name?: string | null
+          source_url?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -551,8 +563,12 @@ export type Database = {
           export_available?: boolean
           governorate?: string | null
           id?: string
+          import_batch_id?: string | null
+          imported_by?: string | null
           industry?: string | null
+          is_launch_content?: boolean
           is_premium?: boolean
+          is_system?: boolean
           is_verified?: boolean
           logo_url?: string | null
           name_ar?: string
@@ -562,6 +578,8 @@ export type Database = {
           production_capacity?: string | null
           referred_by_code?: string | null
           referred_by_user_id?: string | null
+          source_name?: string | null
+          source_url?: string | null
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
           subscription_updated_at?: string | null
@@ -703,7 +721,12 @@ export type Database = {
           created_at: string
           employees_range: string | null
           export_available: boolean
+          import_batch_id: string | null
+          imported_by: string | null
+          is_launch_content: boolean
           production_capacity: string | null
+          source_name: string | null
+          source_url: string | null
           updated_at: string
           verified: boolean
         }
@@ -713,7 +736,12 @@ export type Database = {
           created_at?: string
           employees_range?: string | null
           export_available?: boolean
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           production_capacity?: string | null
+          source_name?: string | null
+          source_url?: string | null
           updated_at?: string
           verified?: boolean
         }
@@ -723,7 +751,12 @@ export type Database = {
           created_at?: string
           employees_range?: string | null
           export_available?: boolean
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           production_capacity?: string | null
+          source_name?: string | null
+          source_url?: string | null
           updated_at?: string
           verified?: boolean
         }
@@ -839,6 +872,36 @@ export type Database = {
           },
         ]
       }
+      launch_import_batches: {
+        Row: {
+          admin_user_id: string
+          content_type: string
+          created_at: string
+          id: string
+          item_count: number
+          notes: string | null
+          source_name: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          item_count?: number
+          notes?: string | null
+          source_name?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          item_count?: number
+          notes?: string | null
+          source_name?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           buyer_email: string | null
@@ -938,6 +1001,9 @@ export type Database = {
           id: string
           image_sources: string[]
           images: string[] | null
+          import_batch_id: string | null
+          imported_by: string | null
+          is_launch_content: boolean
           latitude: number | null
           leads_count: number
           location: string | null
@@ -951,6 +1017,8 @@ export type Database = {
           promotion_status: string
           property_subtype: string | null
           purpose: string | null
+          source_name: string | null
+          source_url: string | null
           status: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -984,6 +1052,9 @@ export type Database = {
           id?: string
           image_sources?: string[]
           images?: string[] | null
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           latitude?: number | null
           leads_count?: number
           location?: string | null
@@ -997,6 +1068,8 @@ export type Database = {
           promotion_status?: string
           property_subtype?: string | null
           purpose?: string | null
+          source_name?: string | null
+          source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar: string
           title_en: string
@@ -1030,6 +1103,9 @@ export type Database = {
           id?: string
           image_sources?: string[]
           images?: string[] | null
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           latitude?: number | null
           leads_count?: number
           location?: string | null
@@ -1043,6 +1119,8 @@ export type Database = {
           promotion_status?: string
           property_subtype?: string | null
           purpose?: string | null
+          source_name?: string | null
+          source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title_ar?: string
           title_en?: string
@@ -1850,7 +1928,12 @@ export type Database = {
           description: string | null
           governorate: string | null
           id: string
+          import_batch_id: string | null
+          imported_by: string | null
+          is_launch_content: boolean
           quantity: number | null
+          source_name: string | null
+          source_url: string | null
           status: string
           title: string
           unit: string | null
@@ -1868,7 +1951,12 @@ export type Database = {
           description?: string | null
           governorate?: string | null
           id?: string
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           quantity?: number | null
+          source_name?: string | null
+          source_url?: string | null
           status?: string
           title: string
           unit?: string | null
@@ -1886,7 +1974,12 @@ export type Database = {
           description?: string | null
           governorate?: string | null
           id?: string
+          import_batch_id?: string | null
+          imported_by?: string | null
+          is_launch_content?: boolean
           quantity?: number | null
+          source_name?: string | null
+          source_url?: string | null
           status?: string
           title?: string
           unit?: string | null
