@@ -14,6 +14,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
 import { getCompanyContact } from "@/lib/companies.functions";
+import { ShareMenu } from "@/components/ShareMenu";
+import { companyCaption } from "@/lib/share-captions";
 
 export const Route = createFileRoute("/companies/$id")({
   loader: async ({ params }) => {
