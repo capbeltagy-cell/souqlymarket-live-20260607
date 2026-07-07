@@ -53,3 +53,62 @@ export const requestPayout = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// -------- Admin: review auto-created (and manual) commissions --------
+async function requireAdmin(supabase: any, userId: string) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Forbidden");
+}
+
+export const adminListCommissions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    status: z.enum(["pending", "approved", "paid", "all"]).default("pending"),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    let q = supabase.from("commissions").select(`
+      id, amount, currency, status, notes, created_at, paid_at, payout_requested_at,
+      listing_id, agent_id, company_id,
+      listings(title_en, title_ar),
+      agents(headline_en, user_id, profiles:user_id(display_name, full_name)),
+      companies(name_en, name_ar)
+    `).order("created_at", { ascending: false }).limit(500);
+    if (data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return { commissions: rows ?? [] };
+  });
+
+export const adminReviewCommission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    id: z.string().uuid(),
+    action: z.enum(["approve", "reject", "paid"]),
+    notes: z.string().max(500).optional().nullable(),
+  }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+
+    if (data.action === "reject") {
+      const { data: existing, error: eErr } = await supabase
+        .from("commissions").select("id, status").eq("id", data.id).maybeSingle();
+      if (eErr) throw new Error(eErr.message);
+      if (!existing) throw new Error("Commission not found");
+      if (existing.status !== "pending") throw new Error("Only pending commissions can be rejected");
+      const { error } = await supabase.from("commissions").delete().eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { ok: true, deleted: true };
+    }
+
+    const nextStatus = data.action === "approve" ? "approved" : "paid";
+    const patch: Record<string, unknown> = { status: nextStatus };
+    if (data.notes) patch.notes = data.notes;
+    const { error } = await supabase.from("commissions").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
