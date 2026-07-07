@@ -144,7 +144,10 @@ function ListingDetail() {
   const onOrder = async () => {
     setOrdering(true);
     try {
-      const { id: orderId } = await createOrder({ data: { listing_id: id, quantity: 1 } });
+      let referral_code: string | undefined;
+      try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
+      const { id: orderId } = await createOrder({ data: { listing_id: id, quantity: 1, referral_code } });
+
       toast.success(ar ? "تم إنشاء الطلب — انتقل لصفحة الطلب لإكمال البيانات" : "Order created");
       navigate({ to: "/orders/$id", params: { id: orderId } });
     } catch (e) { toast.error((e as Error).message); }
