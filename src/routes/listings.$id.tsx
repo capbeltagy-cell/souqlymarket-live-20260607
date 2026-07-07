@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Share2, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ShareMenu } from "@/components/ShareMenu";
+import { listingCaption } from "@/lib/share-captions";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -366,7 +368,13 @@ function ListingDetail() {
                 <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
                   <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" />Share</Button>
+                <ShareMenu
+                  url={`/listings/${id}`}
+                  title={title}
+                  caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                  variant="button"
+                  className="w-full"
+                />
               </div>
               {!isOwner && user && (
                 <div className="mt-3 grid grid-cols-2 gap-2">
@@ -410,26 +418,20 @@ function ListingDetail() {
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button asChild variant="outline" size="sm">
-                        <a
-                          href={`https://wa.me/?text=${encodeURIComponent(`${title}\n${myShareLink}`)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          WhatsApp
-                        </a>
-                      </Button>
-                      <Button asChild variant="outline" size="sm">
-                        <a
-                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(myShareLink)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Facebook
-                        </a>
-                      </Button>
-                    </div>
+                    <ShareMenu
+                      url={myShareLink}
+                      title={title}
+                      earning
+                      caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                      triggerLabel={ar ? "شارك رابطك واربح" : "Share your link & earn"}
+                      className="w-full"
+                    />
+                    <ol className="text-[11px] text-muted-foreground list-decimal ps-4 space-y-0.5 pt-1">
+                      <li>{ar ? "انسخ رابطك" : "Copy your link"}</li>
+                      <li>{ar ? "انشره على واتساب أو فيسبوك أو تيك توك" : "Share it on WhatsApp, Facebook, or TikTok"}</li>
+                      <li>{ar ? "العميل يطلب من خلال الرابط" : "Customer orders through your link"}</li>
+                      <li>{ar ? "العمولة تظهر بعد التحويل المؤهل" : "Commission appears after qualified conversion"}</li>
+                    </ol>
                   </div>
                 ) : (
                   <Button
@@ -439,7 +441,6 @@ function ListingDetail() {
                     disabled={generatingLink}
                   >
                     {generatingLink && <Loader2 className="h-4 w-4 animate-spin me-2" />}
-                    <Share2 className="h-4 w-4 me-2" />
                     {ar ? "احصل على رابطي واربح" : "Get my link & earn"}
                   </Button>
                 )}

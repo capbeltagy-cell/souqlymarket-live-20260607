@@ -14,6 +14,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { initialOf } from "@/lib/marketplace";
 import { getCompanyContact } from "@/lib/companies.functions";
+import { ShareMenu } from "@/components/ShareMenu";
+import { companyCaption } from "@/lib/share-captions";
 
 export const Route = createFileRoute("/companies/$id")({
   loader: async ({ params }) => {
@@ -137,6 +139,11 @@ function CompanyProfile() {
                 <Link to="/auth"><MessageCircle className="h-4 w-4" />{locale === "ar" ? "سجّل الدخول للتواصل" : "Sign in to contact"}</Link>
               </Button>
             )}
+            <ShareMenu
+              url={`/companies/${company.id}`}
+              title={name}
+              caption={companyCaption({ locale, nameAr: company.name_ar, nameEn: company.name_en, industry: company.industry, governorate: null, city: company.city })}
+            />
           </div>
 
         </div>

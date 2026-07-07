@@ -14,6 +14,8 @@ import { formatPrice } from "@/lib/currency";
 import { listMyReferrals, createReferral } from "@/lib/referrals.functions";
 import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { ShareMenu } from "@/components/ShareMenu";
+import { referralCaption } from "@/lib/share-captions";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
   head: () => ({ meta: [{ title: "Referrals — Souqly" }] }),
@@ -126,11 +128,19 @@ function ReferralsPage() {
                         <div><span className="font-semibold">{r.conversions}</span> {t("conversions")}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <code className="rounded bg-muted px-2 py-1 text-xs truncate flex-1">{url}</code>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <code className="rounded bg-muted px-2 py-1 text-xs truncate flex-1 min-w-0">{url}</code>
                       <Button size="sm" variant="ghost" onClick={() => copy(r.code)} className="gap-1">
                         <Copy className="h-3.5 w-3.5" />{t("copy_link")}
                       </Button>
+                      <ShareMenu
+                        url={url}
+                        title={title}
+                        earning
+                        caption={referralCaption({ locale, titleAr: r.listings?.title_ar, titleEn: r.listings?.title_en, commissionPct: r.listings?.commission_percentage })}
+                        variant="compact"
+                        triggerLabel={ar ? "شارك" : "Share"}
+                      />
                       <Button size="sm" variant="ghost" onClick={() => setQrFor(qrFor === r.code ? null : r.code)} className="gap-1">
                         <QrCode className="h-3.5 w-3.5" />QR
                       </Button>
