@@ -14,6 +14,8 @@ import { formatPrice } from "@/lib/currency";
 import { listMyReferrals, createReferral } from "@/lib/referrals.functions";
 import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { ShareMenu } from "@/components/ShareMenu";
+import { referralCaption } from "@/lib/share-captions";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
   head: () => ({ meta: [{ title: "Referrals — Souqly" }] }),
