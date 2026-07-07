@@ -233,8 +233,8 @@ function ListingDetail() {
   const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
   // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
   const showContact = !isPromoted || isOwner;
-  const contactPhone = showContact ? (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "") : "";
-  const whatsappNum = showContact ? (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "") : "";
+  const contactPhone = showContact ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "") : "";
+  const whatsappNum = showContact ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
