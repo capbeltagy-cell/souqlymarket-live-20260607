@@ -66,6 +66,7 @@ import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyCenterRouteImport } from './routes/_authenticated/company-center'
+import { Route as AuthenticatedCompanyCampaignsRouteImport } from './routes/_authenticated/company-campaigns'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedChooseRoleRouteImport } from './routes/_authenticated/choose-role'
@@ -386,6 +387,12 @@ const AuthenticatedCompanyCenterRoute =
     path: '/company-center',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCompanyCampaignsRoute =
+  AuthenticatedCompanyCampaignsRouteImport.update({
+    id: '/company-campaigns',
+    path: '/company-campaigns',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompanyRoute = AuthenticatedCompanyRouteImport.update({
   id: '/company',
   path: '/company',
@@ -605,6 +612,7 @@ export interface FileRoutesByFullPath {
   '/choose-role': typeof AuthenticatedChooseRoleRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
+  '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -693,6 +701,7 @@ export interface FileRoutesByTo {
   '/choose-role': typeof AuthenticatedChooseRoleRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
+  '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -783,6 +792,7 @@ export interface FileRoutesById {
   '/_authenticated/choose-role': typeof AuthenticatedChooseRoleRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
+  '/_authenticated/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/_authenticated/company-center': typeof AuthenticatedCompanyCenterRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -873,6 +883,7 @@ export interface FileRouteTypes {
     | '/choose-role'
     | '/commissions'
     | '/company'
+    | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
     | '/dashboard'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/choose-role'
     | '/commissions'
     | '/company'
+    | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
     | '/dashboard'
@@ -1050,6 +1062,7 @@ export interface FileRouteTypes {
     | '/_authenticated/choose-role'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
+    | '/_authenticated/company-campaigns'
     | '/_authenticated/company-center'
     | '/_authenticated/company-profile-extra'
     | '/_authenticated/dashboard'
@@ -1529,6 +1542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompanyCenterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company-campaigns': {
+      id: '/_authenticated/company-campaigns'
+      path: '/company-campaigns'
+      fullPath: '/company-campaigns'
+      preLoaderRoute: typeof AuthenticatedCompanyCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/company': {
       id: '/_authenticated/company'
       path: '/company'
@@ -1799,6 +1819,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChooseRoleRoute: typeof AuthenticatedChooseRoleRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
+  AuthenticatedCompanyCampaignsRoute: typeof AuthenticatedCompanyCampaignsRoute
   AuthenticatedCompanyCenterRoute: typeof AuthenticatedCompanyCenterRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -1846,6 +1867,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChooseRoleRoute: AuthenticatedChooseRoleRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
+  AuthenticatedCompanyCampaignsRoute: AuthenticatedCompanyCampaignsRoute,
   AuthenticatedCompanyCenterRoute: AuthenticatedCompanyCenterRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

@@ -227,7 +227,9 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
       </div>
       {/* Primary actions — the ones a company owner needs first */}
       <div className="flex flex-wrap gap-2">
-        <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/listings/new"><PlusCircle className="h-4 w-4" />{t("new_listing")}</Link></Button>
+        <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/company-center"><LayoutDashboard className="h-4 w-4" />{ar ? "مركز قيادة الشركة" : "Command Center"}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/listings/new"><PlusCircle className="h-4 w-4" />{t("new_listing")}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/company-campaigns"><Sparkles className="h-4 w-4" />{ar ? "حملاتي" : "Campaigns"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
         <Button asChild variant="outline"><Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link></Button>
