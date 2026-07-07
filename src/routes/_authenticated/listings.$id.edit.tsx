@@ -215,7 +215,7 @@ function EditListing() {
               <Select value={governorate} onValueChange={(v) => { setGovernorate(v); setCity(""); }}>
                 <SelectTrigger><SelectValue placeholder={ar ? "اختر" : "Select"} /></SelectTrigger>
                 <SelectContent>
-                  {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.ar} value={g.ar}>{ar ? g.ar : g.en}</SelectItem>)}
+                  {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{ar ? g.label_ar : g.label_en}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -224,7 +224,7 @@ function EditListing() {
               <Select value={city} onValueChange={setCity} disabled={!governorate}>
                 <SelectTrigger><SelectValue placeholder={ar ? "اختر" : "Select"} /></SelectTrigger>
                 <SelectContent>
-                  {cities.map((c) => <SelectItem key={c.ar} value={c.ar}>{ar ? c.ar : c.en}</SelectItem>)}
+                  {cities.map((c) => <SelectItem key={c.value} value={c.value}>{ar ? c.label_ar : c.label_en}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
