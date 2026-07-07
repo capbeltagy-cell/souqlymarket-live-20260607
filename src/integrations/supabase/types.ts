@@ -2337,48 +2337,72 @@ export type Database = {
       wholesale_listings: {
         Row: {
           active: boolean
+          attributes: Json
+          available_quantity: number | null
           category_slug: string | null
+          city: string | null
           company_id: string
           created_at: string
           currency: string
+          delivery_available: boolean
           description: string | null
           governorate: string | null
           id: string
           images: Json
+          kind: string
           moq: number
           price_per_unit: number | null
+          shipping_available: boolean
           title: string
+          unit: string | null
           updated_at: string
+          wholesale_price: number | null
         }
         Insert: {
           active?: boolean
+          attributes?: Json
+          available_quantity?: number | null
           category_slug?: string | null
+          city?: string | null
           company_id: string
           created_at?: string
           currency?: string
+          delivery_available?: boolean
           description?: string | null
           governorate?: string | null
           id?: string
           images?: Json
+          kind?: string
           moq?: number
           price_per_unit?: number | null
+          shipping_available?: boolean
           title: string
+          unit?: string | null
           updated_at?: string
+          wholesale_price?: number | null
         }
         Update: {
           active?: boolean
+          attributes?: Json
+          available_quantity?: number | null
           category_slug?: string | null
+          city?: string | null
           company_id?: string
           created_at?: string
           currency?: string
+          delivery_available?: boolean
           description?: string | null
           governorate?: string | null
           id?: string
           images?: Json
+          kind?: string
           moq?: number
           price_per_unit?: number | null
+          shipping_available?: boolean
           title?: string
+          unit?: string | null
           updated_at?: string
+          wholesale_price?: number | null
         }
         Relationships: [
           {
