@@ -139,6 +139,11 @@ function CompanyProfile() {
                 <Link to="/auth"><MessageCircle className="h-4 w-4" />{locale === "ar" ? "سجّل الدخول للتواصل" : "Sign in to contact"}</Link>
               </Button>
             )}
+            <ShareMenu
+              url={`/companies/${company.id}`}
+              title={name}
+              caption={companyCaption({ locale, nameAr: company.name_ar, nameEn: company.name_en, industry: company.industry, governorate: null, city: company.city })}
+            />
           </div>
 
         </div>
