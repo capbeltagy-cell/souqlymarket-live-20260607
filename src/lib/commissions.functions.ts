@@ -104,10 +104,11 @@ export const adminReviewCommission = createServerFn({ method: "POST" })
       return { ok: true, deleted: true };
     }
 
-    const nextStatus = data.action === "approve" ? "approved" : "paid";
-    const patch: Record<string, unknown> = { status: nextStatus };
+    const nextStatus = data.action === "approve" ? "approved" as const : "paid" as const;
+    const patch: { status: "approved" | "paid"; notes?: string } = { status: nextStatus };
     if (data.notes) patch.notes = data.notes;
     const { error } = await supabase.from("commissions").update(patch).eq("id", data.id);
+
     if (error) throw new Error(error.message);
     return { ok: true };
   });
