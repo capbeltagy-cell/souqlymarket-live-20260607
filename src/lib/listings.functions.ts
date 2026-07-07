@@ -142,6 +142,74 @@ export const deleteListing = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// Full owner-side edit for a listing (including marketer promotion settings).
+// Ownership is enforced server-side (RLS + explicit company_id check).
+export const updateListing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      id: z.string().uuid(),
+      title_ar: z.string().min(2).max(200).optional(),
+      title_en: z.string().min(2).max(200).optional(),
+      description_ar: z.string().max(4000).nullable().optional(),
+      description_en: z.string().max(4000).nullable().optional(),
+      category: z.string().max(80).nullable().optional(),
+      price: z.number().nonnegative().nullable().optional(),
+      city: z.string().trim().min(2).max(80).optional(),
+      governorate: z.string().trim().min(2).max(80).optional(),
+      images: z.array(z.string()).max(10).optional(),
+      phone: z.string().trim().regex(PHONE_RE).max(20).nullable().optional(),
+      whatsapp: z.string().trim().regex(PHONE_RE).max(20).nullable().optional(),
+      status: z.enum(["approved", "hidden", "pending_review"]).optional(),
+      commission_percentage: z.number().min(0).max(100).optional(),
+      marketer_promotion_enabled: z.boolean().optional(),
+      commission_type: z.enum(["percentage", "fixed"]).optional(),
+      commission_fixed_amount: z.number().nonnegative().optional(),
+      conversion_goal: z.string().max(200).nullable().optional(),
+      promotion_conditions: z.string().max(1000).nullable().optional(),
+      promotion_status: z.enum(["active", "paused", "ended"]).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { id, ...rest } = data;
+    const { data: row, error: rErr } = await supabase
+      .from("listings").select("id, company_id").eq("id", id).maybeSingle();
+    if (rErr) throw new Error(rErr.message);
+    if (!row) throw new Error("Listing not found");
+    const { data: comp } = await supabase
+      .from("companies").select("id").eq("id", row.company_id).eq("owner_id", userId).maybeSingle();
+    if (!comp) throw new Error("Not authorized to edit this listing");
+    const patch: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(rest)) if (v !== undefined) patch[k] = v;
+    if (Object.keys(patch).length === 0) return { ok: true };
+    const { error } = await supabase.from("listings").update(patch).eq("id", id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Contact reveal — masked on promoted+active listings so the public flow goes through Souqly.
+export const getListingContact = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: row } = await sb
+      .from("listings")
+      .select("phone, whatsapp, marketer_promotion_enabled, promotion_status")
+      .eq("id", data.id)
+      .eq("status", "approved")
+      .maybeSingle() as { data: { phone: string | null; whatsapp: string | null; marketer_promotion_enabled: boolean | null; promotion_status: string | null } | null };
+    if (!row) return { phone: null, whatsapp: null, masked: false };
+    const promoted = !!row.marketer_promotion_enabled && (row.promotion_status ?? "active") === "active";
+    if (promoted) return { phone: null, whatsapp: null, masked: true };
+    return { phone: row.phone, whatsapp: row.whatsapp, masked: false };
+  });
+
 export const checkListingDuplicate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
