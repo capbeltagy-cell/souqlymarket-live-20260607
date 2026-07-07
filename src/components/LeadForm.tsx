@@ -25,7 +25,9 @@ export function LeadForm({ listingId }: { listingId: string }) {
     e.preventDefault();
     setBusy(true);
     try {
-      await send({ data: { listingId, buyer_name: name, buyer_email: email, buyer_phone: phone, message } });
+      let referral_code: string | undefined;
+      try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
+      await send({ data: { listingId, buyer_name: name, buyer_email: email, buyer_phone: phone, message, referral_code } });
       // also count click for engagement
       await supabase.rpc("increment_listing_click", { _id: listingId });
       setDone(true);
@@ -36,6 +38,7 @@ export function LeadForm({ listingId }: { listingId: string }) {
       setBusy(false);
     }
   };
+
 
   if (done) {
     return (
