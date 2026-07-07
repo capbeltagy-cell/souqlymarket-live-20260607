@@ -16,6 +16,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { convertReferral, createReferral } from "@/lib/referrals.functions";
+import { getListingContact } from "@/lib/listings.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
 import { createOrderFromListing } from "@/lib/orders.functions";
@@ -67,7 +68,7 @@ type Listing = {
   commission_fixed_amount: number | null;
   marketer_promotion_enabled: boolean | null;
   promotion_status: string | null;
-  phone: string | null; whatsapp: string | null;
+  // phone/whatsapp intentionally NOT selected in public query — loaded via server fn.
   source_name: string | null; source_url: string | null;
   featured: boolean | null; featured_until: string | null;
   views_count: number | null;
@@ -121,6 +122,8 @@ function ListingDetail() {
   const [msgLoading, setMsgLoading] = useState(false);
   const [myShareLink, setMyShareLink] = useState<string | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({ phone: null, whatsapp: null });
+  const loadContact = useServerFn(getListingContact);
 
   const onGetShareLink = async () => {
     setGeneratingLink(true);
@@ -162,11 +165,12 @@ function ListingDetail() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, phone, whatsapp, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
+        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
         .eq("id", id).maybeSingle();
       setL(data as unknown as Listing);
-      // Track view (fire and forget)
       supabase.rpc("increment_listing_view", { _id: id });
+      // Contact is served by a secured server fn (mask on promoted listings).
+      loadContact({ data: { id } }).then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp })).catch(() => {});
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
@@ -179,7 +183,7 @@ function ListingDetail() {
       }
       setLoading(false);
     })();
-  }, [id, user]);
+  }, [id, user, loadContact]);
 
   const onFeature = async (days: 7 | 30) => {
     setFeaturing(days);
@@ -229,8 +233,8 @@ function ListingDetail() {
   const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
   // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
   const showContact = !isPromoted || isOwner;
-  const contactPhone = showContact ? (l.phone || l.whatsapp || "").replace(/[^0-9]/g, "") : "";
-  const whatsappNum = showContact ? (l.whatsapp || l.phone || "").replace(/[^0-9]/g, "") : "";
+  const contactPhone = showContact ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "") : "";
+  const whatsappNum = showContact ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
@@ -267,6 +271,11 @@ function ListingDetail() {
                 {company?.is_verified && <TrustBadge kind="verified_company" />}
                 {company?.is_premium && <TrustBadge kind="premium_company" />}
                 {isOwner && <TrustBadge kind="owner" />}
+                {isOwner && (
+                  <Button asChild size="sm" variant="outline" className="ml-2 h-7 text-xs">
+                    <Link to="/listings/$id/edit" params={{ id }}>{ar ? "تعديل الإعلان" : "Edit listing"}</Link>
+                  </Button>
+                )}
                 {hasLive && (
                   <Badge className="bg-success/15 text-success border border-success/30">
                     {ar ? "موثق بالتصوير المباشر" : "Verified live photo"}
