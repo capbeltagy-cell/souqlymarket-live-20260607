@@ -105,11 +105,8 @@ export const getPricingConfig = createServerFn({ method: "GET" })
     const sb = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined as never },
     });
-    const { data } = await sb
-      .from("platform_settings")
-      .select("subscription_plan_price_egp, subscription_marketer_commission_pct")
-      .eq("id", true)
-      .maybeSingle();
+    const { data: rows } = await sb.rpc("get_public_pricing" as never);
+    const data = Array.isArray(rows) ? (rows[0] as { subscription_plan_price_egp?: number; subscription_marketer_commission_pct?: number } | undefined) : undefined;
     return {
       companyPremiumPriceEgp: Number(data?.subscription_plan_price_egp ?? COMPANY_PLAN_PRICE_EGP),
       marketerCommissionPct: Number(data?.subscription_marketer_commission_pct ?? 15),
