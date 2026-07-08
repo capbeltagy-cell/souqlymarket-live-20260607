@@ -2648,6 +2648,13 @@ export type Database = {
         }
         Returns: string
       }
+      get_public_pricing: {
+        Args: never
+        Returns: {
+          subscription_marketer_commission_pct: number
+          subscription_plan_price_egp: number
+        }[]
+      }
       has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean

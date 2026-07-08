@@ -172,7 +172,8 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { data: settings } = await (supabase.from("platform_settings" as never) as any).select("min_withdrawal_amount").maybeSingle();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: settings } = await (supabaseAdmin.from("platform_settings" as never) as any).select("min_withdrawal_amount").maybeSingle();
     const minAmount = Number(settings?.min_withdrawal_amount ?? 100);
     if (data.amount < minAmount) throw new Error(`الحد الأدنى للسحب ${minAmount} ج.م`);
     if (!data.payoutMethodId) throw new Error("اختر طريقة السحب أولاً");
