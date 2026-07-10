@@ -37,6 +37,7 @@ function AuthPage() {
   const ar = dir === "rtl";
 
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
+  const [signupRole, setSignupRole] = useState<"company" | "agent">("company");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -54,12 +55,13 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { display_name: email.split("@")[0] } },
+          options: { data: { display_name: email.split("@")[0], role: signupRole } },
         });
         if (error) throw error;
+        try { localStorage.setItem("souqly:role_choice", signupRole); } catch {}
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
-        // New users must pick a role before any dashboard makes sense.
-        navigate({ to: "/choose-role" });
+        // Send user straight to the right onboarding surface for their chosen role.
+        navigate({ to: signupRole === "company" ? "/company" : "/agent" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
