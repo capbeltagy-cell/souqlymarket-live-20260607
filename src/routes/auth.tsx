@@ -109,8 +109,32 @@ function AuthPage() {
               {mode === "signup" ? (ar ? "أدخل بريدك وكلمة المرور" : "Enter your email and password") : (ar ? "مرحباً بعودتك" : "Welcome back")}
             </p>
 
+            {mode === "signup" && (
+              <div className="mb-5">
+                <Label className="text-sm">{ar ? "نوع الحساب" : "Account type"}</Label>
+                <div className="grid grid-cols-2 gap-2 mt-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSignupRole("company")}
+                    className={`rounded-lg border p-3 text-start transition ${signupRole === "company" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                  >
+                    <div className="font-semibold text-sm">{ar ? "سجل كشركة" : "Register as company"}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">{ar ? "انشر منتجاتك واستقبل الطلبات" : "Publish products, receive leads"}</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSignupRole("agent")}
+                    className={`rounded-lg border p-3 text-start transition ${signupRole === "agent" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                  >
+                    <div className="font-semibold text-sm">{ar ? "سجل كمسوق" : "Register as marketer"}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">{ar ? "اربح عمولات من الإحالات" : "Earn commissions from referrals"}</div>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+
               <div>
                 <Label htmlFor="email">{ar ? "البريد الإلكتروني" : "Email"}</Label>
                 <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
