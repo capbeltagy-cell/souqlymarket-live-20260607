@@ -227,13 +227,14 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
       </div>
       {/* Primary actions — the ones a company owner needs first */}
       <div className="flex flex-wrap gap-2">
-        <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/company-center"><LayoutDashboard className="h-4 w-4" />{ar ? "مركز قيادة الشركة" : "Command Center"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/listings/new"><PlusCircle className="h-4 w-4" />{t("new_listing")}</Link></Button>
+        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold"><Link to="/listings/new"><PlusCircle className="h-5 w-5" />{ar ? "+ أضف إعلانًا" : "+ Add listing"}</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/company-center"><LayoutDashboard className="h-4 w-4" />{ar ? "مركز قيادة الشركة" : "Command Center"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/company-campaigns"><Sparkles className="h-4 w-4" />{ar ? "حملاتي" : "Campaigns"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
         <Button asChild variant="outline"><Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link></Button>
       </div>
+
 
       {/* Advanced tools — hidden by default */}
       <Collapsible className="mt-4">
@@ -318,15 +319,17 @@ function AgentDash({ counts }: { counts: Counts }) {
         <Stat icon={Link2} label="روابط الإحالة" value={String(counts.referrals)} />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button asChild className="bg-primary hover:bg-primary-hover gap-2"><Link to="/campaigns"><Sparkles className="h-4 w-4" />تصفح الفرص</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/referrals"><Link2 className="h-4 w-4" />روابط الإحالة</Link></Button>
+        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold"><Link to="/campaigns"><Sparkles className="h-5 w-5" />ابدأ الربح</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/campaigns"><Sparkles className="h-4 w-4" />فرص التسويق</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/referrals"><Link2 className="h-4 w-4" />روابط التسويق</Link></Button>
+        <Button asChild variant="outline" className="gap-2"><Link to="/commissions"><ClipboardList className="h-4 w-4" />العمولات</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/wallet"><DollarSign className="h-4 w-4" />المحفظة</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/payouts"><DollarSign className="h-4 w-4" />طلب سحب</Link></Button>
-        <Button asChild variant="outline"><Link to="/commissions">سجل العمولات</Link></Button>
         <Button asChild variant="outline"><Link to="/messages">الرسائل</Link></Button>
         <Button asChild variant="outline"><Link to="/agent">ملفي الشخصي</Link></Button>
         <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />الأداء</Link></Button>
       </div>
+
     </>
   );
 }

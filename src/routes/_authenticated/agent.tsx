@@ -15,6 +15,7 @@ import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
 import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
 import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/agent")({
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
@@ -40,6 +41,19 @@ function AgentEdit() {
   const [form, setForm] = useState<Form>(empty);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  // Company accounts must never be auto-converted to marketer by visiting this page.
+  // If they landed here, redirect them safely to their dashboard.
+  const { roles, loading: rolesLoading } = useAuth();
+  useEffect(() => {
+    if (rolesLoading) return;
+    const isCompany = roles.includes("company") && !roles.includes("agent") && !roles.includes("admin");
+    if (isCompany) {
+      toast.error(locale === "ar" ? "هذه الصفحة مخصصة للمسوقين. تم توجيهك إلى لوحة الشركة." : "This page is for marketers. Redirecting to your company dashboard.");
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [rolesLoading, roles, locale, navigate]);
+
 
   useEffect(() => {
     fetchMine().then((r) => {
