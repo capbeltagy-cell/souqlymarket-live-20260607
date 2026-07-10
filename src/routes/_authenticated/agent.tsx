@@ -15,6 +15,7 @@ import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
 import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
 import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/agent")({
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
