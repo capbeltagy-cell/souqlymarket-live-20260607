@@ -37,6 +37,7 @@ function AdminOverview() {
             <Link to="/admin-launch-content" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "محتوى الإطلاق" : "Launch content"}</Link>
             <Link to="/admin-commissions" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "العمولات" : "Commissions"}</Link>
             <Link to="/admin-withdrawals" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "طلبات السحب" : "Withdrawals"}</Link>
+            <Link to="/admin-deposits" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "إيداعات الشركات" : "Deposits"}</Link>
             <Link to="/admin-companies" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "الشركات" : "Companies"}</Link>
           </div>
         </div>
