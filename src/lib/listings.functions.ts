@@ -172,6 +172,8 @@ export const updateListing = createServerFn({ method: "POST" })
       conversion_goal: z.string().max(200).nullable().optional(),
       promotion_conditions: z.string().max(1000).nullable().optional(),
       promotion_status: z.enum(["active", "paused", "ended"]).optional(),
+      campaign_max_conversions: z.number().int().positive().nullable().optional(),
+      campaign_budget_egp: z.number().positive().nullable().optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
