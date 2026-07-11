@@ -37,7 +37,9 @@ export const createListing = createServerFn({ method: "POST" })
       commission_fixed_amount: z.number().nonnegative().optional().default(0),
       conversion_goal: z.string().max(200).optional().nullable(),
       promotion_conditions: z.string().max(1000).optional().nullable(),
-      promotion_status: z.enum(["active", "paused", "ended"]).optional().default("active"),
+      promotion_status: z.enum(["active", "paused", "ended"]).optional().default("paused"),
+      campaign_max_conversions: z.number().int().positive().optional().nullable(),
+      campaign_budget_egp: z.number().positive().optional().nullable(),
       phone: z.string().trim().regex(PHONE_RE).max(20).optional().nullable(),
       whatsapp: z.string().trim().regex(PHONE_RE).max(20).optional().nullable(),
       property_subtype: z.string().max(40).optional().nullable(),
@@ -115,7 +117,9 @@ export const createListing = createServerFn({ method: "POST" })
         commission_fixed_amount: data.commission_fixed_amount ?? 0,
         conversion_goal: data.conversion_goal ?? null,
         promotion_conditions: data.promotion_conditions ?? null,
-        promotion_status: data.promotion_status ?? "active",
+        promotion_status: data.marketer_promotion_enabled ? "paused" : "ended",
+        campaign_max_conversions: data.campaign_max_conversions ?? null,
+        campaign_budget_egp: data.campaign_budget_egp ?? null,
         phone: data.phone ?? null,
         whatsapp: data.whatsapp ?? null,
         property_subtype: data.property_subtype ?? null,
@@ -168,6 +172,8 @@ export const updateListing = createServerFn({ method: "POST" })
       conversion_goal: z.string().max(200).nullable().optional(),
       promotion_conditions: z.string().max(1000).nullable().optional(),
       promotion_status: z.enum(["active", "paused", "ended"]).optional(),
+      campaign_max_conversions: z.number().int().positive().nullable().optional(),
+      campaign_budget_egp: z.number().positive().nullable().optional(),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -180,11 +186,22 @@ export const updateListing = createServerFn({ method: "POST" })
     const { data: comp } = await supabase
       .from("companies").select("id").eq("id", row.company_id).eq("owner_id", userId).maybeSingle();
     if (!comp) throw new Error("Not authorized to edit this listing");
+    // Route promotion_status changes through the reserve RPCs. Owners cannot
+    // set "active" via a bare update — that would bypass the campaign reserve.
+    const promoStatusChange = rest.promotion_status;
     const patch: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(rest)) if (v !== undefined) patch[k] = v;
-    if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await supabase.from("listings").update(patch as never).eq("id", id);
-    if (error) throw new Error(error.message);
+    for (const [k, v] of Object.entries(rest)) if (v !== undefined && k !== "promotion_status") patch[k] = v;
+    if (Object.keys(patch).length > 0) {
+      const { error } = await supabase.from("listings").update(patch as never).eq("id", id);
+      if (error) throw new Error(error.message);
+    }
+    if (promoStatusChange === "active") {
+      const { error } = await supabase.rpc("activate_listing_promotion" as never, { _listing_id: id } as never);
+      if (error) throw new Error(error.message);
+    } else if (promoStatusChange === "paused" || promoStatusChange === "ended") {
+      const { error } = await supabase.rpc("deactivate_listing_promotion" as never, { _listing_id: id, _status: promoStatusChange } as never);
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
 

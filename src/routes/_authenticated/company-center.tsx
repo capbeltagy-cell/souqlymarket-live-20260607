@@ -122,7 +122,7 @@ function CommandCenter() {
         <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/company-campaigns"><Megaphone className="h-4 w-4" />{ar ? "الحملات" : "Campaigns"}</Link></Button>
         <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
         <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/analytics"><BarChart3 className="h-4 w-4" />{ar ? "التحليلات" : "Analytics"}</Link></Button>
-        <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/wallet"><Wallet className="h-4 w-4" />{ar ? "المحفظة" : "Wallet"}</Link></Button>
+        <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/company-wallet"><Wallet className="h-4 w-4" />{ar ? "محفظة الشركة" : "Company Wallet"}</Link></Button>
         <Button asChild size="sm" variant="outline" className="gap-1"><Link to="/company"><Settings className="h-4 w-4" />{ar ? "الملف" : "Profile"}</Link></Button>
       </div>
 

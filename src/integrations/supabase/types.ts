@@ -588,6 +588,75 @@ export type Database = {
         }
         Relationships: []
       }
+      company_deposits: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          company_id: string
+          created_at: string
+          credited_wallet_tx_id: string | null
+          currency: string
+          id: string
+          method_code: string | null
+          owner_id: string
+          proof_url: string | null
+          reference: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          company_id: string
+          created_at?: string
+          credited_wallet_tx_id?: string | null
+          currency?: string
+          id?: string
+          method_code?: string | null
+          owner_id: string
+          proof_url?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          company_id?: string
+          created_at?: string
+          credited_wallet_tx_id?: string | null
+          currency?: string
+          id?: string
+          method_code?: string | null
+          owner_id?: string
+          proof_url?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_deposits_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_deposits_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_trust"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
       company_profiles_extra: {
         Row: {
           achievements: Json
@@ -982,6 +1051,9 @@ export type Database = {
           area_sqm: number | null
           bathrooms: number | null
           bedrooms: number | null
+          campaign_budget_egp: number | null
+          campaign_max_conversions: number | null
+          campaign_reserved_amount: number
           category: string | null
           city: string | null
           clicks_count: number
@@ -1033,6 +1105,9 @@ export type Database = {
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
+          campaign_budget_egp?: number | null
+          campaign_max_conversions?: number | null
+          campaign_reserved_amount?: number
           category?: string | null
           city?: string | null
           clicks_count?: number
@@ -1084,6 +1159,9 @@ export type Database = {
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
+          campaign_budget_egp?: number | null
+          campaign_max_conversions?: number | null
+          campaign_reserved_amount?: number
           category?: string | null
           city?: string | null
           clicks_count?: number
@@ -1525,6 +1603,7 @@ export type Database = {
       }
       platform_settings: {
         Row: {
+          campaign_reserve_pct: number
           currency: string
           id: boolean
           marketer_commission_pct: number
@@ -1537,6 +1616,7 @@ export type Database = {
           withdrawal_review_mode: string
         }
         Insert: {
+          campaign_reserve_pct?: number
           currency?: string
           id?: boolean
           marketer_commission_pct?: number
@@ -1549,6 +1629,7 @@ export type Database = {
           withdrawal_review_mode?: string
         }
         Update: {
+          campaign_reserve_pct?: number
           currency?: string
           id?: boolean
           marketer_commission_pct?: number
@@ -2303,6 +2384,7 @@ export type Database = {
           id: string
           kind: Database["public"]["Enums"]["wallet_kind"]
           pending_balance: number
+          reserved_balance: number
           total_earned: number
           total_paid_out: number
           updated_at: string
@@ -2315,6 +2397,7 @@ export type Database = {
           id?: string
           kind: Database["public"]["Enums"]["wallet_kind"]
           pending_balance?: number
+          reserved_balance?: number
           total_earned?: number
           total_paid_out?: number
           updated_at?: string
@@ -2327,6 +2410,7 @@ export type Database = {
           id?: string
           kind?: Database["public"]["Enums"]["wallet_kind"]
           pending_balance?: number
+          reserved_balance?: number
           total_earned?: number
           total_paid_out?: number
           updated_at?: string
@@ -2622,6 +2706,14 @@ export type Database = {
       }
     }
     Functions: {
+      activate_listing_promotion: {
+        Args: { _listing_id: string }
+        Returns: Json
+      }
+      approve_company_deposit: {
+        Args: { _admin_notes?: string; _deposit_id: string }
+        Returns: string
+      }
       attribute_referral_from_code: {
         Args: {
           _amount?: number
@@ -2632,6 +2724,10 @@ export type Database = {
         }
         Returns: string
       }
+      compute_listing_required_reserve: {
+        Args: { _listing_id: string }
+        Returns: number
+      }
       convert_referral: {
         Args: {
           _amount: number
@@ -2641,6 +2737,11 @@ export type Database = {
         }
         Returns: string
       }
+      deactivate_listing_promotion: {
+        Args: { _listing_id: string; _status: string }
+        Returns: Json
+      }
+      ensure_company_funding_wallet: { Args: never; Returns: string }
       ensure_wallet: {
         Args: {
           _kind: Database["public"]["Enums"]["wallet_kind"]
@@ -2675,6 +2776,10 @@ export type Database = {
         }[]
       }
       is_pure_marketer: { Args: { _user_id: string }; Returns: boolean }
+      reject_company_deposit: {
+        Args: { _admin_notes?: string; _deposit_id: string }
+        Returns: undefined
+      }
       set_company_referrer: { Args: { _code: string }; Returns: boolean }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
@@ -2726,7 +2831,7 @@ export type Database = {
         | "cancelled"
         | "converted"
       subscription_plan: "free" | "premium_company" | "premium_agent"
-      wallet_kind: "company" | "agent" | "platform"
+      wallet_kind: "company" | "agent" | "platform" | "company_funding"
       wallet_tx_reason:
         | "commission"
         | "referral"
@@ -2736,6 +2841,8 @@ export type Database = {
         | "manual_credit"
         | "manual_debit"
         | "refund"
+        | "deposit"
+        | "campaign_reserve"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2913,7 +3020,7 @@ export const Constants = {
         "converted",
       ],
       subscription_plan: ["free", "premium_company", "premium_agent"],
-      wallet_kind: ["company", "agent", "platform"],
+      wallet_kind: ["company", "agent", "platform", "company_funding"],
       wallet_tx_reason: [
         "commission",
         "referral",
@@ -2923,6 +3030,8 @@ export const Constants = {
         "manual_credit",
         "manual_debit",
         "refund",
+        "deposit",
+        "campaign_reserve",
       ],
     },
   },

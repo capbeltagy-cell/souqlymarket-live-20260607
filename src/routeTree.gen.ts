@@ -64,6 +64,7 @@ import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCompanyWalletRouteImport } from './routes/_authenticated/company-wallet'
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyCenterRouteImport } from './routes/_authenticated/company-center'
 import { Route as AuthenticatedCompanyCampaignsRouteImport } from './routes/_authenticated/company-campaigns'
@@ -82,6 +83,7 @@ import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminLaunchContentRouteImport } from './routes/_authenticated/admin-launch-content'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
+import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin-deposits'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -94,6 +96,7 @@ import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authen
 import { Route as AuthenticatedQuotationsIdRouteImport } from './routes/_authenticated/quotations.$id'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
+import { Route as AuthenticatedCompanyWalletDepositRouteImport } from './routes/_authenticated/company-wallet.deposit'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
 import { Route as AuthenticatedListingsIdEditRouteImport } from './routes/_authenticated/listings.$id.edit'
@@ -375,6 +378,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompanyWalletRoute =
+  AuthenticatedCompanyWalletRouteImport.update({
+    id: '/company-wallet',
+    path: '/company-wallet',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompanyProfileExtraRoute =
   AuthenticatedCompanyProfileExtraRouteImport.update({
     id: '/company-profile-extra',
@@ -477,6 +486,12 @@ const AuthenticatedAdminExecutiveRoute =
     path: '/admin-executive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminDepositsRoute =
+  AuthenticatedAdminDepositsRouteImport.update({
+    id: '/admin-deposits',
+    path: '/admin-deposits',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCompaniesRoute =
   AuthenticatedAdminCompaniesRouteImport.update({
     id: '/admin-companies',
@@ -545,6 +560,12 @@ const AuthenticatedListingsNewRoute =
     path: '/listings/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCompanyWalletDepositRoute =
+  AuthenticatedCompanyWalletDepositRouteImport.update({
+    id: '/deposit',
+    path: '/deposit',
+    getParentRoute: () => AuthenticatedCompanyWalletRoute,
+  } as any)
 const AuthenticatedCampaignsIdRoute =
   AuthenticatedCampaignsIdRouteImport.update({
     id: '/$id',
@@ -597,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -615,6 +637,7 @@ export interface FileRoutesByFullPath {
   '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -641,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
@@ -686,6 +710,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -704,6 +729,7 @@ export interface FileRoutesByTo {
   '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -730,6 +756,7 @@ export interface FileRoutesByTo {
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
@@ -777,6 +804,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/_authenticated/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -795,6 +823,7 @@ export interface FileRoutesById {
   '/_authenticated/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/_authenticated/company-center': typeof AuthenticatedCompanyCenterRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/_authenticated/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
@@ -821,6 +850,7 @@ export interface FileRoutesById {
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/_authenticated/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/_authenticated/quotations/$id': typeof AuthenticatedQuotationsIdRoute
@@ -868,6 +898,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin-commissions'
     | '/admin-companies'
+    | '/admin-deposits'
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-overview'
@@ -886,6 +917,7 @@ export interface FileRouteTypes {
     | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
+    | '/company-wallet'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -912,6 +944,7 @@ export interface FileRouteTypes {
     | '/wholesale/$id'
     | '/companies/'
     | '/campaigns/$id'
+    | '/company-wallet/deposit'
     | '/listings/new'
     | '/orders/$id'
     | '/quotations/$id'
@@ -957,6 +990,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin-commissions'
     | '/admin-companies'
+    | '/admin-deposits'
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-overview'
@@ -975,6 +1009,7 @@ export interface FileRouteTypes {
     | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
+    | '/company-wallet'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -1001,6 +1036,7 @@ export interface FileRouteTypes {
     | '/wholesale/$id'
     | '/companies'
     | '/campaigns/$id'
+    | '/company-wallet/deposit'
     | '/listings/new'
     | '/orders/$id'
     | '/quotations/$id'
@@ -1047,6 +1083,7 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/admin-commissions'
     | '/_authenticated/admin-companies'
+    | '/_authenticated/admin-deposits'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-launch-content'
     | '/_authenticated/admin-overview'
@@ -1065,6 +1102,7 @@ export interface FileRouteTypes {
     | '/_authenticated/company-campaigns'
     | '/_authenticated/company-center'
     | '/_authenticated/company-profile-extra'
+    | '/_authenticated/company-wallet'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
@@ -1091,6 +1129,7 @@ export interface FileRouteTypes {
     | '/wholesale/$id'
     | '/companies/'
     | '/_authenticated/campaigns/$id'
+    | '/_authenticated/company-wallet/deposit'
     | '/_authenticated/listings/new'
     | '/_authenticated/orders/$id'
     | '/_authenticated/quotations/$id'
@@ -1528,6 +1567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company-wallet': {
+      id: '/_authenticated/company-wallet'
+      path: '/company-wallet'
+      fullPath: '/company-wallet'
+      preLoaderRoute: typeof AuthenticatedCompanyWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/company-profile-extra': {
       id: '/_authenticated/company-profile-extra'
       path: '/company-profile-extra'
@@ -1654,6 +1700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-deposits': {
+      id: '/_authenticated/admin-deposits'
+      path: '/admin-deposits'
+      fullPath: '/admin-deposits'
+      preLoaderRoute: typeof AuthenticatedAdminDepositsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-companies': {
       id: '/_authenticated/admin-companies'
       path: '/admin-companies'
@@ -1738,6 +1791,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedListingsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company-wallet/deposit': {
+      id: '/_authenticated/company-wallet/deposit'
+      path: '/deposit'
+      fullPath: '/company-wallet/deposit'
+      preLoaderRoute: typeof AuthenticatedCompanyWalletDepositRouteImport
+      parentRoute: typeof AuthenticatedCompanyWalletRoute
+    }
     '/_authenticated/campaigns/$id': {
       id: '/_authenticated/campaigns/$id'
       path: '/$id'
@@ -1776,6 +1836,21 @@ const AuthenticatedCampaignsRouteWithChildren =
     AuthenticatedCampaignsRouteChildren,
   )
 
+interface AuthenticatedCompanyWalletRouteChildren {
+  AuthenticatedCompanyWalletDepositRoute: typeof AuthenticatedCompanyWalletDepositRoute
+}
+
+const AuthenticatedCompanyWalletRouteChildren: AuthenticatedCompanyWalletRouteChildren =
+  {
+    AuthenticatedCompanyWalletDepositRoute:
+      AuthenticatedCompanyWalletDepositRoute,
+  }
+
+const AuthenticatedCompanyWalletRouteWithChildren =
+  AuthenticatedCompanyWalletRoute._addFileChildren(
+    AuthenticatedCompanyWalletRouteChildren,
+  )
+
 interface AuthenticatedOrdersIdRouteChildren {
   AuthenticatedOrdersIdPayRoute: typeof AuthenticatedOrdersIdPayRoute
 }
@@ -1804,6 +1879,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
+  AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminLaunchContentRoute: typeof AuthenticatedAdminLaunchContentRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
@@ -1822,6 +1898,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyCampaignsRoute: typeof AuthenticatedCompanyCampaignsRoute
   AuthenticatedCompanyCenterRoute: typeof AuthenticatedCompanyCenterRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
+  AuthenticatedCompanyWalletRoute: typeof AuthenticatedCompanyWalletRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
@@ -1851,6 +1928,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
+  AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminLaunchContentRoute: AuthenticatedAdminLaunchContentRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
@@ -1870,6 +1948,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyCampaignsRoute: AuthenticatedCompanyCampaignsRoute,
   AuthenticatedCompanyCenterRoute: AuthenticatedCompanyCenterRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
+  AuthenticatedCompanyWalletRoute: AuthenticatedCompanyWalletRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
@@ -2015,13 +2094,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
