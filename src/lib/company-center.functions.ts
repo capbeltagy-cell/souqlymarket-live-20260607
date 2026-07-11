@@ -264,7 +264,9 @@ export const listCompanyCampaigns = createServerFn({ method: "GET" })
     return { hasCompany: true, rows };
   });
 
-// Set promotion_status on a listing owned by the caller.
+// Set promotion_status on a listing owned by the caller. Uses reserve RPCs so
+// activating a promotion atomically holds the required campaign reserve, and
+// ending it releases the unused portion back to the company funding wallet.
 export const setListingPromotionStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({
@@ -278,7 +280,12 @@ export const setListingPromotionStatus = createServerFn({ method: "POST" })
     const { data: comp } = await supabase
       .from("companies").select("id").eq("id", row.company_id).eq("owner_id", userId).maybeSingle();
     if (!comp) throw new Error("Not authorized");
-    const { error } = await supabase.from("listings").update({ promotion_status: data.status } as never).eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (data.status === "active") {
+      const { error } = await supabase.rpc("activate_listing_promotion" as never, { _listing_id: data.id } as never);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase.rpc("deactivate_listing_promotion" as never, { _listing_id: data.id, _status: data.status } as never);
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
