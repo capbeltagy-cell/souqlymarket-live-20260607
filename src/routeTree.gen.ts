@@ -64,6 +64,7 @@ import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCompanyWalletRouteImport } from './routes/_authenticated/company-wallet'
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyCenterRouteImport } from './routes/_authenticated/company-center'
 import { Route as AuthenticatedCompanyCampaignsRouteImport } from './routes/_authenticated/company-campaigns'
@@ -375,6 +376,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompanyWalletRoute =
+  AuthenticatedCompanyWalletRouteImport.update({
+    id: '/company-wallet',
+    path: '/company-wallet',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompanyProfileExtraRoute =
   AuthenticatedCompanyProfileExtraRouteImport.update({
     id: '/company-profile-extra',
@@ -615,6 +622,7 @@ export interface FileRoutesByFullPath {
   '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/company-wallet': typeof AuthenticatedCompanyWalletRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -704,6 +712,7 @@ export interface FileRoutesByTo {
   '/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/company-wallet': typeof AuthenticatedCompanyWalletRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -795,6 +804,7 @@ export interface FileRoutesById {
   '/_authenticated/company-campaigns': typeof AuthenticatedCompanyCampaignsRoute
   '/_authenticated/company-center': typeof AuthenticatedCompanyCenterRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
+  '/_authenticated/company-wallet': typeof AuthenticatedCompanyWalletRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
@@ -886,6 +896,7 @@ export interface FileRouteTypes {
     | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
+    | '/company-wallet'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -975,6 +986,7 @@ export interface FileRouteTypes {
     | '/company-campaigns'
     | '/company-center'
     | '/company-profile-extra'
+    | '/company-wallet'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -1065,6 +1077,7 @@ export interface FileRouteTypes {
     | '/_authenticated/company-campaigns'
     | '/_authenticated/company-center'
     | '/_authenticated/company-profile-extra'
+    | '/_authenticated/company-wallet'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
@@ -1528,6 +1541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/company-wallet': {
+      id: '/_authenticated/company-wallet'
+      path: '/company-wallet'
+      fullPath: '/company-wallet'
+      preLoaderRoute: typeof AuthenticatedCompanyWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/company-profile-extra': {
       id: '/_authenticated/company-profile-extra'
       path: '/company-profile-extra'
@@ -1822,6 +1842,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyCampaignsRoute: typeof AuthenticatedCompanyCampaignsRoute
   AuthenticatedCompanyCenterRoute: typeof AuthenticatedCompanyCenterRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
+  AuthenticatedCompanyWalletRoute: typeof AuthenticatedCompanyWalletRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
@@ -1870,6 +1891,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyCampaignsRoute: AuthenticatedCompanyCampaignsRoute,
   AuthenticatedCompanyCenterRoute: AuthenticatedCompanyCenterRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
+  AuthenticatedCompanyWalletRoute: AuthenticatedCompanyWalletRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
