@@ -186,11 +186,22 @@ export const updateListing = createServerFn({ method: "POST" })
     const { data: comp } = await supabase
       .from("companies").select("id").eq("id", row.company_id).eq("owner_id", userId).maybeSingle();
     if (!comp) throw new Error("Not authorized to edit this listing");
+    // Route promotion_status changes through the reserve RPCs. Owners cannot
+    // set "active" via a bare update — that would bypass the campaign reserve.
+    const promoStatusChange = rest.promotion_status;
     const patch: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(rest)) if (v !== undefined) patch[k] = v;
-    if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await supabase.from("listings").update(patch as never).eq("id", id);
-    if (error) throw new Error(error.message);
+    for (const [k, v] of Object.entries(rest)) if (v !== undefined && k !== "promotion_status") patch[k] = v;
+    if (Object.keys(patch).length > 0) {
+      const { error } = await supabase.from("listings").update(patch as never).eq("id", id);
+      if (error) throw new Error(error.message);
+    }
+    if (promoStatusChange === "active") {
+      const { error } = await supabase.rpc("activate_listing_promotion" as never, { _listing_id: id } as never);
+      if (error) throw new Error(error.message);
+    } else if (promoStatusChange === "paused" || promoStatusChange === "ended") {
+      const { error } = await supabase.rpc("deactivate_listing_promotion" as never, { _listing_id: id, _status: promoStatusChange } as never);
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
 
