@@ -83,6 +83,7 @@ import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
 import { Route as AuthenticatedAdminLaunchContentRouteImport } from './routes/_authenticated/admin-launch-content'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
+import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin-deposits'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -485,6 +486,12 @@ const AuthenticatedAdminExecutiveRoute =
     path: '/admin-executive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminDepositsRoute =
+  AuthenticatedAdminDepositsRouteImport.update({
+    id: '/admin-deposits',
+    path: '/admin-deposits',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCompaniesRoute =
   AuthenticatedAdminCompaniesRouteImport.update({
     id: '/admin-companies',
@@ -611,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -702,6 +710,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -795,6 +804,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
+  '/_authenticated/admin-deposits': typeof AuthenticatedAdminDepositsRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
@@ -888,6 +898,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin-commissions'
     | '/admin-companies'
+    | '/admin-deposits'
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-overview'
@@ -979,6 +990,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin-commissions'
     | '/admin-companies'
+    | '/admin-deposits'
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-overview'
@@ -1071,6 +1083,7 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/admin-commissions'
     | '/_authenticated/admin-companies'
+    | '/_authenticated/admin-deposits'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-launch-content'
     | '/_authenticated/admin-overview'
@@ -1687,6 +1700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-deposits': {
+      id: '/_authenticated/admin-deposits'
+      path: '/admin-deposits'
+      fullPath: '/admin-deposits'
+      preLoaderRoute: typeof AuthenticatedAdminDepositsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-companies': {
       id: '/_authenticated/admin-companies'
       path: '/admin-companies'
@@ -1859,6 +1879,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
+  AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminLaunchContentRoute: typeof AuthenticatedAdminLaunchContentRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
@@ -1907,6 +1928,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
+  AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminLaunchContentRoute: AuthenticatedAdminLaunchContentRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
