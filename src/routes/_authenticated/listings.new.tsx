@@ -183,6 +183,8 @@ function NewListing() {
           conversion_goal: promoEnabled ? conversionGoal : null,
           promotion_conditions: promoEnabled ? (promoConditions || null) : null,
           promotion_status: promoEnabled ? promoStatus : "ended",
+          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
+          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
           images: legacy.images,
           image_sources: legacy.image_sources,
           phone: phone || null,
