@@ -65,6 +65,8 @@ function NewListing() {
   const [conversionGoal, setConversionGoal] = useState<string>("order_paid");
   const [promoConditions, setPromoConditions] = useState("");
   const [promoStatus, setPromoStatus] = useState<"active" | "paused" | "ended">("active");
+  const [campaignBudget, setCampaignBudget] = useState("");
+  const [campaignMaxConversions, setCampaignMaxConversions] = useState("");
   const [propertySubtype, setPropertySubtype] = useState("");
   const [areaSqm, setAreaSqm] = useState("");
   const [bedrooms, setBedrooms] = useState("");
