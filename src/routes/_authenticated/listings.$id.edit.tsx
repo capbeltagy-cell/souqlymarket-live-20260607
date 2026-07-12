@@ -75,13 +75,15 @@ function EditListing() {
   const [conversionGoal, setConversionGoal] = useState("order_paid");
   const [promoConditions, setPromoConditions] = useState("");
   const [promoStatus, setPromoStatus] = useState<"active" | "paused" | "ended">("active");
+  const [campaignBudget, setCampaignBudget] = useState("");
+  const [campaignMaxConversions, setCampaignMaxConversions] = useState("");
 
   useEffect(() => {
     (async () => {
       if (!user) return;
       const { data } = await supabase
         .from("listings")
-        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, companies!inner(owner_id)")
+        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)")
         .eq("id", id)
         .maybeSingle() as { data: (Row & { companies: { owner_id: string } | null }) | null };
       if (!data) { setLoading(false); setNotAuthorized(true); return; }
@@ -110,6 +112,8 @@ function EditListing() {
       setConversionGoal(data.conversion_goal ?? "order_paid");
       setPromoConditions(data.promotion_conditions ?? "");
       setPromoStatus((data.promotion_status as never) ?? "active");
+      setCampaignBudget((data as any).campaign_budget_egp != null ? String((data as any).campaign_budget_egp) : "");
+      setCampaignMaxConversions((data as any).campaign_max_conversions != null ? String((data as any).campaign_max_conversions) : "");
       setLoading(false);
     })();
   }, [id, user]);
@@ -139,6 +143,8 @@ function EditListing() {
           conversion_goal: conversionGoal || null,
           promotion_conditions: promoConditions || null,
           promotion_status: promoStatus,
+          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
+          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
         },
       });
       toast.success(ar ? "تم حفظ التغييرات" : "Saved");
@@ -292,9 +298,23 @@ function EditListing() {
                   </SelectContent>
                 </Select>
               </div>
+              {commissionType === "percentage" ? (
+                <div>
+                  <Label>{ar ? "ميزانية الحملة (جنيه)" : "Campaign budget (EGP)"}</Label>
+                  <Input type="number" min="0" step="1" value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)} placeholder={ar ? "إجمالي العمولات المسموح صرفها" : "Total commission cap"} />
+                </div>
+              ) : (
+                <div>
+                  <Label>{ar ? "الحد الأقصى للتحويلات" : "Max conversions"}</Label>
+                  <Input type="number" min="1" step="1" value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)} placeholder={ar ? "عدد التحويلات القصوى" : "Maximum paid conversions"} />
+                </div>
+              )}
               <div className="sm:col-span-2">
                 <Label>{ar ? "شروط العمولة (اختياري)" : "Commission conditions (optional)"}</Label>
                 <Textarea rows={2} value={promoConditions} onChange={(e) => setPromoConditions(e.target.value)} />
+              </div>
+              <div className="sm:col-span-2 text-xs text-muted-foreground">
+                {ar ? "يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. تأكد من كفاية الرصيد." : "A portion of this commitment is reserved from the company wallet when the campaign is activated. Ensure sufficient balance."}
               </div>
             </div>
           )}

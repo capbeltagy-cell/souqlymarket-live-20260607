@@ -65,6 +65,8 @@ function NewListing() {
   const [conversionGoal, setConversionGoal] = useState<string>("order_paid");
   const [promoConditions, setPromoConditions] = useState("");
   const [promoStatus, setPromoStatus] = useState<"active" | "paused" | "ended">("active");
+  const [campaignBudget, setCampaignBudget] = useState("");
+  const [campaignMaxConversions, setCampaignMaxConversions] = useState("");
   const [propertySubtype, setPropertySubtype] = useState("");
   const [areaSqm, setAreaSqm] = useState("");
   const [bedrooms, setBedrooms] = useState("");
@@ -181,6 +183,8 @@ function NewListing() {
           conversion_goal: promoEnabled ? conversionGoal : null,
           promotion_conditions: promoEnabled ? (promoConditions || null) : null,
           promotion_status: promoEnabled ? promoStatus : "ended",
+          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
+          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
           images: legacy.images,
           image_sources: legacy.image_sources,
           phone: phone || null,
@@ -362,6 +366,26 @@ function NewListing() {
                         <option value="ended">منتهية</option>
                       </select>
                     </Field>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {commissionType === "percentage" ? (
+                      <Field label="ميزانية الحملة (جنيه) *">
+                        <Input type="number" min={0} step="1"
+                          value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)}
+                          placeholder="إجمالي العمولات المسموح صرفها"
+                          required={promoEnabled} />
+                      </Field>
+                    ) : (
+                      <Field label="الحد الأقصى للتحويلات *">
+                        <Input type="number" min={1} step="1"
+                          value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)}
+                          placeholder="عدد التحويلات المدفوعة كحد أقصى"
+                          required={promoEnabled} />
+                      </Field>
+                    )}
+                    <div className="text-xs text-muted-foreground self-end pb-2">
+                      يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. راجع محفظة الشركة قبل التفعيل.
+                    </div>
                   </div>
                   <Field label="شروط العمولة (اختياري)">
                     <Textarea
