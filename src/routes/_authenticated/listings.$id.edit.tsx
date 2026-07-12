@@ -112,6 +112,8 @@ function EditListing() {
       setConversionGoal(data.conversion_goal ?? "order_paid");
       setPromoConditions(data.promotion_conditions ?? "");
       setPromoStatus((data.promotion_status as never) ?? "active");
+      setCampaignBudget((data as any).campaign_budget_egp != null ? String((data as any).campaign_budget_egp) : "");
+      setCampaignMaxConversions((data as any).campaign_max_conversions != null ? String((data as any).campaign_max_conversions) : "");
       setLoading(false);
     })();
   }, [id, user]);
