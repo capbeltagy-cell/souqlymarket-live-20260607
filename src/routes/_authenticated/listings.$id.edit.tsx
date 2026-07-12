@@ -83,7 +83,7 @@ function EditListing() {
       if (!user) return;
       const { data } = await supabase
         .from("listings")
-        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, companies!inner(owner_id)")
+        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)")
         .eq("id", id)
         .maybeSingle() as { data: (Row & { companies: { owner_id: string } | null }) | null };
       if (!data) { setLoading(false); setNotAuthorized(true); return; }
