@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, MessageSquare, ShoppingBag, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Briefcase, LogOut, LayoutDashboard, PlusCircle, User as UserIcon, DollarSign, Link2, ShieldCheck, Building2, UserCircle2, Heart, ListChecks, MessageSquare, ShoppingBag, ChevronRight, ShoppingCart } from "lucide-react";
+import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { GlobalSearch } from "./GlobalSearch";
@@ -83,6 +85,7 @@ export function SiteHeader() {
           </div>
 
           <LanguageToggle />
+          <CartButton />
           <NotificationBell />
           {user ? (
             <DropdownMenu>
