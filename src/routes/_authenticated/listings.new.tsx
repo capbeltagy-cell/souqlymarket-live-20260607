@@ -367,6 +367,26 @@ function NewListing() {
                       </select>
                     </Field>
                   </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {commissionType === "percentage" ? (
+                      <Field label="ميزانية الحملة (جنيه) *">
+                        <Input type="number" min={0} step="1"
+                          value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)}
+                          placeholder="إجمالي العمولات المسموح صرفها"
+                          required={promoEnabled} />
+                      </Field>
+                    ) : (
+                      <Field label="الحد الأقصى للتحويلات *">
+                        <Input type="number" min={1} step="1"
+                          value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)}
+                          placeholder="عدد التحويلات المدفوعة كحد أقصى"
+                          required={promoEnabled} />
+                      </Field>
+                    )}
+                    <div className="text-xs text-muted-foreground self-end pb-2">
+                      يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. راجع محفظة الشركة قبل التفعيل.
+                    </div>
+                  </div>
                   <Field label="شروط العمولة (اختياري)">
                     <Textarea
                       value={promoConditions}
