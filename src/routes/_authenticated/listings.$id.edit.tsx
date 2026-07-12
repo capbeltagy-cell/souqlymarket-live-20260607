@@ -298,9 +298,23 @@ function EditListing() {
                   </SelectContent>
                 </Select>
               </div>
+              {commissionType === "percentage" ? (
+                <div>
+                  <Label>{ar ? "ميزانية الحملة (جنيه)" : "Campaign budget (EGP)"}</Label>
+                  <Input type="number" min="0" step="1" value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)} placeholder={ar ? "إجمالي العمولات المسموح صرفها" : "Total commission cap"} />
+                </div>
+              ) : (
+                <div>
+                  <Label>{ar ? "الحد الأقصى للتحويلات" : "Max conversions"}</Label>
+                  <Input type="number" min="1" step="1" value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)} placeholder={ar ? "عدد التحويلات القصوى" : "Maximum paid conversions"} />
+                </div>
+              )}
               <div className="sm:col-span-2">
                 <Label>{ar ? "شروط العمولة (اختياري)" : "Commission conditions (optional)"}</Label>
                 <Textarea rows={2} value={promoConditions} onChange={(e) => setPromoConditions(e.target.value)} />
+              </div>
+              <div className="sm:col-span-2 text-xs text-muted-foreground">
+                {ar ? "يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. تأكد من كفاية الرصيد." : "A portion of this commitment is reserved from the company wallet when the campaign is activated. Ensure sufficient balance."}
               </div>
             </div>
           )}
