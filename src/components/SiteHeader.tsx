@@ -218,3 +218,22 @@ export function SiteHeader() {
     </header>
   );
 }
+
+function CartButton() {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    setN(cartCount());
+    return subscribeCart(() => setN(cartCount()));
+  }, []);
+  return (
+    <Link to="/cart" aria-label="Cart" className="relative inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-muted transition">
+      <ShoppingCart className="h-5 w-5" />
+      {n > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold grid place-items-center">
+          {n > 99 ? "99+" : n}
+        </span>
+      )}
+    </Link>
+  );
+}
+
