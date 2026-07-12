@@ -22,6 +22,7 @@ import { getListingContact } from "@/lib/listings.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
 import { createOrderFromListing } from "@/lib/orders.functions";
+import { addToCart } from "@/lib/cart";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
@@ -384,6 +385,23 @@ function ListingDetail() {
                   </Button>
                   <Button className="gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
                     <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                  </Button>
+                  <Button
+                    className="gap-2 col-span-2"
+                    variant="outline"
+                    onClick={() => {
+                      addToCart({
+                        listing_id: id,
+                        company_id: l?.company_id ?? null,
+                        title: (ar ? l?.title_ar : l?.title_en) ?? l?.title_ar ?? l?.title_en ?? "",
+                        image: l?.images?.[0] ?? null,
+                        price: Number(l?.price ?? 0),
+                        currency: l?.currency ?? "EGP",
+                      });
+                      toast.success(ar ? "تمت الإضافة إلى السلة" : "Added to cart");
+                    }}
+                  >
+                    {ar ? "أضف إلى السلة" : "Add to cart"}
                   </Button>
                 </div>
               )}
