@@ -34,6 +34,7 @@ import { Route as EarnRouteImport } from './routes/earn'
 import { Route as ControlCenterX7RouteImport } from './routes/control-center-x7'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
@@ -224,6 +225,11 @@ const ContactRoute = ContactRouteImport.update({
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -590,6 +596,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
@@ -682,6 +689,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
@@ -776,6 +784,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRouteWithChildren
   '/contact': typeof ContactRoute
   '/control-center-x7': typeof ControlCenterX7Route
@@ -870,6 +879,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/contact'
     | '/control-center-x7'
@@ -962,6 +972,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/contact'
     | '/control-center-x7'
@@ -1055,6 +1066,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/contact'
     | '/control-center-x7'
@@ -1149,6 +1161,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRouteWithChildren
   ContactRoute: typeof ContactRoute
   ControlCenterX7Route: typeof ControlCenterX7Route
@@ -1355,6 +1368,13 @@ declare module '@tanstack/react-router' {
       path: '/categories'
       fullPath: '/categories'
       preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2061,6 +2081,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  CartRoute: CartRoute,
   CategoriesRoute: CategoriesRouteWithChildren,
   ContactRoute: ContactRoute,
   ControlCenterX7Route: ControlCenterX7Route,
