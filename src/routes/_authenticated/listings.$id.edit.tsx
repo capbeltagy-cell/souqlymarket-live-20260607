@@ -143,6 +143,8 @@ function EditListing() {
           conversion_goal: conversionGoal || null,
           promotion_conditions: promoConditions || null,
           promotion_status: promoStatus,
+          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
+          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
         },
       });
       toast.success(ar ? "تم حفظ التغييرات" : "Saved");
