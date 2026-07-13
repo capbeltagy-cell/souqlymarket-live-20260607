@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
 import { MapView } from "@/components/MapView";
 import { TrustBadge } from "@/components/TrustBadges";
+import { ListingImageGallery } from "@/components/ListingImageGallery";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
