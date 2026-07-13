@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
 import { MapView } from "@/components/MapView";
 import { TrustBadge } from "@/components/TrustBadges";
+import { ListingImageGallery } from "@/components/ListingImageGallery";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -250,18 +251,7 @@ function ListingDetail() {
         </Button>
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-xl overflow-hidden border border-border bg-card">
-              {cover ? (
-                <img src={cover} alt={title} className="w-full aspect-video object-cover" />
-              ) : (
-                <div className="w-full aspect-video bg-muted grid place-items-center text-muted-foreground">No image</div>
-              )}
-            </div>
-            {l.images && l.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto">
-                {l.images.slice(1).map((u) => <img key={u} src={u} alt="" className="h-20 w-20 object-cover rounded border border-border flex-shrink-0" />)}
-              </div>
-            )}
+            <ListingImageGallery images={l.images ?? []} alt={title} />
             {l.video_url && (
               <video controls src={l.video_url} className="w-full rounded-xl border border-border" />
             )}
