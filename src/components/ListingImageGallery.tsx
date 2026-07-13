@@ -51,6 +51,15 @@ export function ListingImageGallery({ images, alt }: Props) {
     );
   }
 
+  // SSR fallback: static image; embla hydrates on client.
+  if (!mounted) {
+    return (
+      <div className="rounded-xl overflow-hidden border border-border bg-card">
+        <img src={uniq[0]} alt={alt} className="w-full aspect-video object-cover" />
+      </div>
+    );
+  }
+
   const scrollTo = (i: number) => embla?.scrollTo(i);
 
   return (
