@@ -16,6 +16,8 @@ type Props = {
 export function ListingImageGallery({ images, alt }: Props) {
   const { dir, locale } = useI18n();
   const ar = locale === "ar";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   // De-dupe while preserving order; keep first image as main.
   const uniq = Array.from(new Set(images.filter(Boolean)));
   const [emblaRef, embla] = useEmblaCarousel({ loop: uniq.length > 1, direction: dir === "rtl" ? "rtl" : "ltr" });
