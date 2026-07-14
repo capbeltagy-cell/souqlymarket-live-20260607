@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import {
   type CartItem,
 } from "@/lib/cart";
 import { formatPrice } from "@/lib/currency";
-import { createOrderFromListing } from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "السلة — Souqly" }, { name: "description", content: "سلة المشتريات على سوقلي" }] }),
@@ -30,7 +28,6 @@ function CartPage() {
   const ar = locale === "ar";
   const { user } = useAuth();
   const navigate = useNavigate();
-  const createOrder = useServerFn(createOrderFromListing);
   const [items, setItems] = useState<CartItem[]>([]);
   const [placing, setPlacing] = useState(false);
 
@@ -43,33 +40,14 @@ function CartPage() {
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const currency = items[0]?.currency ?? "EGP";
 
-  async function checkout() {
+  function checkout() {
     if (!user) {
       toast.error(ar ? "سجّل الدخول لإتمام الشراء" : "Sign in to checkout");
       navigate({ to: "/auth" });
       return;
     }
     if (items.length === 0) return;
-    setPlacing(true);
-    let referral_code: string | undefined;
-    try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
-    const created: string[] = [];
-    try {
-      for (const it of items) {
-        const { id } = await createOrder({
-          data: { listing_id: it.listing_id, quantity: it.quantity, referral_code },
-        });
-        created.push(id);
-      }
-      clearCart();
-      toast.success(ar ? `تم إنشاء ${created.length} طلب/طلبات` : `Created ${created.length} order(s)`);
-      if (created.length === 1) navigate({ to: "/orders/$id", params: { id: created[0] } });
-      else navigate({ to: "/orders" });
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setPlacing(false);
-    }
+    navigate({ to: "/checkout" });
   }
 
   return (
@@ -145,7 +123,6 @@ function CartPage() {
                 <span className="text-primary">{formatPrice(total, locale)} {currency !== "EGP" && currency}</span>
               </div>
               <Button className="w-full bg-primary hover:bg-primary-hover" onClick={checkout} disabled={placing}>
-                {placing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 {ar ? "إتمام الشراء" : "Checkout"}
               </Button>
               {groups.length > 1 && (

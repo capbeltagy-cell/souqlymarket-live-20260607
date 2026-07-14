@@ -72,6 +72,7 @@ import { Route as AuthenticatedCompanyCampaignsRouteImport } from './routes/_aut
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenticated/commissions'
 import { Route as AuthenticatedChooseRoleRouteImport } from './routes/_authenticated/choose-role'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticated/ai-tools'
@@ -100,6 +101,7 @@ import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCompanyWalletDepositRouteImport } from './routes/_authenticated/company-wallet.deposit'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
+import { Route as AuthenticatedOrdersIdConfirmationRouteImport } from './routes/_authenticated/orders.$id.confirmation'
 import { Route as AuthenticatedListingsIdEditRouteImport } from './routes/_authenticated/listings.$id.edit'
 
 const WholesaleRoute = WholesaleRouteImport.update({
@@ -424,6 +426,11 @@ const AuthenticatedChooseRoleRoute = AuthenticatedChooseRoleRouteImport.update({
   path: '/choose-role',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   id: '/campaigns',
   path: '/campaigns',
@@ -584,6 +591,12 @@ const AuthenticatedOrdersIdPayRoute =
     path: '/pay',
     getParentRoute: () => AuthenticatedOrdersIdRoute,
   } as any)
+const AuthenticatedOrdersIdConfirmationRoute =
+  AuthenticatedOrdersIdConfirmationRouteImport.update({
+    id: '/confirmation',
+    path: '/confirmation',
+    getParentRoute: () => AuthenticatedOrdersIdRoute,
+  } as any)
 const AuthenticatedListingsIdEditRoute =
   AuthenticatedListingsIdEditRouteImport.update({
     id: '/listings/$id/edit',
@@ -638,6 +651,7 @@ export interface FileRoutesByFullPath {
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -682,6 +696,7 @@ export interface FileRoutesByFullPath {
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
+  '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesByTo {
@@ -731,6 +746,7 @@ export interface FileRoutesByTo {
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
   '/commissions': typeof AuthenticatedCommissionsRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -775,6 +791,7 @@ export interface FileRoutesByTo {
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
+  '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRoutesById {
@@ -826,6 +843,7 @@ export interface FileRoutesById {
   '/_authenticated/ai-tools': typeof AuthenticatedAiToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/choose-role': typeof AuthenticatedChooseRoleRoute
   '/_authenticated/commissions': typeof AuthenticatedCommissionsRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
@@ -870,6 +888,7 @@ export interface FileRoutesById {
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
   '/_authenticated/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
+  '/_authenticated/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
 }
 export interface FileRouteTypes {
@@ -921,6 +940,7 @@ export interface FileRouteTypes {
     | '/ai-tools'
     | '/analytics'
     | '/campaigns'
+    | '/checkout'
     | '/choose-role'
     | '/commissions'
     | '/company'
@@ -965,6 +985,7 @@ export interface FileRouteTypes {
     | '/tenders/new'
     | '/wholesale/new'
     | '/listings/$id/edit'
+    | '/orders/$id/confirmation'
     | '/orders/$id/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1014,6 +1035,7 @@ export interface FileRouteTypes {
     | '/ai-tools'
     | '/analytics'
     | '/campaigns'
+    | '/checkout'
     | '/choose-role'
     | '/commissions'
     | '/company'
@@ -1058,6 +1080,7 @@ export interface FileRouteTypes {
     | '/tenders/new'
     | '/wholesale/new'
     | '/listings/$id/edit'
+    | '/orders/$id/confirmation'
     | '/orders/$id/pay'
   id:
     | '__root__'
@@ -1108,6 +1131,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai-tools'
     | '/_authenticated/analytics'
     | '/_authenticated/campaigns'
+    | '/_authenticated/checkout'
     | '/_authenticated/choose-role'
     | '/_authenticated/commissions'
     | '/_authenticated/company'
@@ -1152,6 +1176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
     | '/_authenticated/listings/$id/edit'
+    | '/_authenticated/orders/$id/confirmation'
     | '/_authenticated/orders/$id/pay'
   fileRoutesById: FileRoutesById
 }
@@ -1636,6 +1661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChooseRoleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns': {
       id: '/_authenticated/campaigns'
       path: '/campaigns'
@@ -1832,6 +1864,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersIdPayRouteImport
       parentRoute: typeof AuthenticatedOrdersIdRoute
     }
+    '/_authenticated/orders/$id/confirmation': {
+      id: '/_authenticated/orders/$id/confirmation'
+      path: '/confirmation'
+      fullPath: '/orders/$id/confirmation'
+      preLoaderRoute: typeof AuthenticatedOrdersIdConfirmationRouteImport
+      parentRoute: typeof AuthenticatedOrdersIdRoute
+    }
     '/_authenticated/listings/$id/edit': {
       id: '/_authenticated/listings/$id/edit'
       path: '/listings/$id/edit'
@@ -1872,10 +1911,13 @@ const AuthenticatedCompanyWalletRouteWithChildren =
   )
 
 interface AuthenticatedOrdersIdRouteChildren {
+  AuthenticatedOrdersIdConfirmationRoute: typeof AuthenticatedOrdersIdConfirmationRoute
   AuthenticatedOrdersIdPayRoute: typeof AuthenticatedOrdersIdPayRoute
 }
 
 const AuthenticatedOrdersIdRouteChildren: AuthenticatedOrdersIdRouteChildren = {
+  AuthenticatedOrdersIdConfirmationRoute:
+    AuthenticatedOrdersIdConfirmationRoute,
   AuthenticatedOrdersIdPayRoute: AuthenticatedOrdersIdPayRoute,
 }
 
@@ -1912,6 +1954,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiToolsRoute: typeof AuthenticatedAiToolsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedChooseRoleRoute: typeof AuthenticatedChooseRoleRoute
   AuthenticatedCommissionsRoute: typeof AuthenticatedCommissionsRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
@@ -1962,6 +2005,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiToolsRoute: AuthenticatedAiToolsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedChooseRoleRoute: AuthenticatedChooseRoleRoute,
   AuthenticatedCommissionsRoute: AuthenticatedCommissionsRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
