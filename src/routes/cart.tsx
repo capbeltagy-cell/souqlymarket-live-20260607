@@ -123,7 +123,6 @@ function CartPage() {
                 <span className="text-primary">{formatPrice(total, locale)} {currency !== "EGP" && currency}</span>
               </div>
               <Button className="w-full bg-primary hover:bg-primary-hover" onClick={checkout} disabled={placing}>
-                {placing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 {ar ? "إتمام الشراء" : "Checkout"}
               </Button>
               {groups.length > 1 && (
