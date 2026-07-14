@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import {
   type CartItem,
 } from "@/lib/cart";
 import { formatPrice } from "@/lib/currency";
-import { createOrderFromListing } from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "السلة — Souqly" }, { name: "description", content: "سلة المشتريات على سوقلي" }] }),
@@ -30,7 +28,6 @@ function CartPage() {
   const ar = locale === "ar";
   const { user } = useAuth();
   const navigate = useNavigate();
-  const createOrder = useServerFn(createOrderFromListing);
   const [items, setItems] = useState<CartItem[]>([]);
   const [placing, setPlacing] = useState(false);
 
