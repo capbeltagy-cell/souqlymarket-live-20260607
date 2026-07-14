@@ -161,7 +161,8 @@ function CheckoutPage() {
             icon={<ShoppingBag className="h-7 w-7" />}
             title={ar ? "السلة فارغة" : "Cart is empty"}
             description={ar ? "أضف منتجات إلى السلة قبل إتمام الشراء" : "Add products to cart before checkout"}
-            action={<Button asChild><Link to="/">{ar ? "تصفح المنتجات" : "Browse products"}</Link></Button>}
+            ctaLabel={ar ? "تصفح المنتجات" : "Browse products"}
+            ctaTo="/"
           />
         </section>
         <SiteFooter />

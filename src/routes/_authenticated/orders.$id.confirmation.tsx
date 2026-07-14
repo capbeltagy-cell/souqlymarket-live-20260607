@@ -29,7 +29,7 @@ function OrderConfirmationPage() {
 
   useEffect(() => {
     const list = ids?.split(",").filter(Boolean) ?? [id];
-    Promise.all(list.map((oid) => load({ data: { id: oid } }).catch(() => null)))
+    Promise.all(list.map((oid: string) => load({ data: { id: oid } }).catch(() => null)))
       .then((res) => {
         setOrders(res.filter(Boolean) as Array<{ order: any; listing: any }>);
       })
