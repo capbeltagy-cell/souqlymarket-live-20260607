@@ -43,33 +43,14 @@ function CartPage() {
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const currency = items[0]?.currency ?? "EGP";
 
-  async function checkout() {
+  function checkout() {
     if (!user) {
       toast.error(ar ? "سجّل الدخول لإتمام الشراء" : "Sign in to checkout");
       navigate({ to: "/auth" });
       return;
     }
     if (items.length === 0) return;
-    setPlacing(true);
-    let referral_code: string | undefined;
-    try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
-    const created: string[] = [];
-    try {
-      for (const it of items) {
-        const { id } = await createOrder({
-          data: { listing_id: it.listing_id, quantity: it.quantity, referral_code },
-        });
-        created.push(id);
-      }
-      clearCart();
-      toast.success(ar ? `تم إنشاء ${created.length} طلب/طلبات` : `Created ${created.length} order(s)`);
-      if (created.length === 1) navigate({ to: "/orders/$id", params: { id: created[0] } });
-      else navigate({ to: "/orders" });
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setPlacing(false);
-    }
+    navigate({ to: "/checkout" });
   }
 
   return (
