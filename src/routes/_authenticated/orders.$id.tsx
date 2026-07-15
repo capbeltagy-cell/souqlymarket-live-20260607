@@ -2,13 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw, CreditCard } from "lucide-react";
+import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw, CreditCard, MessageSquare, RefreshCw, FileText, Gift } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getOrder, updateOrderStatus } from "@/lib/orders.functions";
+import { startConversationForListing } from "@/lib/messages.functions";
+import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
@@ -31,7 +33,8 @@ function OrderDetailPage() {
   const navigate = useNavigate();
   const load = useServerFn(getOrder);
   const update = useServerFn(updateOrderStatus);
-  const [data, setData] = useState<{ order: any; listing: any } | null>(null);
+  const startConv = useServerFn(startConversationForListing);
+  const [data, setData] = useState<{ order: any; listing: any; company?: any } | null>(null);
   const [tracking, setTracking] = useState("");
   const [carrier, setCarrier] = useState("");
   const [busy, setBusy] = useState(false);
@@ -40,9 +43,34 @@ function OrderDetailPage() {
   useEffect(() => { reload(); /* eslint-disable-next-line */ }, [id]);
 
   if (!data) return <div className="min-h-screen flex flex-col"><SiteHeader /><div className="container-souqly py-8 flex-1 text-muted-foreground">جارٍ التحميل…</div><SiteFooter /></div>;
-  const { order, listing } = data;
+  const { order, listing, company } = data;
   const isBuyer = order.buyer_id === user?.id;
   const activeIdx = TIMELINE.findIndex((s) => s.key === order.status);
+
+  const contactCompany = async () => {
+    if (order.conversation_id) { navigate({ to: "/messages", search: { c: order.conversation_id } as any }); return; }
+    if (!listing?.id) { toast.error("لا يمكن فتح المحادثة"); return; }
+    try {
+      const r = await startConv({ data: { listing_id: listing.id } });
+      navigate({ to: "/messages", search: { c: r.id } as any });
+    } catch (e) { toast.error((e as Error).message); }
+  };
+
+  const reorder = () => {
+    if (!listing) return;
+    addToCart({
+      listing_id: listing.id,
+      company_id: listing.company_id ?? null,
+      title: listing.title_ar ?? listing.title_en ?? "منتج",
+      image: listing.images?.[0] ?? null,
+      price: Number(order.unit_price ?? 0),
+      currency: order.currency ?? "EGP",
+      quantity: order.quantity ?? 1,
+    });
+    toast.success("تمت الإضافة إلى السلة");
+    navigate({ to: "/cart" });
+  };
+
 
   const act = async (patch: { id: string; status: any; tracking_number?: string | null; tracking_carrier?: string | null; cancelled_reason?: string | null }) => {
     setBusy(true);
@@ -96,12 +124,30 @@ function OrderDetailPage() {
             </div>
           </div>
 
+          {company && (
+            <Link to="/companies/$id" params={{ id: company.id }} className="flex items-center gap-3 rounded-lg border border-border p-3 mb-4 hover:border-primary transition">
+              {company.logo_url && <img src={company.logo_url} alt="" className="h-10 w-10 rounded object-cover" />}
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground">الشركة</div>
+                <div className="font-medium truncate">{company.name_ar ?? company.name_en}</div>
+              </div>
+            </Link>
+          )}
+
+          {order.referral_code && (
+            <div className="rounded-md bg-primary/10 border border-primary/40 p-3 mb-4 text-sm flex items-center gap-2">
+              <Gift className="h-4 w-4 text-primary" />
+              <span>هذا الطلب مرتبط بكود إحالة تسويقية <span className="font-mono">{order.referral_code}</span></span>
+            </div>
+          )}
+
           {(order.status === "cancelled" || order.status === "returned" || order.status === "rejected") && (
             <div className="rounded-md bg-destructive/10 border border-destructive/40 p-3 mb-4 text-sm text-destructive">
               الطلب {order.status === "cancelled" ? "ملغي" : order.status === "returned" ? "مُرتجع" : "مرفوض"}
               {order.cancelled_reason && ` — ${order.cancelled_reason}`}
             </div>
           )}
+
 
           {order.shipping_address && (
             <div className="rounded-lg border border-border p-3 mb-4 text-sm">
@@ -173,9 +219,30 @@ function OrderDetailPage() {
                 <XCircle className="h-4 w-4 me-2" />إلغاء
               </Button>
             )}
-            {order.conversation_id && (
+            {isBuyer && (
+              <>
+                <Button onClick={contactCompany} variant="outline">
+                  <MessageSquare className="h-4 w-4 me-2" />تواصل مع الشركة
+                </Button>
+                {listing && (
+                  <Button onClick={reorder} variant="outline">
+                    <RefreshCw className="h-4 w-4 me-2" />إعادة الطلب
+                  </Button>
+                )}
+                {order.payment_status === "paid" && (
+                  <Button asChild variant="outline">
+                    <Link to="/invoices">
+                      <FileText className="h-4 w-4 me-2" />الفواتير
+                    </Link>
+                  </Button>
+                )}
+              </>
+            )}
+            {!isBuyer && order.conversation_id && (
               <Button asChild variant="outline">
-                <Link to="/messages" search={{ c: order.conversation_id }}>فتح المحادثة</Link>
+                <Link to="/messages" search={{ c: order.conversation_id } as any}>
+                  <MessageSquare className="h-4 w-4 me-2" />فتح المحادثة
+                </Link>
               </Button>
             )}
           </div>
