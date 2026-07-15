@@ -219,9 +219,30 @@ function OrderDetailPage() {
                 <XCircle className="h-4 w-4 me-2" />إلغاء
               </Button>
             )}
-            {order.conversation_id && (
+            {isBuyer && (
+              <>
+                <Button onClick={contactCompany} variant="outline">
+                  <MessageSquare className="h-4 w-4 me-2" />تواصل مع الشركة
+                </Button>
+                {listing && (
+                  <Button onClick={reorder} variant="outline">
+                    <RefreshCw className="h-4 w-4 me-2" />إعادة الطلب
+                  </Button>
+                )}
+                {order.payment_status === "paid" && (
+                  <Button asChild variant="outline">
+                    <Link to="/invoices">
+                      <FileText className="h-4 w-4 me-2" />الفواتير
+                    </Link>
+                  </Button>
+                )}
+              </>
+            )}
+            {!isBuyer && order.conversation_id && (
               <Button asChild variant="outline">
-                <Link to="/messages" search={{ c: order.conversation_id }}>فتح المحادثة</Link>
+                <Link to="/messages" search={{ c: order.conversation_id } as any}>
+                  <MessageSquare className="h-4 w-4 me-2" />فتح المحادثة
+                </Link>
               </Button>
             )}
           </div>
