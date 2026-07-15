@@ -2,13 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw, CreditCard } from "lucide-react";
+import { CheckCircle2, Circle, Package, Truck, Home, ShieldCheck, XCircle, RotateCcw, CreditCard, MessageSquare, RefreshCw, FileText, Gift } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getOrder, updateOrderStatus } from "@/lib/orders.functions";
+import { startConversationForListing } from "@/lib/messages.functions";
+import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
@@ -31,7 +33,8 @@ function OrderDetailPage() {
   const navigate = useNavigate();
   const load = useServerFn(getOrder);
   const update = useServerFn(updateOrderStatus);
-  const [data, setData] = useState<{ order: any; listing: any } | null>(null);
+  const startConv = useServerFn(startConversationForListing);
+  const [data, setData] = useState<{ order: any; listing: any; company?: any } | null>(null);
   const [tracking, setTracking] = useState("");
   const [carrier, setCarrier] = useState("");
   const [busy, setBusy] = useState(false);
@@ -40,9 +43,34 @@ function OrderDetailPage() {
   useEffect(() => { reload(); /* eslint-disable-next-line */ }, [id]);
 
   if (!data) return <div className="min-h-screen flex flex-col"><SiteHeader /><div className="container-souqly py-8 flex-1 text-muted-foreground">جارٍ التحميل…</div><SiteFooter /></div>;
-  const { order, listing } = data;
+  const { order, listing, company } = data;
   const isBuyer = order.buyer_id === user?.id;
   const activeIdx = TIMELINE.findIndex((s) => s.key === order.status);
+
+  const contactCompany = async () => {
+    if (order.conversation_id) { navigate({ to: "/messages", search: { c: order.conversation_id } as any }); return; }
+    if (!listing?.id) { toast.error("لا يمكن فتح المحادثة"); return; }
+    try {
+      const r = await startConv({ data: { listing_id: listing.id } });
+      navigate({ to: "/messages", search: { c: r.id } as any });
+    } catch (e) { toast.error((e as Error).message); }
+  };
+
+  const reorder = () => {
+    if (!listing) return;
+    addToCart({
+      listing_id: listing.id,
+      company_id: listing.company_id ?? null,
+      title: listing.title_ar ?? listing.title_en ?? "منتج",
+      image: listing.images?.[0] ?? null,
+      price: Number(order.unit_price ?? 0),
+      currency: order.currency ?? "EGP",
+      quantity: order.quantity ?? 1,
+    });
+    toast.success("تمت الإضافة إلى السلة");
+    navigate({ to: "/cart" });
+  };
+
 
   const act = async (patch: { id: string; status: any; tracking_number?: string | null; tracking_carrier?: string | null; cancelled_reason?: string | null }) => {
     setBusy(true);
