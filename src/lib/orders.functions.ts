@@ -100,11 +100,12 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
 async function enrichOrders(supabase: any, orders: any[]) {
   const listingIds = Array.from(new Set(orders.map((o) => o.product_listing_id ?? o.listing_id).filter(Boolean)));
   if (!listingIds.length) return orders.map((o) => ({ ...o, _listing: null, _company: null }));
-  const { data: listings } = await supabase.from("listings").select("id, title_ar, title_en, images, company_id, currency").in("id", listingIds);
+  const { data: listings } = await supabase.from("listings").select("id, title_ar, title_en, images, company_id, currency").in("id", listingIds) as { data: any[] | null };
   const companyIds = Array.from(new Set((listings ?? []).map((l: any) => l.company_id).filter(Boolean)));
-  const { data: companies } = companyIds.length
+  const companiesRes = companyIds.length
     ? await supabase.from("companies").select("id, name_ar, name_en, logo_url").in("id", companyIds)
-    : { data: [] };
+    : { data: [] as any[] };
+  const companies = companiesRes.data as any[] | null;
   const lm = new Map((listings ?? []).map((l: any) => [l.id, l]));
   const cm = new Map((companies ?? []).map((c: any) => [c.id, c]));
   return orders.map((o) => {
