@@ -124,12 +124,30 @@ function OrderDetailPage() {
             </div>
           </div>
 
+          {company && (
+            <Link to="/companies/$id" params={{ id: company.id }} className="flex items-center gap-3 rounded-lg border border-border p-3 mb-4 hover:border-primary transition">
+              {company.logo_url && <img src={company.logo_url} alt="" className="h-10 w-10 rounded object-cover" />}
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground">الشركة</div>
+                <div className="font-medium truncate">{company.name_ar ?? company.name_en}</div>
+              </div>
+            </Link>
+          )}
+
+          {order.referral_code && (
+            <div className="rounded-md bg-primary/10 border border-primary/40 p-3 mb-4 text-sm flex items-center gap-2">
+              <Gift className="h-4 w-4 text-primary" />
+              <span>هذا الطلب مرتبط بكود إحالة تسويقية <span className="font-mono">{order.referral_code}</span></span>
+            </div>
+          )}
+
           {(order.status === "cancelled" || order.status === "returned" || order.status === "rejected") && (
             <div className="rounded-md bg-destructive/10 border border-destructive/40 p-3 mb-4 text-sm text-destructive">
               الطلب {order.status === "cancelled" ? "ملغي" : order.status === "returned" ? "مُرتجع" : "مرفوض"}
               {order.cancelled_reason && ` — ${order.cancelled_reason}`}
             </div>
           )}
+
 
           {order.shipping_address && (
             <div className="rounded-lg border border-border p-3 mb-4 text-sm">
