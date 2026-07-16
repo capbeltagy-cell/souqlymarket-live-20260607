@@ -106,15 +106,16 @@ function Landing() {
     })();
 
     (async () => {
-      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, is_verified)";
+      const listingSelect = "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)";
       const [lRes, oRes, cRes, fRes, wRes] = await Promise.all([
-        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(8),
+        supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "product").order("created_at", { ascending: false }).limit(40),
         supabase.from("listings").select(listingSelect).eq("status", "approved").eq("type", "opportunity").order("created_at", { ascending: false }).limit(4),
-        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, logo_url").order("is_verified", { ascending: false }).order("created_at", { ascending: false }).limit(6),
+        supabase.from("companies").select("id, name_ar, name_en, industry, country, is_verified, is_premium, logo_url").order("is_premium", { ascending: false }).order("is_verified", { ascending: false }).order("created_at", { ascending: false }).limit(6),
         supabase.from("factories").select("company_id, production_capacity, employees_range, verified, companies(id, name_ar, name_en, industry, governorate, logo_url, is_verified)").order("verified", { ascending: false }).limit(6),
         supabase.from("wholesale_listings").select("id, title, images, price_per_unit, currency, moq, governorate, companies(name_ar, name_en, is_verified)").eq("active", true).order("created_at", { ascending: false }).limit(4),
       ]);
-      setListings((lRes.data ?? []) as unknown as ListingCardData[]);
+      const { rankListings } = await import("@/lib/ranking");
+      setListings(rankListings(((lRes.data ?? []) as unknown as ListingCardData[])).slice(0, 8));
       setOpportunities((oRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
       setFactories((fRes.data ?? []) as unknown as FactoryRow[]);
