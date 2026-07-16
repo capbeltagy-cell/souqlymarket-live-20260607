@@ -33,7 +33,7 @@ function OrderDetailPage() {
   const navigate = useNavigate();
   const load = useServerFn(getOrder);
   const update = useServerFn(updateOrderStatus);
-  const startConv = useServerFn(startConversationForListing);
+  
   const [data, setData] = useState<{ order: any; listing: any; company?: any } | null>(null);
   const [tracking, setTracking] = useState("");
   const [carrier, setCarrier] = useState("");
