@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getOrder, updateOrderStatus } from "@/lib/orders.functions";
-import { startConversationForListing } from "@/lib/messages.functions";
+// Buyer↔company direct messaging removed — support goes through Souqly.
 import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/useAuth";
 
