@@ -221,8 +221,10 @@ function OrderDetailPage() {
             )}
             {isBuyer && (
               <>
-                <Button onClick={contactCompany} variant="outline">
-                  <MessageSquare className="h-4 w-4 me-2" />تواصل مع الشركة
+                <Button asChild variant="outline">
+                  <Link to="/contact">
+                    <MessageSquare className="h-4 w-4 me-2" />تواصل مع دعم سوقلي
+                  </Link>
                 </Button>
                 {listing && (
                   <Button onClick={reorder} variant="outline">
