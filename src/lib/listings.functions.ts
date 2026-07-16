@@ -205,25 +205,38 @@ export const updateListing = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Contact reveal — masked on promoted+active listings so the public flow goes through Souqly.
+// Contact reveal — buyers/anonymous NEVER get direct contact. Only the listing's company owner does.
 export const getListingContact = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
+    // Try to identify caller via bearer token; if none or not the owner, mask.
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const auth = (() => { try { return getRequestHeader("authorization"); } catch { return null; } })();
     const { createClient } = await import("@supabase/supabase-js");
     const sb = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+      {
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+        global: auth ? { headers: { Authorization: auth } } : undefined,
+      },
     );
     const { data: row } = await sb
       .from("listings")
-      .select("phone, whatsapp, marketer_promotion_enabled, promotion_status")
+      .select("phone, whatsapp, company_id")
       .eq("id", data.id)
       .eq("status", "approved")
-      .maybeSingle() as { data: { phone: string | null; whatsapp: string | null; marketer_promotion_enabled: boolean | null; promotion_status: string | null } | null };
-    if (!row) return { phone: null, whatsapp: null, masked: false };
-    const promoted = !!row.marketer_promotion_enabled && (row.promotion_status ?? "active") === "active";
-    if (promoted) return { phone: null, whatsapp: null, masked: true };
+      .maybeSingle() as { data: { phone: string | null; whatsapp: string | null; company_id: string | null } | null };
+    if (!row) return { phone: null, whatsapp: null, masked: true };
+    // Determine caller's user id (if any) and check company ownership
+    let uid: string | null = null;
+    if (auth) {
+      const { data: u } = await sb.auth.getUser();
+      uid = u?.user?.id ?? null;
+    }
+    if (!uid || !row.company_id) return { phone: null, whatsapp: null, masked: true };
+    const { data: comp } = await sb.from("companies").select("owner_id").eq("id", row.company_id).maybeSingle();
+    if (comp?.owner_id !== uid) return { phone: null, whatsapp: null, masked: true };
     return { phone: row.phone, whatsapp: row.whatsapp, masked: false };
   });
 

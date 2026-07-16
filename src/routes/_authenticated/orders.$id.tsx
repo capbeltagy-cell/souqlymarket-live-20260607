@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getOrder, updateOrderStatus } from "@/lib/orders.functions";
-import { startConversationForListing } from "@/lib/messages.functions";
+// Buyer↔company direct messaging removed — support goes through Souqly.
 import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -33,7 +33,7 @@ function OrderDetailPage() {
   const navigate = useNavigate();
   const load = useServerFn(getOrder);
   const update = useServerFn(updateOrderStatus);
-  const startConv = useServerFn(startConversationForListing);
+  
   const [data, setData] = useState<{ order: any; listing: any; company?: any } | null>(null);
   const [tracking, setTracking] = useState("");
   const [carrier, setCarrier] = useState("");
@@ -47,14 +47,6 @@ function OrderDetailPage() {
   const isBuyer = order.buyer_id === user?.id;
   const activeIdx = TIMELINE.findIndex((s) => s.key === order.status);
 
-  const contactCompany = async () => {
-    if (order.conversation_id) { navigate({ to: "/messages", search: { c: order.conversation_id } as any }); return; }
-    if (!listing?.id) { toast.error("لا يمكن فتح المحادثة"); return; }
-    try {
-      const r = await startConv({ data: { listing_id: listing.id } });
-      navigate({ to: "/messages", search: { c: r.id } as any });
-    } catch (e) { toast.error((e as Error).message); }
-  };
 
   const reorder = () => {
     if (!listing) return;
@@ -221,8 +213,10 @@ function OrderDetailPage() {
             )}
             {isBuyer && (
               <>
-                <Button onClick={contactCompany} variant="outline">
-                  <MessageSquare className="h-4 w-4 me-2" />تواصل مع الشركة
+                <Button asChild variant="outline">
+                  <Link to="/contact">
+                    <MessageSquare className="h-4 w-4 me-2" />تواصل مع دعم سوقلي
+                  </Link>
                 </Button>
                 {listing && (
                   <Button onClick={reorder} variant="outline">

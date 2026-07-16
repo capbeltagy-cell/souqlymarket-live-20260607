@@ -235,8 +235,8 @@ function ListingDetail() {
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
   const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
-  // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
-  const showContact = !isPromoted || isOwner;
+  // All buyer↔company contact goes through Souqly. Only the listing owner sees direct contact.
+  const showContact = isOwner;
   const contactPhone = showContact ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "") : "";
   const whatsappNum = showContact ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
@@ -347,11 +347,11 @@ function ListingDetail() {
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
-              ) : isPromoted && !isOwner ? (
+              ) : !isOwner ? (
                 <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
                   {ar
-                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. استخدم الأزرار أدناه لإرسال استفسار أو طلب عرض سعر."
-                    : "For your protection, orders and contact happen through Souqly. Use the actions below to send an inquiry or request a quote."}
+                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. أضف المنتج إلى السلة أو أرسل استفسارًا من هنا."
+                    : "For your protection, orders and contact happen through Souqly. Add to cart or send an inquiry from here."}
                 </div>
               ) : null}
 
