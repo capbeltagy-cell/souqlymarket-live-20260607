@@ -235,8 +235,8 @@ function ListingDetail() {
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
   const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
-  // On promoted listings, contact info is masked from the public — buyers must go through Souqly.
-  const showContact = !isPromoted || isOwner;
+  // All buyer↔company contact goes through Souqly. Only the listing owner sees direct contact.
+  const showContact = isOwner;
   const contactPhone = showContact ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "") : "";
   const whatsappNum = showContact ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "") : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
