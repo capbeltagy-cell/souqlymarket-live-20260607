@@ -347,11 +347,11 @@ function ListingDetail() {
                     <a href={`tel:+${contactPhone}`}>{t("call_now")}</a>
                   </Button>
                 </div>
-              ) : isPromoted && !isOwner ? (
+              ) : !isOwner ? (
                 <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
                   {ar
-                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. استخدم الأزرار أدناه لإرسال استفسار أو طلب عرض سعر."
-                    : "For your protection, orders and contact happen through Souqly. Use the actions below to send an inquiry or request a quote."}
+                    ? "لحماية معاملتك، يتم إتمام الطلب والتواصل عبر سوقلي فقط. أضف المنتج إلى السلة أو أرسل استفسارًا من هنا."
+                    : "For your protection, orders and contact happen through Souqly. Add to cart or send an inquiry from here."}
                 </div>
               ) : null}
 
