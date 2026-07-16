@@ -37,7 +37,7 @@ function Marketplace() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const nowIso = new Date().toISOString();
+    
     let query = supabase
       .from("listings")
       .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
