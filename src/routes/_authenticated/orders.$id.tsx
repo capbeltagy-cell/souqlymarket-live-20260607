@@ -47,14 +47,6 @@ function OrderDetailPage() {
   const isBuyer = order.buyer_id === user?.id;
   const activeIdx = TIMELINE.findIndex((s) => s.key === order.status);
 
-  const contactCompany = async () => {
-    if (order.conversation_id) { navigate({ to: "/messages", search: { c: order.conversation_id } as any }); return; }
-    if (!listing?.id) { toast.error("لا يمكن فتح المحادثة"); return; }
-    try {
-      const r = await startConv({ data: { listing_id: listing.id } });
-      navigate({ to: "/messages", search: { c: r.id } as any });
-    } catch (e) { toast.error((e as Error).message); }
-  };
 
   const reorder = () => {
     if (!listing) return;
