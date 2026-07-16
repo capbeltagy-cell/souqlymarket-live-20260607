@@ -40,24 +40,15 @@ function Marketplace() {
     const nowIso = new Date().toISOString();
     let query = supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, company_id, companies(name_ar, name_en, is_verified)")
+      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(120);
     if (type !== "all") query = query.eq("type", type);
     query.then(({ data }) => {
       if (cancelled) return;
-      const rows = (data ?? []) as unknown as (ListingCardData & { featured_until?: string | null; companies?: { is_verified?: boolean } | null })[];
-      const sorted = [...rows].sort((a, b) => {
-        const af = a.featured && (!a.featured_until || a.featured_until > nowIso) ? 1 : 0;
-        const bf = b.featured && (!b.featured_until || b.featured_until > nowIso) ? 1 : 0;
-        if (af !== bf) return bf - af;
-        const av = a.companies?.is_verified ? 1 : 0;
-        const bv = b.companies?.is_verified ? 1 : 0;
-        if (av !== bv) return bv - av;
-        return 0;
-      });
-      setItems(sorted);
+      const rows = (data ?? []) as unknown as ListingCardData[];
+      setItems(rankListings(rows));
       setLoading(false);
     });
     return () => { cancelled = true; };
