@@ -129,6 +129,7 @@ function ListingDetail() {
   const [myShareLink, setMyShareLink] = useState<string | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
   const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({ phone: null, whatsapp: null });
+  const [related, setRelated] = useState<ListingCardData[]>([]);
   const loadContact = useServerFn(getListingContact);
 
   const onGetShareLink = async () => {
