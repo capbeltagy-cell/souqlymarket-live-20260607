@@ -2704,6 +2704,27 @@ export type Database = {
         }
         Relationships: []
       }
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          full_name: string | null
+          id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          full_name?: string | null
+          id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          full_name?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       activate_listing_promotion: {
@@ -2754,6 +2775,15 @@ export type Database = {
         Returns: {
           subscription_marketer_commission_pct: number
           subscription_plan_price_egp: number
+        }[]
+      }
+      get_public_profiles: {
+        Args: { _ids: string[] }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          full_name: string
+          id: string
         }[]
       }
       has_permission: {
