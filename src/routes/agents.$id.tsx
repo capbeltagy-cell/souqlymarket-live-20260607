@@ -66,7 +66,7 @@ function AgentProfile() {
       setAgent(a as Agent | null);
       if (a) {
         const [{ data: p }, { count }, { data: paid }] = await Promise.all([
-          supabase.from("profiles").select("id, full_name, display_name, avatar_url, phone, phone_verified").eq("id", a.user_id).maybeSingle(),
+          supabase.from("profiles").select("id, full_name, display_name, avatar_url").eq("id", a.user_id).maybeSingle(),
           supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", a.id).eq("status", "paid"),
           supabase.from("commissions").select("amount, notes").eq("agent_id", a.id).eq("status", "paid"),
         ]);
