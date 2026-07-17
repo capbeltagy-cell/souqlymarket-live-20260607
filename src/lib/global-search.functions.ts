@@ -58,9 +58,9 @@ export const globalSearch = createServerFn({ method: "POST" })
         .limit(lim),
       supabaseAdmin
         .from("agents")
-        .select("id, user_id, headline_ar, headline_en, city, country, is_verified, is_premium, is_trusted")
+        .select("id, user_id, headline_ar, headline_en, city, country, is_verified, is_premium, is_trusted, created_at")
         .or(`headline_ar.ilike.${like},headline_en.ilike.${like},bio_ar.ilike.${like},bio_en.ilike.${like}`)
-        .limit(lim),
+        .limit(lim * 2),
     ]);
 
     // Resolve factories from company match too (industry/name)
