@@ -65,11 +65,12 @@ function AgentProfile() {
       const { data: a } = await supabase.from("agents").select("*").eq("id", id).maybeSingle();
       setAgent(a as Agent | null);
       if (a) {
-        const [{ data: p }, { count }, { data: paid }] = await Promise.all([
-          supabase.from("profiles").select("id, full_name, display_name, avatar_url").eq("id", a.user_id).maybeSingle(),
+        const [{ data: profArr }, { count }, { data: paid }] = await Promise.all([
+          supabase.rpc("get_public_profiles", { _ids: [a.user_id] }),
           supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", a.id).eq("status", "paid"),
           supabase.from("commissions").select("amount, notes").eq("agent_id", a.id).eq("status", "paid"),
         ]);
+        const p = Array.isArray(profArr) ? profArr[0] : null;
         setProfile(p as Profile | null);
         setDeals(count ?? 0);
         const total = (paid ?? []).reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
