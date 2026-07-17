@@ -6,6 +6,7 @@ import { AgentCard, type AgentCardData } from "@/components/AgentCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { rankAgents } from "@/lib/ranking";
 
 export const Route = createFileRoute("/agents")({
   head: () => ({ meta: [{ title: "Agents — Souqly" }, { name: "description", content: "Top-performing B2B sales agents on Souqly." }] }),
