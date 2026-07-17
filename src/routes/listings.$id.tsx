@@ -15,6 +15,8 @@ import { LeadForm } from "@/components/LeadForm";
 import { MapView } from "@/components/MapView";
 import { TrustBadge } from "@/components/TrustBadges";
 import { ListingImageGallery } from "@/components/ListingImageGallery";
+import { ListingCard, type ListingCardData } from "@/components/ListingCard";
+import { rankListings } from "@/lib/ranking";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -127,6 +129,7 @@ function ListingDetail() {
   const [myShareLink, setMyShareLink] = useState<string | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
   const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({ phone: null, whatsapp: null });
+  const [related, setRelated] = useState<ListingCardData[]>([]);
   const loadContact = useServerFn(getListingContact);
 
   const onGetShareLink = async () => {
@@ -175,6 +178,16 @@ function ListingDetail() {
       supabase.rpc("increment_listing_view", { _id: id });
       // Contact is served by a secured server fn (mask on promoted listings).
       loadContact({ data: { id } }).then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp })).catch(() => {});
+      // Related listings — same type, approved, excluding this one, ranked by platform priority.
+      if (data?.type) {
+        supabase.from("listings")
+          .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
+          .eq("status", "approved")
+          .eq("type", data.type)
+          .neq("id", id)
+          .limit(24)
+          .then(({ data: rows }) => setRelated(rankListings((rows ?? []) as any[]).slice(0, 8) as ListingCardData[]));
+      }
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
@@ -519,6 +532,14 @@ function ListingDetail() {
             )}
           </aside>
         </div>
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold mb-4">{ar ? "منتجات مرتبطة" : "Related listings"}</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {related.map((r) => <ListingCard key={r.id} l={r} />)}
+            </div>
+          </section>
+        )}
       </div>
       <SiteFooter />
     </div>

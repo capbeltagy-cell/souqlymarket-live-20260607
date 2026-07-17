@@ -6,6 +6,7 @@ import { AgentCard, type AgentCardData } from "@/components/AgentCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { rankAgents } from "@/lib/ranking";
 
 export const Route = createFileRoute("/agents")({
   head: () => ({ meta: [{ title: "Agents — Souqly" }, { name: "description", content: "Top-performing B2B sales agents on Souqly." }] }),
@@ -20,17 +21,15 @@ function AgentsPage() {
   useEffect(() => {
     (async () => {
       const { data: agents } = await supabase.from("agents")
-        .select("id, user_id, headline_ar, headline_en, country, is_verified")
-        .order("is_verified", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(60);
-      const list = agents ?? [];
-      const userIds = list.map((a) => a.user_id).filter(Boolean) as string[];
+        .select("id, user_id, headline_ar, headline_en, country, is_verified, is_premium, is_trusted, created_at")
+        .limit(120);
+      const ranked = rankAgents((agents ?? []) as any[]).slice(0, 60);
+      const userIds = ranked.map((a: any) => a.user_id).filter(Boolean) as string[];
       const profiles = userIds.length
         ? (await supabase.rpc("get_public_profiles", { _ids: userIds })).data ?? []
         : [];
-      const byId = new Map(profiles.map((p) => [p.id, p]));
-      setItems(list.map((a) => ({ ...a, profile: byId.get(a.user_id) ?? null })) as AgentCardData[]);
+      const byId = new Map(profiles.map((p: any) => [p.id, p]));
+      setItems(ranked.map((a: any) => ({ ...a, profile: byId.get(a.user_id) ?? null })) as AgentCardData[]);
       setLoading(false);
     })();
   }, []);

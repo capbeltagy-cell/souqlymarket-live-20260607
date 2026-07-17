@@ -6,6 +6,7 @@ import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { rankCompanies } from "@/lib/ranking";
 
 export const Route = createFileRoute("/companies/")({
   head: () => ({ meta: [{ title: "Companies — Souqly" }, { name: "description", content: "Discover verified B2B companies on Souqly." }] }),
@@ -19,11 +20,13 @@ function CompaniesPage() {
 
   useEffect(() => {
     supabase.from("companies")
-      .select("id, name_ar, name_en, industry, country, is_verified, logo_url")
-      .order("is_verified", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(60)
-      .then(({ data }) => { setItems((data ?? []) as CompanyCardData[]); setLoading(false); });
+      .select("id, name_ar, name_en, industry, country, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url")
+      .limit(120)
+      .then(({ data }) => {
+        const ranked = rankCompanies((data ?? []) as any[]).slice(0, 60);
+        setItems(ranked as CompanyCardData[]);
+        setLoading(false);
+      });
   }, []);
 
   return (

@@ -572,7 +572,8 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
         return data.plan === "paid" ? isPaid : !isPaid;
       });
     }
-    return { companies: list };
+    const { rankCompanies } = await import("@/lib/ranking");
+    return { companies: rankCompanies(list) };
   });
 
 // =========================================================================

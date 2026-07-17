@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { rankListings, rankCompanies, rankAgents } from "@/lib/ranking";
 
 function sanitize(q: string) {
   // Strip characters that break PostgREST `or=` filters: commas, parens, percent.
@@ -25,15 +26,15 @@ export const globalSearch = createServerFn({ method: "POST" })
     const [companiesR, listingsR, factoriesR, wholesaleR, rfqsR, tendersR, agentsR] = await Promise.all([
       supabaseAdmin
         .from("companies")
-        .select("id, name_ar, name_en, industry, city, governorate, is_verified, is_premium, logo_url")
+        .select("id, name_ar, name_en, industry, city, governorate, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url")
         .or(`name_ar.ilike.${like},name_en.ilike.${like},industry.ilike.${like}`)
-        .limit(lim),
+        .limit(lim * 2),
       supabaseAdmin
         .from("listings")
-        .select("id, type, title_ar, title_en, price, currency, city, governorate, images, featured, status")
+        .select("id, type, title_ar, title_en, price, currency, city, governorate, images, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, status, companies(is_premium, is_verified)")
         .eq("status", "approved")
         .or(`title_ar.ilike.${like},title_en.ilike.${like},description_ar.ilike.${like},description_en.ilike.${like}`)
-        .limit(lim * 2),
+        .limit(lim * 4),
       supabaseAdmin
         .from("factories")
         .select("company_id, production_capacity, export_available, verified, companies(name_ar, name_en, governorate, city, industry)")
@@ -57,9 +58,9 @@ export const globalSearch = createServerFn({ method: "POST" })
         .limit(lim),
       supabaseAdmin
         .from("agents")
-        .select("id, user_id, headline_ar, headline_en, city, country, is_verified, is_premium, is_trusted")
+        .select("id, user_id, headline_ar, headline_en, city, country, is_verified, is_premium, is_trusted, created_at")
         .or(`headline_ar.ilike.${like},headline_en.ilike.${like},bio_ar.ilike.${like},bio_en.ilike.${like}`)
-        .limit(lim),
+        .limit(lim * 2),
     ]);
 
     // Resolve factories from company match too (industry/name)
@@ -77,7 +78,7 @@ export const globalSearch = createServerFn({ method: "POST" })
       return true;
     }).slice(0, lim);
 
-    const all = (listingsR.data ?? []) as any[];
+    const all = rankListings((listingsR.data ?? []) as any[]);
     const byType = (t: string) => all.filter((l) => l.type === t).slice(0, lim);
 
     // Agent display names from profiles
@@ -86,11 +87,13 @@ export const globalSearch = createServerFn({ method: "POST" })
       ? await supabaseAdmin.from("profiles").select("id, full_name, display_name, avatar_url").in("id", userIds)
       : { data: [] as any[] };
     const pMap = new Map((profilesR.data ?? []).map((p: any) => [p.id, p]));
-    const agents = (agentsR.data ?? []).map((a: any) => ({ ...a, profile: pMap.get(a.user_id) ?? null }));
+    const agents = rankAgents((agentsR.data ?? []) as any[]).map((a: any) => ({ ...a, profile: pMap.get(a.user_id) ?? null })).slice(0, lim);
+
+    const companies = rankCompanies((companiesR.data ?? []) as any[]).slice(0, lim);
 
     return {
       query: q,
-      companies: (companiesR.data ?? []) as any[],
+      companies,
       products: byType("product"),
       services: byType("service"),
       real_estate: byType("real_estate"),
