@@ -26,15 +26,15 @@ export const globalSearch = createServerFn({ method: "POST" })
     const [companiesR, listingsR, factoriesR, wholesaleR, rfqsR, tendersR, agentsR] = await Promise.all([
       supabaseAdmin
         .from("companies")
-        .select("id, name_ar, name_en, industry, city, governorate, is_verified, is_premium, logo_url")
+        .select("id, name_ar, name_en, industry, city, governorate, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url")
         .or(`name_ar.ilike.${like},name_en.ilike.${like},industry.ilike.${like}`)
-        .limit(lim),
+        .limit(lim * 2),
       supabaseAdmin
         .from("listings")
-        .select("id, type, title_ar, title_en, price, currency, city, governorate, images, featured, status")
+        .select("id, type, title_ar, title_en, price, currency, city, governorate, images, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, status, companies(is_premium, is_verified)")
         .eq("status", "approved")
         .or(`title_ar.ilike.${like},title_en.ilike.${like},description_ar.ilike.${like},description_en.ilike.${like}`)
-        .limit(lim * 2),
+        .limit(lim * 4),
       supabaseAdmin
         .from("factories")
         .select("company_id, production_capacity, export_available, verified, companies(name_ar, name_en, governorate, city, industry)")
