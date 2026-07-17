@@ -27,7 +27,7 @@ function AgentsPage() {
       const list = agents ?? [];
       const userIds = list.map((a) => a.user_id).filter(Boolean) as string[];
       const profiles = userIds.length
-        ? (await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds)).data ?? []
+        ? (await supabase.rpc("get_public_profiles", { _ids: userIds })).data ?? []
         : [];
       const byId = new Map(profiles.map((p) => [p.id, p]));
       setItems(list.map((a) => ({ ...a, profile: byId.get(a.user_id) ?? null })) as AgentCardData[]);
