@@ -178,6 +178,16 @@ function ListingDetail() {
       supabase.rpc("increment_listing_view", { _id: id });
       // Contact is served by a secured server fn (mask on promoted listings).
       loadContact({ data: { id } }).then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp })).catch(() => {});
+      // Related listings — same type, approved, excluding this one, ranked by platform priority.
+      if (data?.type) {
+        supabase.from("listings")
+          .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
+          .eq("status", "approved")
+          .eq("type", data.type)
+          .neq("id", id)
+          .limit(24)
+          .then(({ data: rows }) => setRelated(rankListings((rows ?? []) as any[]).slice(0, 8) as ListingCardData[]));
+      }
       if (data && user) {
         const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
         if (owned) {
