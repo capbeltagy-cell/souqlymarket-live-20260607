@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { rankListings, rankCompanies, rankAgents } from "@/lib/ranking";
 
 function sanitize(q: string) {
   // Strip characters that break PostgREST `or=` filters: commas, parens, percent.
