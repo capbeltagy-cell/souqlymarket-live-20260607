@@ -78,7 +78,7 @@ export const globalSearch = createServerFn({ method: "POST" })
       return true;
     }).slice(0, lim);
 
-    const all = (listingsR.data ?? []) as any[];
+    const all = rankListings((listingsR.data ?? []) as any[]);
     const byType = (t: string) => all.filter((l) => l.type === t).slice(0, lim);
 
     // Agent display names from profiles
@@ -87,11 +87,13 @@ export const globalSearch = createServerFn({ method: "POST" })
       ? await supabaseAdmin.from("profiles").select("id, full_name, display_name, avatar_url").in("id", userIds)
       : { data: [] as any[] };
     const pMap = new Map((profilesR.data ?? []).map((p: any) => [p.id, p]));
-    const agents = (agentsR.data ?? []).map((a: any) => ({ ...a, profile: pMap.get(a.user_id) ?? null }));
+    const agents = rankAgents((agentsR.data ?? []) as any[]).map((a: any) => ({ ...a, profile: pMap.get(a.user_id) ?? null })).slice(0, lim);
+
+    const companies = rankCompanies((companiesR.data ?? []) as any[]).slice(0, lim);
 
     return {
       query: q,
-      companies: (companiesR.data ?? []) as any[],
+      companies,
       products: byType("product"),
       services: byType("service"),
       real_estate: byType("real_estate"),
