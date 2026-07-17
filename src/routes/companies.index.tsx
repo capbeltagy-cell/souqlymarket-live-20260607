@@ -6,6 +6,7 @@ import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { rankCompanies } from "@/lib/ranking";
 
 export const Route = createFileRoute("/companies/")({
   head: () => ({ meta: [{ title: "Companies — Souqly" }, { name: "description", content: "Discover verified B2B companies on Souqly." }] }),
