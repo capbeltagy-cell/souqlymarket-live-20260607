@@ -20,11 +20,13 @@ function CompaniesPage() {
 
   useEffect(() => {
     supabase.from("companies")
-      .select("id, name_ar, name_en, industry, country, is_verified, logo_url")
-      .order("is_verified", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(60)
-      .then(({ data }) => { setItems((data ?? []) as CompanyCardData[]); setLoading(false); });
+      .select("id, name_ar, name_en, industry, country, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url")
+      .limit(120)
+      .then(({ data }) => {
+        const ranked = rankCompanies((data ?? []) as any[]).slice(0, 60);
+        setItems(ranked as CompanyCardData[]);
+        setLoading(false);
+      });
   }, []);
 
   return (
