@@ -532,6 +532,14 @@ function ListingDetail() {
             )}
           </aside>
         </div>
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold mb-4">{ar ? "منتجات مرتبطة" : "Related listings"}</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {related.map((r) => <ListingCard key={r.id} l={r} />)}
+            </div>
+          </section>
+        )}
       </div>
       <SiteFooter />
     </div>
