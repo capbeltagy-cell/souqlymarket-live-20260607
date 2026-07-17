@@ -15,6 +15,8 @@ import { LeadForm } from "@/components/LeadForm";
 import { MapView } from "@/components/MapView";
 import { TrustBadge } from "@/components/TrustBadges";
 import { ListingImageGallery } from "@/components/ListingImageGallery";
+import { ListingCard, type ListingCardData } from "@/components/ListingCard";
+import { rankListings } from "@/lib/ranking";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
