@@ -58,9 +58,13 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: order } = await (supabase.from("wholesale_orders" as never) as any)
-      .select("id, buyer_id, product_listing_id, listing_id, currency").eq("id", data.order_id).maybeSingle();
+      .select("id, buyer_id, product_listing_id, listing_id, currency, total_amount, payment_status").eq("id", data.order_id).maybeSingle();
     if (!order) throw new Error("Order not found");
     if (order.buyer_id !== userId) throw new Error("فقط المشتري يمكنه رفع إثبات الدفع");
+    if (order.payment_status === "paid") throw new Error("تم دفع هذا الطلب بالفعل");
+    if (Math.abs(Number(order.total_amount) - data.amount) > 0.01) {
+      throw new Error("يجب أن يطابق المبلغ إجمالي الطلب");
+    }
 
     // Resolve seller
     let sellerId: string | null = null;
@@ -74,7 +78,11 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
     }
 
     const { data: pm } = await (supabase.from("payment_methods" as never) as any)
-      .select("code").eq("id", data.payment_method_id).maybeSingle();
+      .select("code, is_active").eq("id", data.payment_method_id).maybeSingle();
+    if (!pm?.is_active) throw new Error("طريقة الدفع غير متاحة حاليًا");
+    if (pm.code !== "cash" && !data.proof_url && !data.reference) {
+      throw new Error("أرفق إثبات الدفع أو اكتب رقم العملية");
+    }
 
     const { error } = await (supabase.from("payment_proofs" as never) as any).insert({
       order_id: data.order_id,
