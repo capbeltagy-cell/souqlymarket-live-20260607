@@ -5,14 +5,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const slugSchema = z.string().trim().toLowerCase().min(2).max(60).regex(/^[a-z0-9][a-z0-9-]*$/);
 
 async function getOwnedStore(supabase: any, userId: string) {
-  const { data, error } = await supabase
-    .from("stores")
-    .select("id,company_id,status")
-    .eq("company_id", supabase.from("companies").select("id").eq("owner_id", userId))
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (data) return data as { id: string; company_id: string; status: string };
-
   const { data: company, error: companyError } = await supabase
     .from("companies")
     .select("id")
