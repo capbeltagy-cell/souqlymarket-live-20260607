@@ -741,6 +741,54 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          message: string
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          message: string
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          message?: string
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           buyer_id: string
