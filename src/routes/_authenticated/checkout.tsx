@@ -16,6 +16,7 @@ import { clearCart, getCart, subscribeCart, type CartItem } from "@/lib/cart";
 import { formatPrice } from "@/lib/currency";
 import { createOrderFromListing } from "@/lib/orders.functions";
 import { listMyAddresses, saveMyAddress, deleteMyAddress } from "@/lib/addresses.functions";
+import { getShippingQuote } from "@/lib/shipping";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({ meta: [{ title: "إتمام الشراء — Souqly" }, { name: "description", content: "أكمل شراءك بأمان على سوقلي" }] }),
@@ -109,6 +110,11 @@ function CheckoutPage() {
   const groups = groupByCompany(items);
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const currency = items[0]?.currency ?? "EGP";
+  const selectedAddress = addresses.find((a) => a.id === selectedId);
+  const shipping = selectedAddress ? getShippingQuote(selectedAddress.governorate) : null;
+  // Checkout currently creates one independently payable/shippable order per item.
+  const shippingTotal = shipping ? shipping.amount * items.length : 0;
+  const grandTotal = total + shippingTotal;
 
   async function placeOrders() {
     if (items.length === 0) return;
@@ -340,11 +346,19 @@ function CheckoutPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span>{ar ? "الشحن" : "Shipping"}</span>
-              <span className="text-muted-foreground">{ar ? "يُحسب لاحقًا" : "Calculated later"}</span>
+              <span className="text-muted-foreground">
+                {shipping ? formatPrice(shippingTotal, locale) : (ar ? "اختر العنوان" : "Choose address")}
+              </span>
             </div>
+            {shipping && (
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{ar ? "التوصيل المتوقع" : "Estimated delivery"}</span>
+                <span>{shipping.etaMinDays}–{shipping.etaMaxDays} {ar ? "أيام عمل" : "business days"}</span>
+              </div>
+            )}
             <div className="flex justify-between font-semibold border-t border-border pt-3">
               <span>{ar ? "الإجمالي" : "Total"}</span>
-              <span className="text-primary">{formatPrice(total, locale)} {currency !== "EGP" && currency}</span>
+              <span className="text-primary">{formatPrice(grandTotal, locale)} {currency !== "EGP" && currency}</span>
             </div>
             <Button
               className="w-full bg-primary hover:bg-primary-hover"
