@@ -32,7 +32,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: listing, error } = await supabase
       .from("listings")
-      .select("id, company_id, price, currency, title_ar, title_en, status, type")
+      .select("id, company_id, price, currency, title_ar, title_en, status, type, track_inventory, stock_quantity, min_order_quantity")
       .eq("id", data.listing_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -42,6 +42,12 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
     if (["product", "market"].includes(listing.type) && !data.shipping_address) {
       throw new Error("عنوان الشحن مطلوب لإتمام شراء هذا المنتج");
+    }
+    if (data.quantity < (listing.min_order_quantity ?? 1)) {
+      throw new Error(`الحد الأدنى للطلب ${listing.min_order_quantity} قطعة`);
+    }
+    if (listing.track_inventory && data.quantity > Number(listing.stock_quantity ?? 0)) {
+      throw new Error("الكمية المطلوبة غير متاحة في المخزون");
     }
 
     const { data: sellerCompany } = await supabase
