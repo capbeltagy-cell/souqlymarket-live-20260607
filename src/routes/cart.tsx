@@ -71,7 +71,7 @@ function CartPage() {
               {groups.map((g) => (
                 <div key={g.companyKey} className="rounded-lg border border-border bg-card">
                   <div className="px-4 py-3 border-b border-border text-sm text-muted-foreground">
-                    {ar ? "بائع" : "Seller"}: <span className="font-semibold text-foreground">#{g.companyKey.slice(0, 8)}</span>
+                    {ar ? "البائع" : "Seller"}: <span className="font-semibold text-foreground">{g.companyName}</span>
                   </div>
                   <ul className="divide-y divide-border">
                     {g.items.map((it) => (
@@ -152,5 +152,9 @@ function groupByCompany(items: CartItem[]) {
     list.push(it);
     map.set(key, list);
   }
-  return Array.from(map.entries()).map(([companyKey, list]) => ({ companyKey, items: list }));
+  return Array.from(map.entries()).map(([companyKey, list]) => ({
+    companyKey,
+    companyName: list[0]?.company_name || `#${companyKey.slice(0, 8)}`,
+    items: list,
+  }));
 }
