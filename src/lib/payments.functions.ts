@@ -65,6 +65,12 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
     if (Math.abs(Number(order.total_amount) - data.amount) > 0.01) {
       throw new Error("يجب أن يطابق المبلغ إجمالي الطلب");
     }
+    const { data: existingProof } = await (supabase.from("payment_proofs" as never) as any)
+      .select("id")
+      .eq("order_id", data.order_id)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (existingProof) throw new Error("يوجد إثبات دفع قيد المراجعة لهذا الطلب");
 
     // Resolve seller
     let sellerId: string | null = null;
@@ -91,7 +97,7 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
       payment_method_id: data.payment_method_id,
       payment_method_code: pm?.code ?? null,
       amount: data.amount,
-      currency: data.currency,
+      currency: order.currency ?? "EGP",
       proof_url: data.proof_url ?? null,
       reference: data.reference ?? null,
       note: data.note ?? null,
@@ -106,6 +112,11 @@ export const listOrderProofs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
+    const { data: visibleOrder } = await (context.supabase.from("wholesale_orders" as never) as any)
+      .select("id")
+      .eq("id", data.order_id)
+      .maybeSingle();
+    if (!visibleOrder) throw new Error("غير مسموح لك بعرض بيانات دفع هذا الطلب");
     const { data: items } = await (context.supabase.from("payment_proofs" as never) as any)
       .select("*").eq("order_id", data.order_id).order("created_at", { ascending: false });
     return { items: items ?? [] };
