@@ -34,6 +34,7 @@ function AdminOverview() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-bold">{ar ? "لوحة الإدارة - نظرة عامة" : "Admin Overview"}</h1>
           <div className="flex flex-wrap gap-2 text-sm">
+            <Link to="/admin-stores" className="rounded-md border border-primary bg-primary/10 px-3 py-1.5 font-semibold text-primary hover:bg-primary/20">{ar ? "إدارة المتاجر" : "Store moderation"}</Link>
             <Link to="/admin-launch-content" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "محتوى الإطلاق" : "Launch content"}</Link>
             <Link to="/admin-commissions" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "العمولات" : "Commissions"}</Link>
             <Link to="/admin-withdrawals" className="rounded-md border border-border bg-card px-3 py-1.5 hover:bg-accent">{ar ? "طلبات السحب" : "Withdrawals"}</Link>
