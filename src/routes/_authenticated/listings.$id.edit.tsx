@@ -38,6 +38,7 @@ type Row = {
   conversion_goal: string | null;
   promotion_conditions: string | null;
   promotion_status: string | null;
+  track_inventory: boolean; stock_quantity: number | null; min_order_quantity: number;
 };
 
 function EditListing() {
@@ -60,6 +61,9 @@ function EditListing() {
   const [descAr, setDescAr] = useState("");
   const [descEn, setDescEn] = useState("");
   const [price, setPrice] = useState("");
+  const [trackInventory, setTrackInventory] = useState(false);
+  const [stockQuantity, setStockQuantity] = useState("");
+  const [minOrderQuantity, setMinOrderQuantity] = useState("1");
   const [governorate, setGovernorate] = useState("");
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
@@ -83,7 +87,7 @@ function EditListing() {
       if (!user) return;
       const { data } = await supabase
         .from("listings")
-        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)")
+        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, track_inventory, stock_quantity, min_order_quantity, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)")
         .eq("id", id)
         .maybeSingle() as { data: (Row & { companies: { owner_id: string } | null }) | null };
       if (!data) { setLoading(false); setNotAuthorized(true); return; }
@@ -94,6 +98,9 @@ function EditListing() {
       setDescAr(data.description_ar ?? "");
       setDescEn(data.description_en ?? "");
       setPrice(data.price != null ? String(data.price) : "");
+      setTrackInventory(!!data.track_inventory);
+      setStockQuantity(data.stock_quantity != null ? String(data.stock_quantity) : "");
+      setMinOrderQuantity(String(data.min_order_quantity ?? 1));
       setGovernorate(data.governorate ?? "");
       setCity(data.city ?? "");
       setPhone(data.phone ?? "");
@@ -130,6 +137,9 @@ function EditListing() {
           description_ar: descAr || null,
           description_en: descEn || null,
           price: price ? Number(price) : null,
+          track_inventory: trackInventory,
+          stock_quantity: trackInventory ? Number(stockQuantity || 0) : null,
+          min_order_quantity: Number(minOrderQuantity || 1),
           governorate,
           city,
           images: images.map((i) => i.url),
@@ -211,6 +221,15 @@ function EditListing() {
               </Select>
             </div>
           </div>
+          {(row?.type === "product" || row?.type === "market") && (
+            <div className="rounded-md border border-border p-3 space-y-3">
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={trackInventory} onChange={(e) => setTrackInventory(e.target.checked)} />{ar ? "تتبع المخزون" : "Track inventory"}</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>{ar ? "الكمية المتاحة" : "Stock quantity"}</Label><Input type="number" min="0" disabled={!trackInventory} value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} /></div>
+                <div><Label>{ar ? "الحد الأدنى للطلب" : "Minimum order"}</Label><Input type="number" min="1" value={minOrderQuantity} onChange={(e) => setMinOrderQuantity(e.target.value)} /></div>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="rounded-lg border border-border bg-card p-5 space-y-3">
