@@ -82,6 +82,34 @@ export const saveMyStore = createServerFn({ method: "POST" })
     return saved;
   });
 
+export const listPublishedStores = createServerFn({ method: "GET" })
+  .inputValidator((value: unknown) =>
+    z
+      .object({
+        search: z.string().trim().max(120).optional().default(""),
+        limit: z.number().int().min(1).max(60).optional().default(24),
+      })
+      .parse(value ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    let query = context.supabase
+      .from("stores")
+      .select("id,slug,name_ar,name_en,description_ar,description_en,logo_url,banner_url,primary_color,accent_color,city,governorate,verified,featured,created_at")
+      .eq("status", "published")
+      .order("featured", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+
+    if (data.search) {
+      const safe = data.search.replace(/[,%()]/g, " ").trim();
+      if (safe) query = query.or(`name_ar.ilike.%${safe}%,name_en.ilike.%${safe}%,city.ilike.%${safe}%,governorate.ilike.%${safe}%`);
+    }
+
+    const { data: stores, error } = await query;
+    if (error) throw new Error(error.message);
+    return stores ?? [];
+  });
+
 export const getPublicStore = createServerFn({ method: "GET" })
   .inputValidator((value: unknown) => z.object({ slug: slugSchema }).parse(value))
   .handler(async ({ context, data }) => {
