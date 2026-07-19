@@ -360,6 +360,27 @@
   }
 }
 
+/* Keep the premium look while avoiding expensive compositing on phones. */
+@media (max-width: 767px) {
+  body {
+    background-image: linear-gradient(180deg, rgba(36, 199, 165, 0.055), transparent 24rem);
+  }
+  .glass-card,
+  .hero-quick-link {
+    backdrop-filter: none;
+  }
+  .hero-orb,
+  .hero-ring {
+    animation: none !important;
+    will-change: auto;
+  }
+  main > section,
+  footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 520px;
+  }
+}
+
 @utility container-souqly {
   width: 100%;
   margin-inline: auto;
