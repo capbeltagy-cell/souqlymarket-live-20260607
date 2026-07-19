@@ -127,7 +127,7 @@ function PayOrderPage() {
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-2">
-                    <label className="text-sm">المبلغ<Input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></label>
+                    <label className="text-sm">المبلغ<Input type="number" value={amount} readOnly aria-readonly="true" /></label>
                     <label className="text-sm">رقم المرجع / آخر أرقام<Input value={ref} onChange={(e) => setRef(e.target.value)} /></label>
                   </div>
                   <label className="block text-sm">
