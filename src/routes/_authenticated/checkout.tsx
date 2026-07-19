@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin, Plus, ShoppingBag, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -49,6 +49,7 @@ function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [placing, setPlacing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const checkoutSessionId = useRef<string>(crypto.randomUUID());
 
   // Form fields for new address
   const [f, setF] = useState({
@@ -122,6 +123,7 @@ function CheckoutPage() {
         const { id } = await createOrder({
           data: {
             listing_id: it.listing_id,
+            checkout_session_id: checkoutSessionId.current,
             quantity: it.quantity,
             notes: notes || null,
             contact_phone: addr.phone,
@@ -285,7 +287,7 @@ function CheckoutPage() {
                 {groups.map((g) => (
                   <div key={g.companyKey}>
                     <div className="text-xs text-muted-foreground mb-2">
-                      {ar ? "بائع" : "Seller"} #{g.companyKey.slice(0, 8)}
+                      {ar ? "البائع" : "Seller"}: {g.companyName}
                     </div>
                     <ul className="divide-y divide-border">
                       {g.items.map((it) => (
@@ -379,5 +381,9 @@ function groupByCompany(items: CartItem[]) {
     list.push(it);
     map.set(key, list);
   }
-  return Array.from(map.entries()).map(([companyKey, list]) => ({ companyKey, items: list }));
+  return Array.from(map.entries()).map(([companyKey, list]) => ({
+    companyKey,
+    companyName: list[0]?.company_name || `#${companyKey.slice(0, 8)}`,
+    items: list,
+  }));
 }
