@@ -24,7 +24,7 @@ export function AgentCard({ a }: { a: AgentCardData }) {
     <Link to="/agents/$id" params={{ id: a.id }} className="block rounded-[1.5rem] border border-white/10 bg-surface-2 p-5 shadow-elev transition duration-200 hover:-translate-y-1 hover:bg-surface">
       <div className="flex items-start gap-4">
         {a.profile?.avatar_url ? (
-          <img src={a.profile.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover flex-shrink-0" />
+          <img src={a.profile.avatar_url} alt="" loading="lazy" decoding="async" className="h-14 w-14 rounded-full object-cover flex-shrink-0" />
         ) : (
           <div className="h-14 w-14 rounded-full bg-accent text-accent-foreground grid place-items-center font-bold text-xl flex-shrink-0">
             {initialOf(name)}
@@ -47,4 +47,3 @@ export function AgentCard({ a }: { a: AgentCardData }) {
     </Link>
   );
 }
-
