@@ -12,6 +12,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       listing_id: z.string().uuid(),
+      checkout_session_id: z.string().uuid().optional().nullable(),
       quantity: z.number().int().positive().default(1),
       notes: z.string().max(2000).optional().nullable(),
       contact_phone: z.string().max(30).optional().nullable(),
@@ -65,6 +66,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       conversation_id: data.conversation_id ?? null,
       payment_status: "unpaid",
       referral_code: data.referral_code ?? null,
+      checkout_session_id: data.checkout_session_id ?? null,
     } as Record<string, unknown>;
 
 
@@ -72,7 +74,18 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       .insert(insertPayload)
       .select("id")
       .single();
-    if (iErr) throw new Error(iErr.message);
+    if (iErr) {
+      if (iErr.code === "23505" && data.checkout_session_id) {
+        const { data: existing } = await (supabase.from("wholesale_orders" as never) as any)
+          .select("id")
+          .eq("buyer_id", userId)
+          .eq("checkout_session_id", data.checkout_session_id)
+          .eq("product_listing_id", listing.id)
+          .maybeSingle();
+        if (existing?.id) return { id: existing.id as string };
+      }
+      throw new Error(iErr.message);
+    }
 
     // Notify seller
     if (sellerCompany?.owner_id) {
