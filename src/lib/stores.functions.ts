@@ -39,6 +39,12 @@ async function getOwnedCompany(supabase: any, userId: string) {
   return data as { id: string };
 }
 
+async function requireAdmin(supabase: any, userId: string) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("ADMIN_ONLY");
+}
+
 export const getMyStore = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -84,12 +90,7 @@ export const saveMyStore = createServerFn({ method: "POST" })
 
 export const listPublishedStores = createServerFn({ method: "GET" })
   .inputValidator((value: unknown) =>
-    z
-      .object({
-        search: z.string().trim().max(120).optional().default(""),
-        limit: z.number().int().min(1).max(60).optional().default(24),
-      })
-      .parse(value ?? {}),
+    z.object({ search: z.string().trim().max(120).optional().default(""), limit: z.number().int().min(1).max(60).optional().default(24) }).parse(value ?? {}),
   )
   .handler(async ({ context, data }) => {
     let query = context.supabase
@@ -99,12 +100,10 @@ export const listPublishedStores = createServerFn({ method: "GET" })
       .order("featured", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(data.limit);
-
     if (data.search) {
       const safe = data.search.replace(/[,%()]/g, " ").trim();
       if (safe) query = query.or(`name_ar.ilike.%${safe}%,name_en.ilike.%${safe}%,city.ilike.%${safe}%,governorate.ilike.%${safe}%`);
     }
-
     const { data: stores, error } = await query;
     if (error) throw new Error(error.message);
     return stores ?? [];
@@ -113,15 +112,9 @@ export const listPublishedStores = createServerFn({ method: "GET" })
 export const getPublicStore = createServerFn({ method: "GET" })
   .inputValidator((value: unknown) => z.object({ slug: slugSchema }).parse(value))
   .handler(async ({ context, data }) => {
-    const { data: store, error } = await context.supabase
-      .from("stores")
-      .select("*")
-      .eq("slug", data.slug)
-      .eq("status", "published")
-      .maybeSingle();
+    const { data: store, error } = await context.supabase.from("stores").select("*").eq("slug", data.slug).eq("status", "published").maybeSingle();
     if (error) throw new Error(error.message);
     if (!store) return null;
-
     const { data: listings, error: listingsError } = await context.supabase
       .from("listings")
       .select("id,title_ar,title_en,description_ar,description_en,price,currency,images,category,city,governorate,stock_quantity,track_inventory")
@@ -129,6 +122,35 @@ export const getPublicStore = createServerFn({ method: "GET" })
       .eq("status", "approved")
       .order("created_at", { ascending: false });
     if (listingsError) throw new Error(listingsError.message);
-
     return { store, listings: listings ?? [] };
+  });
+
+export const listAdminStores = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { data, error } = await context.supabase
+      .from("stores")
+      .select("id,company_id,slug,name_ar,name_en,logo_url,city,governorate,status,verified,featured,created_at,updated_at")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const moderateStore = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((value: unknown) => z.object({
+    id: z.string().uuid(),
+    status: z.enum(["draft", "pending_review", "published", "suspended"]),
+    verified: z.boolean().optional(),
+    featured: z.boolean().optional(),
+  }).parse(value))
+  .handler(async ({ context, data }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const patch: Record<string, unknown> = { status: data.status, published_at: data.status === "published" ? new Date().toISOString() : null };
+    if (data.verified !== undefined) patch.verified = data.verified;
+    if (data.featured !== undefined) patch.featured = data.featured;
+    const { data: row, error } = await context.supabase.from("stores").update(patch).eq("id", data.id).select("id,status,verified,featured").single();
+    if (error) throw new Error(error.message);
+    return row;
   });
