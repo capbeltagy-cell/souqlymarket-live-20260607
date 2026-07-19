@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, TrendingUp, Heart, MessageCircle, BadgeCheck } from "lucide-react";
+import { MapPin, TrendingUp, Heart, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
+import { addToCart } from "@/lib/cart";
 
 import type { ListingType } from "@/lib/marketplace";
 
@@ -137,6 +138,28 @@ export function ListingCard({ l }: { l: ListingCardData }) {
           </div>
 
           <div className="flex gap-1.5 flex-shrink-0">
+            {Number(l.price ?? 0) > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="px-2"
+                aria-label={locale === "ar" ? "أضف إلى السلة" : "Add to cart"}
+                title={locale === "ar" ? "أضف إلى السلة" : "Add to cart"}
+                onClick={() => {
+                  addToCart({
+                    listing_id: l.id,
+                    company_id: l.company_id ?? null,
+                    title,
+                    image: l.images?.[0] ?? null,
+                    price: Number(l.price),
+                    currency: l.currency ?? "EGP",
+                  });
+                  toast.success(locale === "ar" ? "تمت الإضافة إلى السلة" : "Added to cart");
+                }}
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </Button>
+            )}
             {wa && (
               <Button asChild size="sm" variant="outline" className="text-success border-success/40 hover:bg-success/5 hover:text-success px-2"
                 onClick={(e) => e.stopPropagation()}>
