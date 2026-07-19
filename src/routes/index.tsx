@@ -218,12 +218,17 @@ function Landing() {
 
       {/* 1. HERO + SEARCH — compact */}
       <section className="relative overflow-hidden hero-gradient">
-        <div className="container-souqly relative pt-6 pb-8 md:pt-14 md:pb-12">
+        <div className="hero-grid" aria-hidden="true" />
+        <div className="hero-orb hero-orb-a" aria-hidden="true" />
+        <div className="hero-orb hero-orb-b" aria-hidden="true" />
+        <div className="hero-ring hero-ring-a" aria-hidden="true" />
+        <div className="hero-ring hero-ring-b" aria-hidden="true" />
+        <div className="container-souqly relative z-10 pt-8 pb-10 md:pt-20 md:pb-16">
           <span className="status-pill mb-3 fade-up text-[10px] md:text-xs">
             <Sparkles className="h-3 w-3" />
             {ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
           </span>
-          <h1 className="text-serif text-[2rem] leading-[1.05] md:text-5xl lg:text-7xl tracking-tight text-foreground mb-3 md:mb-4 fade-up-1">
+          <h1 className="text-serif text-[2.25rem] leading-[1.08] md:text-6xl lg:text-7xl tracking-tight text-foreground mb-4 fade-up-1 max-w-5xl">
             {ar ? (
               <>
                 حيث تلتقي <span className="gold-shine italic">الصفقات</span> بالشركات الجادة.
@@ -265,6 +270,18 @@ function Landing() {
               {ar ? "بحث" : "Search"}
             </Button>
           </form>
+
+          <div className="mt-4 flex flex-wrap gap-2 fade-up-3">
+            <Link to="/marketplace" className="hero-quick-link">
+              <Package className="h-3.5 w-3.5" /> {ar ? "تسوّق الآن" : "Shop now"}
+            </Link>
+            <Link to="/rfq" className="hero-quick-link">
+              <TrendingUp className="h-3.5 w-3.5" /> {ar ? "طلبات الأسعار" : "Price requests"}
+            </Link>
+            <Link to="/earn" className="hero-quick-link">
+              <Megaphone className="h-3.5 w-3.5" /> {ar ? "فرص المسوقين" : "Marketer opportunities"}
+            </Link>
+          </div>
 
           {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
           <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
@@ -316,9 +333,9 @@ function Landing() {
             <Link
               key={key}
               to={to}
-              className="group premium-panel rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/40 hover:shadow-gold transition-all min-h-[88px]"
+              className="group premium-panel category-tile rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/50 hover:shadow-gold transition-all min-h-[88px]"
             >
-              <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-primary/10 text-gold grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition">
+              <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-primary/10 text-primary grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition shadow-[0_0_30px_-12px_var(--primary)]">
                 <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">
