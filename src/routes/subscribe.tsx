@@ -9,11 +9,7 @@ export const Route = createFileRoute("/subscribe")({
   head: () => ({
     meta: [
       { title: "اشترك في باقة الشركة — سوقلي" },
-      {
-        name: "description",
-        content:
-          "اشترك في باقة الشركة المدفوعة لإضافة إعلانات غير محدودة على سوقلي بسعر 499 جنيه شهرياً.",
-      },
+      { name: "description", content: "اشترك في باقة الشركة المدفوعة لإضافة إعلانات غير محدودة على سوقلي بسعر 499 جنيه شهرياً." },
     ],
   }),
   component: Subscribe,
@@ -63,12 +59,12 @@ function Subscribe() {
             <div className="font-semibold mb-1">{ar ? "كيف أشترك؟" : "How to subscribe"}</div>
             <p className="text-muted-foreground">
               {ar
-                ? "أرسل طلب الاشتراك من صفحة الدعم، وسيقوم المسؤول بمراجعة الدفع وتفعيل الباقة على حسابك."
-                : "Send your subscription request through support. An admin will review payment and activate the plan."}
+                ? "للاشتراك، يرجى التواصل مع فريق سوقلي عبر واتساب أو البريد الإلكتروني وسيقوم المسؤول بتفعيل الباقة على حسابك."
+                : "To subscribe, contact the Souqly team via WhatsApp or email and an admin will activate the plan on your account."}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" className="bg-primary hover:bg-primary-hover">
-                <Link to="/contact">{ar ? "إرسال طلب الاشتراك" : "Send subscription request"}</Link>
+                <a href="https://wa.me/201000000000" target="_blank" rel="noreferrer">WhatsApp</a>
               </Button>
               <Button asChild size="sm" variant="outline">
                 <a href="mailto:billing@souqlymarket.com">billing@souqlymarket.com</a>
@@ -81,10 +77,7 @@ function Subscribe() {
               <Link to="/dashboard">{t("nav_dashboard")}</Link>
             </Button>
             <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-              <Link to="/pricing">
-                <Sparkles className="h-4 w-4" />
-                {t("section_pricing")}
-              </Link>
+              <Link to="/pricing"><Sparkles className="h-4 w-4" />{t("section_pricing")}</Link>
             </Button>
           </div>
         </div>
