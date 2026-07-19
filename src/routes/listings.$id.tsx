@@ -24,7 +24,6 @@ import { convertReferral, createReferral } from "@/lib/referrals.functions";
 import { getListingContact } from "@/lib/listings.functions";
 import { featureMyListing, FEATURE_PRICING_EGP } from "@/lib/phase2.functions";
 import { startConversationForListing } from "@/lib/messages.functions";
-import { createOrderFromListing } from "@/lib/orders.functions";
 import { addToCart } from "@/lib/cart";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
@@ -112,7 +111,6 @@ function ListingDetail() {
   const feature = useServerFn(featureMyListing);
   const makeReferral = useServerFn(createReferral);
   const startConv = useServerFn(startConversationForListing);
-  const createOrder = useServerFn(createOrderFromListing);
   const [ordering, setOrdering] = useState(false);
   const navigate = Route.useNavigate();
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
@@ -159,12 +157,19 @@ function ListingDetail() {
   const onOrder = async () => {
     setOrdering(true);
     try {
-      let referral_code: string | undefined;
-      try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
-      const { id: orderId } = await createOrder({ data: { listing_id: id, quantity: 1, referral_code } });
-
-      toast.success(ar ? "تم إنشاء الطلب — انتقل لصفحة الطلب لإكمال البيانات" : "Order created");
-      navigate({ to: "/orders/$id", params: { id: orderId } });
+      if (!l || !Number(l.price) || Number(l.price) <= 0) {
+        throw new Error(ar ? "هذا العرض لا يحتوي على سعر شراء صالح" : "This listing has no valid purchase price");
+      }
+      addToCart({
+        listing_id: id,
+        company_id: l.company_id ?? null,
+        title: (ar ? l.title_ar : l.title_en) ?? l.title_ar ?? l.title_en ?? "",
+        image: l.images?.[0] ?? null,
+        price: Number(l.price),
+        currency: l.currency ?? "EGP",
+      });
+      toast.success(ar ? "أكمل عنوان الشحن والدفع" : "Complete shipping and payment");
+      navigate({ to: "/checkout" });
     } catch (e) { toast.error((e as Error).message); }
     finally { setOrdering(false); }
   };
