@@ -49,6 +49,9 @@ function NewListing() {
   const [city, setCity] = useState("");
   const [governorate, setGovernorate] = useState("");
   const [price, setPrice] = useState("");
+  const [trackInventory, setTrackInventory] = useState(false);
+  const [stockQuantity, setStockQuantity] = useState("");
+  const [minOrderQuantity, setMinOrderQuantity] = useState("1");
   const [images, setImages] = useState<UploadedImage[]>([]);
 
   // Advanced
@@ -176,6 +179,9 @@ function NewListing() {
           category: null,
           price: price ? Number(price) : null,
           currency: "EGP",
+          track_inventory: trackInventory,
+          stock_quantity: trackInventory ? Number(stockQuantity || 0) : null,
+          min_order_quantity: Number(minOrderQuantity || 1),
           commission_percentage: Number(commission || 5),
           marketer_promotion_enabled: promoEnabled,
           commission_type: commissionType,
@@ -276,6 +282,23 @@ function NewListing() {
             <Field label="السعر (جنيه)" required>
               <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="السعر بالجنيه المصري" />
             </Field>
+
+            {(type === "product" || type === "market") && (
+              <div className="rounded-lg border border-border p-4 space-y-3">
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input type="checkbox" checked={trackInventory} onChange={(e) => setTrackInventory(e.target.checked)} />
+                  تتبع المخزون ومنع البيع بعد نفاد الكمية
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="الكمية المتاحة">
+                    <Input type="number" min={0} disabled={!trackInventory} value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} />
+                  </Field>
+                  <Field label="الحد الأدنى للطلب">
+                    <Input type="number" min={1} value={minOrderQuantity} onChange={(e) => setMinOrderQuantity(e.target.value)} />
+                  </Field>
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <Field label="الوصف">
