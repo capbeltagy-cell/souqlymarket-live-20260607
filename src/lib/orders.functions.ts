@@ -30,12 +30,21 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: listing, error } = await supabase
       .from("listings")
-      .select("id, company_id, price, currency, title_ar, title_en")
+      .select("id, company_id, price, currency, title_ar, title_en, status, type")
       .eq("id", data.listing_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!listing) throw new Error("Listing not found");
+    if (listing.status !== "approved") throw new Error("هذا العرض غير متاح للشراء حاليًا");
     const price = Number(listing.price ?? 0);
+    if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
+
+    const { data: sellerCompany } = await supabase
+      .from("companies")
+      .select("owner_id")
+      .eq("id", listing.company_id as string)
+      .maybeSingle();
+    if (sellerCompany?.owner_id === userId) throw new Error("لا يمكنك شراء عرض تابع لشركتك");
     const total = price * data.quantity;
 
     const insertPayload = {
@@ -62,10 +71,9 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     if (iErr) throw new Error(iErr.message);
 
     // Notify seller
-    const { data: comp } = await supabase.from("companies").select("owner_id").eq("id", listing.company_id as string).maybeSingle();
-    if (comp?.owner_id) {
+    if (sellerCompany?.owner_id) {
       await (supabase.from("notifications" as never) as any).insert({
-        user_id: comp.owner_id,
+        user_id: sellerCompany.owner_id,
         type: "order",
         title: "طلب جديد",
         body: `طلب جديد على ${listing.title_ar ?? listing.title_en ?? "منتج"}`,
