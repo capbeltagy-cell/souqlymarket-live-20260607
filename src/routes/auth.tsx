@@ -18,9 +18,16 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in or create account — Souqly" },
-      { name: "description", content: "Sign in to Souqly or create a free account to publish listings, send RFQs, and connect with Egyptian companies, factories and sales agents." },
+      {
+        name: "description",
+        content:
+          "Sign in to Souqly or create a free account to publish listings, send RFQs, and connect with Egyptian companies, factories and sales agents.",
+      },
       { property: "og:title", content: "Sign in to Souqly" },
-      { property: "og:description", content: "Access your Souqly B2B account or join free in seconds." },
+      {
+        property: "og:description",
+        content: "Access your Souqly B2B account or join free in seconds.",
+      },
       { property: "og:url", content: "https://souqlymarket.com/auth" },
       { name: "robots", content: "noindex,follow" },
     ],
@@ -42,25 +49,41 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { if (user) navigate({ to: "/dashboard" }); }, [user, navigate]);
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
       if (password.length < 6) {
-        throw new Error(ar ? "كلمة المرور 6 أحرف على الأقل" : "Password must be at least 6 characters");
+        throw new Error(
+          ar ? "كلمة المرور 6 أحرف على الأقل" : "Password must be at least 6 characters",
+        );
       }
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { data: { display_name: email.split("@")[0], role: signupRole } },
         });
         if (error) throw error;
-        try { localStorage.setItem("souqly:role_choice", signupRole); } catch {}
+        try {
+          localStorage.setItem("souqly:role_choice", signupRole);
+        } catch {}
+        if (!data.session) {
+          toast.success(
+            ar
+              ? "تم إنشاء الحساب. افتح رسالة التأكيد في بريدك ثم سجّل الدخول."
+              : "Account created. Confirm your email, then sign in.",
+            { duration: 8000 },
+          );
+          setMode("signin");
+          setPassword("");
+          return;
+        }
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
-        // Send user straight to the right onboarding surface for their chosen role.
         navigate({ to: signupRole === "company" ? "/company" : "/agent" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -85,28 +108,50 @@ function AuthPage() {
           Souqly
         </Link>
         <div>
-          <h2 className="text-4xl font-bold leading-tight mb-4">{ar ? "انضم إلى أكبر سوق B2B في مصر" : "Join Egypt's leading B2B marketplace"}</h2>
-          <p className="text-primary-foreground/80">{ar ? "تسجيل سريع. بدون نماذج طويلة." : "Fast signup. No long forms."}</p>
+          <h2 className="text-4xl font-bold leading-tight mb-4">
+            {ar ? "انضم إلى أكبر سوق B2B في مصر" : "Join Egypt's leading B2B marketplace"}
+          </h2>
+          <p className="text-primary-foreground/80">
+            {ar ? "تسجيل سريع. بدون نماذج طويلة." : "Fast signup. No long forms."}
+          </p>
         </div>
-        <div className="text-sm text-primary-foreground/60">© {new Date().getFullYear()} Souqly</div>
+        <div className="text-sm text-primary-foreground/60">
+          © {new Date().getFullYear()} Souqly
+        </div>
       </div>
 
       <div className="flex flex-col p-6 lg:p-12">
         <div className="flex justify-between items-center mb-6">
           <Link to="/" className="flex items-center gap-2 font-bold text-primary lg:hidden">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground"><Briefcase className="h-5 w-5" /></div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Briefcase className="h-5 w-5" />
+            </div>
             Souqly
           </Link>
-          <div className="ml-auto"><LanguageToggle /></div>
+          <div className="ml-auto">
+            <LanguageToggle />
+          </div>
         </div>
 
         <div className="flex-1 grid place-items-center">
           <div className="w-full max-w-md">
             <h1 className="text-2xl font-bold mb-1">
-              {mode === "signup" ? (ar ? "إنشاء حساب" : "Create account") : (ar ? "تسجيل الدخول" : "Sign in")}
+              {mode === "signup"
+                ? ar
+                  ? "إنشاء حساب"
+                  : "Create account"
+                : ar
+                  ? "تسجيل الدخول"
+                  : "Sign in"}
             </h1>
             <p className="text-muted-foreground text-sm mb-6">
-              {mode === "signup" ? (ar ? "أدخل بريدك وكلمة المرور" : "Enter your email and password") : (ar ? "مرحباً بعودتك" : "Welcome back")}
+              {mode === "signup"
+                ? ar
+                  ? "أدخل بريدك وكلمة المرور"
+                  : "Enter your email and password"
+                : ar
+                  ? "مرحباً بعودتك"
+                  : "Welcome back"}
             </p>
 
             {mode === "signup" && (
@@ -118,58 +163,100 @@ function AuthPage() {
                     onClick={() => setSignupRole("company")}
                     className={`rounded-lg border p-3 text-start transition ${signupRole === "company" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
                   >
-                    <div className="font-semibold text-sm">{ar ? "سجل كشركة" : "Register as company"}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">{ar ? "انشر منتجاتك واستقبل الطلبات" : "Publish products, receive leads"}</div>
+                    <div className="font-semibold text-sm">
+                      {ar ? "سجل كشركة" : "Register as company"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {ar ? "انشر منتجاتك واستقبل الطلبات" : "Publish products, receive leads"}
+                    </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setSignupRole("agent")}
                     className={`rounded-lg border p-3 text-start transition ${signupRole === "agent" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
                   >
-                    <div className="font-semibold text-sm">{ar ? "سجل كمسوق" : "Register as marketer"}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">{ar ? "اربح عمولات من الإحالات" : "Earn commissions from referrals"}</div>
+                    <div className="font-semibold text-sm">
+                      {ar ? "سجل كمسوق" : "Register as marketer"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {ar ? "اربح عمولات من الإحالات" : "Earn commissions from referrals"}
+                    </div>
                   </button>
                 </div>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-
               <div>
                 <Label htmlFor="email">{ar ? "البريد الإلكتروني" : "Email"}</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="mt-1.5"
+                />
               </div>
               <div>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">{ar ? "كلمة المرور" : "Password"}</Label>
                   {mode === "signin" && (
-                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">{ar ? "نسيت كلمة المرور؟" : "Forgot?"}</Link>
+                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                      {ar ? "نسيت كلمة المرور؟" : "Forgot?"}
+                    </Link>
                   )}
                 </div>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="mt-1.5" />
-                <p className="text-xs text-muted-foreground mt-1">{ar ? "6 أحرف على الأقل" : "Minimum 6 characters"}</p>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="mt-1.5"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {ar ? "6 أحرف على الأقل" : "Minimum 6 characters"}
+                </p>
               </div>
               <Button type="submit" disabled={busy} className="w-full h-11">
-                {busy ? (ar ? "جارٍ..." : "Working...") : mode === "signup" ? (ar ? "إنشاء حساب" : "Create account") : (ar ? "دخول" : "Sign in")}
+                {busy
+                  ? ar
+                    ? "جارٍ..."
+                    : "Working..."
+                  : mode === "signup"
+                    ? ar
+                      ? "إنشاء حساب"
+                      : "Create account"
+                    : ar
+                      ? "دخول"
+                      : "Sign in"}
               </Button>
             </form>
 
             <p className="text-sm text-center text-muted-foreground mt-6">
               {mode === "signup"
-                ? (ar ? "لديك حساب؟ " : "Already have an account? ")
-                : (ar ? "ليس لديك حساب؟ " : "Don't have an account? ")}
+                ? ar
+                  ? "لديك حساب؟ "
+                  : "Already have an account? "
+                : ar
+                  ? "ليس لديك حساب؟ "
+                  : "Don't have an account? "}
               <button
                 type="button"
                 onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
                 className="text-primary hover:underline font-medium"
               >
-                {mode === "signup" ? (ar ? "دخول" : "Sign in") : (ar ? "إنشاء حساب" : "Sign up")}
+                {mode === "signup" ? (ar ? "دخول" : "Sign in") : ar ? "إنشاء حساب" : "Sign up"}
               </button>
             </p>
 
             <p className="text-xs text-muted-foreground text-center pt-4">
               {ar ? "بالمتابعة، فإنك توافق على" : "By continuing, you agree to our"}{" "}
-              <Link to="/terms" className="underline">{ar ? "الشروط" : "Terms"}</Link>
+              <Link to="/terms" className="underline">
+                {ar ? "الشروط" : "Terms"}
+              </Link>
             </p>
           </div>
         </div>
