@@ -149,6 +149,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
                   addToCart({
                     listing_id: l.id,
                     company_id: l.company_id ?? null,
+                    company_name: company || null,
                     title,
                     image: l.images?.[0] ?? null,
                     price: Number(l.price),
