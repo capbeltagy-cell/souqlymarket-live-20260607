@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, ShoppingCart, Sparkles, Star, TrendingUp } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
 import { listingCaption } from "@/lib/share-captions";
 import { useServerFn } from "@tanstack/react-start";
@@ -385,17 +385,14 @@ function ListingDetail() {
                   className="w-full"
                 />
               </div>
-              {!isOwner && user && (
+              {!isOwner && Number(l.price ?? 0) > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <Button className="gap-2 bg-primary hover:bg-primary-hover" onClick={onOrder} disabled={ordering}>
                     {ordering ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                    {ar ? "اطلب الآن" : "Order now"}
-                  </Button>
-                  <Button className="gap-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
-                    <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                    {ar ? "اشترِ الآن" : "Buy now"}
                   </Button>
                   <Button
-                    className="gap-2 col-span-2"
+                    className="gap-2"
                     variant="outline"
                     onClick={() => {
                       addToCart({
@@ -409,8 +406,14 @@ function ListingDetail() {
                       toast.success(ar ? "تمت الإضافة إلى السلة" : "Added to cart");
                     }}
                   >
+                    <ShoppingCart className="h-4 w-4" />
                     {ar ? "أضف إلى السلة" : "Add to cart"}
                   </Button>
+                  {user && (
+                    <Button className="gap-2 col-span-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
+                      <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
