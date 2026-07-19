@@ -24,7 +24,7 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
     <Link to="/companies/$id" params={{ id: c.id }} className="block rounded-[1.5rem] border border-white/10 bg-surface-2 p-5 shadow-elev transition duration-200 hover:-translate-y-1 hover:bg-surface">
       <div className="flex items-start gap-4">
         {c.logo_url ? (
-          <img src={c.logo_url} alt="" className="h-14 w-14 rounded-xl object-cover flex-shrink-0" />
+          <img src={c.logo_url} alt="" loading="lazy" decoding="async" className="h-14 w-14 rounded-xl object-cover flex-shrink-0" />
         ) : (
           <div className="h-14 w-14 rounded-xl hero-gradient grid place-items-center text-primary-foreground font-bold text-xl flex-shrink-0">
             {initialOf(name)}
@@ -48,4 +48,3 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
     </Link>
   );
 }
-
