@@ -163,6 +163,7 @@ function ListingDetail() {
       addToCart({
         listing_id: id,
         company_id: l.company_id ?? null,
+        company_name: companyName || null,
         title: (ar ? l.title_ar : l.title_en) ?? l.title_ar ?? l.title_en ?? "",
         image: l.images?.[0] ?? null,
         price: Number(l.price),
@@ -398,6 +399,7 @@ function ListingDetail() {
                       addToCart({
                         listing_id: id,
                         company_id: l?.company_id ?? null,
+                        company_name: companyName || null,
                         title: (ar ? l?.title_ar : l?.title_en) ?? l?.title_ar ?? l?.title_en ?? "",
                         image: l?.images?.[0] ?? null,
                         price: Number(l?.price ?? 0),
