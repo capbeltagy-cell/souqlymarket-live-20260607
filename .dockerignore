@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+.output
+.nitro
+.wrangler
+.env
+.env.*
+!.env.production.example
+logs
+*.log
