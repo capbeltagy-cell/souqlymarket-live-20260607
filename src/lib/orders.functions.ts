@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getShippingQuote } from "@/lib/shipping";
 
 const ORDER_STATUS = z.enum([
   "draft","awaiting_seller","accepted","rejected","packed","shipped","delivered","completed","cancelled","returned",
@@ -56,7 +57,11 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       .eq("id", listing.company_id as string)
       .maybeSingle();
     if (sellerCompany?.owner_id === userId) throw new Error("لا يمكنك شراء عرض تابع لشركتك");
-    const total = price * data.quantity;
+    const subtotal = price * data.quantity;
+    const shippingQuote = data.shipping_address
+      ? getShippingQuote(data.shipping_address.governorate)
+      : { amount: 0, etaMinDays: 0, etaMaxDays: 0 };
+    const total = subtotal + shippingQuote.amount;
 
     const insertPayload = {
       buyer_id: userId,
@@ -67,6 +72,9 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       status: "awaiting_seller",
       unit_price: price,
       total_amount: total,
+      shipping_amount: shippingQuote.amount,
+      shipping_eta_min_days: shippingQuote.etaMinDays || null,
+      shipping_eta_max_days: shippingQuote.etaMaxDays || null,
       currency: listing.currency ?? "EGP",
       shipping_address: data.shipping_address ?? null,
       conversation_id: data.conversation_id ?? null,
