@@ -5,6 +5,7 @@
 export type CartItem = {
   listing_id: string;
   company_id: string | null;
+  company_name?: string | null;
   title: string;
   image?: string | null;
   price: number;
