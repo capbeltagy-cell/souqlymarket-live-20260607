@@ -81,8 +81,8 @@ function Page() {
           </a>
           <div className="rounded-lg border border-border bg-card p-5 text-right">
             <MessageCircle className="h-6 w-6 text-primary mb-2" />
-            <div className="font-semibold">واتساب</div>
-            <div className="text-sm text-muted-foreground">قريباً</div>
+            <div className="font-semibold">رسالة مباشرة</div>
+            <div className="text-sm text-muted-foreground">استخدم نموذج الدعم بالأسفل</div>
           </div>
         </div>
 
