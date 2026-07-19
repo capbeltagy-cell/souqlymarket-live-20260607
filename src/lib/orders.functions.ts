@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const ORDER_STATUS = z.enum([
   "draft","awaiting_seller","accepted","rejected","packed","shipped","delivered","completed","cancelled","returned",
@@ -15,11 +16,11 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       notes: z.string().max(2000).optional().nullable(),
       contact_phone: z.string().max(30).optional().nullable(),
       shipping_address: z.object({
-        recipient_name: z.string(),
-        phone: z.string(),
-        governorate: z.string(),
-        city: z.string(),
-        address_line: z.string(),
+        recipient_name: z.string().min(2).max(120),
+        phone: z.string().min(6).max(30),
+        governorate: z.string().min(1).max(120),
+        city: z.string().min(1).max(120),
+        address_line: z.string().min(3).max(500),
       }).optional().nullable(),
       conversation_id: z.string().uuid().optional().nullable(),
       referral_code: z.string().min(4).max(32).optional().nullable(),
@@ -38,6 +39,9 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     if (listing.status !== "approved") throw new Error("هذا العرض غير متاح للشراء حاليًا");
     const price = Number(listing.price ?? 0);
     if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
+    if (["product", "market"].includes(listing.type) && !data.shipping_address) {
+      throw new Error("عنوان الشحن مطلوب لإتمام شراء هذا المنتج");
+    }
 
     const { data: sellerCompany } = await supabase
       .from("companies")
@@ -93,15 +97,64 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     cancelled_reason: z.string().max(500).optional().nullable(),
   }).parse(d))
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
+    const { userId } = context;
+    const { data: order, error: orderError } = await (supabaseAdmin.from("wholesale_orders" as never) as any)
+      .select("id, buyer_id, status, payment_status, product_listing_id, listing_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (orderError) throw new Error(orderError.message);
+    if (!order) throw new Error("Order not found");
+
+    const listingId = order.product_listing_id ?? order.listing_id;
+    let sellerId: string | null = null;
+    if (listingId) {
+      const { data: listing } = await supabaseAdmin.from("listings").select("company_id").eq("id", listingId).maybeSingle();
+      if (listing?.company_id) {
+        const { data: company } = await supabaseAdmin.from("companies").select("owner_id").eq("id", listing.company_id).maybeSingle();
+        sellerId = company?.owner_id ?? null;
+      }
+    }
+    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" });
+    const actor = isAdmin ? "admin" : order.buyer_id === userId ? "buyer" : sellerId === userId ? "seller" : "none";
+    if (actor === "none") throw new Error("غير مسموح لك بتعديل هذا الطلب");
+
+    const allowed: Record<"buyer" | "seller", Record<string, string[]>> = {
+      buyer: {
+        awaiting_seller: ["cancelled"],
+        accepted: ["cancelled"],
+        delivered: ["completed", "returned"],
+      },
+      seller: {
+        awaiting_seller: ["accepted", "rejected"],
+        accepted: ["packed"],
+        packed: ["shipped"],
+        shipped: ["delivered"],
+      },
+    };
+    if (actor !== "admin" && !allowed[actor][order.status]?.includes(data.status)) {
+      throw new Error("انتقال حالة الطلب غير مسموح");
+    }
+    if (actor === "seller" && ["packed", "shipped", "delivered"].includes(data.status) && order.payment_status !== "paid") {
+      throw new Error("لا يمكن تجهيز أو شحن الطلب قبل تأكيد الدفع");
+    }
+    if (data.status === "shipped" && (!data.tracking_number?.trim() || !data.tracking_carrier?.trim())) {
+      throw new Error("أدخل شركة الشحن ورقم التتبع");
+    }
+
     const patch: Record<string, unknown> = { status: data.status };
     if (data.tracking_number !== undefined) patch.tracking_number = data.tracking_number;
     if (data.tracking_carrier !== undefined) patch.tracking_carrier = data.tracking_carrier;
     if (data.cancelled_reason !== undefined) patch.cancelled_reason = data.cancelled_reason;
     if (data.status === "delivered") patch.delivered_at = new Date().toISOString();
     if (data.status === "completed") patch.completed_at = new Date().toISOString();
-    const { error } = await (supabase.from("wholesale_orders" as never) as any).update(patch).eq("id", data.id);
+    const { data: updated, error } = await (supabaseAdmin.from("wholesale_orders" as never) as any)
+      .update(patch)
+      .eq("id", data.id)
+      .eq("status", order.status)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!updated) throw new Error("تم تحديث الطلب من جلسة أخرى؛ حدّث الصفحة وحاول مجددًا");
     return { ok: true };
   });
 
