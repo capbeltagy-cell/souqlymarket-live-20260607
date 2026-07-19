@@ -53,8 +53,8 @@ function OrderConfirmationPage() {
           </h1>
           <p className="text-muted-foreground text-sm">
             {ar
-              ? `أرسلنا تنبيهًا للبائع${orders.length > 1 ? "ين" : ""} وسنُعلمك فور القبول.`
-              : `We notified the seller${orders.length > 1 ? "s" : ""} — you'll be alerted when they respond.`}
+              ? "تم تثبيت طلبك. أكمل الدفع الآن ليبدأ البائع التجهيز والشحن."
+              : "Your order is reserved. Complete payment now so fulfilment can begin."}
           </p>
         </div>
 
@@ -87,7 +87,9 @@ function OrderConfirmationPage() {
                       {Number(order.total_amount ?? 0).toLocaleString(ar ? "ar-EG" : "en")} {order.currency ?? "EGP"}
                     </div>
                     <Badge variant="secondary" className="mt-1 text-xs">
-                      {ar ? "بانتظار البائع" : "Awaiting seller"}
+                      {order.payment_status === "paid"
+                        ? (ar ? "تم الدفع" : "Paid")
+                        : (ar ? "بانتظار الدفع" : "Payment required")}
                     </Badge>
                   </div>
                 </div>
@@ -117,14 +119,16 @@ function OrderConfirmationPage() {
                   </Link>
                 </Button>
               )}
-              {orders.length === 1 && (
-                <Button asChild variant="outline">
-                  <Link to="/orders/$id/pay" params={{ id: orders[0].order.id }}>
+              {orders.filter(({ order }) => order.payment_status !== "paid").map(({ order }, index) => (
+                <Button asChild variant={index === 0 ? "default" : "outline"} key={`pay-${order.id}`}>
+                  <Link to="/orders/$id/pay" params={{ id: order.id }}>
                     <CreditCard className="h-4 w-4 me-2" />
-                    {ar ? "الدفع الآن" : "Pay now"}
+                    {orders.length === 1
+                      ? (ar ? "الدفع الآن" : "Pay now")
+                      : (ar ? `دفع الطلب #${order.id.slice(0, 8)}` : `Pay order #${order.id.slice(0, 8)}`)}
                   </Link>
                 </Button>
-              )}
+              ))}
               <Button asChild variant="ghost">
                 <Link to="/">
                   <ShoppingBag className="h-4 w-4 me-2" />
@@ -135,8 +139,8 @@ function OrderConfirmationPage() {
 
             <div className="mt-6 rounded-lg bg-muted/40 p-4 text-xs text-muted-foreground text-center">
               {ar
-                ? "ستصلك إشعارات فور تغيّر حالة الطلب — اقبل، تجهيز، شحن، تسليم."
-                : "You'll receive notifications as the order status changes — accepted, packed, shipped, delivered."}
+                ? "بعد تأكيد الدفع ستصلك إشعارات التجهيز والشحن والتسليم، ويمكنك متابعة الطلب من حسابك."
+                : "After payment confirmation, you'll receive packing, shipping and delivery updates in your account."}
             </div>
           </>
         )}
