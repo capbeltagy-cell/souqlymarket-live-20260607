@@ -1129,7 +1129,6 @@ export type Database = {
           location: string | null
           longitude: number | null
           marketer_promotion_enabled: boolean
-          min_order_quantity: number
           ownership_type: string | null
           pdf_url: string | null
           phone: string | null
@@ -1141,11 +1140,9 @@ export type Database = {
           source_name: string | null
           source_url: string | null
           status: Database["public"]["Enums"]["listing_status"]
-          stock_quantity: number | null
           title_ar: string
           title_en: string
           type: Database["public"]["Enums"]["listing_type"]
-          track_inventory: boolean
           updated_at: string
           video_url: string | null
           views_count: number
@@ -1186,7 +1183,6 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           marketer_promotion_enabled?: boolean
-          min_order_quantity?: number
           ownership_type?: string | null
           pdf_url?: string | null
           phone?: string | null
@@ -1198,11 +1194,9 @@ export type Database = {
           source_name?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
-          stock_quantity?: number | null
           title_ar: string
           title_en: string
           type: Database["public"]["Enums"]["listing_type"]
-          track_inventory?: boolean
           updated_at?: string
           video_url?: string | null
           views_count?: number
@@ -1243,7 +1237,6 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           marketer_promotion_enabled?: boolean
-          min_order_quantity?: number
           ownership_type?: string | null
           pdf_url?: string | null
           phone?: string | null
@@ -1255,11 +1248,9 @@ export type Database = {
           source_name?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
-          stock_quantity?: number | null
           title_ar?: string
           title_en?: string
           type?: Database["public"]["Enums"]["listing_type"]
-          track_inventory?: boolean
           updated_at?: string
           video_url?: string | null
           views_count?: number
