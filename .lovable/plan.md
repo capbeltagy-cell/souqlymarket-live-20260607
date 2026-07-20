@@ -1,55 +1,114 @@
-# Souqly Premium Mobile-First Sprint
+# خطة تنفيذ نظام المتاجر لسوقلي (Stores System)
 
-This is a very large scope. To ship it at real quality (not a superficial pass) I'll deliver it in **4 sequential waves in one sprint**, each verified before moving on. No touching marketer wallet, admin, payments, referrals, or DB schema.
+الهدف: إضافة نظام متاجر متكامل للشركات فوق البنية الحالية دون كسر أي صفحة أو ميزة. سنعتمد على جداول `companies` و`listings` و`wholesale_orders` و`wallets` و`notifications` الحالية، ونضيف فقط ما ينقص.
 
----
+## 1) نتيجة الـAudit السريع
 
-## Wave 1 — Mobile-First Foundation (site-wide)
+- لا يوجد أي جدول `stores*` حاليًا → النظام سيُبنى من الصفر لكن معتمدًا على `companies` (كل شركة = مالك محتمل لمتجر).
+- `listings` يحتوي بالفعل على المنتجات وربطها بـ`company_id` → لن نكرر جدول منتجات.
+- `wholesale_orders` + `payment_proofs` + `wallets` = دورة الطلب والدفع الحالية → سنضيف حقول متجر وكوبون بدلًا من نظام موازٍ.
+- `notifications` و`favorites` و`reviews` موجودة → سنُعيد استخدامها.
+- الرفع عبر Supabase Storage bucket `listing-media` موجود بمكون `ImageUploader` → نعيد استخدامه لصور المتجر والبانر واللوجو.
 
-Goal: every page feels premium on phone before desktop, RTL-perfect.
+## 2) الـMigrations الجديدة (SQL واحد، إضافي فقط)
 
-- **SiteHeader**: redesigned mobile nav (bottom-sheet drawer, sticky compact header, large touch targets ≥44px, search chip that expands, role-aware menus preserved).
-- **Mobile Bottom Tab Bar** (new component, mobile-only): Home · Search · Post/Companies · Messages · Me. Native-app feel.
-- **SiteFooter**: collapsible sections on mobile.
-- **Global tokens** (`src/styles.css`): add spacing/typography scale for mobile, safe-area insets (`env(safe-area-inset-*)`), tap-highlight reset, momentum scroll, RTL logical properties audit.
-- **Cards/grids**: unify ListingCard, CompanyCard, AgentCard — consistent radius, image ratio, min-height, skeletons, `content-visibility: auto` for long lists.
-- **Remove duplicated filter blocks** on marketplace/search/companies/factories pages (single `<FiltersSheet>` on mobile, sidebar on desktop).
+جداول جديدة:
+- `stores` (owner_id, company_id, slug UNIQUE, name_ar/en, description, logo_url, banner_url, colors JSONB, city, governorate, shipping_policy, return_policy, socials JSONB, business_hours JSONB, status enum draft|pending_review|published|suspended|rejected, is_featured, is_verified, followers_count, products_count, review_avg)
+- `store_categories` (store_id, name, slug, sort_order)
+- `store_coupons` (store_id, code, type percent|fixed, value, min_order, max_discount, starts_at, ends_at, usage_limit_total, usage_limit_per_user, active, applies_to JSONB)
+- `store_coupon_usage` (coupon_id, user_id, order_id)
+- `store_followers` (store_id, user_id)
+- `store_reviews` (store_id, user_id, order_id, rating, body, seller_reply, status)
+- `store_staff` (store_id, user_id, role, permissions JSONB)
 
-## Wave 2 — Visitor Experience (Home + Discovery + Search)
+توسعة الجداول القائمة (إضافة أعمدة فقط، Nullable):
+- `listings`: `store_id uuid`, `store_category_id uuid`, `visible_in_marketplace bool default true`, `visible_in_store bool default true`, `sale_price numeric`, `sku text`, `weight_grams int`, `dimensions jsonb`, `variants jsonb`
+- `wholesale_orders`: `store_id uuid`, `coupon_code text`, `discount_amount numeric default 0`, `subtotal numeric`, `shipping_amount numeric default 0`, `idempotency_key text`
 
-- **Homepage** (`routes/index.tsx`): rebuilt sections in order — Hero + value prop, Category tiles, Featured Companies, Verified Factories, Latest Products, Investment Opportunities, Wholesale Offers, Top Marketers, Success Stories, How It Works, Stats, Partners. All lazy-loaded below the fold.
-- **Companies index** (`routes/companies.index.tsx`): tabs — Popular · Verified · Newest · Nearby · Recommended · Trending · Featured Suppliers. Uses existing tables (`companies`, `company_followers`, `is_verified`, `is_premium`, `created_at`, `governorate`). No schema changes.
-- **Global Search** (`routes/search-all.tsx` + `GlobalSearch`): Google-style single input, unified filters sheet (Governorate, City, Category, Subcategory, Business type, Verified only, entity tabs: Products/Factories/Companies/Wholesale/Real Estate/Investment), sort (Newest/Popular/Rating).
+كل الجداول: GRANTs + RLS + Policies + Triggers `updated_at`. المتجر لا يظهر للعامة (`SELECT TO anon`) إلا حيث `status='published'`.
 
-## Wave 3 — Company Experience
+## 3) الصفحات والمسارات الجديدة
 
-- **Company Dashboard** (`routes/_authenticated/dashboard.tsx` — company branch only, marketer branch untouched): sidebar/tab index of all listed sections. Wires to existing routes (products→listings, services, factories, real-estate, wholesale, campaigns, rfq.mine, quotations, messages, orders, followers, statistics/analytics, wallet, subscription, notifications, settings/profile). No new tables.
-- **Company public profile** (`routes/companies.$id.tsx`): LinkedIn/Alibaba-style — cover, logo, verified badges, About, Certificates/licenses/CR/Tax card (uses existing verification docs), gallery, social/website/WhatsApp/phone/email, working hours, Google Map (already have Google Maps connector), stats (followers, products, services, years in business, response rate, avg reply time — computed from existing tables; graceful "—" when absent).
-- **Product page** (`routes/listings.$id.tsx`): image gallery + video, price, wholesale price, MOQ, shipping, stock, category/subcategory, specs, downloads, Inquiry / Share / Save, Related products. Uses existing listing fields only; sections hide when data absent.
+عامة:
+- `/stores` — قائمة المتاجر المنشورة (SSR + ranking).
+- `/stores/$slug` — صفحة المتجر (بانر/لوجو/أقسام/منتجات/تقييمات/سياسة/متابعة/مشاركة + SEO + JSON-LD).
 
-## Wave 4 — Performance & Polish
+Wizard وإدارة (تحت `_authenticated`):
+- `/store/open` — Wizard إنشاء المتجر (اسم/slug/نشاط/محافظة/لوجو/بانر/سياسات/معاينة/إرسال للمراجعة).
+- `/store` — Dashboard المتجر (Overview).
+- `/store/products` — قائمة منتجات المتجر + إضافة/تعديل باستخدام تدفق `listings` الحالي مع `store_id`.
+- `/store/categories` — أقسام المتجر.
+- `/store/orders` — طلبات المتجر (من `wholesale_orders`).
+- `/store/coupons` — الكوبونات.
+- `/store/analytics` — تحليلات من البيانات الفعلية.
+- `/store/settings` — إعدادات + شحن + دفع + معاينة.
+- `/store/reviews` — التقييمات والردود.
 
-- Route-level lazy imports for heavy sections.
-- `<img loading="lazy" decoding="async">` + explicit width/height everywhere; AVIF/WebP via `vite-imagetools` for bundled hero images.
-- Skeletons on every list/detail.
-- React Query: sensible `staleTime`/`gcTime` on discovery queries; prefetch on `Link` intent.
-- Preload LCP image on `/`.
-- Reduce re-renders (memoize card lists, stable keys, split heavy providers).
-- Lighthouse mobile pass; fix CLS on hero and card grids.
+Admin:
+- `/_authenticated/admin-stores` — قائمة/مراجعة/توثيق/إيقاف.
 
----
+## 4) Server Functions (createServerFn, باستخدام requireSupabaseAuth)
 
-## Verification per wave
+`src/lib/stores.functions.ts`:
+- `createStore`, `updateStore`, `submitStoreForReview`, `getMyStore`
+- `listPublicStores`, `getStoreBySlug`
+- `followStore`, `unfollowStore`
+- `listStoreOrders`, `listStoreProducts`, `getStoreAnalytics`
 
-- `tsgo --noEmit` and build after each wave.
-- Playwright (mobile viewport 390×844) screenshots of: `/`, `/companies`, `/companies/$id`, `/listings/$id`, `/search-all`, `/dashboard` (company), header drawer, filters sheet.
-- Verify RTL by toggling locale to `ar`.
+`src/lib/store-coupons.functions.ts`:
+- `createCoupon`, `updateCoupon`, `deleteCoupon`, `listCoupons`
+- `validateCoupon({code, store_id, subtotal, items})` → يرجع خصمًا محسوبًا على السيرفر.
 
-## Explicit non-goals (per your DO NOT list)
+`src/lib/store-admin.functions.ts`:
+- `adminListStores`, `adminApproveStore`, `adminRejectStore`, `adminSuspendStore`, `adminVerifyStore`, `adminFeatureStore`.
 
-- No changes to marketer dashboard, wallet logic, admin, payment system, referral logic.
-- No DB schema changes. If a stat truly requires a column that doesn't exist, it's hidden — not faked, not added.
+Checkout (تحديث `src/lib/orders.functions.ts` بلا حذف):
+- إعادة حساب `subtotal/discount/shipping/total` على السيرفر من `listings.price` الفعلي.
+- تطبيق الكوبون والتحقق من (min_order, usage_limit, per_user, active, dates, applies_to, store match).
+- تجميع الطلبات لكل `store_id` منفصلًا.
+- Idempotency Key لمنع التكرار.
+- تسجيل `store_coupon_usage` بعد نجاح إنشاء الطلب.
 
-## Delivery
+## 5) رفع الصور
 
-Given the size (~30+ files touched, 4 waves), I'll implement wave-by-wave in this single sprint, posting a brief checkpoint between waves so you can catch drift early. Approving this plan starts Wave 1 immediately.
+إعادة استخدام `ImageUploader` مع مجلدات:
+- `stores/{store_id}/logo`, `stores/{store_id}/banner`, `stores/{store_id}/gallery`
+- Storage RLS يضمن ownership.
+
+## 6) الأمان
+
+- كل mutation على السيرفر يتحقق من `owner_id = auth.uid()` أو `has_role(admin)`.
+- Zod validation لكل input.
+- منع تعديل السعر/الشركة من العميل (Triggers `protect_*` مماثلة لما هو موجود).
+- Policy جديدة على `listings`: النشر يتطلب `store.status='published'` عند وجود `store_id`.
+
+## 7) الاختبارات النهائية
+
+- `bunx tsgo --noEmit` نظيف.
+- Build نظيف.
+- Playwright E2E: فتح متجر → اعتماد Admin → إضافة منتج → إضافة للسلة → كوبون → طلب → دفع → تحديث الحالة.
+
+## 8) ما لن يُغيَّر
+
+- لن تُلمس `client.ts`, `types.ts`, `auth-middleware.ts`, أي Migration قديمة.
+- لن تُحذف صفحات `orders`, `checkout`, `cart`, `dashboard`, `admin-*` الحالية.
+- كل تعديل على ملف حالي = إضافة حقول أو خيار جديد فقط.
+
+## 9) الترتيب التنفيذي
+
+1. Migration واحد إضافي (جداول + أعمدة + RLS + GRANT + Triggers).
+2. Server functions (stores, coupons, admin, checkout patch).
+3. Wizard `/store/open` + Dashboard `/store`.
+4. صفحة المتجر العامة `/stores/$slug` + قائمة `/stores`.
+5. لوحة Admin `/admin-stores`.
+6. Patch لـ Checkout + Cart لدعم `store_id` والكوبون.
+7. تحليلات وتقييمات ومتابعة.
+8. Typecheck + Build + Smoke tests + تقرير نهائي.
+
+## 10) ملاحظات
+
+- الحجم: ~15–20 ملف جديد + migration واحد + تعديلات جراحية على 4–6 ملفات قائمة.
+- لا نضيف بوابة دفع جديدة. نستخدم `payment_methods` و`payment_proofs` الحاليتين، وندعم الربط الخارجي لاحقًا عبر Webhook route جاهزة البنية.
+- سأنفذ على Branch `stores-system` وأفتح PR بعد نجاح البناء والاختبار.
+
+بمجرد الموافقة على هذه الخطة سأبدأ فورًا بالـMigration ثم باقي المراحل بلا توقف.

@@ -40,9 +40,11 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StoresIndexRouteImport } from './routes/stores.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
 import { Route as TendersIdRouteImport } from './routes/tenders.$id'
+import { Route as StoresSlugRouteImport } from './routes/stores.$slug'
 import { Route as RfqIdRouteImport } from './routes/rfq.$id'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
@@ -79,6 +81,7 @@ import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin-withdrawals'
+import { Route as AuthenticatedAdminStoresRouteImport } from './routes/_authenticated/admin-stores'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
@@ -89,9 +92,12 @@ import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
+import { Route as AuthenticatedStoreOpenRouteImport } from './routes/_authenticated/store.open'
+import { Route as AuthenticatedStoreCouponsRouteImport } from './routes/_authenticated/store.coupons'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authenticated/quotations.new'
@@ -258,6 +264,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoresIndexRoute = StoresIndexRouteImport.update({
+  id: '/stores/',
+  path: '/stores/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   id: '/companies/',
   path: '/companies/',
@@ -272,6 +283,11 @@ const TendersIdRoute = TendersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => TendersRoute,
+} as any)
+const StoresSlugRoute = StoresSlugRouteImport.update({
+  id: '/stores/$slug',
+  path: '/stores/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RfqIdRoute = RfqIdRouteImport.update({
   id: '/$id',
@@ -463,6 +479,12 @@ const AuthenticatedAdminWithdrawalsRoute =
     path: '/admin-withdrawals',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminStoresRoute =
+  AuthenticatedAdminStoresRouteImport.update({
+    id: '/admin-stores',
+    path: '/admin-stores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRevenueRoute =
   AuthenticatedAdminRevenueRouteImport.update({
     id: '/admin-revenue',
@@ -523,6 +545,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoreIndexRoute = AuthenticatedStoreIndexRouteImport.update({
+  id: '/store/',
+  path: '/store/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWholesaleNewRoute =
   AuthenticatedWholesaleNewRouteImport.update({
     id: '/wholesale/new',
@@ -538,6 +565,17 @@ const AuthenticatedTendersMineRoute =
   AuthenticatedTendersMineRouteImport.update({
     id: '/tenders/mine',
     path: '/tenders/mine',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedStoreOpenRoute = AuthenticatedStoreOpenRouteImport.update({
+  id: '/store/open',
+  path: '/store/open',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStoreCouponsRoute =
+  AuthenticatedStoreCouponsRouteImport.update({
+    id: '/store/coupons',
+    path: '/store/coupons',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRfqNewRoute = AuthenticatedRfqNewRouteImport.update({
@@ -645,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -681,9 +720,11 @@ export interface FileRoutesByFullPath {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/stores/': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
@@ -692,9 +733,12 @@ export interface FileRoutesByFullPath {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/coupons': typeof AuthenticatedStoreCouponsRoute
+  '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/store/': typeof AuthenticatedStoreIndexRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -740,6 +784,7 @@ export interface FileRoutesByTo {
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -776,9 +821,11 @@ export interface FileRoutesByTo {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/stores': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
@@ -787,9 +834,12 @@ export interface FileRoutesByTo {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/coupons': typeof AuthenticatedStoreCouponsRoute
+  '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/store': typeof AuthenticatedStoreIndexRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -837,6 +887,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/_authenticated/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/_authenticated/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -873,9 +924,11 @@ export interface FileRoutesById {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/stores/': typeof StoresIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
@@ -884,9 +937,12 @@ export interface FileRoutesById {
   '/_authenticated/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/_authenticated/store/coupons': typeof AuthenticatedStoreCouponsRoute
+  '/_authenticated/store/open': typeof AuthenticatedStoreOpenRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/_authenticated/store/': typeof AuthenticatedStoreIndexRoute
   '/_authenticated/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/_authenticated/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -934,6 +990,7 @@ export interface FileRouteTypes {
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
+    | '/admin-stores'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -970,9 +1027,11 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/stores/'
     | '/campaigns/$id'
     | '/company-wallet/deposit'
     | '/listings/new'
@@ -981,9 +1040,12 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/coupons'
+    | '/store/open'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/store/'
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
@@ -1029,6 +1091,7 @@ export interface FileRouteTypes {
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
+    | '/admin-stores'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -1065,9 +1128,11 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies'
+    | '/stores'
     | '/campaigns/$id'
     | '/company-wallet/deposit'
     | '/listings/new'
@@ -1076,9 +1141,12 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/coupons'
+    | '/store/open'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/store'
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
@@ -1125,6 +1193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-payments'
     | '/_authenticated/admin-platform-settings'
     | '/_authenticated/admin-revenue'
+    | '/_authenticated/admin-stores'
     | '/_authenticated/admin-withdrawals'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
@@ -1161,9 +1230,11 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/stores/'
     | '/_authenticated/campaigns/$id'
     | '/_authenticated/company-wallet/deposit'
     | '/_authenticated/listings/new'
@@ -1172,9 +1243,12 @@ export interface FileRouteTypes {
     | '/_authenticated/quotations/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
+    | '/_authenticated/store/coupons'
+    | '/_authenticated/store/open'
     | '/_authenticated/tenders/mine'
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
+    | '/_authenticated/store/'
     | '/_authenticated/listings/$id/edit'
     | '/_authenticated/orders/$id/confirmation'
     | '/_authenticated/orders/$id/pay'
@@ -1215,7 +1289,9 @@ export interface RootRouteChildren {
   CompaniesIdRoute: typeof CompaniesIdRoute
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
+  StoresSlugRoute: typeof StoresSlugRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
+  StoresIndexRoute: typeof StoresIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1437,6 +1513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stores/': {
+      id: '/stores/'
+      path: '/stores'
+      fullPath: '/stores/'
+      preLoaderRoute: typeof StoresIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/companies/': {
       id: '/companies/'
       path: '/companies'
@@ -1457,6 +1540,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tenders/$id'
       preLoaderRoute: typeof TendersIdRouteImport
       parentRoute: typeof TendersRoute
+    }
+    '/stores/$slug': {
+      id: '/stores/$slug'
+      path: '/stores/$slug'
+      fullPath: '/stores/$slug'
+      preLoaderRoute: typeof StoresSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/rfq/$id': {
       id: '/rfq/$id'
@@ -1710,6 +1800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWithdrawalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-stores': {
+      id: '/_authenticated/admin-stores'
+      path: '/admin-stores'
+      fullPath: '/admin-stores'
+      preLoaderRoute: typeof AuthenticatedAdminStoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-revenue': {
       id: '/_authenticated/admin-revenue'
       path: '/admin-revenue'
@@ -1780,6 +1877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store/': {
+      id: '/_authenticated/store/'
+      path: '/store'
+      fullPath: '/store/'
+      preLoaderRoute: typeof AuthenticatedStoreIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wholesale/new': {
       id: '/_authenticated/wholesale/new'
       path: '/wholesale/new'
@@ -1799,6 +1903,20 @@ declare module '@tanstack/react-router' {
       path: '/tenders/mine'
       fullPath: '/tenders/mine'
       preLoaderRoute: typeof AuthenticatedTendersMineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/store/open': {
+      id: '/_authenticated/store/open'
+      path: '/store/open'
+      fullPath: '/store/open'
+      preLoaderRoute: typeof AuthenticatedStoreOpenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/store/coupons': {
+      id: '/_authenticated/store/coupons'
+      path: '/store/coupons'
+      fullPath: '/store/coupons'
+      preLoaderRoute: typeof AuthenticatedStoreCouponsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rfq/new': {
@@ -1948,6 +2066,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
+  AuthenticatedAdminStoresRoute: typeof AuthenticatedAdminStoresRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
@@ -1981,9 +2100,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
+  AuthenticatedStoreCouponsRoute: typeof AuthenticatedStoreCouponsRoute
+  AuthenticatedStoreOpenRoute: typeof AuthenticatedStoreOpenRoute
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
   AuthenticatedTendersNewRoute: typeof AuthenticatedTendersNewRoute
   AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
+  AuthenticatedStoreIndexRoute: typeof AuthenticatedStoreIndexRoute
   AuthenticatedListingsIdEditRoute: typeof AuthenticatedListingsIdEditRoute
 }
 
@@ -1999,6 +2121,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPlatformSettingsRoute:
     AuthenticatedAdminPlatformSettingsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
+  AuthenticatedAdminStoresRoute: AuthenticatedAdminStoresRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
@@ -2032,9 +2155,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
+  AuthenticatedStoreCouponsRoute: AuthenticatedStoreCouponsRoute,
+  AuthenticatedStoreOpenRoute: AuthenticatedStoreOpenRoute,
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
   AuthenticatedTendersNewRoute: AuthenticatedTendersNewRoute,
   AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
+  AuthenticatedStoreIndexRoute: AuthenticatedStoreIndexRoute,
   AuthenticatedListingsIdEditRoute: AuthenticatedListingsIdEditRoute,
 }
 
@@ -2154,18 +2280,10 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesIdRoute: CompaniesIdRoute,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
+  StoresSlugRoute: StoresSlugRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
+  StoresIndexRoute: StoresIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
