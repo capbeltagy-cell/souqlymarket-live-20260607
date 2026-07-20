@@ -18,6 +18,8 @@ import {
   ShoppingBag,
   ChevronRight,
   ShoppingCart,
+  Boxes,
+  FileDown,
 } from "lucide-react";
 import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -121,6 +123,27 @@ export function SiteHeader() {
           >
             {t("nav_companies")}
           </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+                حلول الشركات
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link to="/business-solutions" className="gap-2">
+                  <Boxes className="h-4 w-4" />
+                  كل الحلول
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/digital-products" className="gap-2">
+                  <FileDown className="h-4 w-4" />
+                  المنتجات الرقمية
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link
             to="/earn"
             className="px-3 py-2 rounded-full text-accent hover:text-foreground hover:bg-accent/10 transition font-semibold"
