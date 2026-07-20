@@ -162,9 +162,54 @@ export const deleteListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { error } = await context.supabase.from("listings").delete().eq("id", data.id);
+    const { supabase, userId } = context;
+    const { data: listing, error: listingError } = await supabase
+      .from("listings")
+      .select("id, company_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (listingError) throw new Error(listingError.message);
+    if (!listing?.company_id) throw new Error("Listing not found");
+
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select("id")
+      .eq("id", listing.company_id)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (companyError) throw new Error(companyError.message);
+    if (!company) throw new Error("You do not own this listing");
+
+    const { error } = await supabase
+      .from("listings")
+      .delete()
+      .eq("id", data.id)
+      .eq("company_id", company.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const listMyListings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (companyError) throw new Error(companyError.message);
+    if (!company) return [];
+
+    const { data, error } = await supabase
+      .from("listings")
+      .select(
+        "id, type, title_ar, title_en, images, price, currency, city, governorate, status, created_at",
+      )
+      .eq("company_id", company.id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
   });
 
 // Full owner-side edit for a listing (including marketer promotion settings).
