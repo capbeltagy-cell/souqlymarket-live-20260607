@@ -24,6 +24,18 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 
 const searchSchema = z.object({ c: z.string().uuid().optional() });
 
+const MAX_CHAT_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+const CHAT_ATTACHMENT_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "application/vnd.ms-excel": "xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+};
+
 export const Route = createFileRoute("/_authenticated/messages")({
   head: () => ({ meta: [{ title: "الرسائل — Souqly" }] }),
   validateSearch: (s) => searchSchema.parse(s),
@@ -217,11 +229,19 @@ function MessagesPage() {
   };
 
   const onAttach = async (file: File) => {
+    const ext = CHAT_ATTACHMENT_EXTENSIONS[file.type];
+    if (!ext) {
+      toast.error("نوع الملف غير مدعوم");
+      return;
+    }
+    if (file.size > MAX_CHAT_ATTACHMENT_BYTES) {
+      toast.error("حجم المرفق يجب ألا يتجاوز 15 ميجابايت");
+      return;
+    }
     setUploading(true);
     try {
       const isImg = file.type.startsWith("image/");
       const isPdf = file.type === "application/pdf";
-      const ext = file.name.split(".").pop() ?? "bin";
       const url = await uploadFile(file, ext, "chat");
       if (!url) return;
       await sendMessage({
@@ -338,7 +358,7 @@ function MessagesPage() {
                     <Paperclip className="h-4 w-4" />
                     <input
                       type="file"
-                      accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+                      accept="image/jpeg,image/png,image/webp,application/pdf,.doc,.docx,.xls,.xlsx"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && onAttach(e.target.files[0])}
                     />
@@ -347,7 +367,7 @@ function MessagesPage() {
                     <ImageIcon className="h-4 w-4" />
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp"
                       capture="environment"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && onAttach(e.target.files[0])}
