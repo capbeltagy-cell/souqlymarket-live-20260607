@@ -4,6 +4,18 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+const RETURN_TO_KEY = "souqly:return_to";
+
+function consumeReturnTo() {
+  try {
+    const value = localStorage.getItem(RETURN_TO_KEY);
+    localStorage.removeItem(RETURN_TO_KEY);
+    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export const Route = createFileRoute("/auth/callback")({
   head: () => ({ meta: [{ title: "Signing in… — Souqly" }] }),
   component: AuthCallback,
@@ -44,7 +56,9 @@ function AuthCallback() {
         if (type === "recovery") {
           navigate({ to: "/reset-password", replace: true });
         } else {
-          navigate({ to: "/dashboard", replace: true });
+          const returnTo = consumeReturnTo();
+          if (returnTo) window.location.replace(returnTo);
+          else navigate({ to: "/dashboard", replace: true });
         }
       } catch (e) {
         toast.error((e as Error).message);

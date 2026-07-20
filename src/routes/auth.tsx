@@ -11,7 +11,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
+const searchSchema = z.object({
+  mode: z.enum(["signin", "signup"]).optional(),
+  returnTo: z.string().max(300).optional(),
+});
+
+const RETURN_TO_KEY = "souqly:return_to";
+
+function safeReturnTo(value: string | null | undefined) {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -41,6 +50,7 @@ function AuthPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const returnTo = safeReturnTo(search.returnTo);
   const ar = dir === "rtl";
 
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
@@ -50,8 +60,18 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (user) navigate({ to: "/dashboard" });
-  }, [user, navigate]);
+    if (!user) return;
+    if (returnTo) {
+      try {
+        localStorage.removeItem(RETURN_TO_KEY);
+      } catch {
+        // Storage is optional; the validated URL remains usable for this navigation.
+      }
+      window.location.assign(returnTo);
+      return;
+    }
+    navigate({ to: "/dashboard" });
+  }, [user, navigate, returnTo]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -63,6 +83,13 @@ function AuthPage() {
         );
       }
       if (mode === "signup") {
+        if (returnTo) {
+          try {
+            localStorage.setItem(RETURN_TO_KEY, returnTo);
+          } catch {
+            // Storage is optional; immediate-session signups still use the URL search value.
+          }
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -86,12 +113,14 @@ function AuthPage() {
           return;
         }
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
-        navigate({ to: signupRole === "company" ? "/company" : "/agent" });
+        if (returnTo) window.location.assign(returnTo);
+        else navigate({ to: signupRole === "company" ? "/company" : "/agent" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success(ar ? "أهلاً بعودتك" : "Welcome back");
-        navigate({ to: "/dashboard" });
+        if (returnTo) window.location.assign(returnTo);
+        else navigate({ to: "/dashboard" });
       }
     } catch (err) {
       toast.error((err as Error).message);
