@@ -63,14 +63,12 @@ function Subscribe() {
             <div className="font-semibold mb-1">{ar ? "كيف أشترك؟" : "How to subscribe"}</div>
             <p className="text-muted-foreground">
               {ar
-                ? "للاشتراك، يرجى التواصل مع فريق سوقلي عبر واتساب أو البريد الإلكتروني وسيقوم المسؤول بتفعيل الباقة على حسابك."
-                : "To subscribe, contact the Souqly team via WhatsApp or email and an admin will activate the plan on your account."}
+                ? "للاشتراك، تواصل مع فريق سوقلي من صفحة الدعم أو عبر البريد الإلكتروني وسيقوم المسؤول بتفعيل الباقة على حسابك."
+                : "To subscribe, contact the Souqly team through the support page or by email and an admin will activate the plan on your account."}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" className="bg-primary hover:bg-primary-hover">
-                <a href="https://wa.me/201000000000" target="_blank" rel="noreferrer">
-                  WhatsApp
-                </a>
+                <Link to="/contact">{ar ? "تواصل مع الدعم" : "Contact support"}</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
                 <a href="mailto:billing@souqlymarket.com">billing@souqlymarket.com</a>

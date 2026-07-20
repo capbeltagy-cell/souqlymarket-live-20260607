@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const LAUNCH_COMPANY_NAME_AR = "سوقلي للمحتوى التجريبي";
+const LAUNCH_COMPANY_NAME_AR = "سوقلي لمحتوى الإطلاق";
 const LAUNCH_COMPANY_NAME_EN = "Souqly Launch Content";
 
 type Ctx = { supabase: any; userId: string };
@@ -29,8 +29,8 @@ async function ensureLaunchCompany({ supabase, userId }: Ctx): Promise<string> {
       country: "Egypt",
       is_system: true,
       is_launch_content: true,
-      description_ar: "حاوية إدارية لمحتوى الإطلاق التجريبي المُدار من قِبَل الإدارة.",
-      description_en: "Admin-managed container for launch/demo content.",
+      description_ar: "حاوية إدارية لمحتوى الإطلاق المُدار من قِبَل الإدارة.",
+      description_en: "Admin-managed container for verified launch content.",
     })
     .select("id")
     .single();
