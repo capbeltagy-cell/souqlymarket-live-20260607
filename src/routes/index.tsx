@@ -11,6 +11,7 @@ import {
   Package,
   Search,
   ShieldCheck,
+  Store,
   Sparkles,
   TrendingUp,
   Users,
@@ -271,7 +272,27 @@ function Landing() {
             </Button>
           </form>
 
-          <div className="mt-4 flex flex-wrap gap-2 fade-up-3">
+          <div className="mt-4 flex flex-col gap-2 fade-up-3 sm:flex-row sm:items-center">
+            <Button
+              asChild
+              size="lg"
+              className="group h-12 justify-center rounded-xl bg-gold px-5 font-bold text-background shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
+            >
+              <Link to="/store/open">
+                <Store className="me-2 h-5 w-5" />
+                {ar ? "أنشئ متجرك الآن" : "Create your store now"}
+                <Arrow className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+              </Link>
+            </Button>
+            <Link
+              to="/stores"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+            >
+              {ar ? "تصفح المتاجر" : "Browse stores"}
+            </Link>
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-2 fade-up-3">
             <Link to="/marketplace" className="hero-quick-link">
               <Package className="h-3.5 w-3.5" /> {ar ? "تسوّق الآن" : "Shop now"}
             </Link>
