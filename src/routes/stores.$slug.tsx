@@ -6,7 +6,7 @@ import { getStoreBySlug, followStore } from "@/lib/stores.functions";
 import { BadgeCheck, Store as StoreIcon, Heart } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/currency";
+import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { addToCart } from "@/lib/cart";
