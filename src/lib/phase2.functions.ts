@@ -7,7 +7,7 @@ export const FEATURE_PRICING_EGP = { 7: 199, 30: 599 } as const;
 // ---------- Feature listing (owner) ----------
 export const featureMyListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         listingId: z.string().uuid(),
@@ -66,7 +66,7 @@ export const featureMyListing = createServerFn({ method: "POST" })
 
 // ---------- Submit lead (public) ----------
 export const submitLead = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         listingId: z.string().uuid(),
@@ -156,7 +156,7 @@ export const listMyLeads = createServerFn({ method: "GET" })
 
 export const updateLeadStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         leadId: z.string().uuid(),
@@ -242,7 +242,7 @@ export const getCompanyAnalytics = createServerFn({ method: "GET" })
 // ---------- Admin: verify company ----------
 export const adminSetCompanyVerified = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ companyId: z.string().uuid(), verified: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {

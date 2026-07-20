@@ -12,7 +12,7 @@ const roleSchema = z.object({ role: z.enum(["company", "agent"]) });
  */
 export const chooseMyRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => roleSchema.parse(data))
+  .validator((data) => roleSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

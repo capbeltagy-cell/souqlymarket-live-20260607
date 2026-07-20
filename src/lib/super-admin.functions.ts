@@ -69,7 +69,7 @@ export const superOverview = createServerFn({ method: "POST" })
 
 export const superList = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { entity: string; limit?: number }) =>
+  .validator((d: { entity: string; limit?: number }) =>
     z
       .object({
         entity: z.enum([
@@ -113,7 +113,7 @@ export const superList = createServerFn({ method: "POST" })
 
 export const superAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (d: { action: string; entity?: string; id?: string; payload?: Record<string, any> }) =>
       z
         .object({

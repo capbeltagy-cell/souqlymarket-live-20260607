@@ -32,7 +32,7 @@ export const listMyReferrals = createServerFn({ method: "GET" })
 
 export const createReferral = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ listingId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ listingId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: agent } = await supabase
@@ -62,7 +62,7 @@ export const createReferral = createServerFn({ method: "POST" })
 
 export const convertReferral = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         referralId: z.string().uuid(),

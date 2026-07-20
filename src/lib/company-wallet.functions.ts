@@ -47,7 +47,7 @@ export const getMyCompanyFundingWallet = createServerFn({ method: "GET" })
 
 export const createCompanyDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         amount: z.number().positive().max(10_000_000),
@@ -98,7 +98,7 @@ export const listMyCompanyDeposits = createServerFn({ method: "GET" })
 
 export const cancelMyCompanyDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("company_deposits" as never)
@@ -117,7 +117,7 @@ async function assertAdmin(supabase: any, userId: string) {
 
 export const adminListCompanyDeposits = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         status: z
@@ -141,7 +141,7 @@ export const adminListCompanyDeposits = createServerFn({ method: "POST" })
 
 export const adminReviewCompanyDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -177,7 +177,7 @@ export const adminReviewCompanyDeposit = createServerFn({ method: "POST" })
 // -------- Promotion activate/deactivate (reserve gate) --------
 export const activateListingPromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         listing_id: z.string().uuid(),
@@ -229,7 +229,7 @@ export const activateListingPromotion = createServerFn({ method: "POST" })
 
 export const deactivateListingPromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         listing_id: z.string().uuid(),
@@ -251,7 +251,7 @@ export const deactivateListingPromotion = createServerFn({ method: "POST" })
 
 export const previewListingReserve = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ listing_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ listing_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: res, error } = await context.supabase.rpc(
       "compute_listing_required_reserve" as never,

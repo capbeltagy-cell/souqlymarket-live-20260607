@@ -12,7 +12,7 @@ const T = (s: string) => s as any; // bypass generated types for new tables
 // =========================================================================
 export const createRfq = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         title: z.string().trim().min(3).max(200),
@@ -79,7 +79,7 @@ export const createRfq = createServerFn({ method: "POST" })
   });
 
 export const listRfqs = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         category_slug: z.string().max(60).optional(),
@@ -106,7 +106,7 @@ export const listRfqs = createServerFn({ method: "POST" })
   });
 
 export const getRfq = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rfq } = await supabaseAdmin
@@ -135,7 +135,7 @@ export const getMyRfqs = createServerFn({ method: "GET" })
 
 export const listRfqOffers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ rfqId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ rfqId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: rows, error } = await context.supabase
       .from(T("rfq_offers"))
@@ -148,7 +148,7 @@ export const listRfqOffers = createServerFn({ method: "POST" })
 
 export const submitRfqOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         rfqId: z.string().uuid(),
@@ -181,7 +181,7 @@ export const submitRfqOffer = createServerFn({ method: "POST" })
 
 export const awardRfq = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ rfqId: z.string().uuid(), offerId: z.string().uuid() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -206,7 +206,7 @@ export const awardRfq = createServerFn({ method: "POST" })
 // Wholesale
 // =========================================================================
 export const listWholesale = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         category_slug: z.string().max(60).optional(),
@@ -234,7 +234,7 @@ export const listWholesale = createServerFn({ method: "POST" })
   });
 
 export const getWholesale = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Do not expose company phone to anonymous visitors.
@@ -249,7 +249,7 @@ export const getWholesale = createServerFn({ method: "POST" })
 
 export const createWholesale = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         title: z.string().trim().min(3).max(200),
@@ -307,7 +307,7 @@ export const createWholesale = createServerFn({ method: "POST" })
 
 export const submitWholesaleOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         listingId: z.string().uuid(),
@@ -335,7 +335,7 @@ export const submitWholesaleOrder = createServerFn({ method: "POST" })
 // Factories
 // =========================================================================
 export const listFactories = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         governorate: z.string().max(80).optional(),
@@ -364,7 +364,7 @@ export const listFactories = createServerFn({ method: "POST" })
 
 export const upsertMyFactory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         production_capacity: z.string().max(200).optional(),
@@ -396,7 +396,7 @@ export const upsertMyFactory = createServerFn({ method: "POST" })
 
 export const adminVerifyFactory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ companyId: z.string().uuid(), verified: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -418,7 +418,7 @@ export const adminVerifyFactory = createServerFn({ method: "POST" })
 // =========================================================================
 export const createTender = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         title: z.string().trim().min(3).max(200),
@@ -450,7 +450,7 @@ export const createTender = createServerFn({ method: "POST" })
   });
 
 export const listTenders = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         category_slug: z.string().max(60).optional(),
@@ -475,7 +475,7 @@ export const listTenders = createServerFn({ method: "POST" })
   });
 
 export const getTender = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -503,7 +503,7 @@ export const getMyTenders = createServerFn({ method: "GET" })
 
 export const submitTenderProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         tenderId: z.string().uuid(),
@@ -533,7 +533,7 @@ export const submitTenderProposal = createServerFn({ method: "POST" })
 
 export const listTenderProposals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ tenderId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ tenderId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: rows, error } = await context.supabase
       .from(T("tender_proposals"))
@@ -546,7 +546,7 @@ export const listTenderProposals = createServerFn({ method: "POST" })
 
 export const awardTender = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ tenderId: z.string().uuid(), proposalId: z.string().uuid() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -592,7 +592,7 @@ export const listCategories = createServerFn({ method: "GET" }).handler(async ()
 // Company profile extra
 // =========================================================================
 export const getCompanyProfileExtra = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Public projection only — exclude whatsapp (contact detail).
@@ -608,7 +608,7 @@ export const getCompanyProfileExtra = createServerFn({ method: "POST" })
 
 export const upsertMyCompanyProfileExtra = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         cover_url: z
@@ -662,7 +662,7 @@ export const upsertMyCompanyProfileExtra = createServerFn({ method: "POST" })
   });
 
 export const incrementCatalogDownload = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ companyId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -707,7 +707,7 @@ export const getMyReferral = createServerFn({ method: "GET" })
   });
 
 export const trackReferralClick = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ code: z.string().min(4).max(40) }).parse(d))
+  .validator((d: unknown) => z.object({ code: z.string().min(4).max(40) }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -727,7 +727,7 @@ export const trackReferralClick = createServerFn({ method: "POST" })
 // Advanced Search
 // =========================================================================
 export const advancedSearchCompanies = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         q: z.string().max(200).optional(),

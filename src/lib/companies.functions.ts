@@ -40,7 +40,7 @@ export const getMyCompany = createServerFn({ method: "GET" })
 
 export const upsertMyCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     schema
       .extend({
         referral_code: z
@@ -102,7 +102,7 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
  */
 export const getCompanyContact = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
