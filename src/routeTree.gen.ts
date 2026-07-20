@@ -81,6 +81,7 @@ import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin-withdrawals'
+import { Route as AuthenticatedAdminStoresRouteImport } from './routes/_authenticated/admin-stores'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
@@ -478,6 +479,12 @@ const AuthenticatedAdminWithdrawalsRoute =
     path: '/admin-withdrawals',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminStoresRoute =
+  AuthenticatedAdminStoresRouteImport.update({
+    id: '/admin-stores',
+    path: '/admin-stores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRevenueRoute =
   AuthenticatedAdminRevenueRouteImport.update({
     id: '/admin-revenue',
@@ -676,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -776,6 +784,7 @@ export interface FileRoutesByTo {
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -878,6 +887,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
+  '/_authenticated/admin-stores': typeof AuthenticatedAdminStoresRoute
   '/_authenticated/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -980,6 +990,7 @@ export interface FileRouteTypes {
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
+    | '/admin-stores'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -1080,6 +1091,7 @@ export interface FileRouteTypes {
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
+    | '/admin-stores'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -1181,6 +1193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-payments'
     | '/_authenticated/admin-platform-settings'
     | '/_authenticated/admin-revenue'
+    | '/_authenticated/admin-stores'
     | '/_authenticated/admin-withdrawals'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
@@ -1787,6 +1800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWithdrawalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-stores': {
+      id: '/_authenticated/admin-stores'
+      path: '/admin-stores'
+      fullPath: '/admin-stores'
+      preLoaderRoute: typeof AuthenticatedAdminStoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-revenue': {
       id: '/_authenticated/admin-revenue'
       path: '/admin-revenue'
@@ -2046,6 +2066,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
+  AuthenticatedAdminStoresRoute: typeof AuthenticatedAdminStoresRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
@@ -2100,6 +2121,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPlatformSettingsRoute:
     AuthenticatedAdminPlatformSettingsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
+  AuthenticatedAdminStoresRoute: AuthenticatedAdminStoresRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
