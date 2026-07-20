@@ -17,7 +17,7 @@ function consumeReturnTo() {
 }
 
 export const Route = createFileRoute("/auth/callback")({
-  head: () => ({ meta: [{ title: "Signing in… — Souqly" }] }),
+  head: () => ({ meta: [{ title: "جارٍ تسجيل الدخول… — سوقلي" }] }),
   component: AuthCallback,
 });
 

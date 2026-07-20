@@ -17,7 +17,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getCompanyAnalytics } from "@/lib/phase2.functions";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — Souqly" }] }),
+  head: () => ({ meta: [{ title: "التحليلات — سوقلي" }] }),
   component: Analytics,
 });
 

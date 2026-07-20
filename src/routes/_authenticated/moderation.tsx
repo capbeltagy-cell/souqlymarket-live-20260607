@@ -16,7 +16,7 @@ import {
 } from "@/lib/moderation.functions";
 
 export const Route = createFileRoute("/_authenticated/moderation")({
-  head: () => ({ meta: [{ title: "Moderation — Souqly" }] }),
+  head: () => ({ meta: [{ title: "مراجعة الإعلانات — سوقلي" }] }),
   component: ModerationPage,
 });
 

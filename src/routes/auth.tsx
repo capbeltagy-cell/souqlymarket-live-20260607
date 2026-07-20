@@ -26,7 +26,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in or create account — Souqly" },
+      { title: "تسجيل الدخول أو إنشاء حساب — سوقلي" },
       {
         name: "description",
         content:

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
+import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 
 export const Route = createFileRoute("/_authenticated/store/")({
   head: () => ({ meta: [{ title: "متجري — سوقلي" }] }),
@@ -99,10 +100,17 @@ function StoreDashboard() {
     <div className="min-h-screen bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-6 space-y-6">
+        <StoreSubscriptionCard createdAt={store.created_at} />
         <div className="rounded-xl bg-card border border-border p-5 flex flex-wrap items-center gap-4">
           <div className="h-14 w-14 rounded-full overflow-hidden bg-muted grid place-items-center">
             {store.logo_url ? (
-              <img src={store.logo_url} className="h-full w-full object-cover" alt="" />
+              <img
+                src={store.logo_url}
+                className="h-full w-full object-cover"
+                alt={`شعار ${store.name_ar}`}
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <StoreIcon />
             )}

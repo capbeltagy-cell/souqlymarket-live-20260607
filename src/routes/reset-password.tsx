@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Set new password — Souqly" }] }),
+  head: () => ({ meta: [{ title: "تعيين كلمة مرور جديدة — سوقلي" }] }),
   component: ResetPasswordPage,
 });
 

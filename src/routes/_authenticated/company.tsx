@@ -30,7 +30,7 @@ import { BilingualField } from "@/components/BilingualField";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 
 export const Route = createFileRoute("/_authenticated/company")({
-  head: () => ({ meta: [{ title: "My Company — Souqly" }] }),
+  head: () => ({ meta: [{ title: "شركتي — سوقلي" }] }),
   component: CompanyEdit,
 });
 

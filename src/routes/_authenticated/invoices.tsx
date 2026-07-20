@@ -10,7 +10,7 @@ import { listMyInvoices } from "@/lib/wallets.functions";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/invoices")({
-  head: () => ({ meta: [{ title: "Invoices — Souqly" }] }),
+  head: () => ({ meta: [{ title: "الفواتير — سوقلي" }] }),
   component: InvoicesPage,
 });
 

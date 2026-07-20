@@ -9,7 +9,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getMyWallets, listMyWalletTransactions } from "@/lib/wallets.functions";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
-  head: () => ({ meta: [{ title: "Wallet — Souqly" }] }),
+  head: () => ({ meta: [{ title: "المحفظة — سوقلي" }] }),
   component: WalletPage,
 });
 

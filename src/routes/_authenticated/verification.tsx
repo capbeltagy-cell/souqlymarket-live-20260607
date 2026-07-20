@@ -16,7 +16,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/verification")({
-  head: () => ({ meta: [{ title: "Verification — Souqly" }] }),
+  head: () => ({ meta: [{ title: "طلبات التوثيق — سوقلي" }] }),
   component: VerificationPage,
 });
 

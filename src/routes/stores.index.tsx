@@ -52,7 +52,13 @@ function StoresPage() {
               >
                 <div className="aspect-[3/1] bg-muted relative">
                   {s.banner_url ? (
-                    <img src={s.banner_url} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={s.banner_url}
+                      alt={`غلاف ${s.name_ar}`}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : null}
                   {s.logo_url ? (
                     <img

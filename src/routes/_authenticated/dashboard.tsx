@@ -38,7 +38,7 @@ import { upsertMyFactory } from "@/lib/phase3.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Souqly" }] }),
+  head: () => ({ meta: [{ title: "لوحة التحكم — سوقلي" }] }),
   component: Dashboard,
 });
 

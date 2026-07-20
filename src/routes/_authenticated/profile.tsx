@@ -36,7 +36,7 @@ import { deleteListing, listMyListings } from "@/lib/listings.functions";
 import { deleteMyAddress, listMyAddresses, saveMyAddress } from "@/lib/addresses.functions";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — Souqly" }] }),
+  head: () => ({ meta: [{ title: "الملف الشخصي — سوقلي" }] }),
   component: ProfilePage,
 });
 

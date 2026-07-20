@@ -85,7 +85,13 @@ function CartPage() {
                     {g.items.map((it) => (
                       <li key={it.listing_id} className="p-4 flex gap-3 items-center">
                         {it.image ? (
-                          <img src={it.image} alt="" className="h-16 w-16 rounded object-cover" />
+                          <img
+                            src={it.image}
+                            alt={it.title}
+                            className="h-16 w-16 rounded object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         ) : (
                           <div className="h-16 w-16 rounded bg-muted" />
                         )}
