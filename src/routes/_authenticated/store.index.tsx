@@ -20,11 +20,15 @@ import {
   Users,
   Truck,
   Palette,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { getArabicErrorMessage } from "@/lib/user-error";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/_authenticated/store/")({
   head: () => ({ meta: [{ title: "متجري — سوقلي" }] }),
@@ -51,33 +55,78 @@ function StoreDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    getMyStore().then(async (r) => {
-      setStore(r.store);
-      if (r.store?.id) {
-        const [a, o, operations] = await Promise.all([
-          getStoreAnalytics({ data: { store_id: r.store.id } }).catch(() => null),
-          listStoreOrders({ data: { store_id: r.store.id } }).catch(() => ({ items: [] })),
-          getStoreOperations({ data: { store_id: r.store.id } }).catch(() => ({
-            products: [],
-            customers: [],
-          })),
-        ]);
-        setAnalytics(a);
-        setOrders(o.items.slice(0, 8));
-        setProducts(operations.products);
-        setCustomers(operations.customers);
+    let active = true;
+    async function loadDashboard() {
+      setLoading(true);
+      setLoadError(null);
+      try {
+        const r = await getMyStore();
+        if (!active) return;
+        setStore(r.store);
+        if (r.store?.id) {
+          const [a, o, operations] = await Promise.all([
+            getStoreAnalytics({ data: { store_id: r.store.id } }).catch(() => null),
+            listStoreOrders({ data: { store_id: r.store.id } }).catch(() => ({ items: [] })),
+            getStoreOperations({ data: { store_id: r.store.id } }).catch(() => ({
+              products: [],
+              customers: [],
+            })),
+          ]);
+          if (!active) return;
+          setAnalytics(a);
+          setOrders(o.items.slice(0, 8));
+          setProducts(operations.products);
+          setCustomers(operations.customers);
+        }
+      } catch (error) {
+        if (active) setLoadError(getArabicErrorMessage(error, "تعذر تحميل لوحة المتجر."));
+      } finally {
+        if (active) setLoading(false);
       }
-      setLoading(false);
-    });
-  }, []);
+    }
+    void loadDashboard();
+    return () => {
+      active = false;
+    };
+  }, [retryKey]);
 
   if (loading)
     return (
       <div className="min-h-screen">
         <SiteHeader />
-        <div className="container-souqly py-12 text-center text-muted-foreground">…</div>
+        <div className="container-souqly space-y-5 py-8" aria-label="جارٍ تحميل لوحة المتجر">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-24 rounded-xl" />
+            ))}
+          </div>
+          <Skeleton className="h-56 w-full rounded-2xl" />
+        </div>
+      </div>
+    );
+
+  if (loadError)
+    return (
+      <div className="min-h-screen bg-surface-2">
+        <SiteHeader />
+        <div className="container-souqly py-12">
+          <EmptyState
+            icon={<AlertTriangle className="h-7 w-7" />}
+            title="تعذر تحميل لوحة المتجر"
+            description={loadError}
+          />
+          <div className="mt-5 flex justify-center">
+            <Button type="button" variant="outline" onClick={() => setRetryKey((key) => key + 1)}>
+              <RefreshCw className="me-2 h-4 w-4" />
+              إعادة المحاولة
+            </Button>
+          </div>
+        </div>
       </div>
     );
 
