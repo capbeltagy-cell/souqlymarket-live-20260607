@@ -91,6 +91,7 @@ import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
@@ -536,6 +537,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoreIndexRoute = AuthenticatedStoreIndexRouteImport.update({
+  id: '/store/',
+  path: '/store/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWholesaleNewRoute =
   AuthenticatedWholesaleNewRouteImport.update({
     id: '/wholesale/new',
@@ -716,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/store/': typeof AuthenticatedStoreIndexRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -814,6 +821,7 @@ export interface FileRoutesByTo {
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/store': typeof AuthenticatedStoreIndexRoute
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -914,6 +922,7 @@ export interface FileRoutesById {
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
+  '/_authenticated/store/': typeof AuthenticatedStoreIndexRoute
   '/_authenticated/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/_authenticated/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
@@ -1014,6 +1023,7 @@ export interface FileRouteTypes {
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/store/'
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
@@ -1112,6 +1122,7 @@ export interface FileRouteTypes {
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
+    | '/store'
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
@@ -1211,6 +1222,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tenders/mine'
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
+    | '/_authenticated/store/'
     | '/_authenticated/listings/$id/edit'
     | '/_authenticated/orders/$id/confirmation'
     | '/_authenticated/orders/$id/pay'
@@ -1832,6 +1844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store/': {
+      id: '/_authenticated/store/'
+      path: '/store'
+      fullPath: '/store/'
+      preLoaderRoute: typeof AuthenticatedStoreIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/wholesale/new': {
       id: '/_authenticated/wholesale/new'
       path: '/wholesale/new'
@@ -2044,6 +2063,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
   AuthenticatedTendersNewRoute: typeof AuthenticatedTendersNewRoute
   AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
+  AuthenticatedStoreIndexRoute: typeof AuthenticatedStoreIndexRoute
   AuthenticatedListingsIdEditRoute: typeof AuthenticatedListingsIdEditRoute
 }
 
@@ -2096,6 +2116,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
   AuthenticatedTendersNewRoute: AuthenticatedTendersNewRoute,
   AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
+  AuthenticatedStoreIndexRoute: AuthenticatedStoreIndexRoute,
   AuthenticatedListingsIdEditRoute: AuthenticatedListingsIdEditRoute,
 }
 
