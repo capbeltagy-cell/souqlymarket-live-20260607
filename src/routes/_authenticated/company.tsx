@@ -64,6 +64,13 @@ const empty: Form = {
   cover_url: "",
 };
 
+const MAX_COMPANY_ASSET_BYTES = 8 * 1024 * 1024;
+const COMPANY_ASSET_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
 /** Common Egyptian business categories — searchable dropdown, no new tables. */
 const INDUSTRIES: { value: string; ar: string; en: string }[] = [
   { value: "retail", ar: "تجارة تجزئة", en: "Retail" },
@@ -194,9 +201,17 @@ function CompanyEdit() {
 
   const upload = async (kind: "logo" | "cover", file: File) => {
     if (!user) return;
+    const ext = COMPANY_ASSET_EXTENSIONS[file.type];
+    if (!ext) {
+      toast.error(msg("استخدم صورة JPG أو PNG أو WebP", "Use a JPG, PNG, or WebP image"));
+      return;
+    }
+    if (file.size > MAX_COMPANY_ASSET_BYTES) {
+      toast.error(msg("حجم الصورة يجب ألا يتجاوز 8 ميجابايت", "Image must be 8 MB or smaller"));
+      return;
+    }
     setUploading(kind);
     try {
-      const ext = file.name.split(".").pop() ?? "bin";
       const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from("company-assets")
@@ -812,9 +827,13 @@ function FileField({
           <span>Upload</span>
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
-            onChange={(e) => e.target.files?.[0] && onChange(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onChange(file);
+              e.target.value = "";
+            }}
           />
         </label>
       </div>
