@@ -23,6 +23,14 @@ export const Route = createFileRoute("/_authenticated/orders/$id/pay")({
   component: PayOrderPage,
 });
 
+const MAX_PAYMENT_PROOF_BYTES = 10 * 1024 * 1024;
+const ALLOWED_PAYMENT_PROOF_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+
 function PayOrderPage() {
   const { id } = Route.useParams();
   const { user } = useAuth();
@@ -57,6 +65,12 @@ function PayOrderPage() {
 
   const uploadProof = async (): Promise<string | null> => {
     if (!file || !user) return null;
+    if (!ALLOWED_PAYMENT_PROOF_TYPES.has(file.type)) {
+      throw new Error("صيغة إثبات الدفع غير مدعومة. استخدم JPG أو PNG أو WebP أو PDF");
+    }
+    if (file.size > MAX_PAYMENT_PROOF_BYTES) {
+      throw new Error("حجم إثبات الدفع يجب ألا يتجاوز 10 ميجابايت");
+    }
     const ext = file.name.split(".").pop() ?? "jpg";
     const path = `${user.id}/proofs/${Date.now()}.${ext}`;
     const { error } = await supabase.storage
@@ -206,9 +220,27 @@ function PayOrderPage() {
                         <Upload className="h-4 w-4" /> اختر ملف
                         <input
                           type="file"
-                          accept="image/*,application/pdf"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
                           className="hidden"
-                          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                          onChange={(e) => {
+                            const selectedFile = e.target.files?.[0] ?? null;
+                            if (
+                              selectedFile &&
+                              !ALLOWED_PAYMENT_PROOF_TYPES.has(selectedFile.type)
+                            ) {
+                              toast.error(
+                                "صيغة إثبات الدفع غير مدعومة. استخدم JPG أو PNG أو WebP أو PDF",
+                              );
+                              e.target.value = "";
+                              return;
+                            }
+                            if (selectedFile && selectedFile.size > MAX_PAYMENT_PROOF_BYTES) {
+                              toast.error("حجم إثبات الدفع يجب ألا يتجاوز 10 ميجابايت");
+                              e.target.value = "";
+                              return;
+                            }
+                            setFile(selectedFile);
+                          }}
                         />
                       </label>
                       {file && (
