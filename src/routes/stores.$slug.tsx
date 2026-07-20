@@ -119,9 +119,9 @@ function StorePage() {
                 <div className="p-3">
                   <div className="text-sm font-medium line-clamp-2">{locale === "ar" ? l.title_ar : (l.title_en ?? l.title_ar)}</div>
                   <div className="mt-1 flex items-baseline gap-2">
-                    <div className="font-bold text-primary">{formatCurrency(l.sale_price ?? l.price, l.currency, locale)}</div>
+                    <div className="font-bold text-primary">{formatPrice(l.sale_price ?? l.price, locale)}</div>
                     {l.sale_price && l.sale_price < l.price ? (
-                      <div className="text-xs text-muted-foreground line-through">{formatCurrency(l.price, l.currency, locale)}</div>
+                      <div className="text-xs text-muted-foreground line-through">{formatPrice(l.price, locale)}</div>
                     ) : null}
                   </div>
                 </div>
