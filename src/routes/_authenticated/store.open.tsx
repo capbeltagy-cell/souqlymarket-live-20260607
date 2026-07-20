@@ -112,7 +112,7 @@ function OpenStoreWizard() {
                 <Label>المحافظة</Label>
                 <select className="w-full h-10 rounded-md border border-input px-3" value={form.governorate} onChange={(e) => setForm({ ...form, governorate: e.target.value })}>
                   <option value="">اختر</option>
-                  {EGYPT_GOVERNORATES.map((g) => <option key={g.slug} value={g.name_ar}>{g.name_ar}</option>)}
+                  {EGYPT_GOVERNORATES.map((g) => <option key={g.value} value={g.value}>{g.label_ar}</option>)}
                 </select>
               </div>
               <div>
