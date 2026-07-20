@@ -44,6 +44,7 @@ import { Route as StoresIndexRouteImport } from './routes/stores.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
 import { Route as TendersIdRouteImport } from './routes/tenders.$id'
+import { Route as StoresSlugRouteImport } from './routes/stores.$slug'
 import { Route as RfqIdRouteImport } from './routes/rfq.$id'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
@@ -278,6 +279,11 @@ const TendersIdRoute = TendersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => TendersRoute,
+} as any)
+const StoresSlugRoute = StoresSlugRouteImport.update({
+  id: '/stores/$slug',
+  path: '/stores/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RfqIdRoute = RfqIdRouteImport.update({
   id: '/$id',
@@ -687,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
@@ -783,6 +790,7 @@ export interface FileRoutesByTo {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
@@ -881,6 +889,7 @@ export interface FileRoutesById {
   '/listings/$id': typeof ListingsIdRoute
   '/r/$code': typeof RCodeRoute
   '/rfq/$id': typeof RfqIdRoute
+  '/stores/$slug': typeof StoresSlugRoute
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
@@ -979,6 +988,7 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
@@ -1075,6 +1085,7 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies'
@@ -1172,6 +1183,7 @@ export interface FileRouteTypes {
     | '/listings/$id'
     | '/r/$code'
     | '/rfq/$id'
+    | '/stores/$slug'
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
@@ -1227,6 +1239,7 @@ export interface RootRouteChildren {
   CompaniesIdRoute: typeof CompaniesIdRoute
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
+  StoresSlugRoute: typeof StoresSlugRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
   StoresIndexRoute: typeof StoresIndexRoute
 }
@@ -1477,6 +1490,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tenders/$id'
       preLoaderRoute: typeof TendersIdRouteImport
       parentRoute: typeof TendersRoute
+    }
+    '/stores/$slug': {
+      id: '/stores/$slug'
+      path: '/stores/$slug'
+      fullPath: '/stores/$slug'
+      preLoaderRoute: typeof StoresSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/rfq/$id': {
       id: '/rfq/$id'
@@ -2174,6 +2194,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesIdRoute: CompaniesIdRoute,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
+  StoresSlugRoute: StoresSlugRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
   StoresIndexRoute: StoresIndexRoute,
 }
