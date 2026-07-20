@@ -5,9 +5,15 @@ export const Route = createFileRoute("/real-estate")({
   head: () => ({
     meta: [
       { title: "Real Estate Marketplace — Souqly" },
-      { name: "description", content: "Apartments, villas, shops, offices and warehouses across Egypt." },
+      {
+        name: "description",
+        content: "Apartments, villas, shops, offices and warehouses across Egypt.",
+      },
       { property: "og:title", content: "Real Estate Marketplace — Souqly" },
-      { property: "og:description", content: "Apartments, villas, shops, offices and warehouses across Egypt." },
+      {
+        property: "og:description",
+        content: "Apartments, villas, shops, offices and warehouses across Egypt.",
+      },
     ],
   }),
   component: () => (

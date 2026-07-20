@@ -1,7 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, DollarSign, Inbox, Loader2, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import {
+  Activity,
+  DollarSign,
+  Inbox,
+  Loader2,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -20,7 +28,9 @@ function AgentPerformancePage() {
   const ar = locale === "ar";
   const fetchData = useServerFn(getAgentPerformance);
   const [d, setD] = useState<Data | null>(null);
-  useEffect(() => { fetchData().then(setD); }, [fetchData]);
+  useEffect(() => {
+    fetchData().then(setD);
+  }, [fetchData]);
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -32,23 +42,51 @@ function AgentPerformancePage() {
         </div>
 
         {!d ? (
-          <div className="p-10 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>
+          <div className="p-10 text-center text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin inline" />
+          </div>
         ) : !d.hasAgent ? (
           <div className="rounded-lg border border-warning/40 bg-warning/10 p-6 text-center">
-            <p className="font-semibold mb-2">{ar ? "أنشئ ملف الوكيل أولاً" : "Create your agent profile first"}</p>
-            <Link to="/agent" className="text-primary underline">{ar ? "إنشاء ملف الوكيل" : "Create agent profile"}</Link>
+            <p className="font-semibold mb-2">
+              {ar ? "أنشئ ملف الوكيل أولاً" : "Create your agent profile first"}
+            </p>
+            <Link to="/agent" className="text-primary underline">
+              {ar ? "إنشاء ملف الوكيل" : "Create agent profile"}
+            </Link>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-              <Stat icon={Inbox} label={ar ? "العملاء المحتملون" : "Leads generated"} value={String(d.leadsGenerated)} />
-              <Stat icon={TrendingUp} label={ar ? "معدل التحويل" : "Conversion rate"} value={`${d.conversionRate}%`} />
-              <Stat icon={DollarSign} label={ar ? "إجمالي العمولات" : "Total commissions"} value={formatPrice(d.totalCommissions, locale, { showZero: true })} />
-              <Stat icon={Clock} label={ar ? "عمولات معلقة" : "Pending commissions"} value={formatPrice(d.pendingCommissions, locale, { showZero: true })} />
-              <Stat icon={CheckCircle2} label={ar ? "عمولات مدفوعة" : "Paid commissions"} value={formatPrice(d.paidCommissions, locale, { showZero: true })} />
+              <Stat
+                icon={Inbox}
+                label={ar ? "العملاء المحتملون" : "Leads generated"}
+                value={String(d.leadsGenerated)}
+              />
+              <Stat
+                icon={TrendingUp}
+                label={ar ? "معدل التحويل" : "Conversion rate"}
+                value={`${d.conversionRate}%`}
+              />
+              <Stat
+                icon={DollarSign}
+                label={ar ? "إجمالي العمولات" : "Total commissions"}
+                value={formatPrice(d.totalCommissions, locale, { showZero: true })}
+              />
+              <Stat
+                icon={Clock}
+                label={ar ? "عمولات معلقة" : "Pending commissions"}
+                value={formatPrice(d.pendingCommissions, locale, { showZero: true })}
+              />
+              <Stat
+                icon={CheckCircle2}
+                label={ar ? "عمولات مدفوعة" : "Paid commissions"}
+                value={formatPrice(d.paidCommissions, locale, { showZero: true })}
+              />
             </div>
 
-            <h2 className="font-semibold mb-3">{ar ? "أفضل الإعلانات" : "Top referred listings"}</h2>
+            <h2 className="font-semibold mb-3">
+              {ar ? "أفضل الإعلانات" : "Top referred listings"}
+            </h2>
             {d.topListings.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-card p-10 text-center text-muted-foreground">
                 {ar ? "لا توجد إحالات بعد" : "No referrals yet"}
@@ -66,7 +104,15 @@ function AgentPerformancePage() {
                   <tbody>
                     {d.topListings.map((l) => (
                       <tr key={l.id} className="border-t border-border">
-                        <td className="px-4 py-3"><Link to="/listings/$id" params={{ id: l.id }} className="text-primary hover:underline">{l.title}</Link></td>
+                        <td className="px-4 py-3">
+                          <Link
+                            to="/listings/$id"
+                            params={{ id: l.id }}
+                            className="text-primary hover:underline"
+                          >
+                            {l.title}
+                          </Link>
+                        </td>
                         <td className="px-4 py-3 text-end">{l.clicks}</td>
                         <td className="px-4 py-3 text-end">{l.conversions}</td>
                       </tr>
@@ -83,7 +129,15 @@ function AgentPerformancePage() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Activity; label: string; value: string }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-5 shadow-card">
       <Icon className="h-5 w-5 text-primary mb-2" />

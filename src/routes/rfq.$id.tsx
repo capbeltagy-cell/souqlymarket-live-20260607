@@ -11,24 +11,31 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getRfq, listRfqOffers, submitRfqOffer, awardRfq } from "@/lib/phase3.functions";
 
-const DEFAULT_OG = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+const DEFAULT_OG =
+  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
 
 export const Route = createFileRoute("/rfq/$id")({
   loader: async ({ params }) => {
     const { getRfqMeta } = await import("@/lib/seo.functions");
-    try { return { meta: await getRfqMeta({ data: { id: params.id } }) }; }
-    catch { return { meta: null }; }
+    try {
+      return { meta: await getRfqMeta({ data: { id: params.id } }) };
+    } catch {
+      return { meta: null };
+    }
   },
   head: ({ loaderData, params }) => {
     const m: any = loaderData?.meta;
     const title = m?.title ? `${m.title} — RFQ — Souqly` : "RFQ — Souqly";
     const desc = (m?.description ?? "Request for Quote on Souqly.").slice(0, 160);
     const att = Array.isArray(m?.attachments) ? m.attachments : [];
-    const img = att.find((a: any) => typeof a?.url === "string" && /\.(png|jpe?g|webp|gif)$/i.test(a.url))?.url ?? DEFAULT_OG;
+    const img =
+      att.find((a: any) => typeof a?.url === "string" && /\.(png|jpe?g|webp|gif)$/i.test(a.url))
+        ?.url ?? DEFAULT_OG;
     const url = `/rfq/${params.id}`;
     return {
       meta: [
-        { title }, { name: "description", content: desc },
+        { title },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
@@ -59,19 +66,37 @@ function RfqDetail() {
     const r = await getRfq({ data: { id } });
     setRfq(r.rfq);
     if (user) {
-      try { const o = await listRfqOffers({ data: { rfqId: id } }); setOffers(o.offers); } catch { /* not allowed */ }
+      try {
+        const o = await listRfqOffers({ data: { rfqId: id } });
+        setOffers(o.offers);
+      } catch {
+        /* not allowed */
+      }
     }
   }
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [id, user?.id]);
+  useEffect(() => {
+    load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [id, user?.id]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await submitRfqOffer({ data: { rfqId: id, price: Number(price), lead_time_days: days ? Number(days) : undefined, notes: notes || undefined } });
+      await submitRfqOffer({
+        data: {
+          rfqId: id,
+          price: Number(price),
+          lead_time_days: days ? Number(days) : undefined,
+          notes: notes || undefined,
+        },
+      });
       toast.success(ar ? "تم إرسال العرض" : "Offer submitted");
-      setPrice(""); setDays(""); setNotes("");
+      setPrice("");
+      setDays("");
+      setNotes("");
       load();
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
   async function pickWinner(offerId: string) {
@@ -79,7 +104,9 @@ function RfqDetail() {
       await awardRfq({ data: { rfqId: id, offerId } });
       toast.success(ar ? "تم اختيار الفائز" : "Winner selected");
       load();
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
   if (!rfq) return <div className="p-10 text-center text-muted-foreground">…</div>;
@@ -98,40 +125,101 @@ function RfqDetail() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
             <Cell label={ar ? "القسم" : "Category"} value={rfq.category_slug} />
             <Cell label={ar ? "المحافظة" : "Governorate"} value={rfq.governorate} />
-            <Cell label={ar ? "الكمية" : "Quantity"} value={rfq.quantity ? `${rfq.quantity} ${rfq.unit ?? ""}` : null} />
-            <Cell label={ar ? "الميزانية" : "Budget"} value={(rfq.budget_min || rfq.budget_max) ? `${rfq.budget_min ?? "?"}–${rfq.budget_max ?? "?"} ${rfq.currency}` : null} />
+            <Cell
+              label={ar ? "الكمية" : "Quantity"}
+              value={rfq.quantity ? `${rfq.quantity} ${rfq.unit ?? ""}` : null}
+            />
+            <Cell
+              label={ar ? "الميزانية" : "Budget"}
+              value={
+                rfq.budget_min || rfq.budget_max
+                  ? `${rfq.budget_min ?? "?"}–${rfq.budget_max ?? "?"} ${rfq.currency}`
+                  : null
+              }
+            />
           </div>
 
-          <h2 className="text-xl font-semibold mt-6">{ar ? "العروض المقدمة" : "Submitted Offers"}</h2>
+          <h2 className="text-xl font-semibold mt-6">
+            {ar ? "العروض المقدمة" : "Submitted Offers"}
+          </h2>
           {offers.length === 0 ? (
-            <div className="text-muted-foreground text-sm">{user ? (ar ? "لا توجد عروض بعد" : "No offers yet") : (ar ? "سجّل الدخول لعرض العروض" : "Sign in to view offers")}</div>
-          ) : offers.map((o) => (
-            <div key={o.id} className="rounded-lg border border-border bg-card p-4 shadow-card">
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <div>
-                  <div className="font-semibold">{ar ? o.companies?.name_ar : o.companies?.name_en} {o.companies?.is_verified && <span className="text-xs text-primary">✓</span>}</div>
-                  <div className="text-sm text-muted-foreground">{ar ? "السعر" : "Price"}: {o.price} {o.currency} · {ar ? "مدة التسليم" : "Lead time"}: {o.lead_time_days ?? "—"} {ar ? "يوم" : "d"}</div>
-                  {o.notes && <p className="text-sm mt-1">{o.notes}</p>}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={o.status === "accepted" ? "default" : "secondary"}>{o.status}</Badge>
-                  {isBuyer && rfq.status === "open" && (
-                    <Button size="sm" onClick={() => pickWinner(o.id)} className="bg-primary hover:bg-primary-hover">{ar ? "اختر الفائز" : "Award"}</Button>
-                  )}
+            <div className="text-muted-foreground text-sm">
+              {user
+                ? ar
+                  ? "لا توجد عروض بعد"
+                  : "No offers yet"
+                : ar
+                  ? "سجّل الدخول لعرض العروض"
+                  : "Sign in to view offers"}
+            </div>
+          ) : (
+            offers.map((o) => (
+              <div key={o.id} className="rounded-lg border border-border bg-card p-4 shadow-card">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <div className="font-semibold">
+                      {ar ? o.companies?.name_ar : o.companies?.name_en}{" "}
+                      {o.companies?.is_verified && <span className="text-xs text-primary">✓</span>}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {ar ? "السعر" : "Price"}: {o.price} {o.currency} ·{" "}
+                      {ar ? "مدة التسليم" : "Lead time"}: {o.lead_time_days ?? "—"}{" "}
+                      {ar ? "يوم" : "d"}
+                    </div>
+                    {o.notes && <p className="text-sm mt-1">{o.notes}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={o.status === "accepted" ? "default" : "secondary"}>
+                      {o.status}
+                    </Badge>
+                    {isBuyer && rfq.status === "open" && (
+                      <Button
+                        size="sm"
+                        onClick={() => pickWinner(o.id)}
+                        className="bg-primary hover:bg-primary-hover"
+                      >
+                        {ar ? "اختر الفائز" : "Award"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <aside className="space-y-4">
           {rfq.status === "open" && user && !isBuyer && (
-            <form onSubmit={submit} className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3">
+            <form
+              onSubmit={submit}
+              className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3"
+            >
               <h3 className="font-semibold">{ar ? "قدّم عرضك" : "Submit your offer"}</h3>
-              <Input type="number" min="0" step="0.01" required placeholder={ar ? "السعر (ج.م)" : "Price (EGP)"} value={price} onChange={(e) => setPrice(e.target.value)} />
-              <Input type="number" min="0" placeholder={ar ? "مدة التسليم (أيام)" : "Lead time (days)"} value={days} onChange={(e) => setDays(e.target.value)} />
-              <Textarea rows={3} placeholder={ar ? "ملاحظات" : "Notes"} value={notes} onChange={(e) => setNotes(e.target.value)} />
-              <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">{ar ? "إرسال العرض" : "Submit"}</Button>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                placeholder={ar ? "السعر (ج.م)" : "Price (EGP)"}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              <Input
+                type="number"
+                min="0"
+                placeholder={ar ? "مدة التسليم (أيام)" : "Lead time (days)"}
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+              />
+              <Textarea
+                rows={3}
+                placeholder={ar ? "ملاحظات" : "Notes"}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+              <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
+                {ar ? "إرسال العرض" : "Submit"}
+              </Button>
             </form>
           )}
         </aside>
@@ -142,15 +230,21 @@ function RfqDetail() {
 }
 
 function Cell({ label, value }: { label: string; value: any }) {
-  return <div className="rounded border border-border bg-card p-2"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+  return (
+    <div className="rounded border border-border bg-card p-2">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium">{value ?? "—"}</div>
+    </div>
+  );
 }
-
 
 function Fallback({ msg }: { msg: string }) {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">
+        {msg}
+      </div>
       <SiteFooter />
     </div>
   );

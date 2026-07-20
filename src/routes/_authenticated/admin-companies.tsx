@@ -12,7 +12,6 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
 import { adminSetCompanyVerified } from "@/lib/phase2.functions";
 
-
 export const Route = createFileRoute("/_authenticated/admin-companies")({
   head: () => ({ meta: [{ title: "Admin · Companies — Souqly" }] }),
   component: AdminCompanies,
@@ -31,18 +30,34 @@ function AdminCompanies() {
   const [busy, setBusy] = useState<string | null>(null);
   const isAdmin = roles.includes("admin");
 
-  const load = () => list().then(setRows).catch((e: Error) => toast.error(e.message));
+  const load = () =>
+    list()
+      .then(setRows)
+      .catch((e: Error) => toast.error(e.message));
 
-  useEffect(() => { if (isAdmin) load(); }, [isAdmin]);
+  useEffect(() => {
+    if (isAdmin) load();
+  }, [isAdmin]);
 
   const toggle = async (row: Row, paid: boolean) => {
     setBusy(row.id);
     try {
       await setPaid({ data: { companyId: row.id, paid, months: 1 } });
-      toast.success(paid ? (ar ? "تم تفعيل الاشتراك" : "Subscription activated") : (ar ? "تم إلغاء الاشتراك" : "Subscription deactivated"));
+      toast.success(
+        paid
+          ? ar
+            ? "تم تفعيل الاشتراك"
+            : "Subscription activated"
+          : ar
+            ? "تم إلغاء الاشتراك"
+            : "Subscription deactivated",
+      );
       await load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(null); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
   };
 
   const toggleVerify = async (row: Row) => {
@@ -51,24 +66,38 @@ function AdminCompanies() {
       await setVerified({ data: { companyId: row.id, verified: !row.is_verified } });
       toast.success(ar ? "تم تحديث التوثيق" : "Verification updated");
       await load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(null); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
   };
 
-  if (!isAdmin) return (
-    <Shell><div className="p-10 text-center text-muted-foreground">{ar ? "للمسؤولين فقط" : "Admins only"}</div></Shell>
-  );
+  if (!isAdmin)
+    return (
+      <Shell>
+        <div className="p-10 text-center text-muted-foreground">
+          {ar ? "للمسؤولين فقط" : "Admins only"}
+        </div>
+      </Shell>
+    );
 
   return (
     <Shell>
       <div className="flex items-center gap-2 mb-6">
         <Crown className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold">{ar ? "إدارة اشتراكات الشركات" : "Company subscriptions"}</h1>
+        <h1 className="text-2xl font-bold">
+          {ar ? "إدارة اشتراكات الشركات" : "Company subscriptions"}
+        </h1>
       </div>
       {!rows ? (
-        <div className="p-10 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>
+        <div className="p-10 text-center text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin inline" />
+        </div>
       ) : rows.length === 0 ? (
-        <div className="p-10 text-center text-muted-foreground">{ar ? "لا توجد شركات" : "No companies"}</div>
+        <div className="p-10 text-center text-muted-foreground">
+          {ar ? "لا توجد شركات" : "No companies"}
+        </div>
       ) : (
         <div className="rounded-lg border border-border bg-card overflow-x-auto">
           <table className="w-full text-sm">
@@ -93,33 +122,60 @@ function AdminCompanies() {
                   </td>
                   <td className="px-4 py-3">
                     {r.isPaid ? (
-                      <Badge className="bg-success text-success-foreground hover:bg-success">{ar ? "مدفوعة" : "Paid"}</Badge>
+                      <Badge className="bg-success text-success-foreground hover:bg-success">
+                        {ar ? "مدفوعة" : "Paid"}
+                      </Badge>
                     ) : (
                       <Badge variant="outline">{ar ? "مجانية" : "Free"}</Badge>
                     )}
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {r.subscription_expires_at ? new Date(r.subscription_expires_at).toLocaleDateString() : "—"}
+                    {r.subscription_expires_at
+                      ? new Date(r.subscription_expires_at).toLocaleDateString()
+                      : "—"}
                   </td>
                   <td className="px-4 py-3">
                     {r.is_verified ? (
-                      <Badge className="bg-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />{ar ? "موثقة" : "Verified"}</Badge>
+                      <Badge className="bg-primary text-primary-foreground gap-1">
+                        <BadgeCheck className="h-3 w-3" />
+                        {ar ? "موثقة" : "Verified"}
+                      </Badge>
                     ) : (
                       <Badge variant="outline">{ar ? "غير موثقة" : "Unverified"}</Badge>
                     )}
                   </td>
                   <td className="px-4 py-3 text-end space-x-1 rtl:space-x-reverse">
                     {r.isPaid ? (
-                      <Button size="sm" variant="outline" disabled={busy === r.id} onClick={() => toggle(r, false)} className="gap-1">
-                        <ShieldOff className="h-4 w-4" />{ar ? "إلغاء" : "Unpay"}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={busy === r.id}
+                        onClick={() => toggle(r, false)}
+                        className="gap-1"
+                      >
+                        <ShieldOff className="h-4 w-4" />
+                        {ar ? "إلغاء" : "Unpay"}
                       </Button>
                     ) : (
-                      <Button size="sm" className="bg-primary hover:bg-primary-hover gap-1" disabled={busy === r.id} onClick={() => toggle(r, true)}>
-                        <ShieldCheck className="h-4 w-4" />{ar ? "تفعيل (شهر)" : "Mark paid (1mo)"}
+                      <Button
+                        size="sm"
+                        className="bg-primary hover:bg-primary-hover gap-1"
+                        disabled={busy === r.id}
+                        onClick={() => toggle(r, true)}
+                      >
+                        <ShieldCheck className="h-4 w-4" />
+                        {ar ? "تفعيل (شهر)" : "Mark paid (1mo)"}
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" disabled={busy === r.id} onClick={() => toggleVerify(r)} className="gap-1">
-                      <BadgeCheck className="h-4 w-4" />{r.is_verified ? (ar ? "إلغاء توثيق" : "Unverify") : (ar ? "توثيق" : "Verify")}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy === r.id}
+                      onClick={() => toggleVerify(r)}
+                      className="gap-1"
+                    >
+                      <BadgeCheck className="h-4 w-4" />
+                      {r.is_verified ? (ar ? "إلغاء توثيق" : "Unverify") : ar ? "توثيق" : "Verify"}
                     </Button>
                   </td>
                 </tr>

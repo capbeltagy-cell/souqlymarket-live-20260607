@@ -19,7 +19,12 @@ import {
 import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "السلة — Souqly" }, { name: "description", content: "سلة المشتريات على سوقلي" }] }),
+  head: () => ({
+    meta: [
+      { title: "السلة — Souqly" },
+      { name: "description", content: "سلة المشتريات على سوقلي" },
+    ],
+  }),
   component: CartPage,
 });
 
@@ -63,7 +68,9 @@ function CartPage() {
           <EmptyState
             icon={<ShoppingCart className="h-7 w-7" />}
             title={ar ? "السلة فارغة" : "Cart is empty"}
-            description={ar ? "تصفح السوق وأضف منتجات لسلتك" : "Browse the marketplace and add products"}
+            description={
+              ar ? "تصفح السوق وأضف منتجات لسلتك" : "Browse the marketplace and add products"
+            }
           />
         ) : (
           <div className="grid lg:grid-cols-[1fr,320px] gap-6">
@@ -71,7 +78,8 @@ function CartPage() {
               {groups.map((g) => (
                 <div key={g.companyKey} className="rounded-lg border border-border bg-card">
                   <div className="px-4 py-3 border-b border-border text-sm text-muted-foreground">
-                    {ar ? "البائع" : "Seller"}: <span className="font-semibold text-foreground">{g.companyName}</span>
+                    {ar ? "البائع" : "Seller"}:{" "}
+                    <span className="font-semibold text-foreground">{g.companyName}</span>
                   </div>
                   <ul className="divide-y divide-border">
                     {g.items.map((it) => (
@@ -82,7 +90,11 @@ function CartPage() {
                           <div className="h-16 w-16 rounded bg-muted" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <Link to="/listings/$id" params={{ id: it.listing_id }} className="font-medium hover:underline line-clamp-2">
+                          <Link
+                            to="/listings/$id"
+                            params={{ id: it.listing_id }}
+                            className="font-medium hover:underline line-clamp-2"
+                          >
                             {it.title}
                           </Link>
                           <div className="text-sm text-primary font-semibold mt-1">
@@ -90,15 +102,30 @@ function CartPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(it.listing_id, it.quantity - 1)}>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8"
+                            onClick={() => updateQty(it.listing_id, it.quantity - 1)}
+                          >
                             <Minus className="h-3 w-3" />
                           </Button>
                           <span className="w-8 text-center text-sm">{it.quantity}</span>
-                          <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(it.listing_id, it.quantity + 1)}>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8"
+                            onClick={() => updateQty(it.listing_id, it.quantity + 1)}
+                          >
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
-                        <Button size="icon" variant="ghost" onClick={() => removeFromCart(it.listing_id)} aria-label="remove">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => removeFromCart(it.listing_id)}
+                          aria-label="remove"
+                        >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </li>
@@ -120,9 +147,15 @@ function CartPage() {
               </div>
               <div className="flex justify-between font-semibold border-t border-border pt-3">
                 <span>{ar ? "الإجمالي" : "Total"}</span>
-                <span className="text-primary">{formatPrice(total, locale)} {currency !== "EGP" && currency}</span>
+                <span className="text-primary">
+                  {formatPrice(total, locale)} {currency !== "EGP" && currency}
+                </span>
               </div>
-              <Button className="w-full bg-primary hover:bg-primary-hover" onClick={checkout} disabled={placing}>
+              <Button
+                className="w-full bg-primary hover:bg-primary-hover"
+                onClick={checkout}
+                disabled={placing}
+              >
                 {ar ? "إتمام الشراء" : "Checkout"}
               </Button>
               {groups.length > 1 && (

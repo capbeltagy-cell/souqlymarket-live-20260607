@@ -48,7 +48,11 @@ export const saveMyAddress = createServerFn({ method: "POST" })
     }
     let id = data.id ?? null;
     if (id) {
-      const { error } = await supabase.from("user_addresses").update(payload).eq("id", id).eq("user_id", userId);
+      const { error } = await supabase
+        .from("user_addresses")
+        .update(payload)
+        .eq("id", id)
+        .eq("user_id", userId);
       if (error) throw new Error(error.message);
     } else {
       // Auto-default if first address
@@ -73,7 +77,11 @@ export const deleteMyAddress = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("user_addresses").delete().eq("id", data.id).eq("user_id", userId);
+    const { error } = await supabase
+      .from("user_addresses")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

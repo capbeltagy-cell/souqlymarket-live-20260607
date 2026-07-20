@@ -5,41 +5,73 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getShippingQuote } from "@/lib/shipping";
 
 const ORDER_STATUS = z.enum([
-  "draft","awaiting_seller","accepted","rejected","packed","shipped","delivered","completed","cancelled","returned",
+  "draft",
+  "awaiting_seller",
+  "accepted",
+  "rejected",
+  "packed",
+  "shipped",
+  "delivered",
+  "completed",
+  "cancelled",
+  "returned",
 ]);
 
 export const createOrderFromListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      listing_id: z.string().uuid(),
-      checkout_session_id: z.string().uuid().optional().nullable(),
-      quantity: z.number().int().positive().default(1),
-      notes: z.string().max(2000).optional().nullable(),
-      contact_phone: z.string().max(30).optional().nullable(),
-      shipping_address: z.object({
-        recipient_name: z.string().min(2).max(120),
-        phone: z.string().min(6).max(30),
-        governorate: z.string().min(1).max(120),
-        city: z.string().min(1).max(120),
-        address_line: z.string().min(3).max(500),
-      }).optional().nullable(),
-      conversation_id: z.string().uuid().optional().nullable(),
-      referral_code: z.string().min(4).max(32).optional().nullable(),
-    }).parse(d),
+    z
+      .object({
+        listing_id: z.string().uuid(),
+        checkout_session_id: z.string().uuid().optional().nullable(),
+        quantity: z.number().int().positive().default(1),
+        notes: z.string().max(2000).optional().nullable(),
+        contact_phone: z.string().max(30).optional().nullable(),
+        shipping_address: z
+          .object({
+            recipient_name: z.string().min(2).max(120),
+            phone: z.string().min(6).max(30),
+            governorate: z.string().min(1).max(120),
+            city: z.string().min(1).max(120),
+            address_line: z.string().min(3).max(500),
+          })
+          .optional()
+          .nullable(),
+        conversation_id: z.string().uuid().optional().nullable(),
+        referral_code: z.string().min(4).max(32).optional().nullable(),
+        coupon_code: z
+          .string()
+          .trim()
+          .min(3)
+          .max(40)
+          .regex(/^[A-Z0-9_-]+$/i)
+          .optional()
+          .nullable(),
+      })
+      .parse(d),
   )
 
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    const { data: allowed, error: limitError } = await (supabase.rpc as any)(
+      "consume_auth_rate_limit",
+      { p_action: "checkout:create-order", p_max_requests: 30, p_window_seconds: 60 },
+    );
+    if (limitError) throw new Error(limitError.message);
+    if (!allowed) throw new Error("محاولات كثيرة؛ انتظر دقيقة ثم حاول مرة أخرى");
     const { data: listing, error } = await supabase
       .from("listings")
-      .select("id, company_id, price, currency, title_ar, title_en, status, type, track_inventory, stock_quantity, min_order_quantity")
+      .select(
+        "id, company_id, store_id, price, sale_price, currency, title_ar, title_en, status, type, track_inventory, stock_quantity, min_order_quantity",
+      )
       .eq("id", data.listing_id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!listing) throw new Error("Listing not found");
     if (listing.status !== "approved") throw new Error("هذا العرض غير متاح للشراء حاليًا");
-    const price = Number(listing.price ?? 0);
+    const regularPrice = Number(listing.price ?? 0);
+    const salePrice = Number(listing.sale_price ?? 0);
+    const price = salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
     if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
     if (["product", "market"].includes(listing.type) && !data.shipping_address) {
       throw new Error("عنوان الشحن مطلوب لإتمام شراء هذا المنتج");
@@ -58,10 +90,47 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       .maybeSingle();
     if (sellerCompany?.owner_id === userId) throw new Error("لا يمكنك شراء عرض تابع لشركتك");
     const subtotal = price * data.quantity;
+    let discount = 0;
+    let couponId: string | null = null;
+    let couponCode: string | null = null;
+    if (data.coupon_code) {
+      if (!listing.store_id) throw new Error("هذا المنتج غير تابع لمتجر يقبل الكوبونات");
+      const normalizedCode = data.coupon_code.toUpperCase();
+      const { data: coupon } = await (supabaseAdmin.from("store_coupons" as never) as any)
+        .select(
+          "id, code, type, value, min_order, max_discount, starts_at, ends_at, usage_limit_total, usage_limit_per_user, used_count, active",
+        )
+        .eq("store_id", listing.store_id)
+        .eq("code", normalizedCode)
+        .eq("active", true)
+        .maybeSingle();
+      if (!coupon) throw new Error("الكوبون غير صالح لهذا المتجر");
+      const now = Date.now();
+      if (coupon.starts_at && new Date(coupon.starts_at).getTime() > now)
+        throw new Error("الكوبون لم يبدأ بعد");
+      if (coupon.ends_at && new Date(coupon.ends_at).getTime() < now)
+        throw new Error("انتهت صلاحية الكوبون");
+      if (subtotal < Number(coupon.min_order || 0))
+        throw new Error(`الحد الأدنى للكوبون ${coupon.min_order} ج.م`);
+      if (coupon.usage_limit_total && coupon.used_count >= coupon.usage_limit_total)
+        throw new Error("انتهى استخدام الكوبون");
+      const { count: userUsed } = await (supabaseAdmin.from("store_coupon_usage" as never) as any)
+        .select("id", { count: "exact", head: true })
+        .eq("coupon_id", coupon.id)
+        .eq("user_id", userId);
+      if ((userUsed ?? 0) >= Number(coupon.usage_limit_per_user || 1))
+        throw new Error("لقد استنفدت استخدام هذا الكوبون");
+      discount =
+        coupon.type === "percent" ? (subtotal * Number(coupon.value)) / 100 : Number(coupon.value);
+      if (coupon.max_discount) discount = Math.min(discount, Number(coupon.max_discount));
+      discount = Math.round(Math.min(discount, subtotal) * 100) / 100;
+      couponId = coupon.id;
+      couponCode = coupon.code;
+    }
     const shippingQuote = data.shipping_address
       ? getShippingQuote(data.shipping_address.governorate)
       : { amount: 0, etaMinDays: 0, etaMaxDays: 0 };
-    const total = subtotal + shippingQuote.amount;
+    const total = subtotal - discount + shippingQuote.amount;
 
     const insertPayload = {
       buyer_id: userId,
@@ -71,6 +140,8 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       contact_phone: data.contact_phone ?? null,
       status: "awaiting_seller",
       unit_price: price,
+      subtotal,
+      discount_amount: discount,
       total_amount: total,
       shipping_amount: shippingQuote.amount,
       shipping_eta_min_days: shippingQuote.etaMinDays || null,
@@ -80,9 +151,10 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       conversation_id: data.conversation_id ?? null,
       payment_status: "unpaid",
       referral_code: data.referral_code ?? null,
+      store_id: listing.store_id ?? null,
+      coupon_code: couponCode,
       checkout_session_id: data.checkout_session_id ?? null,
     } as Record<string, unknown>;
-
 
     const { data: created, error: iErr } = await (supabase.from("wholesale_orders" as never) as any)
       .insert(insertPayload)
@@ -101,6 +173,23 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       throw new Error(iErr.message);
     }
 
+    if (couponId) {
+      const { error: usageError } = await (
+        supabaseAdmin.from("store_coupon_usage" as never) as any
+      ).insert({
+        coupon_id: couponId,
+        user_id: userId,
+        order_id: created.id,
+        discount_amount: discount,
+      });
+      if (usageError) {
+        await (supabaseAdmin.from("wholesale_orders" as never) as any)
+          .delete()
+          .eq("id", created.id);
+        throw new Error("تعذر حجز الكوبون؛ حاول مرة أخرى");
+      }
+    }
+
     // Notify seller
     if (sellerCompany?.owner_id) {
       await (supabase.from("notifications" as never) as any).insert({
@@ -116,16 +205,22 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    id: z.string().uuid(),
-    status: ORDER_STATUS,
-    tracking_number: z.string().max(120).optional().nullable(),
-    tracking_carrier: z.string().max(120).optional().nullable(),
-    cancelled_reason: z.string().max(500).optional().nullable(),
-  }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: ORDER_STATUS,
+        tracking_number: z.string().max(120).optional().nullable(),
+        tracking_carrier: z.string().max(120).optional().nullable(),
+        cancelled_reason: z.string().max(500).optional().nullable(),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { userId } = context;
-    const { data: order, error: orderError } = await (supabaseAdmin.from("wholesale_orders" as never) as any)
+    const { data: order, error: orderError } = await (
+      supabaseAdmin.from("wholesale_orders" as never) as any
+    )
       .select("id, buyer_id, status, payment_status, product_listing_id, listing_id")
       .eq("id", data.id)
       .maybeSingle();
@@ -135,14 +230,31 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     const listingId = order.product_listing_id ?? order.listing_id;
     let sellerId: string | null = null;
     if (listingId) {
-      const { data: listing } = await supabaseAdmin.from("listings").select("company_id").eq("id", listingId).maybeSingle();
+      const { data: listing } = await supabaseAdmin
+        .from("listings")
+        .select("company_id")
+        .eq("id", listingId)
+        .maybeSingle();
       if (listing?.company_id) {
-        const { data: company } = await supabaseAdmin.from("companies").select("owner_id").eq("id", listing.company_id).maybeSingle();
+        const { data: company } = await supabaseAdmin
+          .from("companies")
+          .select("owner_id")
+          .eq("id", listing.company_id)
+          .maybeSingle();
         sellerId = company?.owner_id ?? null;
       }
     }
-    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" });
-    const actor = isAdmin ? "admin" : order.buyer_id === userId ? "buyer" : sellerId === userId ? "seller" : "none";
+    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const actor = isAdmin
+      ? "admin"
+      : order.buyer_id === userId
+        ? "buyer"
+        : sellerId === userId
+          ? "seller"
+          : "none";
     if (actor === "none") throw new Error("غير مسموح لك بتعديل هذا الطلب");
 
     const allowed: Record<"buyer" | "seller", Record<string, string[]>> = {
@@ -161,10 +273,17 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     if (actor !== "admin" && !allowed[actor][order.status]?.includes(data.status)) {
       throw new Error("انتقال حالة الطلب غير مسموح");
     }
-    if (actor === "seller" && ["packed", "shipped", "delivered"].includes(data.status) && order.payment_status !== "paid") {
+    if (
+      actor === "seller" &&
+      ["packed", "shipped", "delivered"].includes(data.status) &&
+      order.payment_status !== "paid"
+    ) {
       throw new Error("لا يمكن تجهيز أو شحن الطلب قبل تأكيد الدفع");
     }
-    if (data.status === "shipped" && (!data.tracking_number?.trim() || !data.tracking_carrier?.trim())) {
+    if (
+      data.status === "shipped" &&
+      (!data.tracking_number?.trim() || !data.tracking_carrier?.trim())
+    ) {
       throw new Error("أدخل شركة الشحن ورقم التتبع");
     }
 
@@ -186,10 +305,17 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   });
 
 async function enrichOrders(supabase: any, orders: any[]) {
-  const listingIds = Array.from(new Set(orders.map((o) => o.product_listing_id ?? o.listing_id).filter(Boolean)));
+  const listingIds = Array.from(
+    new Set(orders.map((o) => o.product_listing_id ?? o.listing_id).filter(Boolean)),
+  );
   if (!listingIds.length) return orders.map((o) => ({ ...o, _listing: null, _company: null }));
-  const { data: listings } = await supabase.from("listings").select("id, title_ar, title_en, images, company_id, currency").in("id", listingIds) as { data: any[] | null };
-  const companyIds = Array.from(new Set((listings ?? []).map((l: any) => l.company_id).filter(Boolean)));
+  const { data: listings } = (await supabase
+    .from("listings")
+    .select("id, title_ar, title_en, images, company_id, currency")
+    .in("id", listingIds)) as { data: any[] | null };
+  const companyIds = Array.from(
+    new Set((listings ?? []).map((l: any) => l.company_id).filter(Boolean)),
+  );
   const companiesRes = companyIds.length
     ? await supabase.from("companies").select("id, name_ar, name_en, logo_url").in("id", companyIds)
     : { data: [] as any[] };
@@ -198,7 +324,7 @@ async function enrichOrders(supabase: any, orders: any[]) {
   const cm = new Map((companies ?? []).map((c: any) => [c.id, c]));
   return orders.map((o) => {
     const l = lm.get(o.product_listing_id ?? o.listing_id) ?? null;
-    const c = l ? cm.get(l.company_id) ?? null : null;
+    const c = l ? (cm.get(l.company_id) ?? null) : null;
     return { ...o, _listing: l, _company: c };
   });
 }
@@ -212,17 +338,31 @@ export const listMyOrders = createServerFn({ method: "GET" })
       .eq("buyer_id", userId)
       .order("created_at", { ascending: false })
       .limit(200);
-    const { data: companies } = await supabase.from("companies").select("id").eq("owner_id", userId);
+    const { data: companies } = await supabase
+      .from("companies")
+      .select("id")
+      .eq("owner_id", userId);
     const companyIds = (companies ?? []).map((c) => c.id);
     let asSeller: any[] = [];
     if (companyIds.length) {
-      const { data: prodListings } = await supabase.from("listings").select("id").in("company_id", companyIds);
-      const { data: whListings } = await supabase.from("wholesale_listings").select("id").in("company_id", companyIds);
-      const listingIds = [...(prodListings ?? []).map((l) => l.id), ...(whListings ?? []).map((l) => l.id)];
+      const { data: prodListings } = await supabase
+        .from("listings")
+        .select("id")
+        .in("company_id", companyIds);
+      const { data: whListings } = await supabase
+        .from("wholesale_listings")
+        .select("id")
+        .in("company_id", companyIds);
+      const listingIds = [
+        ...(prodListings ?? []).map((l) => l.id),
+        ...(whListings ?? []).map((l) => l.id),
+      ];
       if (listingIds.length) {
         const { data: sellerOrders } = await (supabase.from("wholesale_orders" as never) as any)
           .select("*")
-          .or(`product_listing_id.in.(${listingIds.join(",")}),listing_id.in.(${listingIds.join(",")})`)
+          .or(
+            `product_listing_id.in.(${listingIds.join(",")}),listing_id.in.(${listingIds.join(",")})`,
+          )
           .order("created_at", { ascending: false })
           .limit(200);
         asSeller = sellerOrders ?? [];
@@ -241,17 +381,27 @@ export const getOrder = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { data: order, error } = await (supabase.from("wholesale_orders" as never) as any)
-      .select("*").eq("id", data.id).maybeSingle();
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!order) throw new Error("Order not found");
     const listingId = order.product_listing_id ?? order.listing_id;
     let listing: any = null;
     let company: any = null;
     if (listingId) {
-      const { data: l } = await supabase.from("listings").select("id, title_ar, title_en, images, company_id, currency").eq("id", listingId).maybeSingle();
+      const { data: l } = await supabase
+        .from("listings")
+        .select("id, title_ar, title_en, images, company_id, currency")
+        .eq("id", listingId)
+        .maybeSingle();
       listing = l;
       if (l?.company_id) {
-        const { data: c } = await supabase.from("companies").select("id, name_ar, name_en, logo_url, owner_id").eq("id", l.company_id).maybeSingle();
+        const { data: c } = await supabase
+          .from("companies")
+          .select("id, name_ar, name_en, logo_url, owner_id")
+          .eq("id", l.company_id)
+          .maybeSingle();
         company = c;
       }
     }

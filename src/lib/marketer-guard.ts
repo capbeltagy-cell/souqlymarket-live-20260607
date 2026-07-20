@@ -7,7 +7,10 @@ export async function assertNotPureMarketer(
   supabase: {
     from: (t: string) => {
       select: (s: string) => {
-        eq: (c: string, v: string) => Promise<{ data: Array<{ role: string }> | null; error: unknown }>;
+        eq: (
+          c: string,
+          v: string,
+        ) => Promise<{ data: Array<{ role: string }> | null; error: unknown }>;
       };
     };
   },

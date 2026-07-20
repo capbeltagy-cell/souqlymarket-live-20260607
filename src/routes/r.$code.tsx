@@ -7,7 +7,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export const Route = createFileRoute("/r/$code")({
-  head: () => ({ meta: [{ title: "Redirecting — Souqly" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Redirecting — Souqly" }, { name: "robots", content: "noindex" }],
+  }),
   component: ReferralRedirect,
 });
 
@@ -22,7 +24,11 @@ function ReferralRedirect() {
       try {
         // store attribution for later conversion crediting
         if (typeof window !== "undefined") {
-          try { localStorage.setItem("souqly.ref", code); } catch { /* noop */ }
+          try {
+            localStorage.setItem("souqly.ref", code);
+          } catch {
+            /* noop */
+          }
         }
         // Try listing-referral first (redirects to the listing).
         const { data, error } = await supabase.rpc("increment_referral_click", { _code: code });
@@ -36,15 +42,18 @@ function ReferralRedirect() {
         try {
           const { trackReferralClick } = await import("@/lib/phase3.functions");
           await trackReferralClick({ data: { code } });
-        } catch { /* noop */ }
+        } catch {
+          /* noop */
+        }
         navigate({ to: "/marketplace", replace: true });
       } catch {
         navigate({ to: "/marketplace", replace: true });
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [code, navigate]);
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -54,7 +63,9 @@ function ReferralRedirect() {
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
           <p className="text-muted-foreground">{t("redirecting")}</p>
           <p className="mt-3 text-xs">
-            <Link to="/marketplace" className="text-primary hover:underline">{t("nav_marketplace")}</Link>
+            <Link to="/marketplace" className="text-primary hover:underline">
+              {t("nav_marketplace")}
+            </Link>
           </p>
         </div>
       </div>

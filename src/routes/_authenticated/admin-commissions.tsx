@@ -9,8 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
@@ -24,10 +30,20 @@ export const Route = createFileRoute("/_authenticated/admin-commissions")({
 const STATUSES = ["pending", "approved", "paid", "all"] as const;
 type Status = (typeof STATUSES)[number];
 type Row = {
-  id: string; amount: number; currency: string; status: string; notes: string | null;
-  created_at: string; listing_id: string | null; agent_id: string | null; company_id: string | null;
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  listing_id: string | null;
+  agent_id: string | null;
+  company_id: string | null;
   listings?: { title_en?: string; title_ar?: string } | null;
-  agents?: { headline_en?: string; profiles?: { display_name?: string; full_name?: string } | null } | null;
+  agents?: {
+    headline_en?: string;
+    profiles?: { display_name?: string; full_name?: string } | null;
+  } | null;
   companies?: { name_en?: string; name_ar?: string } | null;
 };
 
@@ -47,9 +63,14 @@ function AdminCommissions() {
     try {
       const r = await fList({ data: { status } });
       setRows(r.commissions as Row[]);
-    } catch (e) { toast.error((e as Error).message); setRows([]); }
+    } catch (e) {
+      toast.error((e as Error).message);
+      setRows([]);
+    }
   };
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [status]);
+  useEffect(() => {
+    load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [status]);
 
   const act = async (id: string, action: "approve" | "reject" | "paid") => {
     setBusy(id + action);
@@ -58,8 +79,11 @@ function AdminCommissions() {
       toast.success(ar ? "تم التحديث" : "Updated");
       setConfirmReject(null);
       await load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(null); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
   };
 
   return (
@@ -84,7 +108,12 @@ function AdminCommissions() {
 
         <div className="flex flex-wrap gap-2">
           {STATUSES.map((s) => (
-            <Button key={s} size="sm" variant={s === status ? "default" : "outline"} onClick={() => setStatus(s)}>
+            <Button
+              key={s}
+              size="sm"
+              variant={s === status ? "default" : "outline"}
+              onClick={() => setStatus(s)}
+            >
               {s}
             </Button>
           ))}
@@ -92,14 +121,23 @@ function AdminCommissions() {
 
         <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
           {rows === null ? (
-            <div className="p-10 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>
+            <div className="p-10 text-center text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin inline" />
+            </div>
           ) : rows.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">{ar ? "لا توجد عمولات" : "No commissions"}</div>
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              {ar ? "لا توجد عمولات" : "No commissions"}
+            </div>
           ) : (
             <div className="divide-y divide-border">
               {rows.map((c) => {
-                const marketer = c.agents?.profiles?.display_name || c.agents?.profiles?.full_name || c.agent_id?.slice(0, 8) || "—";
-                const listingTitle = (ar ? c.listings?.title_ar : c.listings?.title_en) ?? c.listings?.title_en ?? "—";
+                const marketer =
+                  c.agents?.profiles?.display_name ||
+                  c.agents?.profiles?.full_name ||
+                  c.agent_id?.slice(0, 8) ||
+                  "—";
+                const listingTitle =
+                  (ar ? c.listings?.title_ar : c.listings?.title_en) ?? c.listings?.title_en ?? "—";
                 const company = (ar ? c.companies?.name_ar : c.companies?.name_en) ?? "—";
                 const isAuto = (c.notes ?? "").startsWith("Auto:");
                 return (
@@ -109,19 +147,32 @@ function AdminCommissions() {
                         <div className="font-semibold flex items-center gap-2 flex-wrap">
                           {formatPrice(Number(c.amount), locale, { showZero: true })}
                           <Badge variant="outline">{c.status}</Badge>
-                          {isAuto && <Badge className="bg-primary/10 text-primary border-primary/20">{ar ? "تلقائي" : "Auto"}</Badge>}
+                          {isAuto && (
+                            <Badge className="bg-primary/10 text-primary border-primary/20">
+                              {ar ? "تلقائي" : "Auto"}
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {ar ? "مسوّق" : "Marketer"}: <span className="font-medium text-foreground">{marketer}</span>
-                          {" · "}{ar ? "شركة" : "Company"}: {company}
-                          {" · "}{new Date(c.created_at).toLocaleString()}
+                          {ar ? "مسوّق" : "Marketer"}:{" "}
+                          <span className="font-medium text-foreground">{marketer}</span>
+                          {" · "}
+                          {ar ? "شركة" : "Company"}: {company}
+                          {" · "}
+                          {new Date(c.created_at).toLocaleString()}
                         </div>
                         {c.listing_id && (
-                          <Link to="/listings/$id" params={{ id: c.listing_id }} className="text-xs text-primary hover:underline">
+                          <Link
+                            to="/listings/$id"
+                            params={{ id: c.listing_id }}
+                            className="text-xs text-primary hover:underline"
+                          >
                             {listingTitle}
                           </Link>
                         )}
-                        {c.notes && <div className="text-xs text-muted-foreground mt-1">📝 {c.notes}</div>}
+                        {c.notes && (
+                          <div className="text-xs text-muted-foreground mt-1">📝 {c.notes}</div>
+                        )}
                       </div>
                     </div>
 
@@ -136,17 +187,37 @@ function AdminCommissions() {
                         />
                         {c.status === "pending" && (
                           <>
-                            <Button size="sm" onClick={() => act(c.id, "approve")} disabled={busy === c.id + "approve"} className="gap-1">
-                              <Check className="h-4 w-4" />{ar ? "اعتماد" : "Approve"}
+                            <Button
+                              size="sm"
+                              onClick={() => act(c.id, "approve")}
+                              disabled={busy === c.id + "approve"}
+                              className="gap-1"
+                            >
+                              <Check className="h-4 w-4" />
+                              {ar ? "اعتماد" : "Approve"}
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => setConfirmReject(c)} disabled={busy === c.id + "reject"} className="gap-1">
-                              <X className="h-4 w-4" />{ar ? "رفض وحذف" : "Reject"}
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => setConfirmReject(c)}
+                              disabled={busy === c.id + "reject"}
+                              className="gap-1"
+                            >
+                              <X className="h-4 w-4" />
+                              {ar ? "رفض وحذف" : "Reject"}
                             </Button>
                           </>
                         )}
                         {c.status === "approved" && (
-                          <Button size="sm" variant="outline" onClick={() => act(c.id, "paid")} disabled={busy === c.id + "paid"} className="gap-1">
-                            <DollarSign className="h-4 w-4" />{ar ? "تم الدفع" : "Mark paid"}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => act(c.id, "paid")}
+                            disabled={busy === c.id + "paid"}
+                            className="gap-1"
+                          >
+                            <DollarSign className="h-4 w-4" />
+                            {ar ? "تم الدفع" : "Mark paid"}
                           </Button>
                         )}
                       </div>

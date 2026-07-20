@@ -21,7 +21,9 @@ export function EmptyState({ icon, title, description, ctaLabel, ctaTo }: Props)
         {icon ?? <PackageOpen className="h-7 w-7" />}
       </div>
       <h3 className="text-lg font-semibold mb-1">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground max-w-md mx-auto">{description}</p>}
+      {description && (
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">{description}</p>
+      )}
       {ctaLabel && ctaTo && (
         <Button asChild className="mt-5 bg-primary hover:bg-primary-hover">
           <Link to={ctaTo}>{ctaLabel}</Link>

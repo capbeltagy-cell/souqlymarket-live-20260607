@@ -26,29 +26,59 @@ export const Route = createFileRoute("/agents/$id")({
     const url = `/agents/${params.id}`;
     return {
       meta: [
-        { title }, { name: "description", content: desc },
-        { property: "og:title", content: title }, { property: "og:description", content: desc },
-        { property: "og:type", content: "profile" }, { property: "og:url", content: url },
-        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "profile" },
+        { property: "og:url", content: url },
+        ...(img
+          ? [
+              { property: "og:image", content: img },
+              { name: "twitter:image", content: img },
+            ]
+          : []),
       ],
       links: [{ rel: "canonical", href: url }],
     };
   },
-  notFoundComponent: () => <Shell><div className="p-10 text-center">Agent not found</div></Shell>,
-  errorComponent: () => <Shell><div className="p-10 text-center">Something went wrong</div></Shell>,
+  notFoundComponent: () => (
+    <Shell>
+      <div className="p-10 text-center">Agent not found</div>
+    </Shell>
+  ),
+  errorComponent: () => (
+    <Shell>
+      <div className="p-10 text-center">Something went wrong</div>
+    </Shell>
+  ),
   component: AgentProfile,
 });
 
 type Agent = {
-  id: string; user_id: string;
-  headline_ar: string | null; headline_en: string | null;
-  bio_ar: string | null; bio_en: string | null;
-  country: string | null; city: string | null;
-  specialties: string[] | null; languages: string[] | null;
-  is_verified: boolean; is_trusted: boolean | null; is_premium: boolean | null;
+  id: string;
+  user_id: string;
+  headline_ar: string | null;
+  headline_en: string | null;
+  bio_ar: string | null;
+  bio_en: string | null;
+  country: string | null;
+  city: string | null;
+  specialties: string[] | null;
+  languages: string[] | null;
+  is_verified: boolean;
+  is_trusted: boolean | null;
+  is_premium: boolean | null;
 };
 
-type Profile = { id: string; full_name: string | null; display_name: string | null; avatar_url: string | null; phone: string | null; phone_verified: boolean | null };
+type Profile = {
+  id: string;
+  full_name: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  phone_verified: boolean | null;
+};
 
 function AgentProfile() {
   const { id } = Route.useParams();
@@ -67,14 +97,29 @@ function AgentProfile() {
       if (a) {
         const [{ data: profArr }, { count }, { data: paid }] = await Promise.all([
           supabase.rpc("get_public_profiles", { _ids: [a.user_id] }),
-          supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", a.id).eq("status", "paid"),
-          supabase.from("commissions").select("amount, notes").eq("agent_id", a.id).eq("status", "paid"),
+          supabase
+            .from("commissions")
+            .select("id", { count: "exact", head: true })
+            .eq("agent_id", a.id)
+            .eq("status", "paid"),
+          supabase
+            .from("commissions")
+            .select("amount, notes")
+            .eq("agent_id", a.id)
+            .eq("status", "paid"),
         ]);
         const p = Array.isArray(profArr) ? profArr[0] : null;
         setProfile(p as Profile | null);
         setDeals(count ?? 0);
-        const total = (paid ?? []).reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
-        const refTotal = (paid ?? []).filter((r: { notes: string | null }) => (r.notes ?? "").toLowerCase().includes("referral")).reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
+        const total = (paid ?? []).reduce(
+          (s, r: { amount: number | null }) => s + Number(r.amount ?? 0),
+          0,
+        );
+        const refTotal = (paid ?? [])
+          .filter((r: { notes: string | null }) =>
+            (r.notes ?? "").toLowerCase().includes("referral"),
+          )
+          .reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
         setEarnings(total);
         setReferralEarnings(refTotal);
       }
@@ -82,8 +127,18 @@ function AgentProfile() {
     })();
   }, [id]);
 
-  if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
-  if (!agent) return <Shell><div className="p-10 text-center">Agent not found</div></Shell>;
+  if (loading)
+    return (
+      <Shell>
+        <div className="p-10 text-center text-muted-foreground">{t("loading")}</div>
+      </Shell>
+    );
+  if (!agent)
+    return (
+      <Shell>
+        <div className="p-10 text-center">Agent not found</div>
+      </Shell>
+    );
 
   const name = profile?.display_name || profile?.full_name || "Souqly Agent";
   const headline = (locale === "ar" ? agent.headline_ar : agent.headline_en) ?? "";
@@ -98,7 +153,9 @@ function AgentProfile() {
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="" className="h-24 w-24 rounded-full object-cover" />
           ) : (
-            <div className="h-24 w-24 rounded-full bg-accent text-accent-foreground grid place-items-center text-4xl font-bold">{initialOf(name)}</div>
+            <div className="h-24 w-24 rounded-full bg-accent text-accent-foreground grid place-items-center text-4xl font-bold">
+              {initialOf(name)}
+            </div>
           )}
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -110,17 +167,31 @@ function AgentProfile() {
             </div>
             {headline && <p className="opacity-90 mt-1">{headline}</p>}
             <div className="flex items-center gap-4 mt-3 text-sm opacity-90 flex-wrap">
-              {country && <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{country}</span>}
-              <span className="flex items-center gap-1"><Trophy className="h-4 w-4" />{deals} {t("deals_closed")}</span>
+              {country && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  {country}
+                </span>
+              )}
+              <span className="flex items-center gap-1">
+                <Trophy className="h-4 w-4" />
+                {deals} {t("deals_closed")}
+              </span>
             </div>
           </div>
           {wa && (
             <div className="flex flex-col gap-2">
               <Button asChild className="gap-2 bg-success hover:bg-success/90">
-                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{t("contact_whatsapp")}</a>
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 w-4" />
+                  {t("contact_whatsapp")}
+                </a>
               </Button>
               <Button asChild variant="secondary" className="gap-2">
-                <a href={`tel:+${wa}`}><Phone className="h-4 w-4" />{t("call_now")}</a>
+                <a href={`tel:+${wa}`}>
+                  <Phone className="h-4 w-4" />
+                  {t("call_now")}
+                </a>
               </Button>
             </div>
           )}
@@ -139,23 +210,38 @@ function AgentProfile() {
           </div>
           <div className="rounded-lg border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-2">{t("about")}</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{bio || headline || "—"}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              {bio || headline || "—"}
+            </p>
             {agent.specialties && agent.specialties.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1">
-                {agent.specialties.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}
+                {agent.specialties.map((s) => (
+                  <Badge key={s} variant="secondary">
+                    {s}
+                  </Badge>
+                ))}
               </div>
             )}
             {agent.languages && agent.languages.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
-                {agent.languages.map((l) => <Badge key={l} variant="outline">{l}</Badge>)}
+                {agent.languages.map((l) => (
+                  <Badge key={l} variant="outline">
+                    {l}
+                  </Badge>
+                ))}
               </div>
             )}
           </div>
-          <Button asChild variant="outline" className="w-full"><Link to="/agents">← {t("nav_agents")}</Link></Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link to="/agents">← {t("nav_agents")}</Link>
+          </Button>
         </aside>
         <div className="lg:col-span-2">
           <div className="rounded-lg border border-border bg-card p-6 shadow-card">
-            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2"><Star className="h-5 w-5 text-accent" />{t("portfolio")}</h2>
+            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
+              <Star className="h-5 w-5 text-accent" />
+              {t("portfolio")}
+            </h2>
             <p className="text-sm text-muted-foreground">{t("empty_referrals")}</p>
           </div>
         </div>
@@ -174,5 +260,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen flex flex-col"><SiteHeader />{children}<SiteFooter /></div>;
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      {children}
+      <SiteFooter />
+    </div>
+  );
 }

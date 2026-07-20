@@ -71,7 +71,9 @@ function AuthPage() {
         if (error) throw error;
         try {
           localStorage.setItem("souqly:role_choice", signupRole);
-        } catch {}
+        } catch {
+          // Storage is optional; the authenticated session remains authoritative.
+        }
         if (!data.session) {
           toast.success(
             ar

@@ -7,15 +7,27 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { MapView } from "@/components/MapView";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
-import { EGYPT_GOVERNORATES, getCitiesForGovernorate, normalizeEgyptCity, normalizeEgyptGovernorate, translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
+import {
+  EGYPT_GOVERNORATES,
+  getCitiesForGovernorate,
+  normalizeEgyptCity,
+  normalizeEgyptGovernorate,
+  translateEgyptCity,
+  translateEgyptGovernorate,
+} from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/map")({
-  head: () => ({ meta: [
-    { title: "Map — Souqly" },
-    { name: "description", content: "Browse real estate, lands, factories and warehouses on the map across Egypt." },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Map — Souqly" },
+      {
+        name: "description",
+        content: "Browse real estate, lands, factories and warehouses on the map across Egypt.",
+      },
+    ],
+  }),
   component: MapPage,
 });
 
@@ -49,7 +61,9 @@ function MapPage() {
     setLoading(true);
     supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price")
+      .select(
+        "id, type, title_ar, title_en, country, governorate, city, latitude, longitude, price",
+      )
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(500)
@@ -59,10 +73,7 @@ function MapPage() {
       });
   }, []);
 
-  const governorates = useMemo(
-    () => EGYPT_GOVERNORATES.map((gov) => gov.value),
-    [],
-  );
+  const governorates = useMemo(() => EGYPT_GOVERNORATES.map((gov) => gov.value), []);
 
   const cities = useMemo(
     () => (governorate !== "all" ? getCitiesForGovernorate(governorate) : []),
@@ -70,12 +81,14 @@ function MapPage() {
   );
 
   const filtered = useMemo(
-    () => listings.filter((item) => {
-      if (typeFilter !== "all" && item.type !== typeFilter) return false;
-      if (governorate !== "all" && normalizeEgyptGovernorate(item.governorate) !== governorate) return false;
-      if (city !== "all" && normalizeEgyptCity(item.city) !== city) return false;
-      return item.latitude !== null && item.longitude !== null;
-    }),
+    () =>
+      listings.filter((item) => {
+        if (typeFilter !== "all" && item.type !== typeFilter) return false;
+        if (governorate !== "all" && normalizeEgyptGovernorate(item.governorate) !== governorate)
+          return false;
+        if (city !== "all" && normalizeEgyptCity(item.city) !== city) return false;
+        return item.latitude !== null && item.longitude !== null;
+      }),
     [city, governorate, listings, typeFilter],
   );
 
@@ -83,14 +96,19 @@ function MapPage() {
     const loc = [
       translateEgyptCity(item.city, locale) ?? item.city,
       translateEgyptGovernorate(item.governorate, locale) ?? item.governorate,
-    ].filter(Boolean).join(" · ");
+    ]
+      .filter(Boolean)
+      .join(" · ");
     const priceLabel = item.price && item.price > 0 ? ` • ${formatPrice(item.price, locale)}` : "";
     return {
       id: item.id,
       lat: item.latitude ?? 0,
       lng: item.longitude ?? 0,
       type: item.type,
-      title: locale === "ar" ? item.title_ar ?? item.title_en ?? "" : item.title_en ?? item.title_ar ?? "",
+      title:
+        locale === "ar"
+          ? (item.title_ar ?? item.title_en ?? "")
+          : (item.title_en ?? item.title_ar ?? ""),
       description: `${loc}${priceLabel}`,
     };
   });
@@ -116,7 +134,9 @@ function MapPage() {
                   onChange={(e) => setTypeFilter(e.target.value as ListingType | "all")}
                 >
                   {TYPES.map((tp) => (
-                    <option key={tp.value} value={tp.value}>{t(tp.key as never)}</option>
+                    <option key={tp.value} value={tp.value}>
+                      {t(tp.key as never)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -130,7 +150,9 @@ function MapPage() {
               >
                 <option value="all">{t("filter_governorate")}</option>
                 {EGYPT_GOVERNORATES.map((gov) => (
-                  <option key={gov.value} value={gov.value}>{locale === "ar" ? gov.label_ar : gov.label_en}</option>
+                  <option key={gov.value} value={gov.value}>
+                    {locale === "ar" ? gov.label_ar : gov.label_en}
+                  </option>
                 ))}
               </select>
               <select
@@ -141,7 +163,9 @@ function MapPage() {
               >
                 <option value="all">{t("filter_city")}</option>
                 {cities.map((ct) => (
-                  <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
+                  <option key={ct.value} value={ct.value}>
+                    {locale === "ar" ? ct.label_ar : ct.label_en}
+                  </option>
                 ))}
               </select>
             </div>
@@ -158,7 +182,9 @@ function MapPage() {
           <aside className="space-y-4">
             <div className="rounded-xl border border-border bg-card p-4 shadow-card">
               <h2 className="text-lg font-semibold mb-3">{t("map_summary_title")}</h2>
-              <p className="text-sm text-muted-foreground">{filtered.length} {t("listings_count")}</p>
+              <p className="text-sm text-muted-foreground">
+                {filtered.length} {t("listings_count")}
+              </p>
               <Button asChild className="mt-4 w-full bg-primary hover:bg-primary-hover">
                 <Link to="/marketplace">{t("nav_marketplace")}</Link>
               </Button>

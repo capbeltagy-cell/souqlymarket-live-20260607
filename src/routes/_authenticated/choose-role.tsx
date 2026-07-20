@@ -12,10 +12,7 @@ import { chooseMyRole } from "@/lib/onboarding.functions";
 
 export const Route = createFileRoute("/_authenticated/choose-role")({
   head: () => ({
-    meta: [
-      { title: "Choose your role — Souqly" },
-      { name: "robots", content: "noindex,follow" },
-    ],
+    meta: [{ title: "Choose your role — Souqly" }, { name: "robots", content: "noindex,follow" }],
   }),
   component: ChooseRolePage,
 });
@@ -44,13 +41,21 @@ function ChooseRolePage() {
     setBusy(choice);
     try {
       if (choice === "customer") {
-        try { localStorage.setItem("souqly:role_choice", "customer"); } catch {}
+        try {
+          localStorage.setItem("souqly:role_choice", "customer");
+        } catch {
+          // Storage may be unavailable in privacy mode; navigation can continue.
+        }
         toast.success(ar ? "استكشف السوق" : "Explore the marketplace");
         navigate({ to: "/marketplace" });
         return;
       }
       await assign({ data: { role: choice } });
-      try { localStorage.setItem("souqly:role_choice", choice); } catch {}
+      try {
+        localStorage.setItem("souqly:role_choice", choice);
+      } catch {
+        // Storage may be unavailable in privacy mode; role assignment already succeeded.
+      }
       toast.success(ar ? "تم اختيار الدور" : "Role selected");
       navigate({ to: choice === "company" ? "/company" : "/agent" });
     } catch (e) {
@@ -65,9 +70,13 @@ function ChooseRolePage() {
       <div className="container-souqly py-10 flex-1">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold">{ar ? "كيف تريد استخدام سوقلي؟" : "How will you use Souqly?"}</h1>
+            <h1 className="text-3xl font-bold">
+              {ar ? "كيف تريد استخدام سوقلي؟" : "How will you use Souqly?"}
+            </h1>
             <p className="text-muted-foreground mt-2">
-              {ar ? "اختر دورك للمتابعة. يمكنك دائماً إضافة أدوار أخرى لاحقاً." : "Pick your role to continue. You can add other roles later."}
+              {ar
+                ? "اختر دورك للمتابعة. يمكنك دائماً إضافة أدوار أخرى لاحقاً."
+                : "Pick your role to continue. You can add other roles later."}
             </p>
           </div>
 
@@ -75,7 +84,11 @@ function ChooseRolePage() {
             <RoleCard
               icon={Briefcase}
               title={ar ? "شركة / مصنع / تاجر" : "Company / Factory / Trader"}
-              body={ar ? "انشر منتجاتك واستقبل الطلبات وأدر مبيعاتك." : "Publish listings, receive leads, manage sales."}
+              body={
+                ar
+                  ? "انشر منتجاتك واستقبل الطلبات وأدر مبيعاتك."
+                  : "Publish listings, receive leads, manage sales."
+              }
               cta={ar ? "أنشئ ملف الشركة" : "Create company profile"}
               onClick={() => pick("company")}
               loading={busy === "company"}
@@ -90,7 +103,11 @@ function ChooseRolePage() {
             <RoleCard
               icon={Users}
               title={ar ? "مسوّق / وسيط" : "Marketer / Agent"}
-              body={ar ? "اربح عمولات من الإحالات والصفقات." : "Earn commissions from referrals and closed deals."}
+              body={
+                ar
+                  ? "اربح عمولات من الإحالات والصفقات."
+                  : "Earn commissions from referrals and closed deals."
+              }
               cta={ar ? "أنشئ ملف المسوّق" : "Create marketer profile"}
               onClick={() => pick("agent")}
               loading={busy === "agent"}
@@ -105,7 +122,11 @@ function ChooseRolePage() {
             <RoleCard
               icon={ShoppingBag}
               title={ar ? "مشتري / عميل" : "Buyer / Customer"}
-              body={ar ? "تصفح السوق وأرسل طلبات عروض للموردين." : "Browse the marketplace and request quotes."}
+              body={
+                ar
+                  ? "تصفح السوق وأرسل طلبات عروض للموردين."
+                  : "Browse the marketplace and request quotes."
+              }
               cta={ar ? "ابدأ التسوق" : "Start browsing"}
               onClick={() => pick("customer")}
               loading={busy === "customer"}
@@ -133,11 +154,25 @@ function ChooseRolePage() {
 }
 
 function RoleCard({
-  icon: Icon, title, body, cta, onClick, loading, disabled, highlights, ar,
+  icon: Icon,
+  title,
+  body,
+  cta,
+  onClick,
+  loading,
+  disabled,
+  highlights,
+  ar,
 }: {
-  icon: typeof Briefcase; title: string; body: string; cta: string;
-  onClick: () => void; loading: boolean; disabled: boolean;
-  highlights: string[]; ar: boolean;
+  icon: typeof Briefcase;
+  title: string;
+  body: string;
+  cta: string;
+  onClick: () => void;
+  loading: boolean;
+  disabled: boolean;
+  highlights: string[];
+  ar: boolean;
 }) {
   return (
     <button
@@ -160,7 +195,11 @@ function RoleCard({
       </ul>
       <div className="mt-5 flex items-center justify-between text-sm font-medium text-primary">
         <span>{cta}</span>
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className={`h-4 w-4 ${ar ? "rotate-180" : ""}`} />}
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ArrowRight className={`h-4 w-4 ${ar ? "rotate-180" : ""}`} />
+        )}
       </div>
     </button>
   );

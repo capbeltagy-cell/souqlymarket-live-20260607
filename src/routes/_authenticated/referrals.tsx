@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Link2, Copy, TrendingUp, MousePointerClick, PlusCircle, UserPlus, DollarSign, QrCode, Download } from "lucide-react";
+import {
+  Link2,
+  Copy,
+  TrendingUp,
+  MousePointerClick,
+  PlusCircle,
+  UserPlus,
+  DollarSign,
+  QrCode,
+  Download,
+} from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -23,10 +33,16 @@ export const Route = createFileRoute("/_authenticated/referrals")({
 });
 
 type Row = {
-  id: string; code: string; clicks: number; conversions: number; created_at: string;
+  id: string;
+  code: string;
+  clicks: number;
+  conversions: number;
+  created_at: string;
   listing_id: string;
   listings: {
-    title_en: string | null; title_ar: string | null; commission_percentage: number | null;
+    title_en: string | null;
+    title_ar: string | null;
+    commission_percentage: number | null;
     companies: { name_en: string | null; name_ar: string | null } | null;
   } | null;
 };
@@ -38,8 +54,15 @@ function ReferralsPage() {
   const fetchAnalytics = useServerFn(getMyReferralAnalytics);
   const create = useServerFn(createReferral);
   const [rows, setRows] = useState<Row[]>([]);
-  const [analytics, setAnalytics] = useState<{ clicks: number; registrations: number; conversions: number; revenue: number } | null>(null);
-  const [listings, setListings] = useState<{ id: string; title_en: string; title_ar: string }[]>([]);
+  const [analytics, setAnalytics] = useState<{
+    clicks: number;
+    registrations: number;
+    conversions: number;
+    revenue: number;
+  } | null>(null);
+  const [listings, setListings] = useState<{ id: string; title_en: string; title_ar: string }[]>(
+    [],
+  );
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -47,14 +70,25 @@ function ReferralsPage() {
 
   const load = async () => {
     setLoading(true);
-    try { const res = await fetchList(); setRows(res.referrals as unknown as Row[]); }
-    catch (e) { toast.error((e as Error).message); }
-    finally { setLoading(false); }
+    try {
+      const res = await fetchList();
+      setRows(res.referrals as unknown as Row[]);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     load();
-    fetchAnalytics().then((a) => setAnalytics(a)).catch(() => undefined);
-    supabase.from("listings").select("id, title_en, title_ar").eq("status", "approved").limit(50)
+    fetchAnalytics()
+      .then((a) => setAnalytics(a))
+      .catch(() => undefined);
+    supabase
+      .from("listings")
+      .select("id, title_en, title_ar")
+      .eq("status", "approved")
+      .limit(50)
       .then(({ data }) => setListings(data ?? []));
   }, []);
 
@@ -62,9 +96,16 @@ function ReferralsPage() {
     e.preventDefault();
     if (!selected) return;
     setSubmitting(true);
-    try { await create({ data: { listingId: selected } }); toast.success(t("status_updated")); setSelected(""); load(); }
-    catch (e) { toast.error((e as Error).message); }
-    finally { setSubmitting(false); }
+    try {
+      await create({ data: { listingId: selected } });
+      toast.success(t("status_updated"));
+      setSelected("");
+      load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const copy = (code: string) => {
@@ -73,7 +114,10 @@ function ReferralsPage() {
     toast.success(t("link_copied"));
   };
 
-  const totals = rows.reduce((a, r) => ({ clicks: a.clicks + r.clicks, conv: a.conv + r.conversions }), { clicks: 0, conv: 0 });
+  const totals = rows.reduce(
+    (a, r) => ({ clicks: a.clicks + r.clicks, conv: a.conv + r.conversions }),
+    { clicks: 0, conv: 0 },
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -84,23 +128,55 @@ function ReferralsPage() {
         </h1>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <KPI icon={MousePointerClick} label={t("clicks")} value={String(analytics?.clicks ?? totals.clicks)} />
-          <KPI icon={UserPlus} label={ar ? "تسجيلات" : "Registrations"} value={String(analytics?.registrations ?? 0)} />
-          <KPI icon={TrendingUp} label={t("conversions")} value={String(analytics?.conversions ?? totals.conv)} />
-          <KPI icon={DollarSign} label={ar ? "الإيرادات الناتجة" : "Revenue generated"} value={formatPrice(analytics?.revenue ?? 0, locale, { showZero: true })} />
+          <KPI
+            icon={MousePointerClick}
+            label={t("clicks")}
+            value={String(analytics?.clicks ?? totals.clicks)}
+          />
+          <KPI
+            icon={UserPlus}
+            label={ar ? "تسجيلات" : "Registrations"}
+            value={String(analytics?.registrations ?? 0)}
+          />
+          <KPI
+            icon={TrendingUp}
+            label={t("conversions")}
+            value={String(analytics?.conversions ?? totals.conv)}
+          />
+          <KPI
+            icon={DollarSign}
+            label={ar ? "الإيرادات الناتجة" : "Revenue generated"}
+            value={formatPrice(analytics?.revenue ?? 0, locale, { showZero: true })}
+          />
         </div>
 
-        <form onSubmit={onCreate} className="rounded-lg border border-border bg-card p-5 shadow-card mb-6 flex flex-col sm:flex-row gap-3 items-end">
+        <form
+          onSubmit={onCreate}
+          className="rounded-lg border border-border bg-card p-5 shadow-card mb-6 flex flex-col sm:flex-row gap-3 items-end"
+        >
           <div className="flex-1 space-y-1.5 w-full">
             <Label>{t("select_listing")}</Label>
-            <select value={selected} onChange={(e) => setSelected(e.target.value)} required
-              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
+            <select
+              value={selected}
+              onChange={(e) => setSelected(e.target.value)}
+              required
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
               <option value="">—</option>
-              {listings.map((l) => <option key={l.id} value={l.id}>{locale === "ar" ? l.title_ar : l.title_en}</option>)}
+              {listings.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {locale === "ar" ? l.title_ar : l.title_en}
+                </option>
+              ))}
             </select>
           </div>
-          <Button type="submit" disabled={submitting || !selected} className="bg-primary hover:bg-primary-hover gap-2">
-            <PlusCircle className="h-4 w-4" />{t("create_referral")}
+          <Button
+            type="submit"
+            disabled={submitting || !selected}
+            className="bg-primary hover:bg-primary-hover gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            {t("create_referral")}
           </Button>
         </form>
 
@@ -109,40 +185,74 @@ function ReferralsPage() {
           {loading ? (
             <div className="p-10 text-center text-muted-foreground text-sm">{t("loading")}</div>
           ) : rows.length === 0 ? (
-            <div className="p-10 text-center text-muted-foreground text-sm">{t("empty_referrals")}</div>
+            <div className="p-10 text-center text-muted-foreground text-sm">
+              {t("empty_referrals")}
+            </div>
           ) : (
             <div className="divide-y divide-border">
               {rows.map((r) => {
-                const title = (locale === "ar" ? r.listings?.title_ar : r.listings?.title_en) ?? "—";
-                const company = (locale === "ar" ? r.listings?.companies?.name_ar : r.listings?.companies?.name_en) ?? "—";
-                const url = typeof window !== "undefined" ? `${window.location.origin}/r/${r.code}` : `/r/${r.code}`;
+                const title =
+                  (locale === "ar" ? r.listings?.title_ar : r.listings?.title_en) ?? "—";
+                const company =
+                  (locale === "ar"
+                    ? r.listings?.companies?.name_ar
+                    : r.listings?.companies?.name_en) ?? "—";
+                const url =
+                  typeof window !== "undefined"
+                    ? `${window.location.origin}/r/${r.code}`
+                    : `/r/${r.code}`;
                 return (
                   <div key={r.id} className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="font-medium truncate">{title}</div>
-                        <div className="text-xs text-muted-foreground">{company} · {r.listings?.commission_percentage ?? 0}% {t("commission")}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {company} · {r.listings?.commission_percentage ?? 0}% {t("commission")}
+                        </div>
                       </div>
                       <div className="text-right text-xs">
-                        <div><span className="font-semibold">{r.clicks}</span> {t("clicks")}</div>
-                        <div><span className="font-semibold">{r.conversions}</span> {t("conversions")}</div>
+                        <div>
+                          <span className="font-semibold">{r.clicks}</span> {t("clicks")}
+                        </div>
+                        <div>
+                          <span className="font-semibold">{r.conversions}</span> {t("conversions")}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <code className="rounded bg-muted px-2 py-1 text-xs truncate flex-1 min-w-0">{url}</code>
-                      <Button size="sm" variant="ghost" onClick={() => copy(r.code)} className="gap-1">
-                        <Copy className="h-3.5 w-3.5" />{t("copy_link")}
+                      <code className="rounded bg-muted px-2 py-1 text-xs truncate flex-1 min-w-0">
+                        {url}
+                      </code>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copy(r.code)}
+                        className="gap-1"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        {t("copy_link")}
                       </Button>
                       <ShareMenu
                         url={url}
                         title={title}
                         earning
-                        caption={referralCaption({ locale, titleAr: r.listings?.title_ar, titleEn: r.listings?.title_en, commissionPct: r.listings?.commission_percentage })}
+                        caption={referralCaption({
+                          locale,
+                          titleAr: r.listings?.title_ar,
+                          titleEn: r.listings?.title_en,
+                          commissionPct: r.listings?.commission_percentage,
+                        })}
                         variant="compact"
                         triggerLabel={ar ? "شارك" : "Share"}
                       />
-                      <Button size="sm" variant="ghost" onClick={() => setQrFor(qrFor === r.code ? null : r.code)} className="gap-1">
-                        <QrCode className="h-3.5 w-3.5" />QR
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setQrFor(qrFor === r.code ? null : r.code)}
+                        className="gap-1"
+                      >
+                        <QrCode className="h-3.5 w-3.5" />
+                        QR
                       </Button>
                     </div>
                     {qrFor === r.code && (
@@ -150,8 +260,14 @@ function ReferralsPage() {
                         <div className="bg-white p-3 rounded-lg" id={`qr-${r.code}`}>
                           <QRCodeCanvas value={url} size={180} includeMargin={false} />
                         </div>
-                        <Button size="sm" variant="outline" onClick={() => downloadQR(r.code)} className="gap-1">
-                          <Download className="h-3.5 w-3.5" />{ar ? "تحميل QR" : "Download QR"}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => downloadQR(r.code)}
+                          className="gap-1"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          {ar ? "تحميل QR" : "Download QR"}
                         </Button>
                       </div>
                     )}

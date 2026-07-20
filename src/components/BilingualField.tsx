@@ -20,7 +20,10 @@ type Props = {
 export function BilingualField({ label, primary, required }: Props) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}{required && " *"}</Label>
+      <Label>
+        {label}
+        {required && " *"}
+      </Label>
       {primary}
     </div>
   );

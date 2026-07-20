@@ -7,18 +7,34 @@ export const listMyCommissions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     // Try as agent first
-    const { data: agent } = await supabase.from("agents").select("id").eq("user_id", userId).maybeSingle();
-    const { data: company } = await supabase.from("companies").select("id, name_en, name_ar").eq("owner_id", userId).maybeSingle();
-    const role: "agent" | "company" | "admin" | "none" =
-      agent ? "agent" : company ? "company" : "none";
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const { data: company } = await supabase
+      .from("companies")
+      .select("id, name_en, name_ar")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    const role: "agent" | "company" | "admin" | "none" = agent
+      ? "agent"
+      : company
+        ? "company"
+        : "none";
 
-    let query = supabase.from("commissions").select(`
+    let query = supabase
+      .from("commissions")
+      .select(
+        `
       id, amount, currency, status, notes, created_at, payout_requested_at, paid_at,
       listing_id, agent_id, company_id,
       listings(title_en, title_ar),
       agents(headline_en, user_id),
       companies(name_en, name_ar)
-    `).order("created_at", { ascending: false });
+    `,
+      )
+      .order("created_at", { ascending: false });
 
     if (role === "agent" && agent) query = query.eq("agent_id", agent.id);
     else if (role === "company" && company) query = query.eq("company_id", company.id);
@@ -30,13 +46,20 @@ export const listMyCommissions = createServerFn({ method: "GET" })
 
 export const updateCommissionStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    id: z.string().uuid(),
-    status: z.enum(["pending", "approved", "paid"]),
-  }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["pending", "approved", "paid"]),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
-    const { error } = await supabase.from("commissions").update({ status: data.status }).eq("id", data.id);
+    const { error } = await supabase
+      .from("commissions")
+      .update({ status: data.status })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -63,19 +86,29 @@ async function requireAdmin(supabase: any, userId: string) {
 
 export const adminListCommissions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    status: z.enum(["pending", "approved", "paid", "all"]).default("pending"),
-  }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        status: z.enum(["pending", "approved", "paid", "all"]).default("pending"),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
-    let q = supabase.from("commissions").select(`
+    let q = supabase
+      .from("commissions")
+      .select(
+        `
       id, amount, currency, status, notes, created_at, paid_at, payout_requested_at,
       listing_id, agent_id, company_id,
       listings(title_en, title_ar),
       agents(headline_en, user_id, profiles:user_id(display_name, full_name)),
       companies(name_en, name_ar)
-    `).order("created_at", { ascending: false }).limit(500);
+    `,
+      )
+      .order("created_at", { ascending: false })
+      .limit(500);
     if (data.status !== "all") q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -84,27 +117,35 @@ export const adminListCommissions = createServerFn({ method: "POST" })
 
 export const adminReviewCommission = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    id: z.string().uuid(),
-    action: z.enum(["approve", "reject", "paid"]),
-    notes: z.string().max(500).optional().nullable(),
-  }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        action: z.enum(["approve", "reject", "paid"]),
+        notes: z.string().max(500).optional().nullable(),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
 
     if (data.action === "reject") {
       const { data: existing, error: eErr } = await supabase
-        .from("commissions").select("id, status").eq("id", data.id).maybeSingle();
+        .from("commissions")
+        .select("id, status")
+        .eq("id", data.id)
+        .maybeSingle();
       if (eErr) throw new Error(eErr.message);
       if (!existing) throw new Error("Commission not found");
-      if (existing.status !== "pending") throw new Error("Only pending commissions can be rejected");
+      if (existing.status !== "pending")
+        throw new Error("Only pending commissions can be rejected");
       const { error } = await supabase.from("commissions").delete().eq("id", data.id);
       if (error) throw new Error(error.message);
       return { ok: true, deleted: true };
     }
 
-    const nextStatus = data.action === "approve" ? "approved" as const : "paid" as const;
+    const nextStatus = data.action === "approve" ? ("approved" as const) : ("paid" as const);
     const patch: { status: "approved" | "paid"; notes?: string } = { status: nextStatus };
     if (data.notes) patch.notes = data.notes;
     const { error } = await supabase.from("commissions").update(patch).eq("id", data.id);
@@ -112,4 +153,3 @@ export const adminReviewCommission = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-

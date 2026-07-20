@@ -6,7 +6,11 @@ export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
       { title: "كيف يعمل سوقلي — How Souqly Works" },
-      { name: "description", content: "خمس خطوات بسيطة لاستخدام سوقلي: سجّل حسابك، أنشئ ملف شركتك، انشر إعلاناتك، استقبل طلبات العملاء، وأبرم الصفقات بثقة." },
+      {
+        name: "description",
+        content:
+          "خمس خطوات بسيطة لاستخدام سوقلي: سجّل حسابك، أنشئ ملف شركتك، انشر إعلاناتك، استقبل طلبات العملاء، وأبرم الصفقات بثقة.",
+      },
       { property: "og:title", content: "كيف يعمل سوقلي" },
       { property: "og:description", content: "دليل سريع لكيفية البدء على منصة سوقلي B2B." },
       { property: "og:url", content: "https://souqlymarket.com/how-it-works" },
@@ -31,8 +35,13 @@ function Page() {
         <h1 className="text-3xl font-bold mb-8 text-right">كيف يعمل سوقلي</h1>
         <ol className="space-y-5">
           {steps.map((s) => (
-            <li key={s.n} className="flex gap-4 items-start rounded-lg border border-border bg-card p-5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">{s.n}</div>
+            <li
+              key={s.n}
+              className="flex gap-4 items-start rounded-lg border border-border bg-card p-5"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
+                {s.n}
+              </div>
               <div className="text-right flex-1">
                 <h2 className="font-semibold mb-1 text-base">{s.t}</h2>
                 <p className="text-sm text-muted-foreground">{s.d}</p>

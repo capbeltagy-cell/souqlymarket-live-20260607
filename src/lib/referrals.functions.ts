@@ -4,7 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 function randomCode(len = 8) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = ""; for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  let s = "";
+  for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
   return s;
 }
 
@@ -12,11 +13,17 @@ export const listMyReferrals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: agent } = await supabase.from("agents").select("id").eq("user_id", userId).maybeSingle();
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (!agent) return { agentId: null, referrals: [] as any[] };
     const { data, error } = await supabase
       .from("referrals")
-      .select("id, code, clicks, conversions, created_at, listing_id, listings(title_en, title_ar, commission_percentage, company_id, companies(name_en, name_ar))")
+      .select(
+        "id, code, clicks, conversions, created_at, listing_id, listings(title_en, title_ar, commission_percentage, company_id, companies(name_en, name_ar))",
+      )
       .eq("agent_id", agent.id)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -28,18 +35,27 @@ export const createReferral = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ listingId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { data: agent } = await supabase.from("agents").select("id").eq("user_id", userId).maybeSingle();
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (!agent) throw new Error("Create an agent profile first.");
     // dedupe (unique on agent_id+listing_id)
     const { data: existing } = await supabase
-      .from("referrals").select("id, code")
-      .eq("agent_id", agent.id).eq("listing_id", data.listingId).maybeSingle();
+      .from("referrals")
+      .select("id, code")
+      .eq("agent_id", agent.id)
+      .eq("listing_id", data.listingId)
+      .maybeSingle();
     if (existing) return { ok: true, id: existing.id, code: existing.code, existed: true };
 
     const code = randomCode();
-    const { data: row, error } = await supabase.from("referrals")
+    const { data: row, error } = await supabase
+      .from("referrals")
       .insert({ agent_id: agent.id, listing_id: data.listingId, code })
-      .select("id, code").single();
+      .select("id, code")
+      .single();
     if (error) throw new Error(error.message);
     return { ok: true, id: row.id, code: row.code, existed: false };
   });
@@ -47,12 +63,14 @@ export const createReferral = createServerFn({ method: "POST" })
 export const convertReferral = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      referralId: z.string().uuid(),
-      amount: z.number().nonnegative(),
-      currency: z.string().min(2).max(8).default("EGP"),
-      notes: z.string().max(500).optional().nullable(),
-    }).parse(d),
+    z
+      .object({
+        referralId: z.string().uuid(),
+        amount: z.number().nonnegative(),
+        currency: z.string().min(2).max(8).default("EGP"),
+        notes: z.string().max(500).optional().nullable(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;

@@ -12,8 +12,13 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { getMyWallets } from "@/lib/wallets.functions";
 import {
-  listMyPayouts, listMyPayoutMethods, createPayoutMethod, deletePayoutMethod,
-  requestWithdrawal, cancelWithdrawal, getPlatformSettings,
+  listMyPayouts,
+  listMyPayoutMethods,
+  createPayoutMethod,
+  deletePayoutMethod,
+  requestWithdrawal,
+  cancelWithdrawal,
+  getPlatformSettings,
 } from "@/lib/marketing.functions";
 
 export const Route = createFileRoute("/_authenticated/payouts")({
@@ -81,21 +86,30 @@ function PayoutsPage() {
   const [busy, setBusy] = useState(false);
 
   const load = () => {
-    fWallets().then((r) => setWallet(r.wallets.find((w: any) => w.kind === "agent") ?? r.wallets[0] ?? null));
+    fWallets().then((r) =>
+      setWallet(r.wallets.find((w: any) => w.kind === "agent") ?? r.wallets[0] ?? null),
+    );
     fMethods().then((r) => setMethods(r.methods));
     fPayouts().then((r) => setPayouts(r.payouts));
-    fSettings().then((r) => setSettings(r.settings)).catch(() => {});
+    fSettings()
+      .then((r) => setSettings(r.settings))
+      .catch(() => {});
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const minWithdrawal = Number(settings?.min_withdrawal_amount ?? 100);
   const totalPending = useMemo(
-    () => payouts.filter((p) => p.status === "pending" || p.status === "approved").reduce((s, p) => s + Number(p.amount), 0),
-    [payouts]
+    () =>
+      payouts
+        .filter((p) => p.status === "pending" || p.status === "approved")
+        .reduce((s, p) => s + Number(p.amount), 0),
+    [payouts],
   );
   const totalWithdrawn = useMemo(
     () => payouts.filter((p) => p.status === "paid").reduce((s, p) => s + Number(p.amount), 0),
-    [payouts]
+    [payouts],
   );
 
   const currentFields = KIND_FIELDS[mKind];
@@ -107,41 +121,84 @@ function PayoutsPage() {
       const missing = currentFields.filter((f) => !mDetails[f.key]?.trim());
       if (missing.length) throw new Error(ar ? "أكمل كل الحقول" : "Fill all fields");
       // marketing.functions.ts createPayoutMethod validates kind — extend by casting; new kinds get stored as text.
-      await fCreateMethod({ data: { kind: mKind as any, label: mLabel || KIND_LABELS[mKind][ar ? "ar" : "en"], details: mDetails, isDefault: methods.length === 0 } });
+      await fCreateMethod({
+        data: {
+          kind: mKind as any,
+          label: mLabel || KIND_LABELS[mKind][ar ? "ar" : "en"],
+          details: mDetails,
+          isDefault: methods.length === 0,
+        },
+      });
       toast.success(ar ? "تم إضافة الطريقة" : "Method added");
-      setMLabel(""); setMDetails({});
+      setMLabel("");
+      setMDetails({});
       load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const onRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
-      await fRequest({ data: { amount: Number(amount), walletKind: "agent", payoutMethodId: methodId || null, notes: notes || null } });
+      await fRequest({
+        data: {
+          amount: Number(amount),
+          walletKind: "agent",
+          payoutMethodId: methodId || null,
+          notes: notes || null,
+        },
+      });
       toast.success(ar ? "تم إرسال طلب السحب" : "Withdrawal requested");
-      setAmount(""); setNotes("");
+      setAmount("");
+      setNotes("");
       load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-8 flex-1 space-y-6">
-        <div className="flex items-center gap-2"><Banknote className="h-6 w-6 text-primary" /><h1 className="text-2xl font-bold">{ar ? "المحفظة والسحوبات" : "Wallet & Withdrawals"}</h1></div>
+        <div className="flex items-center gap-2">
+          <Banknote className="h-6 w-6 text-primary" />
+          <h1 className="text-2xl font-bold">
+            {ar ? "المحفظة والسحوبات" : "Wallet & Withdrawals"}
+          </h1>
+        </div>
 
         {/* Wallet stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard icon={Wallet} label={ar ? "الرصيد المتاح" : "Available"} value={formatPrice(Number(wallet?.balance ?? 0), locale, { showZero: true })} />
-          <StatCard label={ar ? "معلق" : "Pending"} value={formatPrice(Number(wallet?.pending_balance ?? 0), locale, { showZero: true })} />
-          <StatCard label={ar ? "إجمالي الأرباح" : "Total earned"} value={formatPrice(Number(wallet?.total_earned ?? 0), locale, { showZero: true })} />
-          <StatCard label={ar ? "إجمالي السحوبات" : "Total withdrawn"} value={formatPrice(totalWithdrawn, locale, { showZero: true })} />
+          <StatCard
+            icon={Wallet}
+            label={ar ? "الرصيد المتاح" : "Available"}
+            value={formatPrice(Number(wallet?.balance ?? 0), locale, { showZero: true })}
+          />
+          <StatCard
+            label={ar ? "معلق" : "Pending"}
+            value={formatPrice(Number(wallet?.pending_balance ?? 0), locale, { showZero: true })}
+          />
+          <StatCard
+            label={ar ? "إجمالي الأرباح" : "Total earned"}
+            value={formatPrice(Number(wallet?.total_earned ?? 0), locale, { showZero: true })}
+          />
+          <StatCard
+            label={ar ? "إجمالي السحوبات" : "Total withdrawn"}
+            value={formatPrice(totalWithdrawn, locale, { showZero: true })}
+          />
         </div>
         {totalPending > 0 && (
-          <div className="text-xs text-muted-foreground">{ar ? "قيد الصرف" : "In review"}: {formatPrice(totalPending, locale, { showZero: true })}</div>
+          <div className="text-xs text-muted-foreground">
+            {ar ? "قيد الصرف" : "In review"}:{" "}
+            {formatPrice(totalPending, locale, { showZero: true })}
+          </div>
         )}
 
         {/* Payout methods */}
@@ -151,38 +208,79 @@ function PayoutsPage() {
             <div className="grid md:grid-cols-2 gap-3">
               <div>
                 <Label>{ar ? "نوع الطريقة" : "Method type"}</Label>
-                <select value={mKind} onChange={(e) => { setMKind(e.target.value as MethodKind); setMDetails({}); }} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
-                  {(Object.keys(KIND_LABELS) as MethodKind[]).map((k) => <option key={k} value={k}>{KIND_LABELS[k][ar ? "ar" : "en"]}</option>)}
+                <select
+                  value={mKind}
+                  onChange={(e) => {
+                    setMKind(e.target.value as MethodKind);
+                    setMDetails({});
+                  }}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  {(Object.keys(KIND_LABELS) as MethodKind[]).map((k) => (
+                    <option key={k} value={k}>
+                      {KIND_LABELS[k][ar ? "ar" : "en"]}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
                 <Label>{ar ? "اسم مختصر (اختياري)" : "Label (optional)"}</Label>
-                <Input value={mLabel} onChange={(e) => setMLabel(e.target.value)} placeholder={KIND_LABELS[mKind][ar ? "ar" : "en"]} />
+                <Input
+                  value={mLabel}
+                  onChange={(e) => setMLabel(e.target.value)}
+                  placeholder={KIND_LABELS[mKind][ar ? "ar" : "en"]}
+                />
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
               {currentFields.map((f) => (
                 <div key={f.key}>
                   <Label>{ar ? f.ar : f.en}</Label>
-                  <Input value={mDetails[f.key] ?? ""} onChange={(e) => setMDetails({ ...mDetails, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+                  <Input
+                    value={mDetails[f.key] ?? ""}
+                    onChange={(e) => setMDetails({ ...mDetails, [f.key]: e.target.value })}
+                    placeholder={f.placeholder}
+                    required
+                  />
                 </div>
               ))}
             </div>
-            <Button type="submit" disabled={busy}><PlusCircle className="h-4 w-4 mr-1" />{ar ? "إضافة طريقة" : "Add method"}</Button>
+            <Button type="submit" disabled={busy}>
+              <PlusCircle className="h-4 w-4 mr-1" />
+              {ar ? "إضافة طريقة" : "Add method"}
+            </Button>
           </form>
           <div className="divide-y divide-border">
-            {methods.length === 0 && <div className="text-sm text-muted-foreground py-2">{ar ? "لا توجد طرق سحب" : "No payout methods yet"}</div>}
+            {methods.length === 0 && (
+              <div className="text-sm text-muted-foreground py-2">
+                {ar ? "لا توجد طرق سحب" : "No payout methods yet"}
+              </div>
+            )}
             {methods.map((m) => {
               const kind = m.kind as MethodKind;
               const label = KIND_LABELS[kind]?.[ar ? "ar" : "en"] ?? m.kind;
-              const detailStr = Object.entries(m.details ?? {}).map(([k, v]) => `${k}: ${v}`).join(" · ");
+              const detailStr = Object.entries(m.details ?? {})
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(" · ");
               return (
                 <div key={m.id} className="py-2 flex items-center justify-between text-sm gap-3">
                   <div className="min-w-0">
-                    <div className="font-medium">{m.label || label} <span className="text-xs text-muted-foreground">· {label}</span></div>
+                    <div className="font-medium">
+                      {m.label || label}{" "}
+                      <span className="text-xs text-muted-foreground">· {label}</span>
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">{detailStr}</div>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={async () => { await fDeleteMethod({ data: { id: m.id } }); load(); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={async () => {
+                      await fDeleteMethod({ data: { id: m.id } });
+                      load();
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
               );
             })}
@@ -190,44 +288,103 @@ function PayoutsPage() {
         </div>
 
         {/* Request withdrawal */}
-        <form onSubmit={onRequest} className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3">
+        <form
+          onSubmit={onRequest}
+          className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3"
+        >
           <div className="font-semibold">{ar ? "طلب سحب جديد" : "Request withdrawal"}</div>
-          <div className="text-xs text-muted-foreground">{ar ? `الحد الأدنى للسحب` : `Minimum withdrawal`}: {formatPrice(minWithdrawal, locale, { showZero: true })}</div>
+          <div className="text-xs text-muted-foreground">
+            {ar ? `الحد الأدنى للسحب` : `Minimum withdrawal`}:{" "}
+            {formatPrice(minWithdrawal, locale, { showZero: true })}
+          </div>
           <div className="grid md:grid-cols-3 gap-3">
-            <div><Label>{ar ? "المبلغ" : "Amount"}</Label><Input type="number" min={minWithdrawal} step="1" value={amount} onChange={(e) => setAmount(e.target.value)} required /></div>
-            <div><Label>{ar ? "طريقة السحب" : "Payout method"}</Label>
-              <select value={methodId} onChange={(e) => setMethodId(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm" required>
+            <div>
+              <Label>{ar ? "المبلغ" : "Amount"}</Label>
+              <Input
+                type="number"
+                min={minWithdrawal}
+                step="1"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label>{ar ? "طريقة السحب" : "Payout method"}</Label>
+              <select
+                value={methodId}
+                onChange={(e) => setMethodId(e.target.value)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                required
+              >
                 <option value="">{ar ? "اختر طريقة" : "Select method"}</option>
-                {methods.map((m) => <option key={m.id} value={m.id}>{m.label || KIND_LABELS[m.kind as MethodKind]?.[ar ? "ar" : "en"] || m.kind}</option>)}
+                {methods.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label || KIND_LABELS[m.kind as MethodKind]?.[ar ? "ar" : "en"] || m.kind}
+                  </option>
+                ))}
               </select>
             </div>
-            <div><Label>{ar ? "ملاحظات" : "Notes"}</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+            <div>
+              <Label>{ar ? "ملاحظات" : "Notes"}</Label>
+              <Input value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
           </div>
-          <Button type="submit" disabled={busy || !amount || !methodId} className="bg-primary hover:bg-primary-hover">{ar ? "إرسال الطلب" : "Submit request"}</Button>
+          <Button
+            type="submit"
+            disabled={busy || !amount || !methodId}
+            className="bg-primary hover:bg-primary-hover"
+          >
+            {ar ? "إرسال الطلب" : "Submit request"}
+          </Button>
         </form>
 
         {/* History */}
         <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
-          <div className="p-4 border-b border-border font-semibold">{ar ? "سجل السحوبات" : "Withdrawal history"}</div>
-          {payouts.length === 0 ? <div className="p-8 text-center text-sm text-muted-foreground">{ar ? "لا توجد طلبات" : "No requests yet"}</div> :
-           <div className="divide-y divide-border">
-             {payouts.map((p) => (
-               <div key={p.id} className="p-4 flex flex-wrap items-center justify-between gap-3 text-sm">
-                 <div>
-                   <div className="font-medium">{formatPrice(Number(p.amount), locale, { showZero: true })}</div>
-                   <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()} · {p.payout_methods?.label ?? "—"}</div>
-                   {p.admin_notes && <div className="text-xs text-muted-foreground mt-1">{p.admin_notes}</div>}
-                 </div>
-                 <div className="flex items-center gap-3">
-                   <PayoutBadge status={p.status} />
-                   {p.status === "pending" && (
-                     <Button size="sm" variant="ghost" onClick={async () => { await fCancel({ data: { id: p.id } }); load(); }}>{ar ? "إلغاء" : "Cancel"}</Button>
-                   )}
-                 </div>
-               </div>
-             ))}
-           </div>
-          }
+          <div className="p-4 border-b border-border font-semibold">
+            {ar ? "سجل السحوبات" : "Withdrawal history"}
+          </div>
+          {payouts.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              {ar ? "لا توجد طلبات" : "No requests yet"}
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {payouts.map((p) => (
+                <div
+                  key={p.id}
+                  className="p-4 flex flex-wrap items-center justify-between gap-3 text-sm"
+                >
+                  <div>
+                    <div className="font-medium">
+                      {formatPrice(Number(p.amount), locale, { showZero: true })}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleString()} · {p.payout_methods?.label ?? "—"}
+                    </div>
+                    {p.admin_notes && (
+                      <div className="text-xs text-muted-foreground mt-1">{p.admin_notes}</div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <PayoutBadge status={p.status} />
+                    {p.status === "pending" && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={async () => {
+                          await fCancel({ data: { id: p.id } });
+                          load();
+                        }}
+                      >
+                        {ar ? "إلغاء" : "Cancel"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <SiteFooter />
@@ -246,12 +403,16 @@ function StatCard({ icon: Icon, label, value }: { icon?: any; label: string; val
 }
 
 function PayoutBadge({ status }: { status: string }) {
-  const map: Record<string,string> = {
+  const map: Record<string, string> = {
     pending: "bg-warning/15 text-warning",
     approved: "bg-primary/10 text-primary",
     paid: "bg-success/15 text-success",
     rejected: "bg-destructive/15 text-destructive",
     cancelled: "bg-muted text-muted-foreground",
   };
-  return <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${map[status] ?? ""}`}>{status}</span>;
+  return (
+    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${map[status] ?? ""}`}>
+      {status}
+    </span>
+  );
 }

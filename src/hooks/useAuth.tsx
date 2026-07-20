@@ -13,7 +13,11 @@ interface AuthCtx {
 }
 
 const Ctx = createContext<AuthCtx>({
-  user: null, session: null, roles: [], loading: true, signOut: async () => {},
+  user: null,
+  session: null,
+  roles: [],
+  loading: true,
+  signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -51,7 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         roles,
         loading,
-        signOut: async () => { await supabase.auth.signOut(); },
+        signOut: async () => {
+          await supabase.auth.signOut();
+        },
       }}
     >
       {children}

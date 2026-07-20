@@ -1,6 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, BadgeCheck, Copy, FileText, Heart, Loader2, MapPin, ShoppingCart, Sparkles, Star, TrendingUp } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  Copy,
+  FileText,
+  Heart,
+  Loader2,
+  MapPin,
+  ShoppingCart,
+  Sparkles,
+  Star,
+  TrendingUp,
+} from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
 import { listingCaption } from "@/lib/share-captions";
 import { useServerFn } from "@tanstack/react-start";
@@ -28,7 +41,6 @@ import { addToCart } from "@/lib/cart";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { formatPrice } from "@/lib/currency";
 
-
 export const Route = createFileRoute("/listings/$id")({
   loader: async ({ params }) => {
     const { getListingMeta } = await import("@/lib/seo.functions");
@@ -37,7 +49,11 @@ export const Route = createFileRoute("/listings/$id")({
   head: ({ loaderData, params }) => {
     const m = loaderData?.meta;
     const title = m ? `${m.title_en ?? m.title_ar ?? "Listing"} — Souqly` : "Listing — Souqly";
-    const desc = (m?.description_en ?? m?.description_ar ?? "Professional B2B listing on Souqly.").slice(0, 160);
+    const desc = (
+      m?.description_en ??
+      m?.description_ar ??
+      "Professional B2B listing on Souqly."
+    ).slice(0, 160);
     const img = m?.images?.[0];
     const url = `/listings/${params.id}`;
     return {
@@ -48,40 +64,62 @@ export const Route = createFileRoute("/listings/$id")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { property: "og:url", content: url },
-        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+        ...(img
+          ? [
+              { property: "og:image", content: img },
+              { name: "twitter:image", content: img },
+            ]
+          : []),
       ],
       links: [{ rel: "canonical", href: url }],
     };
   },
   notFoundComponent: () => <NotFoundView />,
   errorComponent: () => (
-    <div className="p-10 text-center"><p>Something went wrong.</p></div>
+    <div className="p-10 text-center">
+      <p>Something went wrong.</p>
+    </div>
   ),
   component: ListingDetail,
 });
 
 type Listing = {
-  id: string; type: string;
-  title_ar: string; title_en: string;
-  description_ar: string | null; description_en: string | null;
-  images: string[] | null; image_sources: string[] | null; video_url: string | null; pdf_url: string | null;
-  price: number | null; currency: string | null;
-  country: string | null; city: string | null; governorate: string | null;
-  latitude: number | null; longitude: number | null;
+  id: string;
+  type: string;
+  title_ar: string;
+  title_en: string;
+  description_ar: string | null;
+  description_en: string | null;
+  images: string[] | null;
+  image_sources: string[] | null;
+  video_url: string | null;
+  pdf_url: string | null;
+  price: number | null;
+  currency: string | null;
+  country: string | null;
+  city: string | null;
+  governorate: string | null;
+  latitude: number | null;
+  longitude: number | null;
   commission_percentage: number | null;
   commission_type: string | null;
   commission_fixed_amount: number | null;
   marketer_promotion_enabled: boolean | null;
   promotion_status: string | null;
   // phone/whatsapp intentionally NOT selected in public query — loaded via server fn.
-  source_name: string | null; source_url: string | null;
-  featured: boolean | null; featured_until: string | null;
+  source_name: string | null;
+  source_url: string | null;
+  featured: boolean | null;
+  featured_until: string | null;
   views_count: number | null;
   updated_at: string | null;
   company_id: string;
   companies: {
-    id: string; name_ar: string; name_en: string;
-    is_verified: boolean; is_premium?: boolean | null;
+    id: string;
+    name_ar: string;
+    name_en: string;
+    is_verified: boolean;
+    is_premium?: boolean | null;
   } | null;
 };
 
@@ -93,7 +131,9 @@ function NotFoundView() {
       <div className="flex-1 grid place-items-center text-center p-10">
         <div>
           <h1 className="text-2xl font-bold mb-4">{t("no_results")}</h1>
-          <Button asChild><Link to="/marketplace">{t("nav_marketplace")}</Link></Button>
+          <Button asChild>
+            <Link to="/marketplace">{t("nav_marketplace")}</Link>
+          </Button>
         </div>
       </div>
       <SiteFooter />
@@ -117,7 +157,9 @@ function ListingDetail() {
   const [l, setL] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
-  const [referrals, setReferrals] = useState<{ id: string; code: string; clicks: number; conversions: number }[]>([]);
+  const [referrals, setReferrals] = useState<
+    { id: string; code: string; clicks: number; conversions: number }[]
+  >([]);
   const [selectedRef, setSelectedRef] = useState("");
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -126,7 +168,10 @@ function ListingDetail() {
   const [msgLoading, setMsgLoading] = useState(false);
   const [myShareLink, setMyShareLink] = useState<string | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
-  const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({ phone: null, whatsapp: null });
+  const [contact, setContact] = useState<{ phone: string | null; whatsapp: string | null }>({
+    phone: null,
+    whatsapp: null,
+  });
   const [related, setRelated] = useState<ListingCardData[]>([]);
   const loadContact = useServerFn(getListingContact);
 
@@ -136,8 +181,16 @@ function ListingDetail() {
       const res = await makeReferral({ data: { listingId: id } });
       const url = `${window.location.origin}/r/${res.code}`;
       setMyShareLink(url);
-      try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
-      toast.success(ar ? "تم توليد رابطك ونسخه — شاركه واكسب عمولتك عند إتمام الصفقة." : "Your link is ready & copied. Share it to earn on every closed deal.");
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        /* ignore */
+      }
+      toast.success(
+        ar
+          ? "تم توليد رابطك ونسخه — شاركه واكسب عمولتك عند إتمام الصفقة."
+          : "Your link is ready & copied. Share it to earn on every closed deal.",
+      );
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -150,15 +203,20 @@ function ListingDetail() {
     try {
       const { id: convId } = await startConv({ data: { listing_id: id } });
       navigate({ to: "/messages", search: { c: convId } });
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setMsgLoading(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setMsgLoading(false);
+    }
   };
 
   const onOrder = async () => {
     setOrdering(true);
     try {
       if (!l || !Number(l.price) || Number(l.price) <= 0) {
-        throw new Error(ar ? "هذا العرض لا يحتوي على سعر شراء صالح" : "This listing has no valid purchase price");
+        throw new Error(
+          ar ? "هذا العرض لا يحتوي على سعر شراء صالح" : "This listing has no valid purchase price",
+        );
       }
       addToCart({
         listing_id: id,
@@ -171,37 +229,64 @@ function ListingDetail() {
       });
       toast.success(ar ? "أكمل عنوان الشحن والدفع" : "Complete shipping and payment");
       navigate({ to: "/checkout" });
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setOrdering(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setOrdering(false);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("listings")
-        .select("id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)")
-        .eq("id", id).maybeSingle();
+      const { data } = await supabase
+        .from("listings")
+        .select(
+          "id, type, title_ar, title_en, description_ar, description_en, images, image_sources, video_url, pdf_url, price, currency, country, governorate, city, latitude, longitude, commission_percentage, commission_type, commission_fixed_amount, marketer_promotion_enabled, promotion_status, source_name, source_url, featured, featured_until, views_count, updated_at, company_id, companies(id, name_ar, name_en, is_verified, is_premium)",
+        )
+        .eq("id", id)
+        .maybeSingle();
       setL(data as unknown as Listing);
       supabase.rpc("increment_listing_view", { _id: id });
       // Contact is served by a secured server fn (mask on promoted listings).
-      loadContact({ data: { id } }).then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp })).catch(() => {});
+      loadContact({ data: { id } })
+        .then((c) => setContact({ phone: c.phone, whatsapp: c.whatsapp }))
+        .catch(() => {});
       // Related listings — same type, approved, excluding this one, ranked by platform priority.
       if (data?.type) {
-        supabase.from("listings")
-          .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
+        supabase
+          .from("listings")
+          .select(
+            "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)",
+          )
           .eq("status", "approved")
           .eq("type", data.type)
           .neq("id", id)
           .limit(24)
-          .then(({ data: rows }) => setRelated(rankListings((rows ?? []) as any[]).slice(0, 8) as ListingCardData[]));
+          .then(({ data: rows }) =>
+            setRelated(rankListings((rows ?? []) as any[]).slice(0, 8) as ListingCardData[]),
+          );
       }
       if (data && user) {
-        const { data: owned } = await supabase.from("companies").select("id").eq("id", data.company_id).eq("owner_id", user.id).maybeSingle();
+        const { data: owned } = await supabase
+          .from("companies")
+          .select("id")
+          .eq("id", data.company_id)
+          .eq("owner_id", user.id)
+          .maybeSingle();
         if (owned) {
           setIsOwner(true);
-          const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
+          const { data: refs } = await supabase
+            .from("referrals")
+            .select("id, code, clicks, conversions")
+            .eq("listing_id", id);
           setReferrals(refs ?? []);
         }
-        const { data: f } = await supabase.from("favorites").select("id").eq("user_id", user.id).eq("listing_id", id).maybeSingle();
+        const { data: f } = await supabase
+          .from("favorites")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("listing_id", id)
+          .maybeSingle();
         setFav(!!f);
       }
       setLoading(false);
@@ -212,23 +297,37 @@ function ListingDetail() {
     setFeaturing(days);
     try {
       const res = await feature({ data: { listingId: id, days } });
-      toast.success(ar ? `تم تثبيت الإعلان حتى ${new Date(res.featured_until).toLocaleDateString()}` : `Featured until ${new Date(res.featured_until).toLocaleDateString()}`);
-      setL((cur) => cur ? { ...cur, featured: true, featured_until: res.featured_until } : cur);
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setFeaturing(null); }
+      toast.success(
+        ar
+          ? `تم تثبيت الإعلان حتى ${new Date(res.featured_until).toLocaleDateString()}`
+          : `Featured until ${new Date(res.featured_until).toLocaleDateString()}`,
+      );
+      setL((cur) => (cur ? { ...cur, featured: true, featured_until: res.featured_until } : cur));
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setFeaturing(null);
+    }
   };
 
   async function toggleFav() {
-    if (!user) { toast.error(t("nav_signin")); return; }
+    if (!user) {
+      toast.error(t("nav_signin"));
+      return;
+    }
     try {
       if (fav) {
         await supabase.from("favorites").delete().eq("user_id", user.id).eq("listing_id", id);
-        setFav(false); toast.success(t("unfavorited"));
+        setFav(false);
+        toast.success(t("unfavorited"));
       } else {
         await supabase.from("favorites").insert({ user_id: user.id, listing_id: id });
-        setFav(true); toast.success(t("favorited"));
+        setFav(true);
+        toast.success(t("favorited"));
       }
-    } catch (e) { toast.error((e as Error).message); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   }
 
   const onConvert = async (e: React.FormEvent) => {
@@ -236,16 +335,32 @@ function ListingDetail() {
     if (!selectedRef || !amount) return;
     setSubmitting(true);
     try {
-      await convert({ data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "EGP" } });
+      await convert({
+        data: { referralId: selectedRef, amount: Number(amount), currency: l?.currency ?? "EGP" },
+      });
       toast.success(t("convert_success"));
-      setAmount(""); setSelectedRef("");
-      const { data: refs } = await supabase.from("referrals").select("id, code, clicks, conversions").eq("listing_id", id);
+      setAmount("");
+      setSelectedRef("");
+      const { data: refs } = await supabase
+        .from("referrals")
+        .select("id, code, clicks, conversions")
+        .eq("listing_id", id);
       setReferrals(refs ?? []);
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setSubmitting(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <div className="min-h-screen flex flex-col"><SiteHeader /><div className="p-10 text-center text-muted-foreground flex-1">{t("loading")}</div><SiteFooter /></div>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <div className="p-10 text-center text-muted-foreground flex-1">{t("loading")}</div>
+        <SiteFooter />
+      </div>
+    );
   if (!l) return <NotFoundView />;
 
   const title = (locale === "ar" ? l.title_ar : l.title_en) ?? "";
@@ -253,11 +368,16 @@ function ListingDetail() {
   const company = l.companies;
   const companyName = company ? (locale === "ar" ? company.name_ar : company.name_en) : "";
   const cover = l.images?.[0];
-  const isPromoted = !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
+  const isPromoted =
+    !!l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active";
   // All buyer↔company contact goes through Souqly. Only the listing owner sees direct contact.
   const showContact = isOwner;
-  const contactPhone = showContact ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "") : "";
-  const whatsappNum = showContact ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "") : "";
+  const contactPhone = showContact
+    ? ((contact.phone || contact.whatsapp) ?? "").replace(/[^0-9]/g, "")
+    : "";
+  const whatsappNum = showContact
+    ? ((contact.whatsapp || contact.phone) ?? "").replace(/[^0-9]/g, "")
+    : "";
   const hasLive = (l.image_sources ?? []).includes("live_capture");
   const hasUploaded = (l.image_sources ?? []).some((s) => s !== "live_capture");
 
@@ -266,26 +386,39 @@ function ListingDetail() {
       <SiteHeader />
       <div className="container-souqly py-6">
         <Button asChild variant="ghost" size="sm" className="mb-4 gap-1">
-          <Link to="/marketplace"><Arrow className="h-4 w-4" />{t("nav_marketplace")}</Link>
+          <Link to="/marketplace">
+            <Arrow className="h-4 w-4" />
+            {t("nav_marketplace")}
+          </Link>
         </Button>
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <ListingImageGallery images={l.images ?? []} alt={title} />
             {l.video_url && (
-              <video controls src={l.video_url} className="w-full rounded-xl border border-border" />
+              <video
+                controls
+                src={l.video_url}
+                className="w-full rounded-xl border border-border"
+              />
             )}
             <div>
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge>{t(`cat_${l.type}` as never)}</Badge>
-                {l.featured && (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
-                  <Badge className="bg-accent text-accent-foreground gap-1"><Star className="h-3 w-3" />{ar ? "مميز" : "Featured"}</Badge>
-                )}
+                {l.featured &&
+                  (!l.featured_until || new Date(l.featured_until).getTime() > Date.now()) && (
+                    <Badge className="bg-accent text-accent-foreground gap-1">
+                      <Star className="h-3 w-3" />
+                      {ar ? "مميز" : "Featured"}
+                    </Badge>
+                  )}
                 {company?.is_verified && <TrustBadge kind="verified_company" />}
                 {company?.is_premium && <TrustBadge kind="premium_company" />}
                 {isOwner && <TrustBadge kind="owner" />}
                 {isOwner && (
                   <Button asChild size="sm" variant="outline" className="ml-2 h-7 text-xs">
-                    <Link to="/listings/$id/edit" params={{ id }}>{ar ? "تعديل الإعلان" : "Edit listing"}</Link>
+                    <Link to="/listings/$id/edit" params={{ id }}>
+                      {ar ? "تعديل الإعلان" : "Edit listing"}
+                    </Link>
                   </Button>
                 )}
                 {hasLive && (
@@ -300,28 +433,47 @@ function ListingDetail() {
               <h1 className="text-3xl font-bold mb-2">{title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                 {company && (
-                  <Link to="/companies/$id" params={{ id: company.id }} className="flex items-center gap-1 hover:text-primary">
-                    {company.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}{companyName}
+                  <Link
+                    to="/companies/$id"
+                    params={{ id: company.id }}
+                    className="flex items-center gap-1 hover:text-primary"
+                  >
+                    {company.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}
+                    {companyName}
                   </Link>
                 )}
                 {(l.city || l.governorate || l.country) && (
-                  <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{
-                    [
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {[
                       translateEgyptCity(l.city, locale) ?? l.city,
                       translateEgyptGovernorate(l.governorate, locale) ?? l.governorate,
                       l.country,
-                    ].filter(Boolean).join(", ")
-                  }</span>
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </span>
                 )}
                 {l.updated_at && (
-                  <span className="text-xs">{t("last_updated")}: {new Date(l.updated_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}</span>
+                  <span className="text-xs">
+                    {t("last_updated")}:{" "}
+                    {new Date(l.updated_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB")}
+                  </span>
                 )}
               </div>
               {l.source_name && (
                 <div className="mt-2 rounded-md border border-border bg-muted/30 p-2 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
-                  <span>{ar ? "المصدر" : "Source"}: <span className="font-medium text-foreground">{l.source_name}</span></span>
+                  <span>
+                    {ar ? "المصدر" : "Source"}:{" "}
+                    <span className="font-medium text-foreground">{l.source_name}</span>
+                  </span>
                   {l.source_url && (
-                    <a href={l.source_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                    <a
+                      href={l.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline"
+                    >
                       {ar ? "عرض الإعلان الأصلي" : "View original listing"}
                     </a>
                   )}
@@ -331,34 +483,69 @@ function ListingDetail() {
             {l.latitude !== null && l.longitude !== null && (
               <div className="rounded-xl overflow-hidden border border-border bg-card mb-4">
                 <MapView
-                  markers={[{ id: l.id, lat: l.latitude, lng: l.longitude, type: l.type as any, title, description: [translateEgyptCity(l.city, locale) ?? l.city, translateEgyptGovernorate(l.governorate, locale) ?? l.governorate, l.country].filter(Boolean).join(" · ") }]}
+                  markers={[
+                    {
+                      id: l.id,
+                      lat: l.latitude,
+                      lng: l.longitude,
+                      type: l.type as any,
+                      title,
+                      description: [
+                        translateEgyptCity(l.city, locale) ?? l.city,
+                        translateEgyptGovernorate(l.governorate, locale) ?? l.governorate,
+                        l.country,
+                      ]
+                        .filter(Boolean)
+                        .join(" · "),
+                    },
+                  ]}
                   center={[l.latitude, l.longitude]}
                   zoom={13}
                 />
               </div>
             )}
             <div className="prose max-w-none text-foreground">
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{desc || "—"}</p>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {desc || "—"}
+              </p>
             </div>
             {l.pdf_url && (
-              <a href={l.pdf_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
-                <FileText className="h-4 w-4" />Brochure (PDF)
+              <a
+                href={l.pdf_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-primary hover:underline"
+              >
+                <FileText className="h-4 w-4" />
+                Brochure (PDF)
               </a>
             )}
           </div>
           <aside className="space-y-4">
             <div className="rounded-xl border border-border bg-card p-6 shadow-card sticky top-20">
               {l.price && l.price > 0 && (
-                <div className="text-3xl font-bold text-primary mb-1">{formatPrice(l.price, locale)}</div>
+                <div className="text-3xl font-bold text-primary mb-1">
+                  {formatPrice(l.price, locale)}
+                </div>
               )}
 
               <div className="flex items-center gap-1 text-sm text-success font-medium mb-4">
-                <TrendingUp className="h-4 w-4" />{t("commission")} {l.commission_percentage ?? 0}%
+                <TrendingUp className="h-4 w-4" />
+                {t("commission")} {l.commission_percentage ?? 0}%
               </div>
               {contactPhone ? (
                 <div className="space-y-2">
-                  <Button asChild className="w-full bg-success hover:bg-success/90" size="lg" onClick={() => supabase.rpc("increment_listing_click", { _id: id })}>
-                    <a href={`https://wa.me/${whatsappNum || contactPhone}?text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer">
+                  <Button
+                    asChild
+                    className="w-full bg-success hover:bg-success/90"
+                    size="lg"
+                    onClick={() => supabase.rpc("increment_listing_click", { _id: id })}
+                  >
+                    <a
+                      href={`https://wa.me/${whatsappNum || contactPhone}?text=${encodeURIComponent(title)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       {t("contact_whatsapp")}
                     </a>
                   </Button>
@@ -376,19 +563,34 @@ function ListingDetail() {
 
               <div className="grid grid-cols-2 gap-2 mt-3">
                 <Button variant="outline" size="sm" className="gap-1" onClick={toggleFav}>
-                  <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />{fav ? t("saved") : t("save_favorite")}
+                  <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : ""}`} />
+                  {fav ? t("saved") : t("save_favorite")}
                 </Button>
                 <ShareMenu
                   url={`/listings/${id}`}
                   title={title}
-                  caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                  caption={listingCaption({
+                    locale,
+                    type: l.type,
+                    titleAr: l.title_ar,
+                    titleEn: l.title_en,
+                    price: l.price,
+                    currency: l.currency,
+                    governorate: l.governorate,
+                    city: l.city,
+                    sourceName: l.source_name,
+                  })}
                   variant="button"
                   className="w-full"
                 />
               </div>
               {!isOwner && Number(l.price ?? 0) > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <Button className="gap-2 bg-primary hover:bg-primary-hover" onClick={onOrder} disabled={ordering}>
+                  <Button
+                    className="gap-2 bg-primary hover:bg-primary-hover"
+                    onClick={onOrder}
+                    disabled={ordering}
+                  >
                     {ordering ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     {ar ? "اشترِ الآن" : "Buy now"}
                   </Button>
@@ -412,8 +614,14 @@ function ListingDetail() {
                     {ar ? "أضف إلى السلة" : "Add to cart"}
                   </Button>
                   {user && (
-                    <Button className="gap-2 col-span-2" variant="secondary" onClick={onMessageSeller} disabled={msgLoading}>
-                      <Sparkles className="h-4 w-4" />{ar ? "راسل البائع" : "Message"}
+                    <Button
+                      className="gap-2 col-span-2"
+                      variant="secondary"
+                      onClick={onMessageSeller}
+                      disabled={msgLoading}
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      {ar ? "راسل البائع" : "Message"}
                     </Button>
                   )}
                 </div>
@@ -425,7 +633,9 @@ function ListingDetail() {
                 <div>
                   <h3 className="font-semibold flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-accent" />
-                    {ar ? `اربح ${l.commission_percentage ?? 0}% عمولة` : `Earn ${l.commission_percentage ?? 0}% commission`}
+                    {ar
+                      ? `اربح ${l.commission_percentage ?? 0}% عمولة`
+                      : `Earn ${l.commission_percentage ?? 0}% commission`}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     {ar
@@ -442,8 +652,12 @@ function ListingDetail() {
                         size="icon"
                         variant="outline"
                         onClick={async () => {
-                          try { await navigator.clipboard.writeText(myShareLink); toast.success(ar ? "تم النسخ" : "Copied"); }
-                          catch { /* ignore */ }
+                          try {
+                            await navigator.clipboard.writeText(myShareLink);
+                            toast.success(ar ? "تم النسخ" : "Copied");
+                          } catch {
+                            /* ignore */
+                          }
                         }}
                       >
                         <Copy className="h-4 w-4" />
@@ -453,15 +667,35 @@ function ListingDetail() {
                       url={myShareLink}
                       title={title}
                       earning
-                      caption={listingCaption({ locale, type: l.type, titleAr: l.title_ar, titleEn: l.title_en, price: l.price, currency: l.currency, governorate: l.governorate, city: l.city, sourceName: l.source_name })}
+                      caption={listingCaption({
+                        locale,
+                        type: l.type,
+                        titleAr: l.title_ar,
+                        titleEn: l.title_en,
+                        price: l.price,
+                        currency: l.currency,
+                        governorate: l.governorate,
+                        city: l.city,
+                        sourceName: l.source_name,
+                      })}
                       triggerLabel={ar ? "شارك رابطك واربح" : "Share your link & earn"}
                       className="w-full"
                     />
                     <ol className="text-[11px] text-muted-foreground list-decimal ps-4 space-y-0.5 pt-1">
                       <li>{ar ? "انسخ رابطك" : "Copy your link"}</li>
-                      <li>{ar ? "انشره على واتساب أو فيسبوك أو تيك توك" : "Share it on WhatsApp, Facebook, or TikTok"}</li>
-                      <li>{ar ? "العميل يطلب من خلال الرابط" : "Customer orders through your link"}</li>
-                      <li>{ar ? "العمولة تظهر بعد التحويل المؤهل" : "Commission appears after qualified conversion"}</li>
+                      <li>
+                        {ar
+                          ? "انشره على واتساب أو فيسبوك أو تيك توك"
+                          : "Share it on WhatsApp, Facebook, or TikTok"}
+                      </li>
+                      <li>
+                        {ar ? "العميل يطلب من خلال الرابط" : "Customer orders through your link"}
+                      </li>
+                      <li>
+                        {ar
+                          ? "العمولة تظهر بعد التحويل المؤهل"
+                          : "Commission appears after qualified conversion"}
+                      </li>
                     </ol>
                   </div>
                 ) : (
@@ -476,7 +710,9 @@ function ListingDetail() {
                   </Button>
                 )}
                 <p className="text-[10px] text-muted-foreground text-center">
-                  {ar ? "تُحسب العمولة على قيمة الصفقة النهائية بعد تأكيد الشركة." : "Commission is calculated on final deal value after seller confirmation."}
+                  {ar
+                    ? "تُحسب العمولة على قيمة الصفقة النهائية بعد تأكيد الشركة."
+                    : "Commission is calculated on final deal value after seller confirmation."}
                 </p>
               </div>
             )}
@@ -495,48 +731,95 @@ function ListingDetail() {
             {isOwner && (
               <div className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
                 <div>
-                  <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" />{ar ? "تثبيت الإعلان في الأعلى" : "Pin listing to top"}</h3>
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-accent" />
+                    {ar ? "تثبيت الإعلان في الأعلى" : "Pin listing to top"}
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {ar
                       ? "اظهر إعلانك في صدارة السوق ولفت انتباه المزيد من العملاء."
                       : "Promote your listing to the top of the marketplace for more visibility."}
                   </p>
-                  {l.featured && l.featured_until && new Date(l.featured_until).getTime() > Date.now() && (
-                    <p className="text-xs text-success mt-1">
-                      {ar ? `مميز حتى ${new Date(l.featured_until).toLocaleDateString()}` : `Featured until ${new Date(l.featured_until).toLocaleDateString()}`}
-                    </p>
-                  )}
+                  {l.featured &&
+                    l.featured_until &&
+                    new Date(l.featured_until).getTime() > Date.now() && (
+                      <p className="text-xs text-success mt-1">
+                        {ar
+                          ? `مميز حتى ${new Date(l.featured_until).toLocaleDateString()}`
+                          : `Featured until ${new Date(l.featured_until).toLocaleDateString()}`}
+                      </p>
+                    )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button type="button" variant="outline" disabled={!!featuring} onClick={() => onFeature(7)} className="flex-col h-auto py-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={!!featuring}
+                    onClick={() => onFeature(7)}
+                    className="flex-col h-auto py-3"
+                  >
                     <span className="font-bold">7 {ar ? "أيام" : "days"}</span>
-                    <span className="text-xs text-muted-foreground">{FEATURE_PRICING_EGP[7]} EGP</span>
+                    <span className="text-xs text-muted-foreground">
+                      {FEATURE_PRICING_EGP[7]} EGP
+                    </span>
                   </Button>
-                  <Button type="button" disabled={!!featuring} onClick={() => onFeature(30)} className="bg-primary hover:bg-primary-hover flex-col h-auto py-3">
+                  <Button
+                    type="button"
+                    disabled={!!featuring}
+                    onClick={() => onFeature(30)}
+                    className="bg-primary hover:bg-primary-hover flex-col h-auto py-3"
+                  >
                     <span className="font-bold">30 {ar ? "يوم" : "days"}</span>
                     <span className="text-xs">{FEATURE_PRICING_EGP[30]} EGP</span>
                   </Button>
                 </div>
-                {featuring && <div className="text-xs text-muted-foreground text-center"><Loader2 className="h-3 w-3 animate-spin inline me-1" />{ar ? "جارٍ التثبيت…" : "Pinning…"}</div>}
+                {featuring && (
+                  <div className="text-xs text-muted-foreground text-center">
+                    <Loader2 className="h-3 w-3 animate-spin inline me-1" />
+                    {ar ? "جارٍ التثبيت…" : "Pinning…"}
+                  </div>
+                )}
               </div>
             )}
             {isOwner && referrals.length > 0 && (
-              <form onSubmit={onConvert} className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3">
+              <form
+                onSubmit={onConvert}
+                className="rounded-xl border border-border bg-card p-5 shadow-card space-y-3"
+              >
                 <h3 className="font-semibold text-sm">{t("convert_referral")}</h3>
                 <div className="space-y-1.5">
                   <Label>{t("your_referral_code")}</Label>
-                  <select value={selectedRef} onChange={(e) => setSelectedRef(e.target.value)} required
-                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
+                  <select
+                    value={selectedRef}
+                    onChange={(e) => setSelectedRef(e.target.value)}
+                    required
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  >
                     <option value="">—</option>
-                    {referrals.map((r) => <option key={r.id} value={r.id}>{r.code} ({r.clicks} clicks, {r.conversions} conv)</option>)}
+                    {referrals.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.code} ({r.clicks} clicks, {r.conversions} conv)
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>{t("referral_amount")}</Label>
-                  <Input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                  <Input
+                    type="number"
+                    min={0}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
+                  />
                 </div>
-                <Button type="submit" disabled={submitting} className="w-full bg-primary hover:bg-primary-hover">
-                  {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("convert_referral")}
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-primary hover:bg-primary-hover"
+                >
+                  {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                  {t("convert_referral")}
                 </Button>
               </form>
             )}
@@ -546,7 +829,9 @@ function ListingDetail() {
           <section className="mt-12">
             <h2 className="text-xl font-bold mb-4">{ar ? "منتجات مرتبطة" : "Related listings"}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {related.map((r) => <ListingCard key={r.id} l={r} />)}
+              {related.map((r) => (
+                <ListingCard key={r.id} l={r} />
+              ))}
             </div>
           </section>
         )}

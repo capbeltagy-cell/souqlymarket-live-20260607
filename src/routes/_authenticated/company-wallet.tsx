@@ -15,7 +15,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/company-wallet")({
   head: () => ({ meta: [{ title: "محفظة الشركة — Souqly" }] }),
-  errorComponent: ({ error }) => <div className="p-8 text-sm text-destructive">{error.message}</div>,
+  errorComponent: ({ error }) => (
+    <div className="p-8 text-sm text-destructive">{error.message}</div>
+  ),
   notFoundComponent: () => <div className="p-8">Not found</div>,
   component: CompanyWalletPage,
 });
@@ -38,11 +40,17 @@ function CompanyWalletPage() {
     setLoading(true);
     try {
       const [w, d] = await Promise.all([fGet(), fDeps()]);
-      setState(w); setDeps(d.deposits);
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setLoading(false); }
+      setState(w);
+      setDeps(d.deposits);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
   }
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const wallet = state?.wallet;
 
@@ -55,43 +63,77 @@ function CompanyWalletPage() {
             <Wallet className="h-6 w-6 text-primary" />
             {ar ? "محفظة الشركة" : "Company Wallet"}
           </h1>
-          <Link to="/company-wallet/deposit"><Button><ArrowUpCircle className="h-4 w-4 me-2" />{ar ? "شحن الرصيد" : "Deposit funds"}</Button></Link>
+          <Link to="/company-wallet/deposit">
+            <Button>
+              <ArrowUpCircle className="h-4 w-4 me-2" />
+              {ar ? "شحن الرصيد" : "Deposit funds"}
+            </Button>
+          </Link>
         </div>
 
-        {loading && <div className="text-sm text-muted-foreground">{ar ? "جاري التحميل..." : "Loading..."}</div>}
+        {loading && (
+          <div className="text-sm text-muted-foreground">
+            {ar ? "جاري التحميل..." : "Loading..."}
+          </div>
+        )}
 
         {wallet && (
           <div className="grid gap-4 md:grid-cols-3">
-            <StatCard label={ar ? "الرصيد المتاح" : "Available"} value={`${fmt(wallet.balance)} EGP`} accent="text-primary" />
-            <StatCard label={ar ? "محجوز للحملات" : "Reserved for campaigns"} value={`${fmt(wallet.reserved_balance)} EGP`} accent="text-amber-600" />
-            <StatCard label={ar ? "إجمالي الإنفاق" : "Total spent"} value={`${fmt(wallet.total_paid_out)} EGP`} accent="text-muted-foreground" />
+            <StatCard
+              label={ar ? "الرصيد المتاح" : "Available"}
+              value={`${fmt(wallet.balance)} EGP`}
+              accent="text-primary"
+            />
+            <StatCard
+              label={ar ? "محجوز للحملات" : "Reserved for campaigns"}
+              value={`${fmt(wallet.reserved_balance)} EGP`}
+              accent="text-amber-600"
+            />
+            <StatCard
+              label={ar ? "إجمالي الإنفاق" : "Total spent"}
+              value={`${fmt(wallet.total_paid_out)} EGP`}
+              accent="text-muted-foreground"
+            />
           </div>
         )}
 
         <section className="rounded-lg border border-border bg-card p-5 shadow-card">
           <h2 className="font-semibold mb-3">{ar ? "طلبات الإيداع" : "Deposit requests"}</h2>
           {deps.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{ar ? "لا يوجد طلبات إيداع بعد." : "No deposits yet."}</p>
+            <p className="text-sm text-muted-foreground">
+              {ar ? "لا يوجد طلبات إيداع بعد." : "No deposits yet."}
+            </p>
           ) : (
             <div className="divide-y divide-border">
               {deps.map((d) => (
                 <div key={d.id} className="py-3 flex items-center justify-between gap-3 flex-wrap">
                   <div className="text-sm">
-                    <div className="font-medium">{fmt(d.amount)} {d.currency}</div>
+                    <div className="font-medium">
+                      {fmt(d.amount)} {d.currency}
+                    </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(d.created_at).toLocaleString()} · {d.method_code ?? (ar ? "غير محدد" : "n/a")}
+                      {new Date(d.created_at).toLocaleString()} ·{" "}
+                      {d.method_code ?? (ar ? "غير محدد" : "n/a")}
                       {d.reference ? ` · ${d.reference}` : ""}
                     </div>
-                    {d.admin_notes && <div className="text-xs text-muted-foreground mt-1">📝 {d.admin_notes}</div>}
+                    {d.admin_notes && (
+                      <div className="text-xs text-muted-foreground mt-1">📝 {d.admin_notes}</div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusPill status={d.status} />
                     {["pending", "under_review"].includes(d.status) && (
-                      <Button variant="outline" size="sm" onClick={async () => {
-                        await fCancel({ data: { id: d.id } });
-                        toast.success(ar ? "تم الإلغاء" : "Cancelled");
-                        load();
-                      }}>{ar ? "إلغاء" : "Cancel"}</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          await fCancel({ data: { id: d.id } });
+                          toast.success(ar ? "تم الإلغاء" : "Cancelled");
+                          load();
+                        }}
+                      >
+                        {ar ? "إلغاء" : "Cancel"}
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -102,18 +144,29 @@ function CompanyWalletPage() {
 
         <section className="rounded-lg border border-border bg-card p-5 shadow-card">
           <h2 className="font-semibold mb-3">{ar ? "آخر الحركات" : "Recent activity"}</h2>
-          {(!state?.transactions?.length) ? (
-            <p className="text-sm text-muted-foreground">{ar ? "لا توجد حركات." : "No transactions."}</p>
+          {!state?.transactions?.length ? (
+            <p className="text-sm text-muted-foreground">
+              {ar ? "لا توجد حركات." : "No transactions."}
+            </p>
           ) : (
             <div className="divide-y divide-border text-sm">
               {state.transactions.map((t: any) => (
                 <div key={t.id} className="py-2 flex justify-between gap-3">
                   <div>
                     <div className="font-medium">{t.reason}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()} · {t.notes ?? ""}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(t.created_at).toLocaleString()} · {t.notes ?? ""}
+                    </div>
                   </div>
-                  <div className={Number(t.amount) >= 0 ? "text-emerald-600 font-medium" : "text-destructive font-medium"}>
-                    {Number(t.amount) >= 0 ? "+" : ""}{fmt(t.amount)} {t.currency}
+                  <div
+                    className={
+                      Number(t.amount) >= 0
+                        ? "text-emerald-600 font-medium"
+                        : "text-destructive font-medium"
+                    }
+                  >
+                    {Number(t.amount) >= 0 ? "+" : ""}
+                    {fmt(t.amount)} {t.currency}
                   </div>
                 </div>
               ))}
@@ -145,5 +198,10 @@ function StatusPill({ status }: { status: string }) {
   };
   const it = map[status] ?? map.pending;
   const Icon = it.icon;
-  return <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${it.cls}`}><Icon className="h-3 w-3" />{it.text}</span>;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${it.cls}`}>
+      <Icon className="h-3 w-3" />
+      {it.text}
+    </span>
+  );
 }

@@ -32,14 +32,21 @@ export const getMyCompanySubscription = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!company) {
       return {
-        hasCompany: false, companyId: null, isPaid: false, plan: "free",
-        listingsCount: 0, listingLimit: FREE_LISTING_LIMIT, expiresAt: null,
+        hasCompany: false,
+        companyId: null,
+        isPaid: false,
+        plan: "free",
+        listingsCount: 0,
+        listingLimit: FREE_LISTING_LIMIT,
+        expiresAt: null,
       };
     }
     const { count } = await supabase
-      .from("listings").select("id", { count: "exact", head: true })
+      .from("listings")
+      .select("id", { count: "exact", head: true })
       .eq("company_id", company.id);
-    const expiresAt = (company as { subscription_expires_at?: string | null }).subscription_expires_at ?? null;
+    const expiresAt =
+      (company as { subscription_expires_at?: string | null }).subscription_expires_at ?? null;
     const isPaid = computeIsPaid(company.subscription_plan, expiresAt);
     return {
       hasCompany: true,
@@ -62,23 +69,30 @@ export const adminListCompanies = createServerFn({ method: "GET" })
     if (!isAdmin) throw new Error("Forbidden");
     const { data, error } = await supabase
       .from("companies")
-      .select("id, name_ar, name_en, owner_id, is_verified, subscription_plan, subscription_expires_at, subscription_updated_at, created_at")
+      .select(
+        "id, name_ar, name_en, owner_id, is_verified, subscription_plan, subscription_expires_at, subscription_updated_at, created_at",
+      )
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((c) => ({
       ...c,
-      isPaid: computeIsPaid(c.subscription_plan, (c as { subscription_expires_at?: string | null }).subscription_expires_at ?? null),
+      isPaid: computeIsPaid(
+        c.subscription_plan,
+        (c as { subscription_expires_at?: string | null }).subscription_expires_at ?? null,
+      ),
     }));
   });
 
 export const adminSetCompanyPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      companyId: z.string().uuid(),
-      paid: z.boolean(),
-      months: z.number().int().min(1).max(60).default(1),
-    }).parse(d),
+    z
+      .object({
+        companyId: z.string().uuid(),
+        paid: z.boolean(),
+        months: z.number().int().min(1).max(60).default(1),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -87,8 +101,16 @@ export const adminSetCompanyPaid = createServerFn({ method: "POST" })
     const expires = new Date();
     expires.setMonth(expires.getMonth() + data.months);
     const update = data.paid
-      ? { subscription_plan: "premium_company" as const, subscription_expires_at: expires.toISOString(), subscription_updated_at: new Date().toISOString() }
-      : { subscription_plan: "free" as const, subscription_expires_at: null, subscription_updated_at: new Date().toISOString() };
+      ? {
+          subscription_plan: "premium_company" as const,
+          subscription_expires_at: expires.toISOString(),
+          subscription_updated_at: new Date().toISOString(),
+        }
+      : {
+          subscription_plan: "free" as const,
+          subscription_expires_at: null,
+          subscription_updated_at: new Date().toISOString(),
+        };
     const { error } = await supabase.from("companies").update(update).eq("id", data.companyId);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -97,22 +119,25 @@ export const adminSetCompanyPaid = createServerFn({ method: "POST" })
 // --- Public pricing config (single source of truth) ---
 // Reads price + commission % from platform_settings so Pricing page and
 // admin controls stay in sync. Falls back to sane defaults.
-export const getPricingConfig = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const url = process.env.SUPABASE_URL!;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
-    const sb = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false, storage: undefined as never },
-    });
-    const { data: rows } = await sb.rpc("get_public_pricing" as never);
-    const data = Array.isArray(rows) ? (rows[0] as { subscription_plan_price_egp?: number; subscription_marketer_commission_pct?: number } | undefined) : undefined;
-    return {
-      companyPremiumPriceEgp: Number(data?.subscription_plan_price_egp ?? COMPANY_PLAN_PRICE_EGP),
-      marketerCommissionPct: Number(data?.subscription_marketer_commission_pct ?? 15),
-      freeListingLimit: FREE_LISTING_LIMIT,
-    };
+export const getPricingConfig = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("@supabase/supabase-js");
+  const url = process.env.SUPABASE_URL!;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  const sb = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false, storage: undefined as never },
   });
+  const { data: rows } = await sb.rpc("get_public_pricing" as never);
+  const data = Array.isArray(rows)
+    ? (rows[0] as
+        | { subscription_plan_price_egp?: number; subscription_marketer_commission_pct?: number }
+        | undefined)
+    : undefined;
+  return {
+    companyPremiumPriceEgp: Number(data?.subscription_plan_price_egp ?? COMPANY_PLAN_PRICE_EGP),
+    marketerCommissionPct: Number(data?.subscription_marketer_commission_pct ?? 15),
+    freeListingLimit: FREE_LISTING_LIMIT,
+  };
+});
 
 // User-facing request to activate premium_company. Does NOT flip the plan
 // (that stays admin-controlled via adminSetCompanyPaid and is protected by
@@ -124,22 +149,32 @@ export const requestCompanyUpgrade = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: company } = await supabase
-      .from("companies").select("id, name_ar, name_en, subscription_plan")
-      .eq("owner_id", userId).maybeSingle();
+      .from("companies")
+      .select("id, name_ar, name_en, subscription_plan")
+      .eq("owner_id", userId)
+      .maybeSingle();
     if (!company) throw new Error("NO_COMPANY: Create your company profile first.");
     if (company.subscription_plan === "premium_company") {
       return { ok: true, alreadyPremium: true as const };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Record a pending subscription row (idempotent-ish: one active pending per user).
-    await supabaseAdmin.from("subscriptions")
+    await supabaseAdmin
+      .from("subscriptions")
       .update({ is_active: false })
-      .eq("user_id", userId).eq("plan", "premium_company").eq("is_active", true);
+      .eq("user_id", userId)
+      .eq("plan", "premium_company")
+      .eq("is_active", true);
     await supabaseAdmin.from("subscriptions").insert({
-      user_id: userId, plan: "premium_company", is_active: false,
+      user_id: userId,
+      plan: "premium_company",
+      is_active: false,
     });
     // Notify all admins.
-    const { data: admins } = await supabaseAdmin.from("user_roles").select("user_id").eq("role", "admin");
+    const { data: admins } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "admin");
     const companyName = company.name_ar || company.name_en || "شركة";
     const rows = (admins ?? []).map((a: { user_id: string }) => ({
       user_id: a.user_id,

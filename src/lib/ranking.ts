@@ -11,11 +11,15 @@ export type RankableListing = {
   companies?: { is_premium?: boolean | null; is_verified?: boolean | null } | null;
 };
 
-export function rankListings<T extends RankableListing>(rows: T[], nowIso = new Date().toISOString()): T[] {
+export function rankListings<T extends RankableListing>(
+  rows: T[],
+  nowIso = new Date().toISOString(),
+): T[] {
   const score = (l: T) => {
     const premium = l.companies?.is_premium ? 1 : 0;
     const featured = l.featured && (!l.featured_until || l.featured_until > nowIso) ? 1 : 0;
-    const promoted = l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active" ? 1 : 0;
+    const promoted =
+      l.marketer_promotion_enabled && (l.promotion_status ?? "active") === "active" ? 1 : 0;
     const verified = l.companies?.is_verified ? 1 : 0;
     return premium * 10000 + featured * 1000 + promoted * 100 + verified * 10;
   };
@@ -37,11 +41,18 @@ export type RankableCompany = {
   created_at?: string | null;
 };
 
-export function rankCompanies<T extends RankableCompany>(rows: T[], nowIso = new Date().toISOString()): T[] {
+export function rankCompanies<T extends RankableCompany>(
+  rows: T[],
+  nowIso = new Date().toISOString(),
+): T[] {
   const score = (c: T) => {
     const premium = c.is_premium ? 1 : 0;
     const verified = c.is_verified ? 1 : 0;
-    const paid = c.subscription_plan === "paid" && (!c.subscription_expires_at || c.subscription_expires_at > nowIso) ? 1 : 0;
+    const paid =
+      c.subscription_plan === "paid" &&
+      (!c.subscription_expires_at || c.subscription_expires_at > nowIso)
+        ? 1
+        : 0;
     return premium * 1000 + verified * 100 + paid * 10;
   };
   return [...rows].sort((a, b) => {
@@ -59,7 +70,10 @@ export type RankableAgent = {
   created_at?: string | null;
 };
 
-export function rankAgents<T extends RankableAgent>(rows: T[], nowIso = new Date().toISOString()): T[] {
+export function rankAgents<T extends RankableAgent>(
+  rows: T[],
+  nowIso = new Date().toISOString(),
+): T[] {
   void nowIso;
   const score = (a: T) => {
     const premium = a.is_premium ? 1 : 0;

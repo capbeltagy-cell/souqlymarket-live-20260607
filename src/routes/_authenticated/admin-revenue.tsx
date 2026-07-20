@@ -24,7 +24,9 @@ function AdminRevenuePage() {
 
   useEffect(() => {
     if (!roles.includes("admin")) return;
-    fetchSummary().then(setData).catch((e) => setErr(e.message));
+    fetchSummary()
+      .then(setData)
+      .catch((e) => setErr(e.message));
   }, [roles]);
 
   if (!roles.includes("admin")) {
@@ -50,20 +52,53 @@ function AdminRevenuePage() {
         ) : (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Card icon={DollarSign} label={ar ? "إجمالي الإيرادات" : "Total revenue"} value={formatPrice(data.totalPaymentsRevenue + data.commissionRevenue, locale, { showZero: true })} highlight />
-              <Card icon={CreditCard} label={ar ? "إيرادات الاشتراكات" : "Subscription revenue"} value={formatPrice(data.subscriptionRevenue, locale, { showZero: true })} />
-              <Card icon={Star} label={ar ? "إيرادات الإعلانات المميزة" : "Featured revenue"} value={formatPrice(data.featuredRevenue, locale, { showZero: true })} />
-              <Card icon={TrendingUp} label={ar ? "حصة المنصة من العمولات" : "Platform commission cut"} value={formatPrice(data.commissionRevenue, locale, { showZero: true })} />
+              <Card
+                icon={DollarSign}
+                label={ar ? "إجمالي الإيرادات" : "Total revenue"}
+                value={formatPrice(data.totalPaymentsRevenue + data.commissionRevenue, locale, {
+                  showZero: true,
+                })}
+                highlight
+              />
+              <Card
+                icon={CreditCard}
+                label={ar ? "إيرادات الاشتراكات" : "Subscription revenue"}
+                value={formatPrice(data.subscriptionRevenue, locale, { showZero: true })}
+              />
+              <Card
+                icon={Star}
+                label={ar ? "إيرادات الإعلانات المميزة" : "Featured revenue"}
+                value={formatPrice(data.featuredRevenue, locale, { showZero: true })}
+              />
+              <Card
+                icon={TrendingUp}
+                label={ar ? "حصة المنصة من العمولات" : "Platform commission cut"}
+                value={formatPrice(data.commissionRevenue, locale, { showZero: true })}
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <Card icon={DollarSign} label={ar ? "رصيد المنصة" : "Platform wallet balance"} value={formatPrice(data.platformBalance, locale, { showZero: true })} />
-              <Card icon={TrendingUp} label={ar ? "عمولات مدفوعة" : "Paid commissions"} value={formatPrice(data.paidCommissions, locale, { showZero: true })} />
-              <Card icon={Users} label={ar ? "اشتراكات نشطة" : "Active subscriptions"} value={String(data.activeSubscriptions)} />
+              <Card
+                icon={DollarSign}
+                label={ar ? "رصيد المنصة" : "Platform wallet balance"}
+                value={formatPrice(data.platformBalance, locale, { showZero: true })}
+              />
+              <Card
+                icon={TrendingUp}
+                label={ar ? "عمولات مدفوعة" : "Paid commissions"}
+                value={formatPrice(data.paidCommissions, locale, { showZero: true })}
+              />
+              <Card
+                icon={Users}
+                label={ar ? "اشتراكات نشطة" : "Active subscriptions"}
+                value={String(data.activeSubscriptions)}
+              />
             </div>
 
             <div className="rounded-lg border border-border bg-card p-6">
-              <h2 className="font-semibold mb-4">{ar ? "الاشتراكات حسب الباقة" : "Subscriptions by plan"}</h2>
+              <h2 className="font-semibold mb-4">
+                {ar ? "الاشتراكات حسب الباقة" : "Subscriptions by plan"}
+              </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {Object.entries(data.subsByPlan as Record<string, number>).map(([plan, count]) => (
                   <div key={plan} className="rounded border border-border p-4">
@@ -71,7 +106,9 @@ function AdminRevenuePage() {
                     <div className="text-2xl font-bold">{count}</div>
                   </div>
                 ))}
-                {Object.keys(data.subsByPlan).length === 0 && <div className="text-muted-foreground text-sm">—</div>}
+                {Object.keys(data.subsByPlan).length === 0 && (
+                  <div className="text-muted-foreground text-sm">—</div>
+                )}
               </div>
             </div>
           </>
@@ -82,9 +119,21 @@ function AdminRevenuePage() {
   );
 }
 
-function Card({ icon: Icon, label, value, highlight }: { icon: any; label: string; value: string; highlight?: boolean }) {
+function Card({
+  icon: Icon,
+  label,
+  value,
+  highlight,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
   return (
-    <div className={`rounded-lg border border-border bg-card p-5 shadow-card ${highlight ? "ring-2 ring-primary" : ""}`}>
+    <div
+      className={`rounded-lg border border-border bg-card p-5 shadow-card ${highlight ? "ring-2 ring-primary" : ""}`}
+    >
       <Icon className="h-5 w-5 text-primary mb-2" />
       <div className="text-2xl font-bold">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{label}</div>

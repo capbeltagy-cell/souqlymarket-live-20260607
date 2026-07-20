@@ -28,12 +28,16 @@ function WalletPage() {
         const res = await fetchWallets();
         setWallets(res.wallets);
         const map: Record<string, any[]> = {};
-        await Promise.all(res.wallets.map(async (w: any) => {
-          const tx = await fetchTx({ data: { walletId: w.id } });
-          map[w.id] = tx.transactions;
-        }));
+        await Promise.all(
+          res.wallets.map(async (w: any) => {
+            const tx = await fetchTx({ data: { walletId: w.id } });
+            map[w.id] = tx.transactions;
+          }),
+        );
         setTxByWallet(map);
-      } finally { setLoading(false); }
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -49,7 +53,9 @@ function WalletPage() {
           <p className="text-muted-foreground text-sm">{ar ? "جاري التحميل..." : "Loading..."}</p>
         ) : wallets.length === 0 ? (
           <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-            {ar ? "لا توجد محفظة بعد. ستُنشأ تلقائيًا عند أول معاملة." : "No wallet yet. It will be created automatically on your first transaction."}
+            {ar
+              ? "لا توجد محفظة بعد. ستُنشأ تلقائيًا عند أول معاملة."
+              : "No wallet yet. It will be created automatically on your first transaction."}
           </div>
         ) : (
           <div className="space-y-6">
@@ -57,29 +63,60 @@ function WalletPage() {
               <div key={w.id} className="rounded-lg border border-border bg-card shadow-card">
                 <div className="p-5 border-b border-border flex items-center justify-between flex-wrap gap-2">
                   <div className="font-semibold capitalize">
-                    {ar ? (w.kind === "agent" ? "محفظة الوسيط" : w.kind === "company" ? "محفظة الشركة" : "محفظة المنصة") : `${w.kind} wallet`}
+                    {ar
+                      ? w.kind === "agent"
+                        ? "محفظة الوسيط"
+                        : w.kind === "company"
+                          ? "محفظة الشركة"
+                          : "محفظة المنصة"
+                      : `${w.kind} wallet`}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5">
-                  <Stat icon={Wallet} label={ar ? "الرصيد المتاح" : "Available balance"} value={formatPrice(Number(w.balance), locale, { showZero: true })} />
-                  <Stat icon={Clock} label={ar ? "رصيد معلق" : "Pending"} value={formatPrice(Number(w.pending_balance), locale, { showZero: true })} />
-                  <Stat icon={TrendingUp} label={ar ? "إجمالي الأرباح" : "Total earned"} value={formatPrice(Number(w.total_earned), locale, { showZero: true })} />
-                  <Stat icon={ArrowDownToLine} label={ar ? "المسحوب" : "Paid out"} value={formatPrice(Number(w.total_paid_out), locale, { showZero: true })} />
+                  <Stat
+                    icon={Wallet}
+                    label={ar ? "الرصيد المتاح" : "Available balance"}
+                    value={formatPrice(Number(w.balance), locale, { showZero: true })}
+                  />
+                  <Stat
+                    icon={Clock}
+                    label={ar ? "رصيد معلق" : "Pending"}
+                    value={formatPrice(Number(w.pending_balance), locale, { showZero: true })}
+                  />
+                  <Stat
+                    icon={TrendingUp}
+                    label={ar ? "إجمالي الأرباح" : "Total earned"}
+                    value={formatPrice(Number(w.total_earned), locale, { showZero: true })}
+                  />
+                  <Stat
+                    icon={ArrowDownToLine}
+                    label={ar ? "المسحوب" : "Paid out"}
+                    value={formatPrice(Number(w.total_paid_out), locale, { showZero: true })}
+                  />
                 </div>
                 <div className="border-t border-border">
-                  <div className="p-4 font-semibold text-sm">{ar ? "آخر المعاملات" : "Recent transactions"}</div>
+                  <div className="p-4 font-semibold text-sm">
+                    {ar ? "آخر المعاملات" : "Recent transactions"}
+                  </div>
                   <div className="divide-y divide-border">
                     {(txByWallet[w.id] ?? []).length === 0 && (
-                      <div className="p-4 text-sm text-muted-foreground">{ar ? "لا توجد معاملات" : "No transactions"}</div>
+                      <div className="p-4 text-sm text-muted-foreground">
+                        {ar ? "لا توجد معاملات" : "No transactions"}
+                      </div>
                     )}
                     {(txByWallet[w.id] ?? []).slice(0, 20).map((t) => (
                       <div key={t.id} className="p-4 flex items-center justify-between text-sm">
                         <div>
                           <div className="font-medium">{t.notes || t.reason}</div>
-                          <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()} · {t.reason}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(t.created_at).toLocaleString()} · {t.reason}
+                          </div>
                         </div>
-                        <div className={`font-bold ${Number(t.amount) >= 0 ? "text-success" : "text-destructive"}`}>
-                          {Number(t.amount) >= 0 ? "+" : ""}{formatPrice(Number(t.amount), locale, { showZero: true })}
+                        <div
+                          className={`font-bold ${Number(t.amount) >= 0 ? "text-success" : "text-destructive"}`}
+                        >
+                          {Number(t.amount) >= 0 ? "+" : ""}
+                          {formatPrice(Number(t.amount), locale, { showZero: true })}
                         </div>
                       </div>
                     ))}

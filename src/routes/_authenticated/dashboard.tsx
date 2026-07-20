@@ -1,6 +1,25 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Activity, Briefcase, Building2, ChevronDown, ClipboardList, Crown, DollarSign, Factory, FileText, Inbox, LayoutDashboard, Link2, Loader2, PlusCircle, Settings, ShieldCheck, Sparkles, Users } from "lucide-react";
+import {
+  Activity,
+  Briefcase,
+  Building2,
+  ChevronDown,
+  ClipboardList,
+  Crown,
+  DollarSign,
+  Factory,
+  FileText,
+  Inbox,
+  LayoutDashboard,
+  Link2,
+  Loader2,
+  PlusCircle,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -11,7 +30,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { getMyCompanySubscription, type CompanySubscriptionInfo } from "@/lib/subscription.functions";
+import {
+  getMyCompanySubscription,
+  type CompanySubscriptionInfo,
+} from "@/lib/subscription.functions";
 import { upsertMyFactory } from "@/lib/phase3.functions";
 import { toast } from "sonner";
 
@@ -21,8 +43,12 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 type Counts = {
-  listings: number; companies: number; agents: number;
-  referrals: number; pendingCommissions: number; pendingListings: number;
+  listings: number;
+  companies: number;
+  agents: number;
+  referrals: number;
+  pendingCommissions: number;
+  pendingListings: number;
   leads?: number;
 };
 
@@ -31,7 +57,8 @@ function Dashboard() {
   const { t, locale } = useI18n();
   const ar = locale === "ar";
   const navigate = useNavigate();
-  const hasAppRole = roles.includes("admin") || roles.includes("company") || roles.includes("agent");
+  const hasAppRole =
+    roles.includes("admin") || roles.includes("company") || roles.includes("agent");
   const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
@@ -43,7 +70,11 @@ function Dashboard() {
     if (loading || !user) return;
     if (hasAppRole) return;
     let choice: string | null = null;
-    try { choice = localStorage.getItem("souqly:role_choice"); } catch {}
+    try {
+      choice = localStorage.getItem("souqly:role_choice");
+    } catch {
+      // Storage is optional; fall back to the server-backed role flow.
+    }
     if (choice === "customer") {
       navigate({ to: "/marketplace", replace: true });
     } else {
@@ -51,10 +82,17 @@ function Dashboard() {
     }
   }, [loading, user, hasAppRole, navigate]);
 
-
   useEffect(() => {
     if (!user || !hasAppRole) return;
-    const zero: Counts = { listings: 0, companies: 0, agents: 0, referrals: 0, pendingCommissions: 0, pendingListings: 0, leads: 0 };
+    const zero: Counts = {
+      listings: 0,
+      companies: 0,
+      agents: 0,
+      referrals: 0,
+      pendingCommissions: 0,
+      pendingListings: 0,
+      leads: 0,
+    };
     (async () => {
       try {
         if (role === "admin") {
@@ -62,32 +100,78 @@ function Dashboard() {
             supabase.from("listings").select("id", { count: "exact", head: true }),
             supabase.from("companies").select("id", { count: "exact", head: true }),
             supabase.from("agents").select("id", { count: "exact", head: true }),
-            supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
+            supabase
+              .from("listings")
+              .select("id", { count: "exact", head: true })
+              .eq("status", "pending"),
           ]);
-          setCounts({ listings: l.count ?? 0, companies: c.count ?? 0, agents: a.count ?? 0, referrals: 0, pendingCommissions: 0, pendingListings: p.count ?? 0 });
+          setCounts({
+            listings: l.count ?? 0,
+            companies: c.count ?? 0,
+            agents: a.count ?? 0,
+            referrals: 0,
+            pendingCommissions: 0,
+            pendingListings: p.count ?? 0,
+          });
         } else if (role === "company") {
           let subInfo: CompanySubscriptionInfo | null = null;
-          try { subInfo = await fetchSub(); } catch (e) { console.error("fetchSub failed", e); }
+          try {
+            subInfo = await fetchSub();
+          } catch (e) {
+            console.error("fetchSub failed", e);
+          }
           setSub(subInfo);
           setHasProfile(subInfo?.hasCompany ?? false);
           if (subInfo?.companyId) {
             const [{ count: pc }, { count: lc }] = await Promise.all([
-              supabase.from("commissions").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "pending"),
-              supabase.from("leads").select("id", { count: "exact", head: true }).eq("company_id", subInfo.companyId).eq("status", "new"),
+              supabase
+                .from("commissions")
+                .select("id", { count: "exact", head: true })
+                .eq("company_id", subInfo.companyId)
+                .eq("status", "pending"),
+              supabase
+                .from("leads")
+                .select("id", { count: "exact", head: true })
+                .eq("company_id", subInfo.companyId)
+                .eq("status", "new"),
             ]);
-            setCounts({ listings: subInfo.listingsCount, companies: 1, agents: 0, referrals: 0, pendingCommissions: pc ?? 0, pendingListings: 0, leads: lc ?? 0 });
+            setCounts({
+              listings: subInfo.listingsCount,
+              companies: 1,
+              agents: 0,
+              referrals: 0,
+              pendingCommissions: pc ?? 0,
+              pendingListings: 0,
+              leads: lc ?? 0,
+            });
           } else {
             setCounts(zero);
           }
         } else {
-          const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
+          const { data: ag } = await supabase
+            .from("agents")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
           setHasProfile(!!ag);
           if (ag) {
             const [r, pc] = await Promise.all([
-              supabase.from("referrals").select("id", { count: "exact", head: true }).eq("agent_id", ag.id),
-              supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
+              supabase
+                .from("referrals")
+                .select("id", { count: "exact", head: true })
+                .eq("agent_id", ag.id),
+              supabase
+                .from("commissions")
+                .select("id", { count: "exact", head: true })
+                .eq("agent_id", ag.id)
+                .eq("status", "pending"),
             ]);
-            setCounts({ ...zero, agents: 1, referrals: r.count ?? 0, pendingCommissions: pc.count ?? 0 });
+            setCounts({
+              ...zero,
+              agents: 1,
+              referrals: r.count ?? 0,
+              pendingCommissions: pc.count ?? 0,
+            });
           } else {
             setCounts(zero);
           }
@@ -107,11 +191,19 @@ function Dashboard() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <LayoutDashboard className="h-6 w-6 text-primary" />
-              {role === "admin" ? t("dashboard_admin_title") : role === "company" ? t("dashboard_company_title") : t("dashboard_agent_title")}
+              {role === "admin"
+                ? t("dashboard_admin_title")
+                : role === "company"
+                  ? t("dashboard_company_title")
+                  : t("dashboard_agent_title")}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">{t("dashboard_welcome")}, {user?.email}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t("dashboard_welcome")}, {user?.email}
+            </p>
           </div>
-          <Badge variant="outline" className="capitalize">{role}</Badge>
+          <Badge variant="outline" className="capitalize">
+            {role}
+          </Badge>
         </div>
 
         {role === "company" && hasProfile === false && (
@@ -144,7 +236,15 @@ function Dashboard() {
   );
 }
 
-function Onboard({ title, body, cta }: { title: string; body: string; cta: { label: string; to: string } }) {
+function Onboard({
+  title,
+  body,
+  cta,
+}: {
+  title: string;
+  body: string;
+  cta: { label: string; to: string };
+}) {
   return (
     <div className="rounded-[1.5rem] border border-primary/20 bg-primary/5 p-6 mb-6 shadow-card">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -160,17 +260,35 @@ function Onboard({ title, body, cta }: { title: string; body: string; cta: { lab
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Briefcase; label: string; value: string }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Briefcase;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-[1.5rem] border border-white/10 bg-surface p-6 shadow-elev">
-      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
+      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center">
+        <Icon className="h-5 w-5" />
+      </div>
       <div className="mt-4 text-3xl font-bold tracking-tight">{value}</div>
       <div className="text-sm text-muted-foreground mt-2">{label}</div>
     </div>
   );
 }
 
-function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscriptionInfo | null; ar: boolean }) {
+function CompanyDash({
+  counts,
+  sub,
+  ar,
+}: {
+  counts: Counts;
+  sub: CompanySubscriptionInfo | null;
+  ar: boolean;
+}) {
   const { t } = useI18n();
   const isPaid = sub?.isPaid ?? false;
   const limit = sub?.listingLimit ?? 5;
@@ -179,26 +297,43 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
   const remaining = limit === -1 ? null : Math.max(0, limit - used);
   return (
     <>
-      <div className={`rounded-lg border p-5 mb-6 ${isPaid ? "border-success/40 bg-success/5" : "border-primary/30 bg-primary/5"}`}>
+      <div
+        className={`rounded-lg border p-5 mb-6 ${isPaid ? "border-success/40 bg-success/5" : "border-primary/30 bg-primary/5"}`}
+      >
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2">
             <Crown className={`h-5 w-5 ${isPaid ? "text-success" : "text-primary"}`} />
             <div>
               <div className="font-semibold">
                 {isPaid
-                  ? (ar ? "اشتراك مدفوع نشط" : "Paid subscription active")
-                  : (ar ? "الباقة المجانية" : "Free plan")}
+                  ? ar
+                    ? "اشتراك مدفوع نشط"
+                    : "Paid subscription active"
+                  : ar
+                    ? "الباقة المجانية"
+                    : "Free plan"}
               </div>
               <div className="text-xs text-muted-foreground">
                 {isPaid
-                  ? (sub?.expiresAt ? (ar ? `ينتهي في ${new Date(sub.expiresAt).toLocaleDateString()}` : `Expires ${new Date(sub.expiresAt).toLocaleDateString()}`) : (ar ? "بدون تاريخ انتهاء" : "No expiry"))
-                  : (ar ? "أضف حتى 5 إعلانات مجاناً. اشترك بـ 499 ج.م شهرياً لإعلانات غير محدودة." : "Add up to 5 listings free. Subscribe for 499 EGP/mo for unlimited listings.")}
+                  ? sub?.expiresAt
+                    ? ar
+                      ? `ينتهي في ${new Date(sub.expiresAt).toLocaleDateString()}`
+                      : `Expires ${new Date(sub.expiresAt).toLocaleDateString()}`
+                    : ar
+                      ? "بدون تاريخ انتهاء"
+                      : "No expiry"
+                  : ar
+                    ? "أضف حتى 5 إعلانات مجاناً. اشترك بـ 499 ج.م شهرياً لإعلانات غير محدودة."
+                    : "Add up to 5 listings free. Subscribe for 499 EGP/mo for unlimited listings."}
               </div>
             </div>
           </div>
           {!isPaid && (
             <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-              <Link to="/subscribe"><Sparkles className="h-4 w-4" />{ar ? "ترقية إلى المدفوع" : "Upgrade — 499 EGP/mo"}</Link>
+              <Link to="/subscribe">
+                <Sparkles className="h-4 w-4" />
+                {ar ? "ترقية إلى المدفوع" : "Upgrade — 499 EGP/mo"}
+              </Link>
             </Button>
           )}
         </div>
@@ -211,7 +346,9 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
                 <span className="ms-2">· {ar ? `متبقي ${remaining}` : `${remaining} left`}</span>
               )}
               {remaining === 0 && (
-                <span className="ms-2 text-warning">· {ar ? "وصلت للحد الأقصى" : "limit reached"}</span>
+                <span className="ms-2 text-warning">
+                  · {ar ? "وصلت للحد الأقصى" : "limit reached"}
+                </span>
               )}
             </span>
           </div>
@@ -221,37 +358,91 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Stat icon={FileText} label={t("total_listings")} value={String(counts.listings)} />
-        <Stat icon={Inbox} label={ar ? "طلبات العملاء" : "Leads"} value={String(counts.leads ?? 0)} />
-        <Stat icon={DollarSign} label={t("commissions_pending")} value={String(counts.pendingCommissions)} />
+        <Stat
+          icon={Inbox}
+          label={ar ? "طلبات العملاء" : "Leads"}
+          value={String(counts.leads ?? 0)}
+        />
+        <Stat
+          icon={DollarSign}
+          label={t("commissions_pending")}
+          value={String(counts.pendingCommissions)}
+        />
         <Stat icon={Users} label={t("active_referrals")} value={String(counts.referrals)} />
       </div>
       {/* Primary actions — the ones a company owner needs first */}
       <div className="flex flex-wrap gap-2">
-        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold"><Link to="/listings/new"><PlusCircle className="h-5 w-5" />{ar ? "+ أضف إعلانًا" : "+ Add listing"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/company-center"><LayoutDashboard className="h-4 w-4" />{ar ? "مركز قيادة الشركة" : "Command Center"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/company-campaigns"><Sparkles className="h-4 w-4" />{ar ? "حملاتي" : "Campaigns"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/leads"><Inbox className="h-4 w-4" />{ar ? "الطلبات" : "Leads"}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Activity className="h-4 w-4" />{ar ? "الإحصائيات" : "Analytics"}</Link></Button>
-        <Button asChild variant="outline"><Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link></Button>
+        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold">
+          <Link to="/listings/new">
+            <PlusCircle className="h-5 w-5" />
+            {ar ? "+ أضف إعلانًا" : "+ Add listing"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/company-center">
+            <LayoutDashboard className="h-4 w-4" />
+            {ar ? "مركز قيادة الشركة" : "Command Center"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/company-campaigns">
+            <Sparkles className="h-4 w-4" />
+            {ar ? "حملاتي" : "Campaigns"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/leads">
+            <Inbox className="h-4 w-4" />
+            {ar ? "الطلبات" : "Leads"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/analytics">
+            <Activity className="h-4 w-4" />
+            {ar ? "الإحصائيات" : "Analytics"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/wallet">{ar ? "المحفظة" : "Wallet"}</Link>
+        </Button>
       </div>
-
 
       {/* Advanced tools — hidden by default */}
       <Collapsible className="mt-4">
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
             {ar ? "أدوات إضافية" : "More tools"}
             <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-3">
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline"><Link to="/company">{t("nav_company_profile")}</Link></Button>
-            <Button asChild variant="outline" className="gap-2"><Link to="/company-profile-extra"><Building2 className="h-4 w-4" />{ar ? "تخصيص الملف" : "Profile extras"}</Link></Button>
-            <Button asChild variant="outline" className="gap-2"><Link to="/analytics"><Sparkles className="h-4 w-4" />{ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}</Link></Button>
+            <Button asChild variant="outline">
+              <Link to="/company">{t("nav_company_profile")}</Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/company-profile-extra">
+                <Building2 className="h-4 w-4" />
+                {ar ? "تخصيص الملف" : "Profile extras"}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/analytics">
+                <Sparkles className="h-4 w-4" />
+                {ar ? "تمييز إعلان (199/599 ج.م)" : "Feature listing (199/599 EGP)"}
+              </Link>
+            </Button>
             <FactoryDirectoryButton ar={ar} />
-            <Button asChild variant="outline"><Link to="/commissions">{t("nav_commissions")}</Link></Button>
-            <Button asChild variant="outline"><Link to="/invoices">{ar ? "الفواتير" : "Invoices"}</Link></Button>
+            <Button asChild variant="outline">
+              <Link to="/commissions">{t("nav_commissions")}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/invoices">{ar ? "الفواتير" : "Invoices"}</Link>
+            </Button>
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -262,21 +453,49 @@ function CompanyDash({ counts, sub, ar }: { counts: Counts; sub: CompanySubscrip
 function AgentDash({ counts }: { counts: Counts }) {
   const { user } = useAuth();
   const [stats, setStats] = useState<{
-    balance: number; pending: number; earned: number; withdrawn: number;
-    pendingC: number; approvedC: number; paidC: number;
-    clicks: number; leads: number; deals: number;
+    balance: number;
+    pending: number;
+    earned: number;
+    withdrawn: number;
+    pendingC: number;
+    approvedC: number;
+    paidC: number;
+    clicks: number;
+    leads: number;
+    deals: number;
   } | null>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: ag } = await supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle();
+      const { data: ag } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
       if (!ag) return;
       const [w, cP, cA, cPaid, refs] = await Promise.all([
-        supabase.from("wallets").select("balance,pending_balance,total_earned,total_paid_out").eq("user_id", user.id).eq("kind", "agent").maybeSingle(),
-        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "pending"),
-        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "approved"),
-        supabase.from("commissions").select("id", { count: "exact", head: true }).eq("agent_id", ag.id).eq("status", "paid"),
+        supabase
+          .from("wallets")
+          .select("balance,pending_balance,total_earned,total_paid_out")
+          .eq("user_id", user.id)
+          .eq("kind", "agent")
+          .maybeSingle(),
+        supabase
+          .from("commissions")
+          .select("id", { count: "exact", head: true })
+          .eq("agent_id", ag.id)
+          .eq("status", "pending"),
+        supabase
+          .from("commissions")
+          .select("id", { count: "exact", head: true })
+          .eq("agent_id", ag.id)
+          .eq("status", "approved"),
+        supabase
+          .from("commissions")
+          .select("id", { count: "exact", head: true })
+          .eq("agent_id", ag.id)
+          .eq("status", "paid"),
         supabase.from("referrals").select("clicks,conversions").eq("agent_id", ag.id),
       ]);
       const clicks = (refs.data ?? []).reduce((s, r) => s + (r.clicks ?? 0), 0);
@@ -296,7 +515,18 @@ function AgentDash({ counts }: { counts: Counts }) {
     })();
   }, [user, counts.referrals]);
 
-  const s = stats ?? { balance: 0, pending: 0, earned: 0, withdrawn: 0, pendingC: 0, approvedC: 0, paidC: 0, clicks: 0, leads: 0, deals: 0 };
+  const s = stats ?? {
+    balance: 0,
+    pending: 0,
+    earned: 0,
+    withdrawn: 0,
+    pendingC: 0,
+    approvedC: 0,
+    paidC: 0,
+    clicks: 0,
+    leads: 0,
+    deals: 0,
+  };
   const convRate = s.clicks > 0 ? Math.round((s.deals / s.clicks) * 100) : 0;
   return (
     <>
@@ -319,17 +549,55 @@ function AgentDash({ counts }: { counts: Counts }) {
         <Stat icon={Link2} label="روابط الإحالة" value={String(counts.referrals)} />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold"><Link to="/campaigns"><Sparkles className="h-5 w-5" />ابدأ الربح</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/campaigns"><Sparkles className="h-4 w-4" />فرص التسويق</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/referrals"><Link2 className="h-4 w-4" />روابط التسويق</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/commissions"><ClipboardList className="h-4 w-4" />العمولات</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/wallet"><DollarSign className="h-4 w-4" />المحفظة</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/payouts"><DollarSign className="h-4 w-4" />طلب سحب</Link></Button>
-        <Button asChild variant="outline"><Link to="/messages">الرسائل</Link></Button>
-        <Button asChild variant="outline"><Link to="/agent">ملفي الشخصي</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/agent-performance"><Activity className="h-4 w-4" />الأداء</Link></Button>
+        <Button asChild size="lg" className="bg-primary hover:bg-primary-hover gap-2 shadow-gold">
+          <Link to="/campaigns">
+            <Sparkles className="h-5 w-5" />
+            ابدأ الربح
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/campaigns">
+            <Sparkles className="h-4 w-4" />
+            فرص التسويق
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/referrals">
+            <Link2 className="h-4 w-4" />
+            روابط التسويق
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/commissions">
+            <ClipboardList className="h-4 w-4" />
+            العمولات
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/wallet">
+            <DollarSign className="h-4 w-4" />
+            المحفظة
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/payouts">
+            <DollarSign className="h-4 w-4" />
+            طلب سحب
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/messages">الرسائل</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/agent">ملفي الشخصي</Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/agent-performance">
+            <Activity className="h-4 w-4" />
+            الأداء
+          </Link>
+        </Button>
       </div>
-
     </>
   );
 }
@@ -342,15 +610,46 @@ function AdminDash({ counts }: { counts: Counts }) {
         <Stat icon={Briefcase} label={t("dashboard_companies")} value={String(counts.companies)} />
         <Stat icon={Users} label={t("nav_agents")} value={String(counts.agents)} />
         <Stat icon={FileText} label={t("total_listings")} value={String(counts.listings)} />
-        <Stat icon={ClipboardList} label={t("dashboard_moderation")} value={String(counts.pendingListings)} />
+        <Stat
+          icon={ClipboardList}
+          label={t("dashboard_moderation")}
+          value={String(counts.pendingListings)}
+        />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button asChild variant="outline" className="gap-2"><Link to="/verification"><ShieldCheck className="h-4 w-4" />{t("nav_verification")}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/admin-companies"><Crown className="h-4 w-4" />Companies</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/admin-withdrawals"><DollarSign className="h-4 w-4" />Withdrawals</Link></Button>
-        <Button asChild variant="outline"><Link to="/marketplace">{t("nav_marketplace")}</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/admin-revenue"><DollarSign className="h-4 w-4" />Revenue</Link></Button>
-        <Button asChild variant="outline" className="gap-2"><Link to="/admin-executive"><Activity className="h-4 w-4" />Executive</Link></Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/verification">
+            <ShieldCheck className="h-4 w-4" />
+            {t("nav_verification")}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/admin-companies">
+            <Crown className="h-4 w-4" />
+            Companies
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/admin-withdrawals">
+            <DollarSign className="h-4 w-4" />
+            Withdrawals
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/marketplace">{t("nav_marketplace")}</Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/admin-revenue">
+            <DollarSign className="h-4 w-4" />
+            Revenue
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/admin-executive">
+            <Activity className="h-4 w-4" />
+            Executive
+          </Link>
+        </Button>
       </div>
     </>
   );
@@ -363,8 +662,11 @@ function FactoryDirectoryButton({ ar }: { ar: boolean }) {
     try {
       await upsertMyFactory({ data: { export_available: false } });
       toast.success(ar ? "تمت إضافتك إلى دليل المصانع" : "Added to factory directory");
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setBusy(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <Button variant="outline" className="gap-2" onClick={add} disabled={busy}>

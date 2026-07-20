@@ -30,16 +30,30 @@ export const getMyCompany = createServerFn({ method: "GET" })
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
-      .from("companies").select("*").eq("owner_id", userId).maybeSingle();
+      .from("companies")
+      .select("*")
+      .eq("owner_id", userId)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     return { company: data };
   });
 
 export const upsertMyCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => schema.extend({
-    referral_code: z.string().trim().min(4).max(40).optional().or(z.literal("")).transform((v) => v || undefined),
-  }).parse(d))
+  .inputValidator((d: unknown) =>
+    schema
+      .extend({
+        referral_code: z
+          .string()
+          .trim()
+          .min(4)
+          .max(40)
+          .optional()
+          .or(z.literal(""))
+          .transform((v) => v || undefined),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await assertNotPureMarketer(supabase as never, userId);
@@ -51,7 +65,10 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
       owner_id: userId,
     };
     const { data: existing } = await supabase
-      .from("companies").select("id").eq("owner_id", userId).maybeSingle();
+      .from("companies")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
     let companyId: string;
     let created: boolean;
     if (existing) {
@@ -60,7 +77,11 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
       companyId = existing.id;
       created = false;
     } else {
-      const { data: row, error } = await supabase.from("companies").insert(payload).select("id").single();
+      const { data: row, error } = await supabase
+        .from("companies")
+        .insert(payload)
+        .select("id")
+        .single();
       if (error) throw new Error(error.message);
       companyId = row.id;
       created = true;
@@ -72,7 +93,6 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
     }
     return { ok: true, id: companyId, created };
   });
-
 
 /**
  * Contact-info reveal for a company profile. Only authenticated users

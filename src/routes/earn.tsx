@@ -38,9 +38,14 @@ function EarnPage() {
   // If logged-in user already has a marketer profile, send them straight to dashboard.
   useEffect(() => {
     if (!user) return;
-    supabase.from("agents").select("id").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      if (data?.id) navigate({ to: "/dashboard", replace: true });
-    });
+    supabase
+      .from("agents")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.id) navigate({ to: "/dashboard", replace: true });
+      });
   }, [user, navigate]);
 
   return (
@@ -79,16 +84,26 @@ function EarnPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               {user ? (
                 <>
-                  <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-accent text-accent-foreground hover:bg-accent/90"
+                  >
                     <Link to="/agent">{ar ? "أنشئ ملف المسوّق" : "Create marketer profile"}</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link to="/marketplace">{ar ? "تصفّح الإعلانات وابدأ" : "Browse listings"}</Link>
+                    <Link to="/marketplace">
+                      {ar ? "تصفّح الإعلانات وابدأ" : "Browse listings"}
+                    </Link>
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-accent text-accent-foreground hover:bg-accent/90"
+                  >
                     <Link to="/auth" search={{ mode: "signup" }}>
                       {ar ? "سجّل مجانًا وابدأ" : "Sign up free"}
                     </Link>
@@ -106,7 +121,9 @@ function EarnPage() {
       {/* Steps */}
       <section className="container-souqly py-16">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">{ar ? "3 خطوات وتبدأ الربح" : "3 steps to start earning"}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">
+            {ar ? "3 خطوات وتبدأ الربح" : "3 steps to start earning"}
+          </h2>
           <p className="mt-3 text-muted-foreground">
             {ar
               ? "بدون رأس مال، بدون مخزون، وبدون خبرة سابقة."
@@ -160,7 +177,9 @@ function EarnPage() {
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-3xl md:text-4xl font-bold">{ar ? "الكل يكسب" : "Everyone wins"}</h2>
             <p className="mt-3 text-muted-foreground">
-              {ar ? "نموذج ثلاثي عادل — لا خسائر، فقط نمو مشترك." : "A fair triangular model — no losses, only shared growth."}
+              {ar
+                ? "نموذج ثلاثي عادل — لا خسائر، فقط نمو مشترك."
+                : "A fair triangular model — no losses, only shared growth."}
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -169,25 +188,58 @@ function EarnPage() {
                 title: ar ? "المسوّق" : "The marketer",
                 accent: "text-accent",
                 items: ar
-                  ? ["عمولة على كل صفقة", "محفظة رقمية فورية", "أدوات مشاركة جاهزة", "تتبّع الأداء بشفافية"]
-                  : ["Commission on every deal", "Instant digital wallet", "Ready share tools", "Transparent tracking"],
+                  ? [
+                      "عمولة على كل صفقة",
+                      "محفظة رقمية فورية",
+                      "أدوات مشاركة جاهزة",
+                      "تتبّع الأداء بشفافية",
+                    ]
+                  : [
+                      "Commission on every deal",
+                      "Instant digital wallet",
+                      "Ready share tools",
+                      "Transparent tracking",
+                    ],
               },
               {
                 title: ar ? "الشركة" : "The company",
                 accent: "text-primary",
                 items: ar
-                  ? ["وصول لعملاء جدد", "دفع مقابل النتائج فقط", "علامة توثيق تبني الثقة", "لوحة تحليلات كاملة"]
-                  : ["New customer reach", "Pay only for results", "Verified badge builds trust", "Full analytics dashboard"],
+                  ? [
+                      "وصول لعملاء جدد",
+                      "دفع مقابل النتائج فقط",
+                      "علامة توثيق تبني الثقة",
+                      "لوحة تحليلات كاملة",
+                    ]
+                  : [
+                      "New customer reach",
+                      "Pay only for results",
+                      "Verified badge builds trust",
+                      "Full analytics dashboard",
+                    ],
               },
               {
                 title: ar ? "الزبون" : "The customer",
                 accent: "text-success",
                 items: ar
-                  ? ["شركات موثّقة فقط", "أسعار تنافسية", "دعم مباشر داخل المنصة", "حماية بيانات كاملة"]
-                  : ["Verified companies only", "Competitive prices", "In-platform support", "Full data protection"],
+                  ? [
+                      "شركات موثّقة فقط",
+                      "أسعار تنافسية",
+                      "دعم مباشر داخل المنصة",
+                      "حماية بيانات كاملة",
+                    ]
+                  : [
+                      "Verified companies only",
+                      "Competitive prices",
+                      "In-platform support",
+                      "Full data protection",
+                    ],
               },
             ].map((col) => (
-              <div key={col.title} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <div
+                key={col.title}
+                className="rounded-2xl border border-border bg-card p-6 shadow-card"
+              >
                 <h3 className={`text-xl font-bold ${col.accent}`}>{col.title}</h3>
                 <ul className="mt-4 space-y-2 text-sm">
                   {col.items.map((it) => (
@@ -223,7 +275,10 @@ function EarnPage() {
                 { k: ar ? "لكل صفقة" : "Per deal", v: "1,250" },
                 { k: ar ? "شهريًا" : "Monthly", v: "5,000+" },
               ].map((s) => (
-                <div key={s.k} className="rounded-xl bg-background/60 border border-border p-4 text-center">
+                <div
+                  key={s.k}
+                  className="rounded-xl bg-background/60 border border-border p-4 text-center"
+                >
                   <div className="text-2xl font-bold text-accent">{s.v}</div>
                   <div className="text-xs text-muted-foreground mt-1">{s.k}</div>
                 </div>
@@ -236,7 +291,9 @@ function EarnPage() {
       {/* CTA */}
       <section className="container-souqly pb-20">
         <div className="rounded-3xl bg-primary text-primary-foreground p-10 md:p-14 text-center shadow-gold">
-          <h2 className="text-3xl md:text-4xl font-bold">{ar ? "جاهز تبدأ اليوم؟" : "Ready to start today?"}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">
+            {ar ? "جاهز تبدأ اليوم؟" : "Ready to start today?"}
+          </h2>
           <p className="mt-3 opacity-90 max-w-xl mx-auto">
             {ar
               ? "التسجيل مجاني، ومحفظتك جاهزة خلال دقائق. فرصتك تبدأ من هنا."
@@ -249,10 +306,17 @@ function EarnPage() {
               </Button>
             ) : (
               <Button asChild size="lg" variant="secondary">
-                <Link to="/auth" search={{ mode: "signup" }}>{ar ? "سجّل مجانًا" : "Sign up free"}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  {ar ? "سجّل مجانًا" : "Sign up free"}
+                </Link>
               </Button>
             )}
-            <Button asChild size="lg" variant="outline" className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+            >
               <Link to="/marketplace">{ar ? "تصفّح الإعلانات" : "Browse listings"}</Link>
             </Button>
           </div>

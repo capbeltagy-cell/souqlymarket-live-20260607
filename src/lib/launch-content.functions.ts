@@ -173,7 +173,9 @@ export const listLaunchListings = createServerFn({ method: "GET" })
     await assertAdmin(ctx);
     let q = ctx.supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, governorate, city, price, currency, featured, status, source_name, source_url, import_batch_id, created_at")
+      .select(
+        "id, type, title_ar, title_en, governorate, city, price, currency, featured, status, source_name, source_url, import_batch_id, created_at",
+      )
       .eq("is_launch_content", true)
       .order("created_at", { ascending: false })
       .limit(500);

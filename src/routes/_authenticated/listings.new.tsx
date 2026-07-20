@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -40,7 +44,13 @@ function NewListing() {
   const fetchSub = useServerFn(getMyCompanySubscription);
   const create = useServerFn(createListing);
   const checkDup = useServerFn(checkListingDuplicate);
-  const [planInfo, setPlanInfo] = useState<{ plan: string; maxListings: number; currentListings: number; hasCompany: boolean; isPaid: boolean } | null>(null);
+  const [planInfo, setPlanInfo] = useState<{
+    plan: string;
+    maxListings: number;
+    currentListings: number;
+    hasCompany: boolean;
+    isPaid: boolean;
+  } | null>(null);
 
   // Required
   const [type, setType] = useState<ListingType>("product");
@@ -105,7 +115,8 @@ function NewListing() {
     })();
   }, [user, fetchPlan, fetchSub, navigate]);
 
-  const atLimit = planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
+  const atLimit =
+    planInfo && planInfo.maxListings !== -1 && planInfo.currentListings >= planInfo.maxListings;
 
   const onPdfUpload = async (file: File) => {
     if (!user) return;
@@ -114,15 +125,23 @@ function NewListing() {
       const path = `${user.id}/pdf-${Date.now()}.pdf`;
       const { error } = await supabase.storage.from("listing-media").upload(path, file);
       if (error) throw error;
-      const { data, error: sErr } = await supabase.storage.from("listing-media").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      const { data, error: sErr } = await supabase.storage
+        .from("listing-media")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
       if (sErr || !data?.signedUrl) throw sErr ?? new Error("Sign URL failed");
       setPdf(data.signedUrl);
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setPdfUploading(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setPdfUploading(false);
+    }
   };
 
   const useMyLocation = () => {
-    if (!navigator.geolocation) { toast.error("الموقع غير مدعوم"); return; }
+    if (!navigator.geolocation) {
+      toast.error("الموقع غير مدعوم");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLatitude(pos.coords.latitude.toFixed(6));
@@ -135,32 +154,56 @@ function NewListing() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!planInfo?.hasCompany) { toast.error(t("need_company_first")); return; }
-    if (atLimit) { navigate({ to: "/subscribe" }); return; }
+    if (!planInfo?.hasCompany) {
+      toast.error(t("need_company_first"));
+      return;
+    }
+    if (atLimit) {
+      navigate({ to: "/subscribe" });
+      return;
+    }
 
-    if (!title.trim()) { toast.error("أدخل عنوان الإعلان"); return; }
-    if (!governorate || !city) { toast.error("اختر المحافظة والمدينة"); return; }
-    if (images.length === 0) { toast.error("أضف صورة واحدة على الأقل"); return; }
+    if (!title.trim()) {
+      toast.error("أدخل عنوان الإعلان");
+      return;
+    }
+    if (!governorate || !city) {
+      toast.error("اختر المحافظة والمدينة");
+      return;
+    }
+    if (images.length === 0) {
+      toast.error("أضف صورة واحدة على الأقل");
+      return;
+    }
 
     setSubmitting(true);
     try {
       if (!forceDup) {
         try {
-          const dup = await checkDup({ data: {
-            title_ar: title, title_en: title_en || title, governorate,
-            phone: phone || whatsapp || null,
-            latitude: latitude ? Number(latitude) : null,
-            longitude: longitude ? Number(longitude) : null,
-          } });
+          const dup = await checkDup({
+            data: {
+              title_ar: title,
+              title_en: title_en || title,
+              governorate,
+              phone: phone || whatsapp || null,
+              latitude: latitude ? Number(latitude) : null,
+              longitude: longitude ? Number(longitude) : null,
+            },
+          });
           if (dup.severity === "exact") {
-            toast.error("هذا الإعلان مكرر بالفعل"); setSubmitting(false); return;
+            toast.error("هذا الإعلان مكرر بالفعل");
+            setSubmitting(false);
+            return;
           }
           if (dup.severity === "similar") {
             setForceDup(true);
             toast.warning("يوجد إعلان مشابه — اضغط نشر مرة أخرى للمتابعة كمراجعة");
-            setSubmitting(false); return;
+            setSubmitting(false);
+            return;
           }
-        } catch { /* non-fatal */ }
+        } catch {
+          /* non-fatal */
+        }
       }
 
       const legacy = toLegacyShape(images);
@@ -172,7 +215,8 @@ function NewListing() {
           description_ar: description || null,
           description_en: description_en || description || null,
           country: "Egypt",
-          city, governorate,
+          city,
+          governorate,
           location: [city, governorate, "Egypt"].filter(Boolean).join(" · "),
           latitude: latitude ? Number(latitude) : null,
           longitude: longitude ? Number(longitude) : null,
@@ -185,12 +229,19 @@ function NewListing() {
           commission_percentage: Number(commission || 5),
           marketer_promotion_enabled: promoEnabled,
           commission_type: commissionType,
-          commission_fixed_amount: promoEnabled && commissionType === "fixed" ? Number(commissionFixed || 0) : 0,
+          commission_fixed_amount:
+            promoEnabled && commissionType === "fixed" ? Number(commissionFixed || 0) : 0,
           conversion_goal: promoEnabled ? conversionGoal : null,
-          promotion_conditions: promoEnabled ? (promoConditions || null) : null,
+          promotion_conditions: promoEnabled ? promoConditions || null : null,
           promotion_status: promoEnabled ? promoStatus : "ended",
-          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
-          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
+          campaign_budget_egp:
+            promoEnabled && commissionType === "percentage" && campaignBudget
+              ? Number(campaignBudget)
+              : null,
+          campaign_max_conversions:
+            promoEnabled && commissionType === "fixed" && campaignMaxConversions
+              ? Number(campaignMaxConversions)
+              : null,
           images: legacy.images,
           image_sources: legacy.image_sources,
           phone: phone || null,
@@ -209,15 +260,19 @@ function NewListing() {
       });
       const pending = (res as { status?: string }).status === "pending_review";
       toast.success(pending ? "تم استلام إعلانك للمراجعة" : "تم نشر الإعلان بنجاح");
-      try { await navigate({ to: "/listings/$id", params: { id: res.id } }); }
-      catch { await navigate({ to: "/marketplace" }); }
+      try {
+        await navigate({ to: "/listings/$id", params: { id: res.id } });
+      } catch {
+        await navigate({ to: "/marketplace" });
+      }
     } catch (e) {
       const msg = (e as Error).message;
       if (msg.includes("LISTING_LIMIT_REACHED")) navigate({ to: "/subscribe" });
       else if (msg.includes("DUPLICATE_EXACT")) toast.error("هذا الإعلان مكرر");
       else toast.error(msg || "تعذّر نشر الإعلان");
+    } finally {
+      setSubmitting(false);
     }
-    finally { setSubmitting(false); }
   };
 
   return (
@@ -232,7 +287,8 @@ function NewListing() {
             </div>
             {planInfo && (
               <div className="text-xs text-muted-foreground">
-                {planInfo.currentListings}/{planInfo.maxListings === -1 ? "∞" : planInfo.maxListings}
+                {planInfo.currentListings}/
+                {planInfo.maxListings === -1 ? "∞" : planInfo.maxListings}
               </div>
             )}
           </div>
@@ -255,19 +311,29 @@ function NewListing() {
                 <div className="font-semibold">{t("plan_limits_reached")}</div>
               </div>
               <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-                <Link to="/subscribe"><Sparkles className="h-4 w-4" />{t("upgrade")}</Link>
+                <Link to="/subscribe">
+                  <Sparkles className="h-4 w-4" />
+                  {t("upgrade")}
+                </Link>
               </Button>
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="rounded-xl border border-border bg-card p-6 shadow-card space-y-5">
+          <form
+            onSubmit={onSubmit}
+            className="rounded-xl border border-border bg-card p-6 shadow-card space-y-5"
+          >
             {/* Type */}
             <Field label="نوع الإعلان" required>
               <Select value={type} onValueChange={(v) => setType(v as ListingType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {LISTING_TYPES.map((tp) => (
-                    <SelectItem key={tp} value={tp}>{t(`cat_${tp}` as never)}</SelectItem>
+                    <SelectItem key={tp} value={tp}>
+                      {t(`cat_${tp}` as never)}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -275,26 +341,52 @@ function NewListing() {
 
             {/* Title */}
             <Field label="العنوان" required>
-              <Input maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="اكتب عنوان واضح ومختصر" />
+              <Input
+                maxLength={200}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="اكتب عنوان واضح ومختصر"
+              />
             </Field>
 
             {/* Price */}
             <Field label="السعر (جنيه)" required>
-              <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="السعر بالجنيه المصري" />
+              <Input
+                type="number"
+                min={0}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="السعر بالجنيه المصري"
+              />
             </Field>
 
             {(type === "product" || type === "market") && (
               <div className="rounded-lg border border-border p-4 space-y-3">
                 <label className="flex items-center gap-2 text-sm font-medium">
-                  <input type="checkbox" checked={trackInventory} onChange={(e) => setTrackInventory(e.target.checked)} />
+                  <input
+                    type="checkbox"
+                    checked={trackInventory}
+                    onChange={(e) => setTrackInventory(e.target.checked)}
+                  />
                   تتبع المخزون ومنع البيع بعد نفاد الكمية
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="الكمية المتاحة">
-                    <Input type="number" min={0} disabled={!trackInventory} value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} />
+                    <Input
+                      type="number"
+                      min={0}
+                      disabled={!trackInventory}
+                      value={stockQuantity}
+                      onChange={(e) => setStockQuantity(e.target.value)}
+                    />
                   </Field>
                   <Field label="الحد الأدنى للطلب">
-                    <Input type="number" min={1} value={minOrderQuantity} onChange={(e) => setMinOrderQuantity(e.target.value)} />
+                    <Input
+                      type="number"
+                      min={1}
+                      value={minOrderQuantity}
+                      onChange={(e) => setMinOrderQuantity(e.target.value)}
+                    />
                   </Field>
                 </div>
               </div>
@@ -302,7 +394,12 @@ function NewListing() {
 
             {/* Description */}
             <Field label="الوصف">
-              <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="اكتب تفاصيل مفيدة للمشتري" />
+              <Textarea
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="اكتب تفاصيل مفيدة للمشتري"
+              />
             </Field>
 
             {/* Location */}
@@ -310,9 +407,11 @@ function NewListing() {
               required
               governorate={governorate}
               city={city}
-              onChange={({ governorate: g, city: c }) => { setGovernorate(g); setCity(c); }}
+              onChange={({ governorate: g, city: c }) => {
+                setGovernorate(g);
+                setCity(c);
+              }}
             />
-
 
             {/* Images */}
             <div className="space-y-2">
@@ -336,7 +435,8 @@ function NewListing() {
                 <div className="flex-1">
                   <div className="font-semibold text-sm">السماح للمسوقين بتسويق هذا الإعلان</div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    عند التفعيل: يظهر إعلانك في "فرص الربح" للمسوقين، وسيتم إخفاء بيانات التواصل المباشرة من الصفحة العامة لضمان إتمام الطلبات عبر سوقلي.
+                    عند التفعيل: يظهر إعلانك في "فرص الربح" للمسوقين، وسيتم إخفاء بيانات التواصل
+                    المباشرة من الصفحة العامة لضمان إتمام الطلبات عبر سوقلي.
                   </div>
                 </div>
               </label>
@@ -347,7 +447,9 @@ function NewListing() {
                     <Field label="نوع العمولة *">
                       <select
                         value={commissionType}
-                        onChange={(e) => setCommissionType(e.target.value as "percentage" | "fixed")}
+                        onChange={(e) =>
+                          setCommissionType(e.target.value as "percentage" | "fixed")
+                        }
                         className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                       >
                         <option value="percentage">نسبة مئوية من قيمة الطلب</option>
@@ -356,13 +458,26 @@ function NewListing() {
                     </Field>
                     {commissionType === "percentage" ? (
                       <Field label="نسبة العمولة (%) *">
-                        <Input type="number" min={0} max={100} step="0.1"
-                          value={commission} onChange={(e) => setCommission(e.target.value)} required />
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          step="0.1"
+                          value={commission}
+                          onChange={(e) => setCommission(e.target.value)}
+                          required
+                        />
                       </Field>
                     ) : (
                       <Field label="قيمة العمولة الثابتة (جنيه) *">
-                        <Input type="number" min={0} step="1"
-                          value={commissionFixed} onChange={(e) => setCommissionFixed(e.target.value)} required />
+                        <Input
+                          type="number"
+                          min={0}
+                          step="1"
+                          value={commissionFixed}
+                          onChange={(e) => setCommissionFixed(e.target.value)}
+                          required
+                        />
                       </Field>
                     )}
                   </div>
@@ -381,7 +496,9 @@ function NewListing() {
                     <Field label="حالة الحملة">
                       <select
                         value={promoStatus}
-                        onChange={(e) => setPromoStatus(e.target.value as "active" | "paused" | "ended")}
+                        onChange={(e) =>
+                          setPromoStatus(e.target.value as "active" | "paused" | "ended")
+                        }
                         className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                       >
                         <option value="active">نشطة</option>
@@ -393,21 +510,32 @@ function NewListing() {
                   <div className="grid sm:grid-cols-2 gap-3">
                     {commissionType === "percentage" ? (
                       <Field label="ميزانية الحملة (جنيه) *">
-                        <Input type="number" min={0} step="1"
-                          value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)}
+                        <Input
+                          type="number"
+                          min={0}
+                          step="1"
+                          value={campaignBudget}
+                          onChange={(e) => setCampaignBudget(e.target.value)}
                           placeholder="إجمالي العمولات المسموح صرفها"
-                          required={promoEnabled} />
+                          required={promoEnabled}
+                        />
                       </Field>
                     ) : (
                       <Field label="الحد الأقصى للتحويلات *">
-                        <Input type="number" min={1} step="1"
-                          value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)}
+                        <Input
+                          type="number"
+                          min={1}
+                          step="1"
+                          value={campaignMaxConversions}
+                          onChange={(e) => setCampaignMaxConversions(e.target.value)}
                           placeholder="عدد التحويلات المدفوعة كحد أقصى"
-                          required={promoEnabled} />
+                          required={promoEnabled}
+                        />
                       </Field>
                     )}
                     <div className="text-xs text-muted-foreground self-end pb-2">
-                      يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. راجع محفظة الشركة قبل التفعيل.
+                      يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. راجع محفظة
+                      الشركة قبل التفعيل.
                     </div>
                   </div>
                   <Field label="شروط العمولة (اختياري)">
@@ -430,55 +558,117 @@ function NewListing() {
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-4 pt-3">
-
-
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Field label="هاتف">
-                    <Input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="01XXXXXXXXX" />
+                    <Input
+                      type="tel"
+                      inputMode="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                    />
                   </Field>
                   <Field label="واتساب">
-                    <Input type="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="01XXXXXXXXX" />
+                    <Input
+                      type="tel"
+                      inputMode="tel"
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                    />
                   </Field>
                 </div>
-
-
 
                 {(type === "real_estate" || type === "land") && (
                   <>
                     <div className="grid sm:grid-cols-4 gap-4">
                       <Field label="النوع الفرعي">
-                        <select value={propertySubtype} onChange={(e) => setPropertySubtype(e.target.value)}
-                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                        <select
+                          value={propertySubtype}
+                          onChange={(e) => setPropertySubtype(e.target.value)}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                        >
                           <option value="">—</option>
                           {(type === "real_estate"
-                            ? [["apartment","شقة"],["villa","فيلا"],["shop","محل"],["office","مكتب"],["warehouse","مخزن"]]
-                            : [["agricultural","زراعية"],["industrial","صناعية"],["investment","استثمارية"],["building","بناء"]]
-                          ).map(([v, ar]) => <option key={v} value={v}>{ar}</option>)}
+                            ? [
+                                ["apartment", "شقة"],
+                                ["villa", "فيلا"],
+                                ["shop", "محل"],
+                                ["office", "مكتب"],
+                                ["warehouse", "مخزن"],
+                              ]
+                            : [
+                                ["agricultural", "زراعية"],
+                                ["industrial", "صناعية"],
+                                ["investment", "استثمارية"],
+                                ["building", "بناء"],
+                              ]
+                          ).map(([v, ar]) => (
+                            <option key={v} value={v}>
+                              {ar}
+                            </option>
+                          ))}
                         </select>
                       </Field>
-                      <Field label="المساحة (م²)"><Input type="number" min="0" value={areaSqm} onChange={(e) => setAreaSqm(e.target.value)} /></Field>
+                      <Field label="المساحة (م²)">
+                        <Input
+                          type="number"
+                          min="0"
+                          value={areaSqm}
+                          onChange={(e) => setAreaSqm(e.target.value)}
+                        />
+                      </Field>
                       {type === "real_estate" && (
                         <>
-                          <Field label="غرف النوم"><Input type="number" min="0" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} /></Field>
-                          <Field label="الحمامات"><Input type="number" min="0" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} /></Field>
+                          <Field label="غرف النوم">
+                            <Input
+                              type="number"
+                              min="0"
+                              value={bedrooms}
+                              onChange={(e) => setBedrooms(e.target.value)}
+                            />
+                          </Field>
+                          <Field label="الحمامات">
+                            <Input
+                              type="number"
+                              min="0"
+                              value={bathrooms}
+                              onChange={(e) => setBathrooms(e.target.value)}
+                            />
+                          </Field>
                         </>
                       )}
                     </div>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <Field label="الغرض">
-                        <select value={purpose} onChange={(e) => setPurpose(e.target.value as "sale" | "rent" | "")}
-                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                          <option value="">—</option><option value="sale">للبيع</option><option value="rent">للإيجار</option>
+                        <select
+                          value={purpose}
+                          onChange={(e) => setPurpose(e.target.value as "sale" | "rent" | "")}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                        >
+                          <option value="">—</option>
+                          <option value="sale">للبيع</option>
+                          <option value="rent">للإيجار</option>
                         </select>
                       </Field>
                       <Field label="نوع الملكية">
-                        <select value={ownershipType} onChange={(e) => setOwnershipType(e.target.value)}
-                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                          <option value="">—</option><option value="freehold">تمليك</option><option value="leasehold">إيجار طويل</option><option value="shared">مشترك</option>
+                        <select
+                          value={ownershipType}
+                          onChange={(e) => setOwnershipType(e.target.value)}
+                          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                        >
+                          <option value="">—</option>
+                          <option value="freehold">تمليك</option>
+                          <option value="leasehold">إيجار طويل</option>
+                          <option value="shared">مشترك</option>
                         </select>
                       </Field>
                       <Field label="العنوان التفصيلي (خاص)">
-                        <Input value={addressLine} onChange={(e) => setAddressLine(e.target.value)} maxLength={300} />
+                        <Input
+                          value={addressLine}
+                          onChange={(e) => setAddressLine(e.target.value)}
+                          maxLength={300}
+                        />
                       </Field>
                     </div>
                   </>
@@ -488,34 +678,82 @@ function NewListing() {
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <Label>الموقع على الخريطة</Label>
                     <div className="flex items-center gap-2">
-                      <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>استخدم موقعي</Button>
+                      <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                        استخدم موقعي
+                      </Button>
                       {latitude && longitude && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => { setLatitude(""); setLongitude(""); }}>مسح</Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setLatitude("");
+                            setLongitude("");
+                          }}
+                        >
+                          مسح
+                        </Button>
                       )}
                     </div>
                   </div>
                   {latitude && longitude && (
-                    <div className="text-xs text-success font-medium">تم تحديد الموقع ✓ {latitude}, {longitude}</div>
+                    <div className="text-xs text-success font-medium">
+                      تم تحديد الموقع ✓ {latitude}, {longitude}
+                    </div>
                   )}
                   <MapView
-                    markers={latitude && longitude ? [{ id: "preview", lat: Number(latitude), lng: Number(longitude), type, title, description: [city, governorate].filter(Boolean).join(" · ") }] : []}
-                    center={latitude && longitude ? [Number(latitude), Number(longitude)] : undefined}
+                    markers={
+                      latitude && longitude
+                        ? [
+                            {
+                              id: "preview",
+                              lat: Number(latitude),
+                              lng: Number(longitude),
+                              type,
+                              title,
+                              description: [city, governorate].filter(Boolean).join(" · "),
+                            },
+                          ]
+                        : []
+                    }
+                    center={
+                      latitude && longitude ? [Number(latitude), Number(longitude)] : undefined
+                    }
                     zoom={latitude && longitude ? 12 : 6}
-                    onMapClick={latitude && longitude ? undefined : (coords) => {
-                      setLatitude(coords.lat.toFixed(6));
-                      setLongitude(coords.lng.toFixed(6));
-                    }}
+                    onMapClick={
+                      latitude && longitude
+                        ? undefined
+                        : (coords) => {
+                            setLatitude(coords.lat.toFixed(6));
+                            setLongitude(coords.lng.toFixed(6));
+                          }
+                    }
                   />
                 </div>
 
                 <Field label="PDF (كتالوج / مواصفات)">
                   <div className="flex items-center gap-2">
                     <label className="flex-1 inline-flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-input bg-background cursor-pointer hover:bg-muted">
-                      {pdfUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                      <span className="truncate">{pdf_url ? pdf_url.split("/").pop() : "رفع ملف PDF"}</span>
-                      <input type="file" accept="application/pdf" className="hidden" onChange={(e) => e.target.files?.[0] && onPdfUpload(e.target.files[0])} />
+                      {pdfUploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      <span className="truncate">
+                        {pdf_url ? pdf_url.split("/").pop() : "رفع ملف PDF"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={(e) => e.target.files?.[0] && onPdfUpload(e.target.files[0])}
+                      />
                     </label>
-                    {pdf_url && <Button type="button" size="sm" variant="ghost" onClick={() => setPdf("")}><X className="h-4 w-4" /></Button>}
+                    {pdf_url && (
+                      <Button type="button" size="sm" variant="ghost" onClick={() => setPdf("")}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </Field>
               </CollapsibleContent>
@@ -527,7 +765,11 @@ function NewListing() {
                   {planError}
                 </div>
               )}
-              <Button type="submit" disabled={submitting} className="w-full h-12 bg-primary hover:bg-primary-hover text-base">
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full h-12 bg-primary hover:bg-primary-hover text-base"
+              >
                 {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
                 نشر الإعلان
               </Button>
@@ -540,6 +782,22 @@ function NewListing() {
   );
 }
 
-function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
-  return <div className="space-y-1.5"><Label>{label}{required && " *"}</Label>{children}</div>;
+function Field({
+  label,
+  children,
+  required,
+}: {
+  label: string;
+  children: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>
+        {label}
+        {required && " *"}
+      </Label>
+      {children}
+    </div>
+  );
 }

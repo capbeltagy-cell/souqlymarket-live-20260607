@@ -59,7 +59,9 @@ function OrderConfirmationPage() {
         </div>
 
         {loading ? (
-          <div className="text-center text-muted-foreground py-8">{ar ? "جارٍ التحميل…" : "Loading…"}</div>
+          <div className="text-center text-muted-foreground py-8">
+            {ar ? "جارٍ التحميل…" : "Loading…"}
+          </div>
         ) : (
           <>
             {/* Orders list */}
@@ -67,7 +69,11 @@ function OrderConfirmationPage() {
               {orders.map(({ order, listing }) => (
                 <div key={order.id} className="p-4 flex items-center gap-4">
                   {listing?.images?.[0] ? (
-                    <img src={listing.images[0]} alt="" className="h-14 w-14 rounded object-cover" />
+                    <img
+                      src={listing.images[0]}
+                      alt=""
+                      className="h-14 w-14 rounded object-cover"
+                    />
                   ) : (
                     <div className="h-14 w-14 rounded bg-muted grid place-items-center">
                       <Package className="h-5 w-5 text-muted-foreground" />
@@ -79,17 +85,24 @@ function OrderConfirmationPage() {
                       {listing?.title_ar ?? listing?.title_en ?? (ar ? "منتج" : "Product")}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      {order.quantity} × {Number(order.unit_price ?? 0).toLocaleString(ar ? "ar-EG" : "en")} {order.currency ?? "EGP"}
+                      {order.quantity} ×{" "}
+                      {Number(order.unit_price ?? 0).toLocaleString(ar ? "ar-EG" : "en")}{" "}
+                      {order.currency ?? "EGP"}
                     </div>
                   </div>
                   <div className="text-end">
                     <div className="font-semibold text-primary">
-                      {Number(order.total_amount ?? 0).toLocaleString(ar ? "ar-EG" : "en")} {order.currency ?? "EGP"}
+                      {Number(order.total_amount ?? 0).toLocaleString(ar ? "ar-EG" : "en")}{" "}
+                      {order.currency ?? "EGP"}
                     </div>
                     <Badge variant="secondary" className="mt-1 text-xs">
                       {order.payment_status === "paid"
-                        ? (ar ? "تم الدفع" : "Paid")
-                        : (ar ? "بانتظار الدفع" : "Payment required")}
+                        ? ar
+                          ? "تم الدفع"
+                          : "Paid"
+                        : ar
+                          ? "بانتظار الدفع"
+                          : "Payment required"}
                     </Badge>
                   </div>
                 </div>
@@ -119,16 +132,26 @@ function OrderConfirmationPage() {
                   </Link>
                 </Button>
               )}
-              {orders.filter(({ order }) => order.payment_status !== "paid").map(({ order }, index) => (
-                <Button asChild variant={index === 0 ? "default" : "outline"} key={`pay-${order.id}`}>
-                  <Link to="/orders/$id/pay" params={{ id: order.id }}>
-                    <CreditCard className="h-4 w-4 me-2" />
-                    {orders.length === 1
-                      ? (ar ? "الدفع الآن" : "Pay now")
-                      : (ar ? `دفع الطلب #${order.id.slice(0, 8)}` : `Pay order #${order.id.slice(0, 8)}`)}
-                  </Link>
-                </Button>
-              ))}
+              {orders
+                .filter(({ order }) => order.payment_status !== "paid")
+                .map(({ order }, index) => (
+                  <Button
+                    asChild
+                    variant={index === 0 ? "default" : "outline"}
+                    key={`pay-${order.id}`}
+                  >
+                    <Link to="/orders/$id/pay" params={{ id: order.id }}>
+                      <CreditCard className="h-4 w-4 me-2" />
+                      {orders.length === 1
+                        ? ar
+                          ? "الدفع الآن"
+                          : "Pay now"
+                        : ar
+                          ? `دفع الطلب #${order.id.slice(0, 8)}`
+                          : `Pay order #${order.id.slice(0, 8)}`}
+                    </Link>
+                  </Button>
+                ))}
               <Button asChild variant="ghost">
                 <Link to="/">
                   <ShoppingBag className="h-4 w-4 me-2" />

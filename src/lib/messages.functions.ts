@@ -9,11 +9,17 @@ export const startConversationForListing = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: listing, error: le } = await supabase
-      .from("listings").select("id, company_id").eq("id", data.listing_id).maybeSingle();
+      .from("listings")
+      .select("id, company_id")
+      .eq("id", data.listing_id)
+      .maybeSingle();
     if (le) throw le;
     if (!listing?.company_id) throw new Error("Listing has no company");
     const { data: company, error: ce } = await supabase
-      .from("companies").select("owner_id").eq("id", listing.company_id).maybeSingle();
+      .from("companies")
+      .select("owner_id")
+      .eq("id", listing.company_id)
+      .maybeSingle();
     if (ce) throw ce;
     if (!company?.owner_id) throw new Error("Company owner not found");
     if (company.owner_id === userId) throw new Error("لا يمكنك مراسلة نفسك");
@@ -28,7 +34,8 @@ export const startConversationForListing = createServerFn({ method: "POST" })
 
     const { data: created, error: xe } = await (supabase.from("conversations" as never) as any)
       .insert({ listing_id: data.listing_id, buyer_id: userId, seller_id: company.owner_id })
-      .select("id").single();
+      .select("id")
+      .single();
     if (xe) throw xe;
     return { id: created.id as string };
   });

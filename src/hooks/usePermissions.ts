@@ -53,9 +53,7 @@ export function usePermissions(): PermissionState {
         .select("permission, role")
         .in("role", roles as never);
 
-      const permissions = Array.from(
-        new Set((permRows ?? []).map((p) => p.permission as string))
-      );
+      const permissions = Array.from(new Set((permRows ?? []).map((p) => p.permission as string)));
       return { roles, permissions };
     },
   });
@@ -63,8 +61,7 @@ export function usePermissions(): PermissionState {
   const roles = (data?.roles ?? []) as AppRole[];
   const permissions = new Set<string>(data?.permissions ?? []);
 
-  const has = (permission: string) =>
-    permissions.has("*") || permissions.has(permission);
+  const has = (permission: string) => permissions.has("*") || permissions.has(permission);
   const hasRole = (role: AppRole) => roles.includes(role);
   const hasAnyRole = (list: AppRole[]) => list.some((r) => roles.includes(r));
 

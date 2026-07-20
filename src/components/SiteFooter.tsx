@@ -30,11 +30,19 @@ export function SiteFooter() {
     return (
       <footer className="mt-16 border-t border-border bg-background">
         <div className="container-souqly py-4 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-          <span>© {new Date().getFullYear()} {t("brand")}</span>
+          <span>
+            © {new Date().getFullYear()} {t("brand")}
+          </span>
           <nav className="flex flex-wrap items-center gap-4">
-            <Link to="/terms" className="hover:text-gold transition">شروط الاستخدام</Link>
-            <Link to="/privacy" className="hover:text-gold transition">الخصوصية</Link>
-            <Link to="/contact" className="hover:text-gold transition">تواصل معنا</Link>
+            <Link to="/terms" className="hover:text-gold transition">
+              شروط الاستخدام
+            </Link>
+            <Link to="/privacy" className="hover:text-gold transition">
+              الخصوصية
+            </Link>
+            <Link to="/contact" className="hover:text-gold transition">
+              تواصل معنا
+            </Link>
           </nav>
         </div>
       </footer>
@@ -52,35 +60,52 @@ export function SiteFooter() {
               </div>
               <span className="text-serif text-2xl text-foreground">{t("brand")}</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-5">{t("footer_tagline")}</p>
-            <a href="mailto:support@souqlymarket.com" className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold-soft transition">
-              <Mail className="h-4 w-4" />support@souqlymarket.com
+            <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+              {t("footer_tagline")}
+            </p>
+            <a
+              href="mailto:support@souqlymarket.com"
+              className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold-soft transition"
+            >
+              <Mail className="h-4 w-4" />
+              support@souqlymarket.com
             </a>
           </div>
-          <FooterCol title="المنصة" links={[
-            { to: "/marketplace", label: "السوق" },
-            { to: "/wholesale", label: "سوق الجملة" },
-            { to: "/factories", label: "المصانع" },
-            { to: "/rfq", label: "طلبات الأسعار" },
-            { to: "/tenders", label: "المناقصات" },
-          ]} />
-          <FooterCol title="الشركة" links={[
-            { to: "/about", label: "من نحن" },
-            { to: "/how-it-works", label: "كيف يعمل سوقلي" },
-            { to: "/pricing", label: "الأسعار" },
-            { to: "/contact", label: "تواصل معنا" },
-            { to: "/faq", label: "الأسئلة الشائعة" },
-          ]} />
-          <FooterCol title="قانوني" links={[
-            { to: "/terms", label: "شروط الاستخدام" },
-            { to: "/privacy", label: "سياسة الخصوصية" },
-            { to: "/refund-policy", label: "سياسة الاسترداد" },
-          ]} />
+          <FooterCol
+            title="المنصة"
+            links={[
+              { to: "/marketplace", label: "السوق" },
+              { to: "/wholesale", label: "سوق الجملة" },
+              { to: "/factories", label: "المصانع" },
+              { to: "/rfq", label: "طلبات الأسعار" },
+              { to: "/tenders", label: "المناقصات" },
+            ]}
+          />
+          <FooterCol
+            title="الشركة"
+            links={[
+              { to: "/about", label: "من نحن" },
+              { to: "/how-it-works", label: "كيف يعمل سوقلي" },
+              { to: "/pricing", label: "الأسعار" },
+              { to: "/contact", label: "تواصل معنا" },
+              { to: "/faq", label: "الأسئلة الشائعة" },
+            ]}
+          />
+          <FooterCol
+            title="قانوني"
+            links={[
+              { to: "/terms", label: "شروط الاستخدام" },
+              { to: "/privacy", label: "سياسة الخصوصية" },
+              { to: "/refund-policy", label: "سياسة الاسترداد" },
+            ]}
+          />
         </div>
       </div>
       <div className="border-t border-border">
         <div className="container-souqly py-4 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-          <span>© {new Date().getFullYear()} {t("brand")} — جميع الحقوق محفوظة</span>
+          <span>
+            © {new Date().getFullYear()} {t("brand")} — جميع الحقوق محفوظة
+          </span>
           <span>صنع في مصر 🇪🇬</span>
         </div>
       </div>
@@ -95,7 +120,9 @@ function FooterCol({ title, links }: { title: string; links: { to: string; label
       <ul className="space-y-3 text-sm text-muted-foreground">
         {links.map((l) => (
           <li key={l.to}>
-            <Link to={l.to} className="hover:text-gold transition">{l.label}</Link>
+            <Link to={l.to} className="hover:text-gold transition">
+              {l.label}
+            </Link>
           </li>
         ))}
       </ul>

@@ -34,6 +34,10 @@ export default tseslint.config(
       ],
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+      // Legacy Supabase result adapters still contain explicit `any` values.
+      // Keep them visible without blocking production checks; new/edited code
+      // should use generated Database types or `unknown` and narrow safely.
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   eslintPluginPrettier,

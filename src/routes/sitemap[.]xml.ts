@@ -4,12 +4,32 @@ import type {} from "@tanstack/react-start";
 const BASE_URL = "https://souqlymarket.com";
 
 const STATIC_PATHS = [
-  "/", "/about", "/contact", "/faq", "/how-it-works", "/pricing",
-  "/privacy", "/terms", "/refund-policy",
-  "/marketplace", "/companies", "/agents", "/factories", "/categories",
-  "/rfq", "/tenders", "/wholesale", "/real-estate", "/lands",
-  "/map", "/search", "/search-all", "/subscribe",
-  "/auth", "/forgot-password", "/reset-password",
+  "/",
+  "/about",
+  "/contact",
+  "/faq",
+  "/how-it-works",
+  "/pricing",
+  "/privacy",
+  "/terms",
+  "/refund-policy",
+  "/marketplace",
+  "/companies",
+  "/agents",
+  "/factories",
+  "/categories",
+  "/rfq",
+  "/tenders",
+  "/wholesale",
+  "/real-estate",
+  "/lands",
+  "/map",
+  "/search",
+  "/search-all",
+  "/subscribe",
+  "/auth",
+  "/forgot-password",
+  "/reset-password",
 ];
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -17,8 +37,7 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         const urls = STATIC_PATHS.map(
-          (p) =>
-            `  <url><loc>${BASE_URL}${p}</loc><changefreq>weekly</changefreq></url>`,
+          (p) => `  <url><loc>${BASE_URL}${p}</loc><changefreq>weekly</changefreq></url>`,
         );
         const xml = [
           `<?xml version="1.0" encoding="UTF-8"?>`,

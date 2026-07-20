@@ -10,12 +10,25 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
-import { EGYPT_GOVERNORATES, getCitiesForGovernorate, normalizeEgyptCity, normalizeEgyptGovernorate } from "@/lib/egypt.locations";
+import {
+  EGYPT_GOVERNORATES,
+  getCitiesForGovernorate,
+  normalizeEgyptCity,
+  normalizeEgyptGovernorate,
+} from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { rankListings } from "@/lib/ranking";
 
 export const Route = createFileRoute("/marketplace")({
-  head: () => ({ meta: [{ title: "Marketplace — Souqly" }, { name: "description", content: "Browse B2B products, services, real estate, factories and opportunities." }] }),
+  head: () => ({
+    meta: [
+      { title: "Marketplace — Souqly" },
+      {
+        name: "description",
+        content: "Browse B2B products, services, real estate, factories and opportunities.",
+      },
+    ],
+  }),
   component: Marketplace,
 });
 
@@ -37,10 +50,12 @@ function Marketplace() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    
+
     let query = supabase
       .from("listings")
-      .select("id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)")
+      .select(
+        "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)",
+      )
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(120);
@@ -51,7 +66,9 @@ function Marketplace() {
       setItems(rankListings(rows));
       setLoading(false);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [type]);
 
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
@@ -61,25 +78,34 @@ function Marketplace() {
     const needle = deferredQ.trim().toLowerCase();
     return items.filter((l) => {
       if (type !== "all" && l.type !== type) return false;
-      if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate) return false;
+      if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate)
+        return false;
       if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
       if (!needle) return true;
-      const hay = `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
+      const hay =
+        `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
       return hay.includes(needle);
     });
   }, [items, deferredQ, type, governorate, city]);
 
-  const activeCount = (type !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
+  const activeCount =
+    (type !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
 
   const filterBody = (
     <div className="space-y-5">
       <div>
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_type")}</div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+          {t("filter_type")}
+        </div>
         <div className="flex flex-wrap gap-2">
           {TYPES.map((tp) => (
-            <Button key={tp.value} size="sm" variant={type === tp.value ? "default" : "outline"}
+            <Button
+              key={tp.value}
+              size="sm"
+              variant={type === tp.value ? "default" : "outline"}
               onClick={() => setType(tp.value)}
-              className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}>
+              className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}
+            >
               {t(tp.key as never)}
             </Button>
           ))}
@@ -87,20 +113,29 @@ function Marketplace() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_governorate")}</div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+            {t("filter_governorate")}
+          </div>
           <select
             className="w-full h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
             value={governorate}
-            onChange={(e) => { setGovernorate(e.target.value); setCity("all"); }}
+            onChange={(e) => {
+              setGovernorate(e.target.value);
+              setCity("all");
+            }}
           >
             <option value="all">{t("filter_governorate")}</option>
             {EGYPT_GOVERNORATES.map((gov) => (
-              <option key={gov.value} value={gov.value}>{locale === "ar" ? gov.label_ar : gov.label_en}</option>
+              <option key={gov.value} value={gov.value}>
+                {locale === "ar" ? gov.label_ar : gov.label_en}
+              </option>
             ))}
           </select>
         </div>
         <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("filter_city")}</div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+            {t("filter_city")}
+          </div>
           <select
             className="w-full h-12 rounded-xl border border-input bg-surface px-4 text-sm text-foreground"
             value={city}
@@ -109,14 +144,24 @@ function Marketplace() {
           >
             <option value="all">{t("filter_city")}</option>
             {cities.map((ct) => (
-              <option key={ct.value} value={ct.value}>{locale === "ar" ? ct.label_ar : ct.label_en}</option>
+              <option key={ct.value} value={ct.value}>
+                {locale === "ar" ? ct.label_ar : ct.label_en}
+              </option>
             ))}
           </select>
         </div>
       </div>
       {activeCount > 0 && (
-        <Button variant="ghost" size="sm" className="text-muted-foreground"
-          onClick={() => { setType("all"); setGovernorate("all"); setCity("all"); }}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          onClick={() => {
+            setType("all");
+            setGovernorate("all");
+            setCity("all");
+          }}
+        >
           <X className="h-4 w-4" /> {t("filter_all")}
         </Button>
       )}
@@ -134,14 +179,21 @@ function Marketplace() {
           <div className="flex items-center gap-2 max-w-2xl">
             <div className="relative flex-1">
               <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="ps-11 h-12 bg-surface" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("search_placeholder")}
+                className="ps-11 h-12 bg-surface"
+              />
             </div>
             <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="lg" className="lg:hidden h-12 shrink-0 relative">
                   <SlidersHorizontal className="h-4 w-4" />
                   {activeCount > 0 && (
-                    <span className="absolute -top-1 -end-1 h-5 min-w-[20px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold grid place-items-center px-1">{activeCount}</span>
+                    <span className="absolute -top-1 -end-1 h-5 min-w-[20px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold grid place-items-center px-1">
+                      {activeCount}
+                    </span>
                   )}
                 </Button>
               </SheetTrigger>
@@ -150,7 +202,10 @@ function Marketplace() {
                   <SheetTitle>{t("filter_type")}</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4">{filterBody}</div>
-                <Button className="w-full mt-6 bg-primary hover:bg-primary-hover" onClick={() => setFiltersOpen(false)}>
+                <Button
+                  className="w-full mt-6 bg-primary hover:bg-primary-hover"
+                  onClick={() => setFiltersOpen(false)}
+                >
                   {t("view_all")} ({filtered.length})
                 </Button>
               </SheetContent>
@@ -183,10 +238,14 @@ function Marketplace() {
           />
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
-            {filtered.map((l) => <ListingCard key={l.id} l={l} />)}
+            {filtered.map((l) => (
+              <ListingCard key={l.id} l={l} />
+            ))}
           </div>
         )}
-        <p className="mt-6 text-xs text-muted-foreground">{filtered.length} {t("listings_count")} • {locale.toUpperCase()}</p>
+        <p className="mt-6 text-xs text-muted-foreground">
+          {filtered.length} {t("listings_count")} • {locale.toUpperCase()}
+        </p>
       </section>
       <SiteFooter />
     </div>
@@ -205,4 +264,3 @@ function EmptyState({ title, cta }: { title: string; cta?: { label: string; to: 
     </div>
   );
 }
-

@@ -18,7 +18,10 @@ export const getMyAgent = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data, error } = await supabase
-      .from("agents").select("*").eq("user_id", userId).maybeSingle();
+      .from("agents")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     return { agent: data };
   });
@@ -30,13 +33,20 @@ export const upsertMyAgent = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const payload = { ...data, user_id: userId };
     const { data: existing } = await supabase
-      .from("agents").select("id").eq("user_id", userId).maybeSingle();
+      .from("agents")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (existing) {
       const { error } = await supabase.from("agents").update(payload).eq("id", existing.id);
       if (error) throw new Error(error.message);
       return { ok: true, id: existing.id, created: false };
     }
-    const { data: row, error } = await supabase.from("agents").insert(payload).select("id").single();
+    const { data: row, error } = await supabase
+      .from("agents")
+      .insert(payload)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { ok: true, id: row.id, created: true };
   });

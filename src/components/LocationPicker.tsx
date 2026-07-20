@@ -3,10 +3,21 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nProvider";
-import { EGYPT_GOVERNORATES, getCitiesForGovernorate, type EgyptLocation } from "@/lib/egypt.locations";
+import {
+  EGYPT_GOVERNORATES,
+  getCitiesForGovernorate,
+  type EgyptLocation,
+} from "@/lib/egypt.locations";
 
 type Props = {
   governorate: string;
@@ -26,7 +37,10 @@ export function LocationPicker({ governorate, city, onChange, required, labels }
   return (
     <div className="grid sm:grid-cols-2 gap-4">
       <div className="space-y-1.5">
-        <Label>{govLabel}{required && " *"}</Label>
+        <Label>
+          {govLabel}
+          {required && " *"}
+        </Label>
         <SearchableSelect
           value={governorate}
           options={EGYPT_GOVERNORATES}
@@ -37,15 +51,22 @@ export function LocationPicker({ governorate, city, onChange, required, labels }
         />
       </div>
       <div className="space-y-1.5">
-        <Label>{cityLabel}{required && " *"}</Label>
+        <Label>
+          {cityLabel}
+          {required && " *"}
+        </Label>
         <SearchableSelect
           value={city}
           options={cities}
           disabled={!governorate}
           placeholder={
             !governorate
-              ? (locale === "ar" ? "اختر المحافظة أولاً" : "Select governorate first")
-              : (locale === "ar" ? "اختر المدينة" : "Select city")
+              ? locale === "ar"
+                ? "اختر المحافظة أولاً"
+                : "Select governorate first"
+              : locale === "ar"
+                ? "اختر المدينة"
+                : "Select city"
           }
           searchPlaceholder={locale === "ar" ? "ابحث..." : "Search..."}
           emptyText={locale === "ar" ? "لا توجد نتائج" : "No results"}
@@ -57,7 +78,13 @@ export function LocationPicker({ governorate, city, onChange, required, labels }
 }
 
 function SearchableSelect({
-  value, options, onChange, placeholder, searchPlaceholder, emptyText, disabled,
+  value,
+  options,
+  onChange,
+  placeholder,
+  searchPlaceholder,
+  emptyText,
+  disabled,
 }: {
   value: string;
   options: EgyptLocation[];
@@ -80,7 +107,10 @@ function SearchableSelect({
           variant="outline"
           role="combobox"
           disabled={disabled}
-          className={cn("h-10 w-full justify-between font-normal", !displayLabel && "text-muted-foreground")}
+          className={cn(
+            "h-10 w-full justify-between font-normal",
+            !displayLabel && "text-muted-foreground",
+          )}
         >
           <span className="truncate">{displayLabel || placeholder}</span>
           <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
@@ -104,9 +134,14 @@ function SearchableSelect({
                 <CommandItem
                   key={o.value}
                   value={o.value}
-                  onSelect={() => { onChange(o.value); setOpen(false); }}
+                  onSelect={() => {
+                    onChange(o.value);
+                    setOpen(false);
+                  }}
                 >
-                  <Check className={cn("me-2 h-4 w-4", value === o.value ? "opacity-100" : "opacity-0")} />
+                  <Check
+                    className={cn("me-2 h-4 w-4", value === o.value ? "opacity-100" : "opacity-0")}
+                  />
                   {locale === "ar" ? o.label_ar : o.label_en}
                 </CommandItem>
               ))}
@@ -114,7 +149,6 @@ function SearchableSelect({
           </CommandList>
         </Command>
       </PopoverContent>
-
     </Popover>
   );
 }

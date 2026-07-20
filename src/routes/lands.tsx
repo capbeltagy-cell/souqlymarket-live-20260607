@@ -5,9 +5,15 @@ export const Route = createFileRoute("/lands")({
   head: () => ({
     meta: [
       { title: "Lands Marketplace — Souqly" },
-      { name: "description", content: "Agricultural, industrial, investment and building lands across Egypt." },
+      {
+        name: "description",
+        content: "Agricultural, industrial, investment and building lands across Egypt.",
+      },
       { property: "og:title", content: "Lands Marketplace — Souqly" },
-      { property: "og:description", content: "Agricultural, industrial, investment and building lands across Egypt." },
+      {
+        property: "og:description",
+        content: "Agricultural, industrial, investment and building lands across Egypt.",
+      },
     ],
   }),
   component: () => (

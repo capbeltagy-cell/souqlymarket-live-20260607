@@ -5,8 +5,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
 
 type AdItem =
-  | { kind: "listing"; id: string; title: string; image: string | null; badge: string; to: any; params: any }
-  | { kind: "company"; id: string; title: string; image: string | null; badge: string; to: any; params: any };
+  | {
+      kind: "listing";
+      id: string;
+      title: string;
+      image: string | null;
+      badge: string;
+      to: any;
+      params: any;
+    }
+  | {
+      kind: "company";
+      id: string;
+      title: string;
+      image: string | null;
+      badge: string;
+      to: any;
+      params: any;
+    };
 
 /**
  * Premium auto-scrolling featured advertisement bar.
@@ -99,14 +115,21 @@ export function FeaturedAdBar() {
               >
                 <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-white/[0.05] grid place-items-center">
                   {item.image ? (
-                    <img src={item.image} alt="" loading="lazy" className="h-full w-full object-cover" />
+                    <img
+                      src={item.image}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                   ) : item.kind === "company" ? (
                     <Building2 className="h-3.5 w-3.5 text-gold" />
                   ) : (
                     <Package className="h-3.5 w-3.5 text-gold" />
                   )}
                 </span>
-                <span className="text-xs font-medium text-foreground truncate min-w-0">{item.title}</span>
+                <span className="text-xs font-medium text-foreground truncate min-w-0">
+                  {item.title}
+                </span>
                 <span className="shrink-0 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-gold">
                   <BadgeCheck className="h-3 w-3" />
                   {item.badge}

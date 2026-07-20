@@ -23,14 +23,24 @@ export const Route = createFileRoute("/_authenticated/agent")({
 });
 
 type Form = {
-  headline_ar: string; headline_en: string;
-  bio_ar: string; bio_en: string;
-  governorate: string; city: string;
-  specialties: string[]; languages: string[];
+  headline_ar: string;
+  headline_en: string;
+  bio_ar: string;
+  bio_en: string;
+  governorate: string;
+  city: string;
+  specialties: string[];
+  languages: string[];
 };
 const empty: Form = {
-  headline_ar: "", headline_en: "", bio_ar: "", bio_en: "",
-  governorate: "", city: "", specialties: [], languages: [],
+  headline_ar: "",
+  headline_en: "",
+  bio_ar: "",
+  bio_en: "",
+  governorate: "",
+  city: "",
+  specialties: [],
+  languages: [],
 };
 
 function AgentEdit() {
@@ -47,27 +57,36 @@ function AgentEdit() {
   const { roles, loading: rolesLoading } = useAuth();
   useEffect(() => {
     if (rolesLoading) return;
-    const isCompany = roles.includes("company") && !roles.includes("agent") && !roles.includes("admin");
+    const isCompany =
+      roles.includes("company") && !roles.includes("agent") && !roles.includes("admin");
     if (isCompany) {
-      toast.error(locale === "ar" ? "هذه الصفحة مخصصة للمسوقين. تم توجيهك إلى لوحة الشركة." : "This page is for marketers. Redirecting to your company dashboard.");
+      toast.error(
+        locale === "ar"
+          ? "هذه الصفحة مخصصة للمسوقين. تم توجيهك إلى لوحة الشركة."
+          : "This page is for marketers. Redirecting to your company dashboard.",
+      );
       navigate({ to: "/dashboard", replace: true });
     }
   }, [rolesLoading, roles, locale, navigate]);
 
-
   useEffect(() => {
-    fetchMine().then((r) => {
-      if (r.agent) {
-        const a = r.agent;
-        setForm({
-          headline_ar: a.headline_ar ?? "", headline_en: a.headline_en ?? "",
-          bio_ar: a.bio_ar ?? "", bio_en: a.bio_en ?? "",
-          governorate: a.country ?? "", city: a.city ?? "",
-          specialties: (a.specialties ?? []) as string[],
-          languages: (a.languages ?? []) as string[],
-        });
-      }
-    }).finally(() => setLoading(false));
+    fetchMine()
+      .then((r) => {
+        if (r.agent) {
+          const a = r.agent;
+          setForm({
+            headline_ar: a.headline_ar ?? "",
+            headline_en: a.headline_en ?? "",
+            bio_ar: a.bio_ar ?? "",
+            bio_en: a.bio_en ?? "",
+            governorate: a.country ?? "",
+            city: a.city ?? "",
+            specialties: (a.specialties ?? []) as string[],
+            languages: (a.languages ?? []) as string[],
+          });
+        }
+      })
+      .finally(() => setLoading(false));
   }, [fetchMine]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -88,11 +107,19 @@ function AgentEdit() {
       });
       toast.success(res.created ? t("agent_created") : t("agent_updated"));
       navigate({ to: "/agents/$id", params: { id: res.id } });
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setSubmitting(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <Shell><div className="p-10 text-center text-muted-foreground">{t("loading")}</div></Shell>;
+  if (loading)
+    return (
+      <Shell>
+        <div className="p-10 text-center text-muted-foreground">{t("loading")}</div>
+      </Shell>
+    );
 
   return (
     <Shell>
@@ -101,21 +128,44 @@ function AgentEdit() {
           <UserCircle2 className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">{t("agent_profile")}</h1>
         </div>
-        <form onSubmit={onSubmit} className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5">
+        <form
+          onSubmit={onSubmit}
+          className="rounded-lg border border-border bg-card p-6 shadow-card space-y-5"
+        >
           <BilingualField
             label={locale === "ar" ? "التخصص المختصر" : "Short headline"}
             hasSecondary={!!(locale === "ar" ? form.headline_en : form.headline_ar)}
             primary={
               locale === "ar" ? (
-                <Input dir="rtl" value={form.headline_ar} onChange={(e) => setForm({ ...form, headline_ar: e.target.value })} placeholder="مسوق عقاري في القاهرة" />
+                <Input
+                  dir="rtl"
+                  value={form.headline_ar}
+                  onChange={(e) => setForm({ ...form, headline_ar: e.target.value })}
+                  placeholder="مسوق عقاري في القاهرة"
+                />
               ) : (
-                <Input value={form.headline_en} onChange={(e) => setForm({ ...form, headline_en: e.target.value })} placeholder="Real estate marketer in Cairo" />
+                <Input
+                  value={form.headline_en}
+                  onChange={(e) => setForm({ ...form, headline_en: e.target.value })}
+                  placeholder="Real estate marketer in Cairo"
+                />
               )
             }
             secondary={
-              locale === "ar"
-                ? <Input value={form.headline_en} onChange={(e) => setForm({ ...form, headline_en: e.target.value })} placeholder="Headline in English" />
-                : <Input dir="rtl" value={form.headline_ar} onChange={(e) => setForm({ ...form, headline_ar: e.target.value })} placeholder="العنوان بالعربية" />
+              locale === "ar" ? (
+                <Input
+                  value={form.headline_en}
+                  onChange={(e) => setForm({ ...form, headline_en: e.target.value })}
+                  placeholder="Headline in English"
+                />
+              ) : (
+                <Input
+                  dir="rtl"
+                  value={form.headline_ar}
+                  onChange={(e) => setForm({ ...form, headline_ar: e.target.value })}
+                  placeholder="العنوان بالعربية"
+                />
+              )
             }
           />
 
@@ -123,7 +173,10 @@ function AgentEdit() {
             governorate={form.governorate}
             city={form.city}
             onChange={({ governorate, city }) => setForm({ ...form, governorate, city })}
-            labels={{ governorate: locale === "ar" ? "المحافظة" : "Governorate", city: locale === "ar" ? "المدينة" : "City" }}
+            labels={{
+              governorate: locale === "ar" ? "المحافظة" : "Governorate",
+              city: locale === "ar" ? "المدينة" : "City",
+            }}
           />
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -145,27 +198,59 @@ function AgentEdit() {
             </Field>
           </div>
 
-
           <BilingualField
             label={locale === "ar" ? "نبذة عنك" : "Short bio"}
             hasSecondary={!!(locale === "ar" ? form.bio_en : form.bio_ar)}
             primary={
-              locale === "ar"
-                ? <Textarea dir="rtl" rows={4} value={form.bio_ar} onChange={(e) => setForm({ ...form, bio_ar: e.target.value })} placeholder="خبرتك، أهم إنجازاتك، وأنواع العملاء الذين تخدمهم" />
-                : <Textarea rows={4} value={form.bio_en} onChange={(e) => setForm({ ...form, bio_en: e.target.value })} placeholder="Your experience, key achievements, and the clients you serve" />
+              locale === "ar" ? (
+                <Textarea
+                  dir="rtl"
+                  rows={4}
+                  value={form.bio_ar}
+                  onChange={(e) => setForm({ ...form, bio_ar: e.target.value })}
+                  placeholder="خبرتك، أهم إنجازاتك، وأنواع العملاء الذين تخدمهم"
+                />
+              ) : (
+                <Textarea
+                  rows={4}
+                  value={form.bio_en}
+                  onChange={(e) => setForm({ ...form, bio_en: e.target.value })}
+                  placeholder="Your experience, key achievements, and the clients you serve"
+                />
+              )
             }
             secondary={
-              locale === "ar"
-                ? <Textarea rows={3} value={form.bio_en} onChange={(e) => setForm({ ...form, bio_en: e.target.value })} placeholder="Bio in English" />
-                : <Textarea rows={3} dir="rtl" value={form.bio_ar} onChange={(e) => setForm({ ...form, bio_ar: e.target.value })} placeholder="النبذة بالعربية" />
+              locale === "ar" ? (
+                <Textarea
+                  rows={3}
+                  value={form.bio_en}
+                  onChange={(e) => setForm({ ...form, bio_en: e.target.value })}
+                  placeholder="Bio in English"
+                />
+              ) : (
+                <Textarea
+                  rows={3}
+                  dir="rtl"
+                  value={form.bio_ar}
+                  onChange={(e) => setForm({ ...form, bio_ar: e.target.value })}
+                  placeholder="النبذة بالعربية"
+                />
+              )
             }
           />
 
           <div className="flex gap-2 pt-2">
-            <Button type="submit" disabled={submitting} className="bg-primary hover:bg-primary-hover">
-              {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}{t("profile_save")}
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="bg-primary hover:bg-primary-hover"
+            >
+              {submitting && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+              {t("profile_save")}
             </Button>
-            <Button asChild type="button" variant="outline"><Link to="/dashboard">{t("nav_dashboard")}</Link></Button>
+            <Button asChild type="button" variant="outline">
+              <Link to="/dashboard">{t("nav_dashboard")}</Link>
+            </Button>
           </div>
         </form>
       </div>
@@ -174,7 +259,12 @@ function AgentEdit() {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {children}
+    </div>
+  );
 }
 
 function Shell({ children }: { children: React.ReactNode }) {

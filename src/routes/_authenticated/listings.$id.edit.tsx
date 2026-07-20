@@ -9,7 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,13 +29,21 @@ export const Route = createFileRoute("/_authenticated/listings/$id/edit")({
 });
 
 type Row = {
-  id: string; company_id: string; type: string;
-  title_ar: string; title_en: string;
-  description_ar: string | null; description_en: string | null;
-  category: string | null; price: number | null;
-  city: string | null; governorate: string | null;
-  images: string[] | null; image_sources: string[] | null;
-  phone: string | null; whatsapp: string | null;
+  id: string;
+  company_id: string;
+  type: string;
+  title_ar: string;
+  title_en: string;
+  description_ar: string | null;
+  description_en: string | null;
+  category: string | null;
+  price: number | null;
+  city: string | null;
+  governorate: string | null;
+  images: string[] | null;
+  image_sources: string[] | null;
+  phone: string | null;
+  whatsapp: string | null;
   status: string;
   commission_percentage: number | null;
   marketer_promotion_enabled: boolean | null;
@@ -38,7 +52,9 @@ type Row = {
   conversion_goal: string | null;
   promotion_conditions: string | null;
   promotion_status: string | null;
-  track_inventory: boolean; stock_quantity: number | null; min_order_quantity: number;
+  track_inventory: boolean;
+  stock_quantity: number | null;
+  min_order_quantity: number;
 };
 
 function EditListing() {
@@ -85,13 +101,23 @@ function EditListing() {
   useEffect(() => {
     (async () => {
       if (!user) return;
-      const { data } = await supabase
+      const { data } = (await supabase
         .from("listings")
-        .select("id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, track_inventory, stock_quantity, min_order_quantity, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)")
+        .select(
+          "id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, track_inventory, stock_quantity, min_order_quantity, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)",
+        )
         .eq("id", id)
-        .maybeSingle() as { data: (Row & { companies: { owner_id: string } | null }) | null };
-      if (!data) { setLoading(false); setNotAuthorized(true); return; }
-      if (data.companies?.owner_id !== user.id) { setNotAuthorized(true); setLoading(false); return; }
+        .maybeSingle()) as { data: (Row & { companies: { owner_id: string } | null }) | null };
+      if (!data) {
+        setLoading(false);
+        setNotAuthorized(true);
+        return;
+      }
+      if (data.companies?.owner_id !== user.id) {
+        setNotAuthorized(true);
+        setLoading(false);
+        return;
+      }
       setRow(data);
       setTitleAr(data.title_ar ?? "");
       setTitleEn(data.title_en ?? "");
@@ -108,10 +134,13 @@ function EditListing() {
       setStatus((data.status as never) ?? "approved");
       const imgs = data.images ?? [];
       const srcs = data.image_sources ?? [];
-      setImages(imgs.map((url, i) => ({
-        url,
-        source: (srcs[i] === "live_capture" ? "live_capture" : "uploaded") as "live_capture" | "uploaded",
-      })));
+      setImages(
+        imgs.map((url, i) => ({
+          url,
+          source: (srcs[i] === "live_capture" ? "live_capture" : "uploaded") as
+            "live_capture" | "uploaded",
+        })),
+      );
       setPromoEnabled(!!data.marketer_promotion_enabled);
       setCommissionType((data.commission_type as never) ?? "percentage");
       setCommissionPct(String(data.commission_percentage ?? 5));
@@ -119,8 +148,14 @@ function EditListing() {
       setConversionGoal(data.conversion_goal ?? "order_paid");
       setPromoConditions(data.promotion_conditions ?? "");
       setPromoStatus((data.promotion_status as never) ?? "active");
-      setCampaignBudget((data as any).campaign_budget_egp != null ? String((data as any).campaign_budget_egp) : "");
-      setCampaignMaxConversions((data as any).campaign_max_conversions != null ? String((data as any).campaign_max_conversions) : "");
+      setCampaignBudget(
+        (data as any).campaign_budget_egp != null ? String((data as any).campaign_budget_egp) : "",
+      );
+      setCampaignMaxConversions(
+        (data as any).campaign_max_conversions != null
+          ? String((data as any).campaign_max_conversions)
+          : "",
+      );
       setLoading(false);
     })();
   }, [id, user]);
@@ -153,14 +188,23 @@ function EditListing() {
           conversion_goal: conversionGoal || null,
           promotion_conditions: promoConditions || null,
           promotion_status: promoStatus,
-          campaign_budget_egp: promoEnabled && commissionType === "percentage" && campaignBudget ? Number(campaignBudget) : null,
-          campaign_max_conversions: promoEnabled && commissionType === "fixed" && campaignMaxConversions ? Number(campaignMaxConversions) : null,
+          campaign_budget_egp:
+            promoEnabled && commissionType === "percentage" && campaignBudget
+              ? Number(campaignBudget)
+              : null,
+          campaign_max_conversions:
+            promoEnabled && commissionType === "fixed" && campaignMaxConversions
+              ? Number(campaignMaxConversions)
+              : null,
         },
       });
       toast.success(ar ? "تم حفظ التغييرات" : "Saved");
       navigate({ to: "/listings/$id", params: { id } });
-    } catch (err) { toast.error((err as Error).message); }
-    finally { setSaving(false); }
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const onDelete = async () => {
@@ -169,11 +213,21 @@ function EditListing() {
       await remove({ data: { id } });
       toast.success(ar ? "تم الحذف" : "Deleted");
       navigate({ to: "/dashboard" });
-    } catch (err) { toast.error((err as Error).message); }
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   if (loading) {
-    return <div className="min-h-screen flex flex-col"><SiteHeader /><div className="flex-1 grid place-items-center"><Loader2 className="h-6 w-6 animate-spin" /></div><SiteFooter /></div>;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <div className="flex-1 grid place-items-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+        <SiteFooter />
+      </div>
+    );
   }
   if (notAuthorized || !row) {
     return (
@@ -182,8 +236,12 @@ function EditListing() {
         <div className="flex-1 grid place-items-center p-8 text-center">
           <div>
             <h1 className="text-xl font-bold mb-2">{ar ? "غير مصرح" : "Not authorized"}</h1>
-            <p className="text-muted-foreground text-sm mb-4">{ar ? "لا يمكنك تعديل هذا الإعلان." : "You cannot edit this listing."}</p>
-            <Button asChild variant="outline"><Link to="/dashboard">{ar ? "العودة" : "Back"}</Link></Button>
+            <p className="text-muted-foreground text-sm mb-4">
+              {ar ? "لا يمكنك تعديل هذا الإعلان." : "You cannot edit this listing."}
+            </p>
+            <Button asChild variant="outline">
+              <Link to="/dashboard">{ar ? "العودة" : "Back"}</Link>
+            </Button>
           </div>
         </div>
         <SiteFooter />
@@ -198,22 +256,55 @@ function EditListing() {
       <SiteHeader />
       <form onSubmit={onSave} className="container-souqly py-6 flex-1 space-y-6 max-w-3xl">
         <div className="flex items-center justify-between">
-          <Button asChild variant="ghost" size="sm"><Link to="/listings/$id" params={{ id }}><ArrowLeft className="h-4 w-4 mr-1" />{ar ? "العودة للإعلان" : "Back"}</Link></Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/listings/$id" params={{ id }}>
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              {ar ? "العودة للإعلان" : "Back"}
+            </Link>
+          </Button>
           <h1 className="text-2xl font-bold">{ar ? "تعديل الإعلان" : "Edit listing"}</h1>
         </div>
 
         <section className="rounded-lg border border-border bg-card p-5 space-y-3">
           <h2 className="font-semibold">{ar ? "المحتوى" : "Content"}</h2>
-          <div><Label>{ar ? "العنوان (عربي)" : "Title (Arabic)"}</Label><Input value={titleAr} onChange={(e) => setTitleAr(e.target.value)} required minLength={2} /></div>
-          <div><Label>{ar ? "العنوان (إنجليزي)" : "Title (English)"}</Label><Input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} /></div>
-          <div><Label>{ar ? "الوصف (عربي)" : "Description (Arabic)"}</Label><Textarea rows={4} value={descAr} onChange={(e) => setDescAr(e.target.value)} /></div>
-          <div><Label>{ar ? "الوصف (إنجليزي)" : "Description (English)"}</Label><Textarea rows={4} value={descEn} onChange={(e) => setDescEn(e.target.value)} /></div>
+          <div>
+            <Label>{ar ? "العنوان (عربي)" : "Title (Arabic)"}</Label>
+            <Input
+              value={titleAr}
+              onChange={(e) => setTitleAr(e.target.value)}
+              required
+              minLength={2}
+            />
+          </div>
+          <div>
+            <Label>{ar ? "العنوان (إنجليزي)" : "Title (English)"}</Label>
+            <Input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} />
+          </div>
+          <div>
+            <Label>{ar ? "الوصف (عربي)" : "Description (Arabic)"}</Label>
+            <Textarea rows={4} value={descAr} onChange={(e) => setDescAr(e.target.value)} />
+          </div>
+          <div>
+            <Label>{ar ? "الوصف (إنجليزي)" : "Description (English)"}</Label>
+            <Textarea rows={4} value={descEn} onChange={(e) => setDescEn(e.target.value)} />
+          </div>
           <div className="grid sm:grid-cols-2 gap-3">
-            <div><Label>{ar ? "السعر" : "Price (EGP)"}</Label><Input type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} /></div>
+            <div>
+              <Label>{ar ? "السعر" : "Price (EGP)"}</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
             <div>
               <Label>{ar ? "الحالة" : "Status"}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as never)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="approved">{ar ? "منشور" : "Published"}</SelectItem>
                   <SelectItem value="hidden">{ar ? "مخفي" : "Hidden"}</SelectItem>
@@ -223,10 +314,34 @@ function EditListing() {
           </div>
           {(row?.type === "product" || row?.type === "market") && (
             <div className="rounded-md border border-border p-3 space-y-3">
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={trackInventory} onChange={(e) => setTrackInventory(e.target.checked)} />{ar ? "تتبع المخزون" : "Track inventory"}</label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={trackInventory}
+                  onChange={(e) => setTrackInventory(e.target.checked)}
+                />
+                {ar ? "تتبع المخزون" : "Track inventory"}
+              </label>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>{ar ? "الكمية المتاحة" : "Stock quantity"}</Label><Input type="number" min="0" disabled={!trackInventory} value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} /></div>
-                <div><Label>{ar ? "الحد الأدنى للطلب" : "Minimum order"}</Label><Input type="number" min="1" value={minOrderQuantity} onChange={(e) => setMinOrderQuantity(e.target.value)} /></div>
+                <div>
+                  <Label>{ar ? "الكمية المتاحة" : "Stock quantity"}</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    disabled={!trackInventory}
+                    value={stockQuantity}
+                    onChange={(e) => setStockQuantity(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>{ar ? "الحد الأدنى للطلب" : "Minimum order"}</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={minOrderQuantity}
+                    onChange={(e) => setMinOrderQuantity(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -237,19 +352,37 @@ function EditListing() {
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <Label>{ar ? "المحافظة" : "Governorate"}</Label>
-              <Select value={governorate} onValueChange={(v) => { setGovernorate(v); setCity(""); }}>
-                <SelectTrigger><SelectValue placeholder={ar ? "اختر" : "Select"} /></SelectTrigger>
+              <Select
+                value={governorate}
+                onValueChange={(v) => {
+                  setGovernorate(v);
+                  setCity("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={ar ? "اختر" : "Select"} />
+                </SelectTrigger>
                 <SelectContent>
-                  {EGYPT_GOVERNORATES.map((g) => <SelectItem key={g.value} value={g.value}>{ar ? g.label_ar : g.label_en}</SelectItem>)}
+                  {EGYPT_GOVERNORATES.map((g) => (
+                    <SelectItem key={g.value} value={g.value}>
+                      {ar ? g.label_ar : g.label_en}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>{ar ? "المدينة" : "City"}</Label>
               <Select value={city} onValueChange={setCity} disabled={!governorate}>
-                <SelectTrigger><SelectValue placeholder={ar ? "اختر" : "Select"} /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder={ar ? "اختر" : "Select"} />
+                </SelectTrigger>
                 <SelectContent>
-                  {cities.map((c) => <SelectItem key={c.value} value={c.value}>{ar ? c.label_ar : c.label_en}</SelectItem>)}
+                  {cities.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {ar ? c.label_ar : c.label_en}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -258,10 +391,28 @@ function EditListing() {
 
         <section className="rounded-lg border border-border bg-card p-5 space-y-3">
           <h2 className="font-semibold">{ar ? "التواصل" : "Contact"}</h2>
-          <p className="text-xs text-muted-foreground">{ar ? "عند تفعيل التسويق بالعمولة على هذا المنتج، يتم إخفاء بيانات التواصل عن العامة تلقائياً." : "When marketer promotion is enabled, contact details are auto-masked from the public."}</p>
+          <p className="text-xs text-muted-foreground">
+            {ar
+              ? "عند تفعيل التسويق بالعمولة على هذا المنتج، يتم إخفاء بيانات التواصل عن العامة تلقائياً."
+              : "When marketer promotion is enabled, contact details are auto-masked from the public."}
+          </p>
           <div className="grid sm:grid-cols-2 gap-3">
-            <div><Label>{ar ? "الهاتف" : "Phone"}</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+201..." /></div>
-            <div><Label>WhatsApp</Label><Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+201..." /></div>
+            <div>
+              <Label>{ar ? "الهاتف" : "Phone"}</Label>
+              <Input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+201..."
+              />
+            </div>
+            <div>
+              <Label>WhatsApp</Label>
+              <Input
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="+201..."
+              />
+            </div>
           </div>
         </section>
 
@@ -272,10 +423,24 @@ function EditListing() {
 
         <section className="rounded-lg border border-primary/40 bg-primary/5 p-5 space-y-3">
           <div className="flex items-start gap-2">
-            <input type="checkbox" id="promo" checked={promoEnabled} onChange={(e) => setPromoEnabled(e.target.checked)} className="mt-1 h-4 w-4" />
+            <input
+              type="checkbox"
+              id="promo"
+              checked={promoEnabled}
+              onChange={(e) => setPromoEnabled(e.target.checked)}
+              className="mt-1 h-4 w-4"
+            />
             <label htmlFor="promo" className="cursor-pointer">
-              <div className="font-semibold">{ar ? "السماح للمسوقين بتسويق هذا المنتج" : "Allow marketers to promote this product"}</div>
-              <p className="text-xs text-muted-foreground mt-1">{ar ? "سيظهر منتجك في فرص الربح وسيتم إنشاء عمولة تلقائياً عند إتمام صفقة عبر رابط المسوق." : "Your product appears in earning opportunities; a commission is auto-created when a deal closes through a marketer's link."}</p>
+              <div className="font-semibold">
+                {ar
+                  ? "السماح للمسوقين بتسويق هذا المنتج"
+                  : "Allow marketers to promote this product"}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {ar
+                  ? "سيظهر منتجك في فرص الربح وسيتم إنشاء عمولة تلقائياً عند إتمام صفقة عبر رابط المسوق."
+                  : "Your product appears in earning opportunities; a commission is auto-created when a deal closes through a marketer's link."}
+              </p>
             </label>
           </div>
           {promoEnabled && (
@@ -283,7 +448,9 @@ function EditListing() {
               <div>
                 <Label>{ar ? "نوع العمولة" : "Commission type"}</Label>
                 <Select value={commissionType} onValueChange={(v) => setCommissionType(v as never)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">{ar ? "نسبة مئوية" : "Percentage"}</SelectItem>
                     <SelectItem value="fixed">{ar ? "مبلغ ثابت" : "Fixed amount"}</SelectItem>
@@ -291,14 +458,35 @@ function EditListing() {
                 </Select>
               </div>
               {commissionType === "percentage" ? (
-                <div><Label>{ar ? "النسبة %" : "Percentage %"}</Label><Input type="number" min="0" max="100" step="0.1" value={commissionPct} onChange={(e) => setCommissionPct(e.target.value)} /></div>
+                <div>
+                  <Label>{ar ? "النسبة %" : "Percentage %"}</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={commissionPct}
+                    onChange={(e) => setCommissionPct(e.target.value)}
+                  />
+                </div>
               ) : (
-                <div><Label>{ar ? "المبلغ (جنيه)" : "Fixed amount (EGP)"}</Label><Input type="number" min="0" step="0.01" value={commissionFixed} onChange={(e) => setCommissionFixed(e.target.value)} /></div>
+                <div>
+                  <Label>{ar ? "المبلغ (جنيه)" : "Fixed amount (EGP)"}</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={commissionFixed}
+                    onChange={(e) => setCommissionFixed(e.target.value)}
+                  />
+                </div>
               )}
               <div>
                 <Label>{ar ? "هدف التحويل" : "Conversion goal"}</Label>
                 <Select value={conversionGoal} onValueChange={setConversionGoal}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="order_paid">{ar ? "طلب مدفوع" : "Paid order"}</SelectItem>
                     <SelectItem value="lead">{ar ? "عميل محتمل" : "Lead"}</SelectItem>
@@ -309,7 +497,9 @@ function EditListing() {
               <div>
                 <Label>{ar ? "حالة الحملة" : "Campaign status"}</Label>
                 <Select value={promoStatus} onValueChange={(v) => setPromoStatus(v as never)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">{ar ? "نشطة" : "Active"}</SelectItem>
                     <SelectItem value="paused">{ar ? "متوقفة" : "Paused"}</SelectItem>
@@ -320,28 +510,54 @@ function EditListing() {
               {commissionType === "percentage" ? (
                 <div>
                   <Label>{ar ? "ميزانية الحملة (جنيه)" : "Campaign budget (EGP)"}</Label>
-                  <Input type="number" min="0" step="1" value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)} placeholder={ar ? "إجمالي العمولات المسموح صرفها" : "Total commission cap"} />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={campaignBudget}
+                    onChange={(e) => setCampaignBudget(e.target.value)}
+                    placeholder={ar ? "إجمالي العمولات المسموح صرفها" : "Total commission cap"}
+                  />
                 </div>
               ) : (
                 <div>
                   <Label>{ar ? "الحد الأقصى للتحويلات" : "Max conversions"}</Label>
-                  <Input type="number" min="1" step="1" value={campaignMaxConversions} onChange={(e) => setCampaignMaxConversions(e.target.value)} placeholder={ar ? "عدد التحويلات القصوى" : "Maximum paid conversions"} />
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={campaignMaxConversions}
+                    onChange={(e) => setCampaignMaxConversions(e.target.value)}
+                    placeholder={ar ? "عدد التحويلات القصوى" : "Maximum paid conversions"}
+                  />
                 </div>
               )}
               <div className="sm:col-span-2">
                 <Label>{ar ? "شروط العمولة (اختياري)" : "Commission conditions (optional)"}</Label>
-                <Textarea rows={2} value={promoConditions} onChange={(e) => setPromoConditions(e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={promoConditions}
+                  onChange={(e) => setPromoConditions(e.target.value)}
+                />
               </div>
               <div className="sm:col-span-2 text-xs text-muted-foreground">
-                {ar ? "يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. تأكد من كفاية الرصيد." : "A portion of this commitment is reserved from the company wallet when the campaign is activated. Ensure sufficient balance."}
+                {ar
+                  ? "يتم حجز نسبة من هذا الالتزام من محفظة الشركة عند تفعيل الحملة. تأكد من كفاية الرصيد."
+                  : "A portion of this commitment is reserved from the company wallet when the campaign is activated. Ensure sufficient balance."}
               </div>
             </div>
           )}
         </section>
 
         <div className="flex flex-wrap gap-3 justify-between items-center pt-2">
-          <Button type="button" variant="destructive" onClick={onDelete}>{ar ? "حذف الإعلان" : "Delete listing"}</Button>
-          <Button type="submit" disabled={saving} className="gap-2 bg-primary hover:bg-primary-hover">
+          <Button type="button" variant="destructive" onClick={onDelete}>
+            {ar ? "حذف الإعلان" : "Delete listing"}
+          </Button>
+          <Button
+            type="submit"
+            disabled={saving}
+            className="gap-2 bg-primary hover:bg-primary-hover"
+          >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {ar ? "حفظ التغييرات" : "Save changes"}
           </Button>

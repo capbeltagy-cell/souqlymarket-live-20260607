@@ -28,14 +28,19 @@ export function listingCaption(input: {
 
   const isRealEstateLike = input.type === "real_estate" || input.type === "land";
   const header = isRealEstateLike
-    ? (ar ? "🏡 إعلان عقاري على سوقلي" : "🏡 Real-estate listing on Souqly")
-    : (ar ? "🔥 فرصة مميزة على سوقلي" : "🔥 Great opportunity on Souqly");
+    ? ar
+      ? "🏡 إعلان عقاري على سوقلي"
+      : "🏡 Real-estate listing on Souqly"
+    : ar
+      ? "🔥 فرصة مميزة على سوقلي"
+      : "🔥 Great opportunity on Souqly";
 
   const lines = [header, title];
   if (price) lines.push(ar ? `السعر: ${price}` : `Price: ${price}`);
   if (where) lines.push(ar ? `المكان: ${where}` : `Location: ${where}`);
   lines.push(ar ? "اطلب من هنا عبر سوقلي 👇" : "Order via Souqly 👇");
-  if (input.sourceName) lines.push(ar ? `المصدر: ${input.sourceName}` : `Source: ${input.sourceName}`);
+  if (input.sourceName)
+    lines.push(ar ? `المصدر: ${input.sourceName}` : `Source: ${input.sourceName}`);
   return lines.filter(Boolean).join("\n");
 }
 
@@ -50,10 +55,7 @@ export function companyCaption(input: {
   const ar = input.locale === "ar";
   const name = (ar ? input.nameAr : input.nameEn) ?? input.nameAr ?? input.nameEn ?? "";
   const where = loc(input.locale, input.governorate, input.city);
-  const lines = [
-    ar ? "🏢 شركة موثوقة على سوقلي" : "🏢 Trusted company on Souqly",
-    name,
-  ];
+  const lines = [ar ? "🏢 شركة موثوقة على سوقلي" : "🏢 Trusted company on Souqly", name];
   if (input.industry) lines.push(ar ? `النشاط: ${input.industry}` : `Industry: ${input.industry}`);
   if (where) lines.push(ar ? `المكان: ${where}` : `Location: ${where}`);
   lines.push(ar ? "تواصل عبر سوقلي 👇" : "Contact via Souqly 👇");

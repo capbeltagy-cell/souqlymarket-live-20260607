@@ -32,22 +32,31 @@ function ForgotPasswordPage() {
       toast.success(t("forgot_sent"));
     } catch (err) {
       toast.error((err as Error).message);
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
     <div className="min-h-screen grid place-items-center bg-surface-2 p-6">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-card">
         <Link to="/" className="inline-flex items-center gap-2 font-bold text-primary mb-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground"><Briefcase className="h-5 w-5" /></div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <Briefcase className="h-5 w-5" />
+          </div>
           {t("brand")}
         </Link>
         <h1 className="text-2xl font-bold mb-1">{t("forgot_title")}</h1>
         <p className="text-sm text-muted-foreground mb-6">{t("forgot_subtitle")}</p>
         {sent ? (
           <div className="space-y-4">
-            <div className="rounded-md bg-success/10 text-success p-4 text-sm">{t("forgot_sent")}</div>
-            <Button onClick={() => navigate({ to: "/auth" })} className="w-full bg-primary hover:bg-primary-hover">
+            <div className="rounded-md bg-success/10 text-success p-4 text-sm">
+              {t("forgot_sent")}
+            </div>
+            <Button
+              onClick={() => navigate({ to: "/auth" })}
+              className="w-full bg-primary hover:bg-primary-hover"
+            >
               {t("back_to_signin")}
             </Button>
           </div>
@@ -55,13 +64,28 @@ function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">{t("auth_email")}</Label>
-              <Input id="email" type="email" required className="mt-1.5" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                className="mt-1.5"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-            <Button type="submit" disabled={busy} className="w-full bg-primary hover:bg-primary-hover">
+            <Button
+              type="submit"
+              disabled={busy}
+              className="w-full bg-primary hover:bg-primary-hover"
+            >
               {t("forgot_send")}
             </Button>
-            <Link to="/auth" className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="h-3 w-3" />{t("back_to_signin")}
+            <Link
+              to="/auth"
+              className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              {t("back_to_signin")}
             </Link>
           </form>
         )}

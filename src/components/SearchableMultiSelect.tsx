@@ -3,7 +3,14 @@ import { Check, ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -25,7 +32,13 @@ type Props = {
 
 /** Searchable multi-select with chips. Values map to option.value. */
 export function SearchableMultiSelect({
-  value, options, onChange, placeholder, searchPlaceholder, emptyText, max,
+  value,
+  options,
+  onChange,
+  placeholder,
+  searchPlaceholder,
+  emptyText,
+  max,
 }: Props) {
   const { locale } = useI18n();
   const [open, setOpen] = useState(false);
@@ -52,12 +65,17 @@ export function SearchableMultiSelect({
             type="button"
             variant="outline"
             role="combobox"
-            className={cn("h-10 w-full justify-between font-normal", value.length === 0 && "text-muted-foreground")}
+            className={cn(
+              "h-10 w-full justify-between font-normal",
+              value.length === 0 && "text-muted-foreground",
+            )}
           >
             <span className="truncate">
               {value.length === 0
                 ? ph
-                : (locale === "ar" ? `${value.length} محدد` : `${value.length} selected`)}
+                : locale === "ar"
+                  ? `${value.length} محدد`
+                  : `${value.length} selected`}
             </span>
             <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>

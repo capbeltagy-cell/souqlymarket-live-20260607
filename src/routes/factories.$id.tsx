@@ -28,12 +28,16 @@ function FactoryProfile() {
 
   useEffect(() => {
     (async () => {
-      const { data: f } = await (supabase.from as any)("factories").select("*").eq("company_id", id).maybeSingle();
+      const { data: f } = await (supabase.from as any)("factories")
+        .select("*")
+        .eq("company_id", id)
+        .maybeSingle();
       setFactory(f);
       const { data: c } = await supabase
         .from("companies")
         .select("id, name_ar, name_en, logo_url, cover_url, industry, is_verified")
-        .eq("id", id).maybeSingle();
+        .eq("id", id)
+        .maybeSingle();
       setCompany(c);
       try {
         const { data: sess } = await supabase.auth.getSession();
@@ -41,7 +45,9 @@ function FactoryProfile() {
           const contact = await loadContact({ data: { id } });
           setPhone(contact.phone);
         }
-      } catch { /* anon */ }
+      } catch {
+        /* anon */
+      }
     })();
   }, [id, loadContact]);
 
@@ -54,34 +60,57 @@ function FactoryProfile() {
       <SiteHeader />
       <section className="container-souqly py-10 flex-1 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
-          {company.logo_url && <img src={company.logo_url} className="h-20 w-20 rounded-lg object-cover" alt="" />}
+          {company.logo_url && (
+            <img src={company.logo_url} className="h-20 w-20 rounded-lg object-cover" alt="" />
+          )}
           <div className="flex-1">
             <h1 className="text-3xl font-bold">{ar ? company.name_ar : company.name_en}</h1>
             <div className="flex gap-2 mt-2 flex-wrap">
               {company.is_verified && <TrustBadge kind="verified_company" />}
               {factory?.verified && <Badge>{ar ? "مصنع موثق" : "Verified factory"}</Badge>}
-              {factory?.export_available && <Badge variant="secondary">{ar ? "متاح للتصدير" : "Export"}</Badge>}
+              {factory?.export_available && (
+                <Badge variant="secondary">{ar ? "متاح للتصدير" : "Export"}</Badge>
+              )}
             </div>
           </div>
           {wa && (
             <div className="flex flex-col gap-2">
               <Button asChild className="gap-2 bg-success hover:bg-success/90">
-                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" />{ar ? "واتساب" : "WhatsApp"}</a>
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 w-4" />
+                  {ar ? "واتساب" : "WhatsApp"}
+                </a>
               </Button>
               <Button asChild variant="secondary" className="gap-2">
-                <a href={`tel:+${wa}`}><Phone className="h-4 w-4" />{ar ? "اتصال" : "Call"}</a>
+                <a href={`tel:+${wa}`}>
+                  <Phone className="h-4 w-4" />
+                  {ar ? "اتصال" : "Call"}
+                </a>
               </Button>
             </div>
           )}
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
-          <Info label={ar ? "المحافظة" : "Governorate"} value={company.governorate ?? company.city ?? company.country} />
-          <Info label={ar ? "الطاقة الإنتاجية" : "Production capacity"} value={factory?.production_capacity} />
+          <Info
+            label={ar ? "المحافظة" : "Governorate"}
+            value={company.governorate ?? company.city ?? company.country}
+          />
+          <Info
+            label={ar ? "الطاقة الإنتاجية" : "Production capacity"}
+            value={factory?.production_capacity}
+          />
           <Info label={ar ? "عدد العاملين" : "Employees"} value={factory?.employees_range} />
-          <Info label={ar ? "الشهادات" : "Certifications"} value={(factory?.certifications ?? []).join(", ") || "—"} />
+          <Info
+            label={ar ? "الشهادات" : "Certifications"}
+            value={(factory?.certifications ?? []).join(", ") || "—"}
+          />
         </div>
-        <p className="whitespace-pre-wrap text-muted-foreground">{ar ? company.description_ar : company.description_en}</p>
-        <Link to="/companies/$id" params={{ id: company.id }} className="text-primary underline">{ar ? "الملف الكامل للشركة" : "Full company profile"}</Link>
+        <p className="whitespace-pre-wrap text-muted-foreground">
+          {ar ? company.description_ar : company.description_en}
+        </p>
+        <Link to="/companies/$id" params={{ id: company.id }} className="text-primary underline">
+          {ar ? "الملف الكامل للشركة" : "Full company profile"}
+        </Link>
       </section>
       <SiteFooter />
     </div>
@@ -89,15 +118,21 @@ function FactoryProfile() {
 }
 
 function Info({ label, value }: { label: string; value: any }) {
-  return <div className="rounded-lg border border-border bg-card p-4"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium">{value ?? "—"}</div>
+    </div>
+  );
 }
-
 
 function Fallback({ msg }: { msg: string }) {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">
+        {msg}
+      </div>
       <SiteFooter />
     </div>
   );

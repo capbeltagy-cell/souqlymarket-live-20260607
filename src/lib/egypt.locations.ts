@@ -59,7 +59,11 @@ export const EGYPT_CITIES_BY_GOVERNORATE: Record<string, EgyptLocation[]> = {
     { value: "Tebin", label_en: "Tebin", label_ar: "التبين" },
     { value: "Badr City", label_en: "Badr City", label_ar: "مدينة بدر" },
     { value: "El Shorouk", label_en: "El Shorouk", label_ar: "الشروق" },
-    { value: "New Administrative Capital", label_en: "New Administrative Capital", label_ar: "العاصمة الإدارية الجديدة" },
+    {
+      value: "New Administrative Capital",
+      label_en: "New Administrative Capital",
+      label_ar: "العاصمة الإدارية الجديدة",
+    },
     { value: "Mokattam", label_en: "Mokattam", label_ar: "المقطم" },
     { value: "Old Cairo", label_en: "Old Cairo", label_ar: "مصر القديمة" },
     { value: "Sayeda Zeinab", label_en: "Sayeda Zeinab", label_ar: "السيدة زينب" },
@@ -180,7 +184,11 @@ export const EGYPT_CITIES_BY_GOVERNORATE: Record<string, EgyptLocation[]> = {
     { value: "Khanka", label_en: "Khanka", label_ar: "الخانكة" },
     { value: "Kafr Shukr", label_en: "Kafr Shukr", label_ar: "كفر شكر" },
     { value: "Shibin El Qanater", label_en: "Shibin El Qanater", label_ar: "شبين القناطر" },
-    { value: "El Qanater El Khayriya", label_en: "El Qanater El Khayriya", label_ar: "القناطر الخيرية" },
+    {
+      value: "El Qanater El Khayriya",
+      label_en: "El Qanater El Khayriya",
+      label_ar: "القناطر الخيرية",
+    },
     { value: "El Obour", label_en: "El Obour", label_ar: "العبور" },
     { value: "15th of May City", label_en: "15th of May City", label_ar: "مدينة 15 مايو" },
     { value: "El Khusus", label_en: "El Khusus", label_ar: "الخصوص" },
@@ -362,7 +370,7 @@ export const EGYPT_CITIES_BY_GOVERNORATE: Record<string, EgyptLocation[]> = {
     { value: "Juhaina", label_en: "Juhaina", label_ar: "جهينة" },
     { value: "Saqulta", label_en: "Saqulta", label_ar: "ساقلتة" },
     { value: "Tahta", label_en: "Tahta", label_ar: "طهطا" },
-									      { value: "Tama", label_en: "Tama", label_ar: "طما" },
+    { value: "Tama", label_en: "Tama", label_ar: "طما" },
   ],
   Qena: [
     { value: "Qena", label_en: "Qena", label_ar: "قنا" },
@@ -421,7 +429,6 @@ export const EGYPT_CITIES_BY_GOVERNORATE: Record<string, EgyptLocation[]> = {
   ],
 };
 
-
 const normalize = (value: string | null | undefined) => {
   if (!value) return null;
   const normalized = value.trim();
@@ -432,7 +439,9 @@ export function findGovernorateOption(value: string | null | undefined): EgyptLo
   const normalized = normalize(value);
   if (!normalized) return undefined;
   return EGYPT_GOVERNORATES.find((gov) =>
-    [gov.value, gov.label_en, gov.label_ar].some((label) => label.toLowerCase() === normalized.toLowerCase()),
+    [gov.value, gov.label_en, gov.label_ar].some(
+      (label) => label.toLowerCase() === normalized.toLowerCase(),
+    ),
   );
 }
 
@@ -441,7 +450,9 @@ export function findCityOption(value: string | null | undefined): EgyptLocation 
   if (!normalized) return undefined;
   for (const cities of Object.values(EGYPT_CITIES_BY_GOVERNORATE)) {
     const found = cities.find((city) =>
-      [city.value, city.label_en, city.label_ar].some((label) => label.toLowerCase() === normalized.toLowerCase()),
+      [city.value, city.label_en, city.label_ar].some(
+        (label) => label.toLowerCase() === normalized.toLowerCase(),
+      ),
     );
     if (found) return found;
   }
@@ -458,13 +469,19 @@ export function normalizeEgyptCity(value: string | null | undefined): string | n
   return found ? found.value : normalize(value);
 }
 
-export function translateEgyptGovernorate(value: string | null | undefined, locale: "en" | "ar" = "en"): string | null {
+export function translateEgyptGovernorate(
+  value: string | null | undefined,
+  locale: "en" | "ar" = "en",
+): string | null {
   const found = findGovernorateOption(value);
   if (!found) return normalize(value);
   return locale === "ar" ? found.label_ar : found.label_en;
 }
 
-export function translateEgyptCity(value: string | null | undefined, locale: "en" | "ar" = "en"): string | null {
+export function translateEgyptCity(
+  value: string | null | undefined,
+  locale: "en" | "ar" = "en",
+): string | null {
   const found = findCityOption(value);
   if (!found) return normalize(value);
   return locale === "ar" ? found.label_ar : found.label_en;

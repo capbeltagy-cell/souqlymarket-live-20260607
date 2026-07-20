@@ -9,7 +9,11 @@ export const Route = createFileRoute("/subscribe")({
   head: () => ({
     meta: [
       { title: "اشترك في باقة الشركة — سوقلي" },
-      { name: "description", content: "اشترك في باقة الشركة المدفوعة لإضافة إعلانات غير محدودة على سوقلي بسعر 499 جنيه شهرياً." },
+      {
+        name: "description",
+        content:
+          "اشترك في باقة الشركة المدفوعة لإضافة إعلانات غير محدودة على سوقلي بسعر 499 جنيه شهرياً.",
+      },
     ],
   }),
   component: Subscribe,
@@ -64,7 +68,9 @@ function Subscribe() {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" className="bg-primary hover:bg-primary-hover">
-                <a href="https://wa.me/201000000000" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a href="https://wa.me/201000000000" target="_blank" rel="noreferrer">
+                  WhatsApp
+                </a>
               </Button>
               <Button asChild size="sm" variant="outline">
                 <a href="mailto:billing@souqlymarket.com">billing@souqlymarket.com</a>
@@ -77,7 +83,10 @@ function Subscribe() {
               <Link to="/dashboard">{t("nav_dashboard")}</Link>
             </Button>
             <Button asChild className="bg-primary hover:bg-primary-hover gap-2">
-              <Link to="/pricing"><Sparkles className="h-4 w-4" />{t("section_pricing")}</Link>
+              <Link to="/pricing">
+                <Sparkles className="h-4 w-4" />
+                {t("section_pricing")}
+              </Link>
             </Button>
           </div>
         </div>

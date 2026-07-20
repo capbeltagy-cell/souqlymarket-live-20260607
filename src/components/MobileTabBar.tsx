@@ -10,20 +10,58 @@ export function MobileTabBar() {
   const ar = locale === "ar";
   const { user, roles } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isPureAgent = roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+  const isPureAgent =
+    roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
 
   const centerTab: Tab = isPureAgent
-    ? { to: "/campaigns", icon: PlusCircle, ar: "الفرص", en: "Opportunities", match: (p) => p.startsWith("/campaigns") }
+    ? {
+        to: "/campaigns",
+        icon: PlusCircle,
+        ar: "الفرص",
+        en: "Opportunities",
+        match: (p) => p.startsWith("/campaigns"),
+      }
     : user
-      ? { to: "/listings/new", icon: PlusCircle, ar: "أضف", en: "Post", match: (p) => p.startsWith("/listings/new") }
-      : { to: "/auth", icon: PlusCircle, ar: "ابدأ", en: "Start", match: (p) => p.startsWith("/auth") };
+      ? {
+          to: "/listings/new",
+          icon: PlusCircle,
+          ar: "أضف",
+          en: "Post",
+          match: (p) => p.startsWith("/listings/new"),
+        }
+      : {
+          to: "/auth",
+          icon: PlusCircle,
+          ar: "ابدأ",
+          en: "Start",
+          match: (p) => p.startsWith("/auth"),
+        };
 
   const tabs: Tab[] = [
     { to: "/", icon: Home, ar: "الرئيسية", en: "Home", match: (p) => p === "/" },
-    { to: "/search-all", icon: Search, ar: "بحث", en: "Search", match: (p) => p.startsWith("/search") },
+    {
+      to: "/search-all",
+      icon: Search,
+      ar: "بحث",
+      en: "Search",
+      match: (p) => p.startsWith("/search"),
+    },
     centerTab,
-    { to: user ? "/messages" : "/auth", icon: MessageSquare, ar: "الرسائل", en: "Chat", match: (p) => p.startsWith("/messages") },
-    { to: user ? "/dashboard" : "/auth", icon: UserIcon, ar: "حسابي", en: "Me", match: (p) => p.startsWith("/dashboard") || p.startsWith("/profile") || p.startsWith("/agent") },
+    {
+      to: user ? "/messages" : "/auth",
+      icon: MessageSquare,
+      ar: "الرسائل",
+      en: "Chat",
+      match: (p) => p.startsWith("/messages"),
+    },
+    {
+      to: user ? "/dashboard" : "/auth",
+      icon: UserIcon,
+      ar: "حسابي",
+      en: "Me",
+      match: (p) =>
+        p.startsWith("/dashboard") || p.startsWith("/profile") || p.startsWith("/agent"),
+    },
   ];
 
   return (

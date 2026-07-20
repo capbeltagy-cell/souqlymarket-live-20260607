@@ -12,7 +12,8 @@ export function useMarketerGuard() {
   const navigate = useNavigate();
   useEffect(() => {
     if (loading || !user) return;
-    const isPureAgent = roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+    const isPureAgent =
+      roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
     if (isPureAgent) {
       toast.error("هذه الصفحة مخصصة للشركات فقط");
       navigate({ to: "/dashboard", replace: true });

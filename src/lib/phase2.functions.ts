@@ -8,10 +8,12 @@ export const FEATURE_PRICING_EGP = { 7: 199, 30: 599 } as const;
 export const featureMyListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      listingId: z.string().uuid(),
-      days: z.union([z.literal(7), z.literal(30)]),
-    }).parse(d),
+    z
+      .object({
+        listingId: z.string().uuid(),
+        days: z.union([z.literal(7), z.literal(30)]),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -43,7 +45,11 @@ export const featureMyListing = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Record pending payment (online payments not yet enabled)
-    const { data: c } = await supabase.from("companies").select("id").eq("owner_id", userId).maybeSingle();
+    const { data: c } = await supabase
+      .from("companies")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
     await supabase.from("payments").insert({
       user_id: userId,
       company_id: c?.id ?? null,
@@ -61,14 +67,42 @@ export const featureMyListing = createServerFn({ method: "POST" })
 // ---------- Submit lead (public) ----------
 export const submitLead = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
-    z.object({
-      listingId: z.string().uuid(),
-      buyer_name: z.string().trim().min(2).max(120),
-      buyer_email: z.string().trim().email().max(255).optional().or(z.literal("")).transform((v) => v || undefined),
-      buyer_phone: z.string().trim().max(40).optional().or(z.literal("")).transform((v) => v || undefined),
-      message: z.string().trim().max(2000).optional().or(z.literal("")).transform((v) => v || undefined),
-      referral_code: z.string().trim().min(4).max(32).optional().or(z.literal("")).transform((v) => v || undefined),
-    }).parse(d),
+    z
+      .object({
+        listingId: z.string().uuid(),
+        buyer_name: z.string().trim().min(2).max(120),
+        buyer_email: z
+          .string()
+          .trim()
+          .email()
+          .max(255)
+          .optional()
+          .or(z.literal(""))
+          .transform((v) => v || undefined),
+        buyer_phone: z
+          .string()
+          .trim()
+          .max(40)
+          .optional()
+          .or(z.literal(""))
+          .transform((v) => v || undefined),
+        message: z
+          .string()
+          .trim()
+          .max(2000)
+          .optional()
+          .or(z.literal(""))
+          .transform((v) => v || undefined),
+        referral_code: z
+          .string()
+          .trim()
+          .min(4)
+          .max(32)
+          .optional()
+          .or(z.literal(""))
+          .transform((v) => v || undefined),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -97,17 +131,22 @@ export const submitLead = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-
 // ---------- Company: my leads ----------
 export const listMyLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: company } = await supabase.from("companies").select("id").eq("owner_id", userId).maybeSingle();
+    const { data: company } = await supabase
+      .from("companies")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
     if (!company) return { leads: [], companyId: null };
     const { data, error } = await supabase
       .from("leads")
-      .select("id, listing_id, buyer_name, buyer_email, buyer_phone, message, status, created_at, listings(title_ar, title_en)")
+      .select(
+        "id, listing_id, buyer_name, buyer_email, buyer_phone, message, status, created_at, listings(title_ar, title_en)",
+      )
       .eq("company_id", company.id)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -118,14 +157,18 @@ export const listMyLeads = createServerFn({ method: "GET" })
 export const updateLeadStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      leadId: z.string().uuid(),
-      status: z.enum(["new", "contacted", "negotiating", "won", "lost"]),
-    }).parse(d),
+    z
+      .object({
+        leadId: z.string().uuid(),
+        status: z.enum(["new", "contacted", "negotiating", "won", "lost"]),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
-      .from("leads").update({ status: data.status }).eq("id", data.leadId);
+      .from("leads")
+      .update({ status: data.status })
+      .eq("id", data.leadId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -136,14 +179,31 @@ export const getCompanyAnalytics = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: company } = await supabase
-      .from("companies").select("id, is_verified").eq("owner_id", userId).maybeSingle();
+      .from("companies")
+      .select("id, is_verified")
+      .eq("owner_id", userId)
+      .maybeSingle();
     if (!company) {
-      return { hasCompany: false, totals: { listings: 0, views: 0, clicks: 0, leads: 0, agentApplications: 0, conversionRate: 0 }, perListing: [], isVerified: false };
+      return {
+        hasCompany: false,
+        totals: {
+          listings: 0,
+          views: 0,
+          clicks: 0,
+          leads: 0,
+          agentApplications: 0,
+          conversionRate: 0,
+        },
+        perListing: [],
+        isVerified: false,
+      };
     }
     const [listingsRes, appsRes] = await Promise.all([
       supabase
         .from("listings")
-        .select("id, title_ar, title_en, views_count, clicks_count, leads_count, featured, featured_until, status")
+        .select(
+          "id, title_ar, title_en, views_count, clicks_count, leads_count, featured, featured_until, status",
+        )
         .eq("company_id", company.id)
         .order("views_count", { ascending: false }),
       supabase
@@ -160,9 +220,17 @@ export const getCompanyAnalytics = createServerFn({ method: "GET" })
         acc.leads += r.leads_count ?? 0;
         return acc;
       },
-      { listings: list.length, views: 0, clicks: 0, leads: 0, agentApplications: appsRes.count ?? 0, conversionRate: 0 },
+      {
+        listings: list.length,
+        views: 0,
+        clicks: 0,
+        leads: 0,
+        agentApplications: appsRes.count ?? 0,
+        conversionRate: 0,
+      },
     );
-    totals.conversionRate = totals.views > 0 ? Math.round((totals.leads / totals.views) * 1000) / 10 : 0;
+    totals.conversionRate =
+      totals.views > 0 ? Math.round((totals.leads / totals.views) * 1000) / 10 : 0;
     return {
       hasCompany: true,
       isVerified: !!company.is_verified,
@@ -182,7 +250,9 @@ export const adminSetCompanyVerified = createServerFn({ method: "POST" })
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
     const { error } = await supabase
-      .from("companies").update({ is_verified: data.verified }).eq("id", data.companyId);
+      .from("companies")
+      .update({ is_verified: data.verified })
+      .eq("id", data.companyId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

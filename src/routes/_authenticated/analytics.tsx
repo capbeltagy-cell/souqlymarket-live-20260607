@@ -1,7 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, BadgeCheck, Eye, Inbox, Loader2, MousePointerClick, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  BadgeCheck,
+  Eye,
+  Inbox,
+  Loader2,
+  MousePointerClick,
+  TrendingUp,
+} from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +29,28 @@ function Analytics() {
   const fetchAnalytics = useServerFn(getCompanyAnalytics);
   const [data, setData] = useState<Data | null>(null);
 
-  useEffect(() => { fetchAnalytics().then(setData); }, [fetchAnalytics]);
+  useEffect(() => {
+    fetchAnalytics().then(setData);
+  }, [fetchAnalytics]);
 
-  if (!data) return <Shell><div className="p-10 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div></Shell>;
+  if (!data)
+    return (
+      <Shell>
+        <div className="p-10 text-center text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin inline" />
+        </div>
+      </Shell>
+    );
   if (!data.hasCompany) {
     return (
       <Shell>
         <div className="rounded-lg border border-warning/40 bg-warning/10 p-6 text-center">
-          <p className="font-semibold">{ar ? "أنشئ ملف شركتك أولاً" : "Create your company profile first"}</p>
-          <Link to="/company" className="text-primary underline mt-2 inline-block">{ar ? "إنشاء شركة" : "Create company"}</Link>
+          <p className="font-semibold">
+            {ar ? "أنشئ ملف شركتك أولاً" : "Create your company profile first"}
+          </p>
+          <Link to="/company" className="text-primary underline mt-2 inline-block">
+            {ar ? "إنشاء شركة" : "Create company"}
+          </Link>
         </div>
       </Shell>
     );
@@ -45,7 +66,10 @@ function Analytics() {
           <h1 className="text-2xl font-bold">{ar ? "الإحصائيات" : "Analytics"}</h1>
         </div>
         {isVerified && (
-          <Badge className="gap-1 bg-primary text-primary-foreground"><BadgeCheck className="h-3 w-3" />{ar ? "موثقة" : "Verified"}</Badge>
+          <Badge className="gap-1 bg-primary text-primary-foreground">
+            <BadgeCheck className="h-3 w-3" />
+            {ar ? "موثقة" : "Verified"}
+          </Badge>
         )}
       </div>
 
@@ -53,8 +77,16 @@ function Analytics() {
         <Stat icon={Eye} label={ar ? "المشاهدات" : "Listing views"} value={totals.views} />
         <Stat icon={MousePointerClick} label={ar ? "النقرات" : "Clicks"} value={totals.clicks} />
         <Stat icon={Inbox} label={ar ? "الطلبات الواردة" : "Lead count"} value={totals.leads} />
-        <Stat icon={BadgeCheck} label={ar ? "طلبات الوكلاء" : "Agent applications"} value={totals.agentApplications} />
-        <Stat icon={TrendingUp} label={ar ? "معدل التحويل" : "Conversion rate"} value={`${totals.conversionRate}%`} />
+        <Stat
+          icon={BadgeCheck}
+          label={ar ? "طلبات الوكلاء" : "Agent applications"}
+          value={totals.agentApplications}
+        />
+        <Stat
+          icon={TrendingUp}
+          label={ar ? "معدل التحويل" : "Conversion rate"}
+          value={`${totals.conversionRate}%`}
+        />
       </div>
 
       <h2 className="font-semibold mb-3">{ar ? "أداء كل إعلان" : "Per-listing performance"}</h2>
@@ -77,12 +109,19 @@ function Analytics() {
             </thead>
             <tbody>
               {perListing.map((r) => {
-                const conv = r.views_count > 0 ? Math.round((r.leads_count / r.views_count) * 1000) / 10 : 0;
-                const featured = r.featured && (!r.featured_until || new Date(r.featured_until).getTime() > Date.now());
+                const conv =
+                  r.views_count > 0 ? Math.round((r.leads_count / r.views_count) * 1000) / 10 : 0;
+                const featured =
+                  r.featured &&
+                  (!r.featured_until || new Date(r.featured_until).getTime() > Date.now());
                 return (
                   <tr key={r.id} className="border-t border-border">
                     <td className="px-4 py-3">
-                      <Link to="/listings/$id" params={{ id: r.id }} className="font-medium hover:text-primary">
+                      <Link
+                        to="/listings/$id"
+                        params={{ id: r.id }}
+                        className="font-medium hover:text-primary"
+                      >
                         {(ar ? r.title_ar : r.title_en) || r.title_en || r.title_ar}
                       </Link>
                     </td>
@@ -92,8 +131,14 @@ function Analytics() {
                     <td className="px-4 py-3 text-end font-mono">{conv}%</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 flex-wrap">
-                        {featured && <Badge className="bg-accent text-accent-foreground">★ {ar ? "مميز" : "Featured"}</Badge>}
-                        <Badge variant="outline" className="capitalize">{r.status}</Badge>
+                        {featured && (
+                          <Badge className="bg-accent text-accent-foreground">
+                            ★ {ar ? "مميز" : "Featured"}
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="capitalize">
+                          {r.status}
+                        </Badge>
                       </div>
                     </td>
                   </tr>
@@ -107,10 +152,20 @@ function Analytics() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Eye; label: string; value: number | string }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Eye;
+  label: string;
+  value: number | string;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-5 shadow-card">
-      <div className="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center"><Icon className="h-5 w-5" /></div>
+      <div className="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center">
+        <Icon className="h-5 w-5" />
+      </div>
       <div className="mt-3 text-2xl font-bold">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{label}</div>
     </div>

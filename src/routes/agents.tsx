@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { rankAgents } from "@/lib/ranking";
 
 export const Route = createFileRoute("/agents")({
-  head: () => ({ meta: [{ title: "Agents — Souqly" }, { name: "description", content: "Top-performing B2B sales agents on Souqly." }] }),
+  head: () => ({
+    meta: [
+      { title: "Agents — Souqly" },
+      { name: "description", content: "Top-performing B2B sales agents on Souqly." },
+    ],
+  }),
   component: AgentsPage,
 });
 
@@ -20,16 +25,21 @@ function AgentsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: agents } = await supabase.from("agents")
-        .select("id, user_id, headline_ar, headline_en, country, is_verified, is_premium, is_trusted, created_at")
+      const { data: agents } = await supabase
+        .from("agents")
+        .select(
+          "id, user_id, headline_ar, headline_en, country, is_verified, is_premium, is_trusted, created_at",
+        )
         .limit(120);
       const ranked = rankAgents((agents ?? []) as any[]).slice(0, 60);
       const userIds = ranked.map((a: any) => a.user_id).filter(Boolean) as string[];
       const profiles = userIds.length
-        ? (await supabase.rpc("get_public_profiles", { _ids: userIds })).data ?? []
+        ? ((await supabase.rpc("get_public_profiles", { _ids: userIds })).data ?? [])
         : [];
       const byId = new Map(profiles.map((p: any) => [p.id, p]));
-      setItems(ranked.map((a: any) => ({ ...a, profile: byId.get(a.user_id) ?? null })) as AgentCardData[]);
+      setItems(
+        ranked.map((a: any) => ({ ...a, profile: byId.get(a.user_id) ?? null })) as AgentCardData[],
+      );
       setLoading(false);
     })();
   }, []);
@@ -40,7 +50,9 @@ function AgentsPage() {
       <section className="bg-surface-2 border-b border-border">
         <div className="container-souqly py-10">
           <h1 className="text-3xl font-bold">{t("nav_agents")}</h1>
-          <p className="text-muted-foreground mt-2">{items.length} {t("agents_count")}</p>
+          <p className="text-muted-foreground mt-2">
+            {items.length} {t("agents_count")}
+          </p>
         </div>
       </section>
       <section className="container-souqly py-8 flex-1">
@@ -55,7 +67,9 @@ function AgentsPage() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {items.map((a) => <AgentCard key={a.id} a={a} />)}
+            {items.map((a) => (
+              <AgentCard key={a.id} a={a} />
+            ))}
           </div>
         )}
       </section>

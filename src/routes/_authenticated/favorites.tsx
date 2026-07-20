@@ -25,7 +25,9 @@ function FavoritesPage() {
     (async () => {
       const { data } = await supabase
         .from("favorites")
-        .select("listing_id, listings(id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en))")
+        .select(
+          "listing_id, listings(id, type, title_ar, title_en, images, price, currency, country, commission_percentage, featured, company_id, companies(name_ar, name_en))",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       const rows = (data ?? []).map((r: any) => r.listings).filter(Boolean) as ListingCardData[];
@@ -39,7 +41,8 @@ function FavoritesPage() {
       <SiteHeader />
       <div className="container-souqly py-8 flex-1">
         <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
-          <Heart className="h-6 w-6 text-primary" />{t("favorites_title")}
+          <Heart className="h-6 w-6 text-primary" />
+          {t("favorites_title")}
         </h1>
         {loading ? (
           <div className="py-20 text-center text-muted-foreground">{t("loading")}</div>
@@ -52,7 +55,9 @@ function FavoritesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {items.map((l) => <ListingCard key={l.id} l={l} />)}
+            {items.map((l) => (
+              <ListingCard key={l.id} l={l} />
+            ))}
           </div>
         )}
       </div>

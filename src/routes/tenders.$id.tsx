@@ -9,15 +9,24 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
-import { getTender, listTenderProposals, submitTenderProposal, awardTender } from "@/lib/phase3.functions";
+import {
+  getTender,
+  listTenderProposals,
+  submitTenderProposal,
+  awardTender,
+} from "@/lib/phase3.functions";
 
-const DEFAULT_OG = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+const DEFAULT_OG =
+  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
 
 export const Route = createFileRoute("/tenders/$id")({
   loader: async ({ params }) => {
     const { getTenderMeta } = await import("@/lib/seo.functions");
-    try { return { meta: await getTenderMeta({ data: { id: params.id } }) }; }
-    catch { return { meta: null }; }
+    try {
+      return { meta: await getTenderMeta({ data: { id: params.id } }) };
+    } catch {
+      return { meta: null };
+    }
   },
   head: ({ loaderData, params }) => {
     const m: any = loaderData?.meta;
@@ -26,7 +35,8 @@ export const Route = createFileRoute("/tenders/$id")({
     const url = `/tenders/${params.id}`;
     return {
       meta: [
-        { title }, { name: "description", content: desc },
+        { title },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
@@ -57,23 +67,46 @@ function TenderDetail() {
     const r = await getTender({ data: { id } });
     setTender(r.tender);
     if (user) {
-      try { const p = await listTenderProposals({ data: { tenderId: id } }); setProposals(p.proposals); } catch { /* not allowed */ }
+      try {
+        const p = await listTenderProposals({ data: { tenderId: id } });
+        setProposals(p.proposals);
+      } catch {
+        /* not allowed */
+      }
     }
   }
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [id, user?.id]);
+  useEffect(() => {
+    load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [id, user?.id]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await submitTenderProposal({ data: { tenderId: id, price: Number(price), timeline_days: days ? Number(days) : undefined, notes: notes || undefined } });
+      await submitTenderProposal({
+        data: {
+          tenderId: id,
+          price: Number(price),
+          timeline_days: days ? Number(days) : undefined,
+          notes: notes || undefined,
+        },
+      });
       toast.success(ar ? "تم إرسال العرض" : "Proposal submitted");
-      setPrice(""); setDays(""); setNotes("");
+      setPrice("");
+      setDays("");
+      setNotes("");
       load();
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
   async function award(pid: string) {
-    try { await awardTender({ data: { tenderId: id, proposalId: pid } }); toast.success(ar ? "تم الترسية" : "Awarded"); load(); }
-    catch (e: any) { toast.error(e.message); }
+    try {
+      await awardTender({ data: { tenderId: id, proposalId: pid } });
+      toast.success(ar ? "تم الترسية" : "Awarded");
+      load();
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
   if (!tender) return <div className="p-10 text-center">…</div>;
   const isPublisher = user?.id === tender.publisher_id;
@@ -91,33 +124,89 @@ function TenderDetail() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
             <Cell label={ar ? "القسم" : "Category"} value={tender.category_slug} />
             <Cell label={ar ? "المحافظة" : "Governorate"} value={tender.governorate} />
-            <Cell label={ar ? "الميزانية" : "Budget"} value={tender.budget ? `${tender.budget} ${tender.currency}` : null} />
+            <Cell
+              label={ar ? "الميزانية" : "Budget"}
+              value={tender.budget ? `${tender.budget} ${tender.currency}` : null}
+            />
             <Cell label={ar ? "الموعد النهائي" : "Deadline"} value={tender.deadline} />
           </div>
           <h2 className="text-xl font-semibold mt-6">{ar ? "العروض المقدمة" : "Proposals"}</h2>
-          {proposals.length === 0 ? <div className="text-muted-foreground text-sm">{user ? (ar ? "لا توجد عروض" : "No proposals") : (ar ? "سجّل الدخول لعرض العروض" : "Sign in to view proposals")}</div> :
+          {proposals.length === 0 ? (
+            <div className="text-muted-foreground text-sm">
+              {user
+                ? ar
+                  ? "لا توجد عروض"
+                  : "No proposals"
+                : ar
+                  ? "سجّل الدخول لعرض العروض"
+                  : "Sign in to view proposals"}
+            </div>
+          ) : (
             proposals.map((p) => (
-              <div key={p.id} className="rounded-lg border border-border bg-card p-4 shadow-card flex items-center justify-between gap-3 flex-wrap">
+              <div
+                key={p.id}
+                className="rounded-lg border border-border bg-card p-4 shadow-card flex items-center justify-between gap-3 flex-wrap"
+              >
                 <div>
-                  <div className="font-semibold">{ar ? p.companies?.name_ar : p.companies?.name_en} {p.companies?.is_verified && <span className="text-xs text-primary">✓</span>}</div>
-                  <div className="text-sm text-muted-foreground">{p.price} {p.currency} · {p.timeline_days ?? "—"} {ar ? "يوم" : "days"}</div>
+                  <div className="font-semibold">
+                    {ar ? p.companies?.name_ar : p.companies?.name_en}{" "}
+                    {p.companies?.is_verified && <span className="text-xs text-primary">✓</span>}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {p.price} {p.currency} · {p.timeline_days ?? "—"} {ar ? "يوم" : "days"}
+                  </div>
                   {p.notes && <p className="text-sm mt-1">{p.notes}</p>}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={p.status === "accepted" ? "default" : "secondary"}>{p.status}</Badge>
-                  {isPublisher && tender.status === "open" && <Button size="sm" onClick={() => award(p.id)} className="bg-primary hover:bg-primary-hover">{ar ? "ترسية" : "Award"}</Button>}
+                  <Badge variant={p.status === "accepted" ? "default" : "secondary"}>
+                    {p.status}
+                  </Badge>
+                  {isPublisher && tender.status === "open" && (
+                    <Button
+                      size="sm"
+                      onClick={() => award(p.id)}
+                      className="bg-primary hover:bg-primary-hover"
+                    >
+                      {ar ? "ترسية" : "Award"}
+                    </Button>
+                  )}
                 </div>
               </div>
-            ))}
+            ))
+          )}
         </div>
         <aside>
           {tender.status === "open" && user && !isPublisher && (
-            <form onSubmit={submit} className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3">
+            <form
+              onSubmit={submit}
+              className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3"
+            >
               <h3 className="font-semibold">{ar ? "قدّم عرضك" : "Submit proposal"}</h3>
-              <Input type="number" min="0" step="0.01" required placeholder={ar ? "السعر (ج.م)" : "Price (EGP)"} value={price} onChange={(e) => setPrice(e.target.value)} />
-              <Input type="number" min="0" placeholder={ar ? "مدة التنفيذ (أيام)" : "Timeline (days)"} value={days} onChange={(e) => setDays(e.target.value)} />
-              <Textarea rows={3} placeholder={ar ? "ملاحظات" : "Notes"} value={notes} onChange={(e) => setNotes(e.target.value)} />
-              <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">{ar ? "إرسال" : "Submit"}</Button>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                placeholder={ar ? "السعر (ج.م)" : "Price (EGP)"}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              <Input
+                type="number"
+                min="0"
+                placeholder={ar ? "مدة التنفيذ (أيام)" : "Timeline (days)"}
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+              />
+              <Textarea
+                rows={3}
+                placeholder={ar ? "ملاحظات" : "Notes"}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+              <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
+                {ar ? "إرسال" : "Submit"}
+              </Button>
             </form>
           )}
         </aside>
@@ -128,15 +217,21 @@ function TenderDetail() {
 }
 
 function Cell({ label, value }: { label: string; value: any }) {
-  return <div className="rounded border border-border bg-card p-2"><div className="text-xs text-muted-foreground">{label}</div><div className="font-medium">{value ?? "—"}</div></div>;
+  return (
+    <div className="rounded border border-border bg-card p-2">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium">{value ?? "—"}</div>
+    </div>
+  );
 }
-
 
 function Fallback({ msg }: { msg: string }) {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">{msg}</div>
+      <div className="flex-1 grid place-items-center p-10 text-center text-muted-foreground">
+        {msg}
+      </div>
       <SiteFooter />
     </div>
   );

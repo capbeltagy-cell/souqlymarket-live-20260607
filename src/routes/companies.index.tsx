@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { rankCompanies } from "@/lib/ranking";
 
 export const Route = createFileRoute("/companies/")({
-  head: () => ({ meta: [{ title: "Companies — Souqly" }, { name: "description", content: "Discover verified B2B companies on Souqly." }] }),
+  head: () => ({
+    meta: [
+      { title: "Companies — Souqly" },
+      { name: "description", content: "Discover verified B2B companies on Souqly." },
+    ],
+  }),
   component: CompaniesPage,
 });
 
@@ -19,8 +24,11 @@ function CompaniesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("companies")
-      .select("id, name_ar, name_en, industry, country, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url")
+    supabase
+      .from("companies")
+      .select(
+        "id, name_ar, name_en, industry, country, is_verified, is_premium, subscription_plan, subscription_expires_at, created_at, logo_url",
+      )
       .limit(120)
       .then(({ data }) => {
         const ranked = rankCompanies((data ?? []) as any[]).slice(0, 60);
@@ -36,22 +44,30 @@ function CompaniesPage() {
         <div className="rounded-[2rem] premium-panel p-8">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-center">
             <div>
-              <div className="text-sm uppercase tracking-[0.28em] text-accent">{t("nav_companies")}</div>
+              <div className="text-sm uppercase tracking-[0.28em] text-accent">
+                {t("nav_companies")}
+              </div>
               <h1 className="mt-3 text-4xl font-bold">{t("discover_verified_companies")}</h1>
               <p className="text-muted-foreground mt-4 max-w-2xl">{t("companies_page_subtitle")}</p>
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="rounded-3xl bg-surface p-5">
                 <div className="text-3xl font-bold">{items.length}</div>
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">{t("companies_count")}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                  {t("companies_count")}
+                </div>
               </div>
               <div className="rounded-3xl bg-surface p-5">
                 <div className="text-3xl font-bold">{Math.max(4, items.length)}</div>
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">{t("trusted_companies")}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                  {t("trusted_companies")}
+                </div>
               </div>
               <div className="rounded-3xl bg-surface p-5">
                 <div className="text-3xl font-bold">99%</div>
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">{t("success_rate")}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                  {t("success_rate")}
+                </div>
               </div>
             </div>
           </div>
@@ -69,7 +85,9 @@ function CompaniesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {items.map((c) => <CompanyCard key={c.id} c={c} />)}
+            {items.map((c) => (
+              <CompanyCard key={c.id} c={c} />
+            ))}
           </div>
         )}
       </section>

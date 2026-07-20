@@ -7,7 +7,8 @@ export const dict = {
     nav_marketplace: "السوق",
     nav_companies: "الشركات",
     discover_verified_companies: "اكتشف الشركات الموثوقة",
-    companies_page_subtitle: "استعرض ملفات الشركات المصرية الرائدة واحصل على شركاء تجاريين موثوقين بسرعة وسهولة.",
+    companies_page_subtitle:
+      "استعرض ملفات الشركات المصرية الرائدة واحصل على شركاء تجاريين موثوقين بسرعة وسهولة.",
     trusted_companies: "شركات موثوقة",
     success_rate: "نسبة نجاح",
     nav_agents: "المسوقون",
@@ -17,7 +18,8 @@ export const dict = {
     nav_signup: "إنشاء حساب",
     nav_signout: "تسجيل الخروج",
     hero_title: "ضاعف مبيعاتك مع شبكة B2B الأقوى",
-    hero_subtitle: "سوقلي يربط الشركات بالمسوقين المحترفين لبيع المنتجات والخدمات والعقارات والمصانع والفرص الاستثمارية.",
+    hero_subtitle:
+      "سوقلي يربط الشركات بالمسوقين المحترفين لبيع المنتجات والخدمات والعقارات والمصانع والفرص الاستثمارية.",
     cta_explore: "تصفح السوق",
     cta_join_company: "سجّل شركتك",
     cta_join_agent: "انضم كمسوق",
@@ -91,7 +93,8 @@ export const dict = {
     filter_governorate: "كل المحافظات",
     filter_city: "كل المدن",
     map_page_title: "خريطة السوق",
-    map_page_description: "تصنيف وعرض الإعلانات على الخريطة مع عوامل تصفية المحافظة والمدينة والفئة.",
+    map_page_description:
+      "تصنيف وعرض الإعلانات على الخريطة مع عوامل تصفية المحافظة والمدينة والفئة.",
     map_summary_title: "عرض الخريطة",
     click_map_to_set_location: "انقر على الخريطة لتحديد الموقع الجغرافي للإعلان.",
     agents_count: "مسوق",
@@ -301,17 +304,14 @@ export const dict = {
     empty_no_items: "لا توجد بيانات حالياً",
   },
 
-
-
-
-
   en: {
     brand: "Souqly",
     tagline: "The professional B2B marketplace",
     nav_marketplace: "Marketplace",
     nav_companies: "Companies",
     discover_verified_companies: "Discover trusted companies",
-    companies_page_subtitle: "Browse leading Egyptian companies and connect with reliable business partners fast.",
+    companies_page_subtitle:
+      "Browse leading Egyptian companies and connect with reliable business partners fast.",
     trusted_companies: "Trusted companies",
     success_rate: "Success rate",
     nav_agents: "Agents",
@@ -321,7 +321,8 @@ export const dict = {
     nav_signup: "Sign up",
     nav_signout: "Sign out",
     hero_title: "Multiply your sales with the strongest B2B network",
-    hero_subtitle: "Souqly connects companies with professional sales agents to move products, services, real estate, factories and investment opportunities.",
+    hero_subtitle:
+      "Souqly connects companies with professional sales agents to move products, services, real estate, factories and investment opportunities.",
     cta_explore: "Explore marketplace",
     cta_join_company: "List your company",
     cta_join_agent: "Join as agent",
@@ -340,7 +341,8 @@ export const dict = {
     section_top_agents: "Top agents",
     trust_indicators: "Trust indicators",
     trusted_b2b_network: "Reliable, professional B2B network",
-    trust_subtitle: "Verified partners, secure transactions, and fast connections across the marketplace.",
+    trust_subtitle:
+      "Verified partners, secure transactions, and fast connections across the marketplace.",
     verified_profiles: "Verified profiles",
     verified_profiles_desc: "Registered companies vetted for quality and performance.",
     secure_transactions: "Secure transactions",
@@ -348,7 +350,8 @@ export const dict = {
     fast_connect: "Fast connections",
     fast_connect_desc: "Quick introductions between buyers, suppliers and agents.",
     success_stories: "Success stories",
-    success_stories_subtitle: "Real customer wins from companies and agents who scaled with Souqly.",
+    success_stories_subtitle:
+      "Real customer wins from companies and agents who scaled with Souqly.",
     learn_more: "Learn more",
     story_1_title: "75% sales growth",
     story_1_body: "An Egyptian company boosted revenue with high-visibility premium listings.",
@@ -395,7 +398,8 @@ export const dict = {
     filter_governorate: "All governorates",
     filter_city: "All cities",
     map_page_title: "Marketplace map",
-    map_page_description: "Browse marketplace listings on the map with governorate, city, and category filters.",
+    map_page_description:
+      "Browse marketplace listings on the map with governorate, city, and category filters.",
     map_summary_title: "Map overview",
     click_map_to_set_location: "Click the map to set the listing location.",
     agents_count: "agents",
@@ -605,10 +609,6 @@ export const dict = {
     view_all: "View all",
     empty_no_items: "No items yet",
   },
-
-
-
-
 } as const;
 
 export type DictKey = keyof (typeof dict)["ar"];

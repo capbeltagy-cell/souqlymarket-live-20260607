@@ -19,7 +19,12 @@ import { listMyAddresses, saveMyAddress, deleteMyAddress } from "@/lib/addresses
 import { getShippingQuote } from "@/lib/shipping";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
-  head: () => ({ meta: [{ title: "إتمام الشراء — Souqly" }, { name: "description", content: "أكمل شراءك بأمان على سوقلي" }] }),
+  head: () => ({
+    meta: [
+      { title: "إتمام الشراء — Souqly" },
+      { name: "description", content: "أكمل شراءك بأمان على سوقلي" },
+    ],
+  }),
   component: CheckoutPage,
 });
 
@@ -54,7 +59,13 @@ function CheckoutPage() {
 
   // Form fields for new address
   const [f, setF] = useState({
-    label: "", recipient_name: "", phone: "", governorate: "", city: "", address_line: "", is_default: true,
+    label: "",
+    recipient_name: "",
+    phone: "",
+    governorate: "",
+    city: "",
+    address_line: "",
+    is_default: true,
   });
 
   useEffect(() => {
@@ -71,8 +82,12 @@ function CheckoutPage() {
       const list = (await loadAddrs()) as Address[];
       setAddresses(list);
       const def = list.find((a) => a.is_default) ?? list[0];
-      if (def) { setSelectedId(def.id); setShowForm(false); }
-      else { setShowForm(true); }
+      if (def) {
+        setSelectedId(def.id);
+        setShowForm(false);
+      } else {
+        setShowForm(true);
+      }
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -87,7 +102,15 @@ function CheckoutPage() {
     }
     try {
       const { id } = await saveAddr({ data: { ...f, label: f.label || null } });
-      setF({ label: "", recipient_name: "", phone: "", governorate: "", city: "", address_line: "", is_default: false });
+      setF({
+        label: "",
+        recipient_name: "",
+        phone: "",
+        governorate: "",
+        city: "",
+        address_line: "",
+        is_default: false,
+      });
       await reloadAddresses();
       setSelectedId(id);
       setShowForm(false);
@@ -119,10 +142,17 @@ function CheckoutPage() {
   async function placeOrders() {
     if (items.length === 0) return;
     const addr = addresses.find((a) => a.id === selectedId);
-    if (!addr) { toast.error(ar ? "اختر عنوان الشحن" : "Choose a shipping address"); return; }
+    if (!addr) {
+      toast.error(ar ? "اختر عنوان الشحن" : "Choose a shipping address");
+      return;
+    }
     setPlacing(true);
     let referral_code: string | undefined;
-    try { referral_code = localStorage.getItem("souqly.ref") || undefined; } catch { /* noop */ }
+    try {
+      referral_code = localStorage.getItem("souqly.ref") || undefined;
+    } catch {
+      /* noop */
+    }
     const created: string[] = [];
     try {
       for (const it of items) {
@@ -146,7 +176,9 @@ function CheckoutPage() {
         created.push(id);
       }
       clearCart();
-      toast.success(ar ? `تم إنشاء ${created.length} طلب/طلبات` : `Created ${created.length} order(s)`);
+      toast.success(
+        ar ? `تم إنشاء ${created.length} طلب/طلبات` : `Created ${created.length} order(s)`,
+      );
       // Navigate to confirmation with the first order id + list of ids
       navigate({
         to: "/orders/$id/confirmation",
@@ -168,7 +200,9 @@ function CheckoutPage() {
           <EmptyState
             icon={<ShoppingBag className="h-7 w-7" />}
             title={ar ? "السلة فارغة" : "Cart is empty"}
-            description={ar ? "أضف منتجات إلى السلة قبل إتمام الشراء" : "Add products to cart before checkout"}
+            description={
+              ar ? "أضف منتجات إلى السلة قبل إتمام الشراء" : "Add products to cart before checkout"
+            }
             ctaLabel={ar ? "تصفح المنتجات" : "Browse products"}
             ctaTo="/"
           />
@@ -201,14 +235,18 @@ function CheckoutPage() {
               </div>
 
               {loading ? (
-                <div className="text-sm text-muted-foreground py-4">{ar ? "جارٍ التحميل…" : "Loading…"}</div>
+                <div className="text-sm text-muted-foreground py-4">
+                  {ar ? "جارٍ التحميل…" : "Loading…"}
+                </div>
               ) : (
                 <>
                   {addresses.length > 0 && !showForm && (
                     <ul className="space-y-2">
                       {addresses.map((a) => (
                         <li key={a.id}>
-                          <label className={`flex gap-3 items-start p-3 rounded-md border cursor-pointer transition ${selectedId === a.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"}`}>
+                          <label
+                            className={`flex gap-3 items-start p-3 rounded-md border cursor-pointer transition ${selectedId === a.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/60"}`}
+                          >
                             <input
                               type="radio"
                               name="addr"
@@ -218,16 +256,27 @@ function CheckoutPage() {
                             />
                             <div className="flex-1 min-w-0 text-sm">
                               <div className="font-semibold">
-                                {a.label ? `${a.label} — ` : ""}{a.recipient_name}
+                                {a.label ? `${a.label} — ` : ""}
+                                {a.recipient_name}
                                 {a.is_default && (
-                                  <span className="ms-2 text-xs text-primary">({ar ? "افتراضي" : "default"})</span>
+                                  <span className="ms-2 text-xs text-primary">
+                                    ({ar ? "افتراضي" : "default"})
+                                  </span>
                                 )}
                               </div>
                               <div className="text-muted-foreground mt-0.5">
                                 {a.phone} • {a.address_line}, {a.city}, {a.governorate}
                               </div>
                             </div>
-                            <Button size="icon" variant="ghost" onClick={(e) => { e.preventDefault(); removeAddress(a.id); }} aria-label="delete">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                removeAddress(a.id);
+                              }}
+                              aria-label="delete"
+                            >
                               <Trash2 className="h-3.5 w-3.5 text-destructive" />
                             </Button>
                           </label>
@@ -241,35 +290,64 @@ function CheckoutPage() {
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div>
                           <Label className="text-xs">{ar ? "الاسم" : "Name"} *</Label>
-                          <Input value={f.recipient_name} onChange={(e) => setF({ ...f, recipient_name: e.target.value })} />
+                          <Input
+                            value={f.recipient_name}
+                            onChange={(e) => setF({ ...f, recipient_name: e.target.value })}
+                          />
                         </div>
                         <div>
                           <Label className="text-xs">{ar ? "الهاتف" : "Phone"} *</Label>
-                          <Input value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+                          <Input
+                            value={f.phone}
+                            onChange={(e) => setF({ ...f, phone: e.target.value })}
+                          />
                         </div>
                         <div>
                           <Label className="text-xs">{ar ? "المحافظة" : "Governorate"} *</Label>
-                          <Input value={f.governorate} onChange={(e) => setF({ ...f, governorate: e.target.value })} />
+                          <Input
+                            value={f.governorate}
+                            onChange={(e) => setF({ ...f, governorate: e.target.value })}
+                          />
                         </div>
                         <div>
                           <Label className="text-xs">{ar ? "المدينة" : "City"} *</Label>
-                          <Input value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })} />
+                          <Input
+                            value={f.city}
+                            onChange={(e) => setF({ ...f, city: e.target.value })}
+                          />
                         </div>
                         <div className="sm:col-span-2">
-                          <Label className="text-xs">{ar ? "العنوان بالتفصيل" : "Address line"} *</Label>
-                          <Input value={f.address_line} onChange={(e) => setF({ ...f, address_line: e.target.value })} />
+                          <Label className="text-xs">
+                            {ar ? "العنوان بالتفصيل" : "Address line"} *
+                          </Label>
+                          <Input
+                            value={f.address_line}
+                            onChange={(e) => setF({ ...f, address_line: e.target.value })}
+                          />
                         </div>
                         <div className="sm:col-span-2">
-                          <Label className="text-xs">{ar ? "تسمية العنوان (اختياري)" : "Label (optional)"}</Label>
-                          <Input placeholder={ar ? "المنزل، العمل..." : "Home, Work..."} value={f.label} onChange={(e) => setF({ ...f, label: e.target.value })} />
+                          <Label className="text-xs">
+                            {ar ? "تسمية العنوان (اختياري)" : "Label (optional)"}
+                          </Label>
+                          <Input
+                            placeholder={ar ? "المنزل، العمل..." : "Home, Work..."}
+                            value={f.label}
+                            onChange={(e) => setF({ ...f, label: e.target.value })}
+                          />
                         </div>
                       </div>
                       <label className="flex items-center gap-2 text-sm">
-                        <Checkbox checked={f.is_default} onCheckedChange={(v) => setF({ ...f, is_default: !!v })} />
+                        <Checkbox
+                          checked={f.is_default}
+                          onCheckedChange={(v) => setF({ ...f, is_default: !!v })}
+                        />
                         {ar ? "اجعله العنوان الافتراضي" : "Make this my default address"}
                       </label>
                       <div className="flex gap-2">
-                        <Button onClick={submitAddress} className="bg-primary hover:bg-primary-hover">
+                        <Button
+                          onClick={submitAddress}
+                          className="bg-primary hover:bg-primary-hover"
+                        >
                           {ar ? "حفظ العنوان" : "Save address"}
                         </Button>
                         {addresses.length > 0 && (
@@ -322,11 +400,15 @@ function CheckoutPage() {
 
             {/* Order notes */}
             <div className="rounded-lg border border-border bg-card p-5">
-              <Label className="text-sm font-semibold">{ar ? "ملاحظات للطلب (اختياري)" : "Order notes (optional)"}</Label>
+              <Label className="text-sm font-semibold">
+                {ar ? "ملاحظات للطلب (اختياري)" : "Order notes (optional)"}
+              </Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={ar ? "تعليمات خاصة للبائع..." : "Special instructions to the seller..."}
+                placeholder={
+                  ar ? "تعليمات خاصة للبائع..." : "Special instructions to the seller..."
+                }
                 rows={3}
                 className="mt-2"
               />
@@ -347,18 +429,26 @@ function CheckoutPage() {
             <div className="flex justify-between text-sm">
               <span>{ar ? "الشحن" : "Shipping"}</span>
               <span className="text-muted-foreground">
-                {shipping ? formatPrice(shippingTotal, locale) : (ar ? "اختر العنوان" : "Choose address")}
+                {shipping
+                  ? formatPrice(shippingTotal, locale)
+                  : ar
+                    ? "اختر العنوان"
+                    : "Choose address"}
               </span>
             </div>
             {shipping && (
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{ar ? "التوصيل المتوقع" : "Estimated delivery"}</span>
-                <span>{shipping.etaMinDays}–{shipping.etaMaxDays} {ar ? "أيام عمل" : "business days"}</span>
+                <span>
+                  {shipping.etaMinDays}–{shipping.etaMaxDays} {ar ? "أيام عمل" : "business days"}
+                </span>
               </div>
             )}
             <div className="flex justify-between font-semibold border-t border-border pt-3">
               <span>{ar ? "الإجمالي" : "Total"}</span>
-              <span className="text-primary">{formatPrice(grandTotal, locale)} {currency !== "EGP" && currency}</span>
+              <span className="text-primary">
+                {formatPrice(grandTotal, locale)} {currency !== "EGP" && currency}
+              </span>
             </div>
             <Button
               className="w-full bg-primary hover:bg-primary-hover"

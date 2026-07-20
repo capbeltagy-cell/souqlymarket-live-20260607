@@ -23,8 +23,12 @@ function InvoicesPage() {
 
   useEffect(() => {
     (async () => {
-      try { const r = await fetchList(); setRows(r.invoices); }
-      finally { setLoading(false); }
+      try {
+        const r = await fetchList();
+        setRows(r.invoices);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -38,9 +42,13 @@ function InvoicesPage() {
         </h1>
         <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center text-muted-foreground">{ar ? "جاري التحميل..." : "Loading..."}</div>
+            <div className="p-10 text-center text-muted-foreground">
+              {ar ? "جاري التحميل..." : "Loading..."}
+            </div>
           ) : rows.length === 0 ? (
-            <div className="p-10 text-center text-muted-foreground">{ar ? "لا توجد فواتير حتى الآن" : "No invoices yet"}</div>
+            <div className="p-10 text-center text-muted-foreground">
+              {ar ? "لا توجد فواتير حتى الآن" : "No invoices yet"}
+            </div>
           ) : (
             <div className="divide-y divide-border">
               {rows.map((r) => (

@@ -23,7 +23,12 @@ function StoresPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    listPublicStores().then((r) => { setItems(r.items); setLoading(false); }).catch(() => setLoading(false));
+    listPublicStores()
+      .then((r) => {
+        setItems(r.items);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -33,15 +38,28 @@ function StoresPage() {
         {loading ? (
           <div className="text-muted-foreground">…</div>
         ) : items.length === 0 ? (
-          <div className="text-muted-foreground">{locale === "ar" ? "لا توجد متاجر منشورة حاليًا" : "No published stores yet"}</div>
+          <div className="text-muted-foreground">
+            {locale === "ar" ? "لا توجد متاجر منشورة حاليًا" : "No published stores yet"}
+          </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((s) => (
-              <Link key={s.id} to="/stores/$slug" params={{ slug: s.slug }} className="group rounded-xl overflow-hidden border border-border bg-card hover:shadow-lg transition">
+              <Link
+                key={s.id}
+                to="/stores/$slug"
+                params={{ slug: s.slug }}
+                className="group rounded-xl overflow-hidden border border-border bg-card hover:shadow-lg transition"
+              >
                 <div className="aspect-[3/1] bg-muted relative">
-                  {s.banner_url ? <img src={s.banner_url} alt="" className="h-full w-full object-cover" /> : null}
+                  {s.banner_url ? (
+                    <img src={s.banner_url} alt="" className="h-full w-full object-cover" />
+                  ) : null}
                   {s.logo_url ? (
-                    <img src={s.logo_url} alt="" className="absolute -bottom-6 start-4 h-14 w-14 rounded-full border-4 border-card object-cover bg-white" />
+                    <img
+                      src={s.logo_url}
+                      alt=""
+                      className="absolute -bottom-6 start-4 h-14 w-14 rounded-full border-4 border-card object-cover bg-white"
+                    />
                   ) : (
                     <div className="absolute -bottom-6 start-4 h-14 w-14 rounded-full border-4 border-card grid place-items-center bg-primary text-primary-foreground">
                       <StoreIcon className="h-6 w-6" />
@@ -50,14 +68,17 @@ function StoresPage() {
                 </div>
                 <div className="p-4 pt-8">
                   <div className="flex items-center gap-1.5">
-                    <div className="font-semibold">{locale === "ar" ? s.name_ar : (s.name_en ?? s.name_ar)}</div>
+                    <div className="font-semibold">
+                      {locale === "ar" ? s.name_ar : (s.name_en ?? s.name_ar)}
+                    </div>
                     {s.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {[s.governorate, s.city].filter(Boolean).join(" • ")}
                   </div>
                   <div className="text-xs text-muted-foreground mt-2">
-                    {s.products_count} {locale === "ar" ? "منتج" : "products"} • ⭐ {Number(s.review_avg || 0).toFixed(1)}
+                    {s.products_count} {locale === "ar" ? "منتج" : "products"} • ⭐{" "}
+                    {Number(s.review_avg || 0).toFixed(1)}
                   </div>
                 </div>
               </Link>
