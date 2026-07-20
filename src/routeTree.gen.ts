@@ -40,6 +40,7 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StoresIndexRouteImport } from './routes/stores.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
 import { Route as TendersIdRouteImport } from './routes/tenders.$id'
@@ -256,6 +257,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoresIndexRoute = StoresIndexRouteImport.update({
+  id: '/stores/',
+  path: '/stores/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
@@ -684,6 +690,7 @@ export interface FileRoutesByFullPath {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/stores/': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
@@ -779,6 +786,7 @@ export interface FileRoutesByTo {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/stores': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
@@ -876,6 +884,7 @@ export interface FileRoutesById {
   '/tenders/$id': typeof TendersIdRoute
   '/wholesale/$id': typeof WholesaleIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/stores/': typeof StoresIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
   '/_authenticated/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
@@ -973,6 +982,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/stores/'
     | '/campaigns/$id'
     | '/company-wallet/deposit'
     | '/listings/new'
@@ -1068,6 +1078,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies'
+    | '/stores'
     | '/campaigns/$id'
     | '/company-wallet/deposit'
     | '/listings/new'
@@ -1164,6 +1175,7 @@ export interface FileRouteTypes {
     | '/tenders/$id'
     | '/wholesale/$id'
     | '/companies/'
+    | '/stores/'
     | '/_authenticated/campaigns/$id'
     | '/_authenticated/company-wallet/deposit'
     | '/_authenticated/listings/new'
@@ -1216,6 +1228,7 @@ export interface RootRouteChildren {
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
+  StoresIndexRoute: typeof StoresIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1435,6 +1448,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stores/': {
+      id: '/stores/'
+      path: '/stores'
+      fullPath: '/stores/'
+      preLoaderRoute: typeof StoresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/companies/': {
@@ -2155,6 +2175,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
+  StoresIndexRoute: StoresIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
