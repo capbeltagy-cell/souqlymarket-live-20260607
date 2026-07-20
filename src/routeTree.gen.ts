@@ -24,6 +24,7 @@ import { Route as EarnRouteImport } from './routes/earn'
 import { Route as FactoriesRouteImport } from './routes/factories'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LandsRouteImport } from './routes/lands'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -184,6 +185,11 @@ const FaqRoute = FaqRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -669,6 +675,7 @@ export interface FileRoutesByFullPath {
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/health': typeof HealthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -772,6 +779,7 @@ export interface FileRoutesByTo {
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/health': typeof HealthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -877,6 +885,7 @@ export interface FileRoutesById {
   '/factories': typeof FactoriesRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/health': typeof HealthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -982,6 +991,7 @@ export interface FileRouteTypes {
     | '/factories'
     | '/faq'
     | '/forgot-password'
+    | '/health'
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
@@ -1085,6 +1095,7 @@ export interface FileRouteTypes {
     | '/factories'
     | '/faq'
     | '/forgot-password'
+    | '/health'
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
@@ -1189,6 +1200,7 @@ export interface FileRouteTypes {
     | '/factories'
     | '/faq'
     | '/forgot-password'
+    | '/health'
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
@@ -1294,6 +1306,7 @@ export interface RootRouteChildren {
   FactoriesRoute: typeof FactoriesRouteWithChildren
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HealthRoute: typeof HealthRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LandsRoute: typeof LandsRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -1425,6 +1438,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -2301,6 +2321,7 @@ const rootRouteChildren: RootRouteChildren = {
   FactoriesRoute: FactoriesRouteWithChildren,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HealthRoute: HealthRoute,
   HowItWorksRoute: HowItWorksRoute,
   LandsRoute: LandsRoute,
   LeaderboardRoute: LeaderboardRoute,
