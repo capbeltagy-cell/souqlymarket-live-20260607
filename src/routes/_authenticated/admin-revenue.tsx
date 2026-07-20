@@ -7,9 +7,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { getAdminRevenueSummary } from "@/lib/wallets.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 import { DollarSign, TrendingUp, Star, CreditCard, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin-revenue")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Revenue — Admin" }] }),
   component: AdminRevenuePage,
 });

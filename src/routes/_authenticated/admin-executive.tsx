@@ -17,8 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { getAdminExecutiveDashboard } from "@/lib/crm-analytics.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-executive")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Executive dashboard — Admin" }] }),
   component: AdminExecutivePage,
 });

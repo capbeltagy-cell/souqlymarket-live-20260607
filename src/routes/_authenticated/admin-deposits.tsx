@@ -11,8 +11,10 @@ import {
   adminListCompanyDeposits,
   adminReviewCompanyDeposit,
 } from "@/lib/company-wallet.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-deposits")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "مراجعة إيداعات الشركات — Admin" }] }),
   errorComponent: ({ error }) => (
     <div className="p-8 text-sm text-destructive">{error.message}</div>

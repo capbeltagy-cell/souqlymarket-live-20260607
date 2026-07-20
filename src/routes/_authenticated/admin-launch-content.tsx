@@ -27,8 +27,10 @@ import {
   adminToggleListingFlag,
   adminDeleteLaunchListing,
 } from "@/lib/launch-content.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-launch-content")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Launch Content — Admin" }] }),
   component: AdminLaunchContent,
 });

@@ -14,8 +14,10 @@ import {
   setListingStatus,
   adminDeleteListing,
 } from "@/lib/moderation.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/moderation")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "مراجعة الإعلانات — سوقلي" }] }),
   component: ModerationPage,
 });

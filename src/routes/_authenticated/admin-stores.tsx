@@ -8,10 +8,12 @@ import {
   adminUpdateStore,
 } from "@/lib/store-admin.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { requireAdminRoute } from "@/lib/route-guards";
 import { toast } from "sonner";
 import { BadgeCheck, Star, ExternalLink, History, Store } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin-stores")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "إدارة المتاجر — سوقلي" }] }),
   component: AdminStoresPage,
 });

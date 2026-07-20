@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getPlatformSettings, updatePlatformSettings } from "@/lib/marketing.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-platform-settings")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Platform Settings — Admin" }] }),
   component: SettingsPage,
 });

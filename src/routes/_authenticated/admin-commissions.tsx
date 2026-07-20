@@ -21,8 +21,10 @@ import {
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { adminListCommissions, adminReviewCommission } from "@/lib/commissions.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-commissions")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Commissions Review — Admin" }] }),
   component: AdminCommissions,
 });

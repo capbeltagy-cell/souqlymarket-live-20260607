@@ -14,8 +14,10 @@ import {
   setAgentVerified,
 } from "@/lib/verification.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/verification")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "طلبات التوثيق — سوقلي" }] }),
   component: VerificationPage,
 });

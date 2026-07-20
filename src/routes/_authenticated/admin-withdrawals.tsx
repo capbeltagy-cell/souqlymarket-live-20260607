@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { adminListWithdrawals, adminUpdateWithdrawal } from "@/lib/marketing.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-withdrawals")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Withdrawals — Admin" }] }),
   component: AdminWithdrawals,
 });

@@ -11,8 +11,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
 import { adminSetCompanyVerified } from "@/lib/phase2.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-companies")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "Admin · Companies — Souqly" }] }),
   component: AdminCompanies,
 });

@@ -7,8 +7,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getAdminOverview } from "@/lib/phase3.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-overview")({
+  beforeLoad: requireAdminRoute,
   component: AdminOverview,
 });
 

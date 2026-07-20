@@ -16,8 +16,10 @@ import {
   listPendingProofs,
   reviewPaymentProof,
 } from "@/lib/payments.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-payments")({
+  beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "الدفع — لوحة الإدارة — Souqly" }] }),
   component: AdminPayments,
 });
