@@ -10,6 +10,7 @@ import { createStore, submitStoreForReview, getMyStore, updateStore } from "@/li
 import { toast } from "sonner";
 import { EGYPT_GOVERNORATES } from "@/lib/egypt.locations";
 import { useEffect } from "react";
+import { getArabicErrorMessage } from "@/lib/user-error";
 
 export const Route = createFileRoute("/_authenticated/store/open")({
   head: () => ({ meta: [{ title: "افتح متجرك — سوقلي" }] }),
@@ -72,7 +73,7 @@ function OpenStoreWizard() {
         toast.success("تم الحفظ");
       }
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(getArabicErrorMessage(e, "تعذر حفظ بيانات المتجر."));
     } finally {
       setSaving(false);
     }

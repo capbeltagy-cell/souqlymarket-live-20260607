@@ -28,6 +28,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
+import { getArabicErrorMessage } from "@/lib/user-error";
 
 export const Route = createFileRoute("/_authenticated/company")({
   head: () => ({ meta: [{ title: "شركتي — سوقلي" }] }),
@@ -225,7 +226,7 @@ function CompanyEdit() {
       setForm((f) => ({ ...f, [kind === "logo" ? "logo_url" : "cover_url"]: data.signedUrl }));
       toast.success(locale === "ar" ? "تم الرفع" : "Uploaded");
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر رفع الصورة."));
     } finally {
       setUploading(null);
     }
@@ -305,7 +306,7 @@ function CompanyEdit() {
       clearDraft();
       navigate({ to: "/companies/$id", params: { id: res.id } });
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر حفظ بيانات الشركة."));
     } finally {
       setSubmitting(false);
     }

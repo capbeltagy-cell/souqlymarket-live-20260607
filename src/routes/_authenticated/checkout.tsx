@@ -17,6 +17,7 @@ import { formatPrice } from "@/lib/currency";
 import { createOrderFromListing } from "@/lib/orders.functions";
 import { listMyAddresses, saveMyAddress, deleteMyAddress } from "@/lib/addresses.functions";
 import { getShippingQuote } from "@/lib/shipping";
+import { getArabicErrorMessage } from "@/lib/user-error";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({
@@ -89,7 +90,7 @@ function CheckoutPage() {
         setShowForm(true);
       }
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر تحميل عناوين الشحن."));
     } finally {
       setLoading(false);
     }
@@ -116,7 +117,7 @@ function CheckoutPage() {
       setShowForm(false);
       toast.success(ar ? "تم حفظ العنوان" : "Address saved");
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر حفظ العنوان."));
     }
   }
 
@@ -126,7 +127,7 @@ function CheckoutPage() {
       await delAddr({ data: { id } });
       await reloadAddresses();
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر حذف العنوان."));
     }
   }
 
@@ -186,7 +187,7 @@ function CheckoutPage() {
         search: { ids: created.join(",") },
       });
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر إنشاء الطلب. راجع بياناتك وحاول مرة أخرى."));
     } finally {
       setPlacing(false);
     }

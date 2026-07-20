@@ -34,6 +34,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteListing, listMyListings } from "@/lib/listings.functions";
 import { deleteMyAddress, listMyAddresses, saveMyAddress } from "@/lib/addresses.functions";
+import { getArabicErrorMessage } from "@/lib/user-error";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "الملف الشخصي — سوقلي" }] }),
@@ -133,7 +134,7 @@ function ProfilePage() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (error) {
-          toast.error(error.message);
+          toast.error(getArabicErrorMessage(error, "تعذر تحميل بيانات الحساب."));
           setLoading(false);
           return;
         }
@@ -158,7 +159,7 @@ function ProfilePage() {
       setListings(myListings as MyListing[]);
       setAddresses(myAddresses as SavedAddress[]);
     } catch (error) {
-      toast.error((error as Error).message);
+      toast.error(getArabicErrorMessage(error, "تعذر تحميل بيانات حسابك."));
     } finally {
       setAccountLoading(false);
     }
@@ -179,7 +180,7 @@ function ProfilePage() {
       setListings((current) => current.filter((listing) => listing.id !== id));
       toast.success(msg("تم حذف الإعلان", "Listing deleted"));
     } catch (error) {
-      toast.error((error as Error).message);
+      toast.error(getArabicErrorMessage(error, "تعذر حذف الإعلان."));
     } finally {
       setDeletingListingId(null);
     }
@@ -206,7 +207,7 @@ function ProfilePage() {
       await loadAccountData();
       toast.success(msg("تم حفظ العنوان لاستخدامه في الطلبات", "Address saved for checkout"));
     } catch (error) {
-      toast.error((error as Error).message);
+      toast.error(getArabicErrorMessage(error, "تعذر حفظ العنوان."));
     } finally {
       setSavingAddress(false);
     }
@@ -219,7 +220,7 @@ function ProfilePage() {
       setAddresses((current) => current.filter((address) => address.id !== id));
       toast.success(msg("تم حذف العنوان", "Address deleted"));
     } catch (error) {
-      toast.error((error as Error).message);
+      toast.error(getArabicErrorMessage(error, "تعذر حذف العنوان."));
     }
   };
 
@@ -249,7 +250,7 @@ function ProfilePage() {
       setForm((f) => ({ ...f, avatar_url: data.signedUrl }));
       toast.success(msg("تم رفع الصورة", "Avatar uploaded"));
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(getArabicErrorMessage(e, "تعذر رفع الصورة."));
     } finally {
       setUploading(false);
     }
@@ -270,7 +271,7 @@ function ProfilePage() {
       preferred_language: form.preferred_language || "ar",
     });
     setSaving(false);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getArabicErrorMessage(error, "تعذر حفظ بيانات الحساب."));
     else {
       setEditingProfile(false);
       toast.success(t("profile_updated"));

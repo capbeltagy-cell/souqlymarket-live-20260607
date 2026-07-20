@@ -24,6 +24,7 @@ import {
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
 import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
+import { getArabicErrorMessage } from "@/lib/user-error";
 
 export const Route = createFileRoute("/_authenticated/store/")({
   head: () => ({ meta: [{ title: "متجري — سوقلي" }] }),
@@ -144,7 +145,7 @@ function StoreDashboard() {
                     toast.success("تم الإرسال للمراجعة");
                     location.reload();
                   } catch (e: any) {
-                    toast.error(e.message);
+                    toast.error(getArabicErrorMessage(e, "تعذر إرسال المتجر للمراجعة."));
                   }
                 }}
               >
