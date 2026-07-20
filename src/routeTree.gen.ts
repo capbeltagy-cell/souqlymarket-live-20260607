@@ -94,6 +94,7 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
 import { Route as AuthenticatedTendersNewRouteImport } from './routes/_authenticated/tenders.new'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
+import { Route as AuthenticatedStoreOpenRouteImport } from './routes/_authenticated/store.open'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authenticated/quotations.new'
@@ -552,6 +553,11 @@ const AuthenticatedTendersMineRoute =
     path: '/tenders/mine',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoreOpenRoute = AuthenticatedStoreOpenRouteImport.update({
+  id: '/store/open',
+  path: '/store/open',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRfqNewRoute = AuthenticatedRfqNewRouteImport.update({
   id: '/rfq/new',
   path: '/rfq/new',
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
@@ -803,6 +810,7 @@ export interface FileRoutesByTo {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/tenders/new': typeof AuthenticatedTendersNewRoute
   '/wholesale/new': typeof AuthenticatedWholesaleNewRoute
@@ -902,6 +910,7 @@ export interface FileRoutesById {
   '/_authenticated/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/_authenticated/store/open': typeof AuthenticatedStoreOpenRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
   '/_authenticated/tenders/new': typeof AuthenticatedTendersNewRoute
   '/_authenticated/wholesale/new': typeof AuthenticatedWholesaleNewRoute
@@ -1001,6 +1010,7 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/open'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
@@ -1098,6 +1108,7 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/open'
     | '/tenders/mine'
     | '/tenders/new'
     | '/wholesale/new'
@@ -1196,6 +1207,7 @@ export interface FileRouteTypes {
     | '/_authenticated/quotations/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
+    | '/_authenticated/store/open'
     | '/_authenticated/tenders/mine'
     | '/_authenticated/tenders/new'
     | '/_authenticated/wholesale/new'
@@ -1841,6 +1853,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTendersMineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store/open': {
+      id: '/_authenticated/store/open'
+      path: '/store/open'
+      fullPath: '/store/open'
+      preLoaderRoute: typeof AuthenticatedStoreOpenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rfq/new': {
       id: '/_authenticated/rfq/new'
       path: '/rfq/new'
@@ -2021,6 +2040,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
+  AuthenticatedStoreOpenRoute: typeof AuthenticatedStoreOpenRoute
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
   AuthenticatedTendersNewRoute: typeof AuthenticatedTendersNewRoute
   AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
@@ -2072,6 +2092,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
+  AuthenticatedStoreOpenRoute: AuthenticatedStoreOpenRoute,
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
   AuthenticatedTendersNewRoute: AuthenticatedTendersNewRoute,
   AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
