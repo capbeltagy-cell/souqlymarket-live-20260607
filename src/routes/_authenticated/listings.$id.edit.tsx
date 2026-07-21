@@ -138,7 +138,8 @@ function EditListing() {
         imgs.map((url, i) => ({
           url,
           source: (srcs[i] === "live_capture" ? "live_capture" : "uploaded") as
-            "live_capture" | "uploaded",
+            | "live_capture"
+            | "uploaded",
         })),
       );
       setPromoEnabled(!!data.marketer_promotion_enabled);
