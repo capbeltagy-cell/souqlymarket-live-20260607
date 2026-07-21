@@ -16,6 +16,7 @@ import { I18nProvider } from "@/i18n/I18nProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTabBar } from "@/components/MobileTabBar";
+import { BUILD_VERSION } from "@/lib/build-info";
 
 function NotFoundComponent() {
   return (
@@ -69,6 +70,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "souqly-build", content: BUILD_VERSION },
       { title: "سوقلي | منصة الأعمال والتجارة في مصر" },
       {
         name: "description",
