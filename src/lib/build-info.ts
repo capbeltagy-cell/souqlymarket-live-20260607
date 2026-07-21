@@ -1,1 +1,1 @@
-export const BUILD_VERSION = "souqly-arabic-light-20260722-final";
+export const BUILD_VERSION = "souqly-admin-core-phase-1-final";

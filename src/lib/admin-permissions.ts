@@ -25,3 +25,7 @@ export function canManageFinance(roles: readonly string[]): boolean {
 export function canManageRoles(roles: readonly string[]): boolean {
   return roles.some((role) => role === "super_admin" || role === "admin");
 }
+
+export function canRemoveRole(role: string, assignedCount: number): boolean {
+  return role !== "super_admin" || assignedCount > 1;
+}

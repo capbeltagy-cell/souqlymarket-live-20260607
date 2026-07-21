@@ -84,6 +84,8 @@ import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin-withdrawals'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin-users'
+import { Route as AuthenticatedAdminSystemStatusRouteImport } from './routes/_authenticated/admin-system-status'
 import { Route as AuthenticatedAdminStoresRouteImport } from './routes/_authenticated/admin-stores'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
@@ -94,6 +96,7 @@ import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin-deposits'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin-audit'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
@@ -497,6 +500,17 @@ const AuthenticatedAdminWithdrawalsRoute =
     path: '/admin-withdrawals',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/admin-users',
+  path: '/admin-users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminSystemStatusRoute =
+  AuthenticatedAdminSystemStatusRouteImport.update({
+    id: '/admin-system-status',
+    path: '/admin-system-status',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminStoresRoute =
   AuthenticatedAdminStoresRouteImport.update({
     id: '/admin-stores',
@@ -557,6 +571,11 @@ const AuthenticatedAdminCommissionsRoute =
     path: '/admin-commissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin-audit',
+  path: '/admin-audit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAchievementsRoute =
   AuthenticatedAchievementsRouteImport.update({
     id: '/achievements',
@@ -695,6 +714,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
@@ -705,6 +725,8 @@ export interface FileRoutesByFullPath {
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/admin-users': typeof AuthenticatedAdminUsersRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -799,6 +821,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
@@ -809,6 +832,8 @@ export interface FileRoutesByTo {
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/admin-users': typeof AuthenticatedAdminUsersRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -905,6 +930,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-deposits': typeof AuthenticatedAdminDepositsRoute
@@ -915,6 +941,8 @@ export interface FileRoutesById {
   '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/_authenticated/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/_authenticated/admin-users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
@@ -1011,6 +1039,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/achievements'
+    | '/admin-audit'
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
@@ -1021,6 +1050,8 @@ export interface FileRouteTypes {
     | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-stores'
+    | '/admin-system-status'
+    | '/admin-users'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -1115,6 +1146,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/achievements'
+    | '/admin-audit'
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
@@ -1125,6 +1157,8 @@ export interface FileRouteTypes {
     | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-stores'
+    | '/admin-system-status'
+    | '/admin-users'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
@@ -1220,6 +1254,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/_authenticated/achievements'
+    | '/_authenticated/admin-audit'
     | '/_authenticated/admin-commissions'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-deposits'
@@ -1230,6 +1265,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-platform-settings'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/admin-stores'
+    | '/_authenticated/admin-system-status'
+    | '/_authenticated/admin-users'
     | '/_authenticated/admin-withdrawals'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
@@ -1860,6 +1897,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWithdrawalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-users': {
+      id: '/_authenticated/admin-users'
+      path: '/admin-users'
+      fullPath: '/admin-users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-system-status': {
+      id: '/_authenticated/admin-system-status'
+      path: '/admin-system-status'
+      fullPath: '/admin-system-status'
+      preLoaderRoute: typeof AuthenticatedAdminSystemStatusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-stores': {
       id: '/_authenticated/admin-stores'
       path: '/admin-stores'
@@ -1928,6 +1979,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-commissions'
       fullPath: '/admin-commissions'
       preLoaderRoute: typeof AuthenticatedAdminCommissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-audit': {
+      id: '/_authenticated/admin-audit'
+      path: '/admin-audit'
+      fullPath: '/admin-audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/achievements': {
@@ -2117,6 +2175,7 @@ const AuthenticatedOrdersRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
@@ -2127,6 +2186,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAdminStoresRoute: typeof AuthenticatedAdminStoresRoute
+  AuthenticatedAdminSystemStatusRoute: typeof AuthenticatedAdminSystemStatusRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
@@ -2171,6 +2232,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
@@ -2182,6 +2244,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminPlatformSettingsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAdminStoresRoute: AuthenticatedAdminStoresRoute,
+  AuthenticatedAdminSystemStatusRoute: AuthenticatedAdminSystemStatusRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
@@ -2350,3 +2414,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

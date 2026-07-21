@@ -15,6 +15,9 @@ import {
   LogOut,
   BarChart3,
   CreditCard,
+  Users,
+  ScrollText,
+  Activity,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -44,8 +47,9 @@ const MENU_ITEMS: MenuSection[] = [
     ],
   },
   {
-    section: "إدارة المنصة",
+    section: "المستخدمون والمنصة",
     items: [
+      { icon: Users, label: "المستخدمون", href: "/admin-users" },
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
       { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
@@ -67,6 +71,8 @@ const MENU_ITEMS: MenuSection[] = [
     items: [
       { icon: Zap, label: "محتوى الإطلاق", href: "/admin-launch-content" },
       { icon: Settings, label: "الإعدادات", href: "/admin-platform-settings" },
+      { icon: ScrollText, label: "سجل العمليات", href: "/admin-audit" },
+      { icon: Activity, label: "حالة النظام", href: "/admin-system-status" },
     ],
   },
 ];

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   canManageFinance,
   canManageRoles,
+  canRemoveRole,
   hasPlatformAdminAccess,
   isPlatformAdminRole,
 } from "./admin-permissions";
@@ -26,5 +27,11 @@ describe("admin permissions", () => {
     expect(canManageRoles(["super_admin"])).toBe(true);
     expect(canManageRoles(["admin"])).toBe(true);
     expect(canManageRoles(["finance_admin"])).toBe(false);
+  });
+
+  it("prevents removing the last super administrator", () => {
+    expect(canRemoveRole("super_admin", 1)).toBe(false);
+    expect(canRemoveRole("super_admin", 2)).toBe(true);
+    expect(canRemoveRole("admin", 1)).toBe(true);
   });
 });
