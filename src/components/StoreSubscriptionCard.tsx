@@ -1,6 +1,5 @@
-import { CalendarDays, CheckCircle2, CreditCard } from "lucide-react";
+import { CalendarDays, CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 const TRIAL_DAYS = 7;
 export const STORE_MONTHLY_PRICE_EGP = 250;
@@ -47,10 +46,6 @@ export function StoreSubscriptionCard({ createdAt }: Props) {
             )}
           </div>
         </div>
-        <Button type="button" variant="outline" disabled className="sm:min-w-40">
-          <CheckCircle2 className="me-2 h-4 w-4" />
-          الدفع قريبًا
-        </Button>
       </div>
     </section>
   );

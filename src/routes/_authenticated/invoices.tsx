@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { FileText } from "lucide-react";
+import { AlertTriangle, FileText } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listMyInvoices } from "@/lib/wallets.functions";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/invoices")({
   head: () => ({ meta: [{ title: "الفواتير — سوقلي" }] }),
@@ -20,17 +21,23 @@ function InvoicesPage() {
   const fetchList = useServerFn(listMyInvoices);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
+        setLoadError(null);
         const r = await fetchList();
         setRows(r.invoices);
+      } catch (error) {
+        setLoadError(error instanceof Error ? error.message : "تعذر تحميل الفواتير");
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [retryKey]);
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -44,6 +51,18 @@ function InvoicesPage() {
           {loading ? (
             <div className="p-10 text-center text-muted-foreground">
               {ar ? "جاري التحميل..." : "Loading..."}
+            </div>
+          ) : loadError ? (
+            <div className="p-10 text-center text-muted-foreground">
+              <AlertTriangle className="mx-auto mb-2 h-6 w-6 text-destructive" />
+              <p>{ar ? "تعذر تحميل الفواتير" : "Could not load invoices"}</p>
+              <Button
+                className="mt-4"
+                variant="outline"
+                onClick={() => setRetryKey((key) => key + 1)}
+              >
+                {ar ? "إعادة المحاولة" : "Retry"}
+              </Button>
             </div>
           ) : rows.length === 0 ? (
             <div className="p-10 text-center text-muted-foreground">

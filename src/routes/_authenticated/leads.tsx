@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Inbox, Loader2, Mail, MessageSquare, Phone } from "lucide-react";
+import { AlertTriangle, Inbox, Loader2, Mail, MessageSquare, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -39,11 +39,15 @@ function LeadsPage() {
   const setStatus = useServerFn(updateLeadStatus);
   const [leads, setLeads] = useState<Lead[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = () =>
-    fetchLeads()
+  const load = () => {
+    setLoadError(null);
+    setLeads(null);
+    return fetchLeads()
       .then((r) => setLeads(r.leads))
-      .catch((e: Error) => toast.error(e.message));
+      .catch((e: Error) => setLoadError(e.message));
+  };
   useEffect(() => {
     load();
   }, []);
@@ -91,7 +95,15 @@ function LeadsPage() {
           </Button>
         </div>
 
-        {!leads ? (
+        {loadError ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-8 text-center">
+            <AlertTriangle className="mx-auto h-6 w-6 text-destructive" />
+            <p className="mt-2 text-sm text-muted-foreground">تعذر تحميل طلبات العملاء.</p>
+            <Button className="mt-4" variant="outline" onClick={load}>
+              إعادة المحاولة
+            </Button>
+          </div>
+        ) : !leads ? (
           <div className="p-10 text-center text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin inline" />
           </div>

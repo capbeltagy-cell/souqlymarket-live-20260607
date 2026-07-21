@@ -1,28 +1,12 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  BarChart3,
-  Bot,
-  Boxes,
-  Calculator,
-  ContactRound,
-  FileText,
-  Megaphone,
-  MonitorSmartphone,
-  PackageCheck,
-  ReceiptText,
-  ShoppingCart,
-  UsersRound,
-} from "lucide-react";
-
-export type BusinessModuleStatus = "available" | "planned";
+import { BarChart3, Bot, Boxes, ContactRound, Megaphone, ReceiptText } from "lucide-react";
 
 export type BusinessModuleDefinition = {
   key: string;
   name: string;
   description: string;
   icon: LucideIcon;
-  status: BusinessModuleStatus;
-  href?: string;
+  href: string;
 };
 
 // The catalog is the single navigation source for business modules. New modules
@@ -33,7 +17,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "إدارة العملاء CRM",
     description: "متابعة العملاء المحتملين ومسار التواصل.",
     icon: ContactRound,
-    status: "available",
     href: "/leads",
   },
   {
@@ -41,7 +24,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "المخزون",
     description: "متابعة المنتجات والكميات المتاحة.",
     icon: Boxes,
-    status: "available",
     href: "/store#inventory",
   },
   {
@@ -49,7 +31,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "الفواتير",
     description: "عرض فواتير الحساب والطلبات.",
     icon: ReceiptText,
-    status: "available",
     href: "/invoices",
   },
   {
@@ -57,7 +38,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "التسويق",
     description: "إدارة الحملات وفرص المسوقين.",
     icon: Megaphone,
-    status: "available",
     href: "/marketing-center",
   },
   {
@@ -65,7 +45,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "أدوات الذكاء الاصطناعي",
     description: "أدوات مساعدة لإعداد المحتوى التسويقي.",
     icon: Bot,
-    status: "available",
     href: "/ai-tools",
   },
   {
@@ -73,49 +52,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "التقارير",
     description: "مؤشرات الأداء وتحليلات النشاط.",
     icon: BarChart3,
-    status: "available",
     href: "/analytics",
-  },
-  {
-    key: "purchases",
-    name: "المشتريات",
-    description: "تنظيم أوامر الشراء والموردين.",
-    icon: ShoppingCart,
-    status: "planned",
-  },
-  {
-    key: "sales",
-    name: "المبيعات",
-    description: "إدارة دورة البيع في مساحة عمل موحدة.",
-    icon: PackageCheck,
-    status: "planned",
-  },
-  {
-    key: "hr",
-    name: "الموارد البشرية",
-    description: "إدارة الفريق والصلاحيات التشغيلية.",
-    icon: UsersRound,
-    status: "planned",
-  },
-  {
-    key: "accounting",
-    name: "المحاسبة",
-    description: "القيود والتقارير المالية المتقدمة.",
-    icon: Calculator,
-    status: "planned",
-  },
-  {
-    key: "documents",
-    name: "المستندات",
-    description: "تنظيم مستندات الشركة والتعاملات.",
-    icon: FileText,
-    status: "planned",
-  },
-  {
-    key: "pos",
-    name: "نقاط البيع POS",
-    description: "إدارة المبيعات المباشرة والفروع.",
-    icon: MonitorSmartphone,
-    status: "planned",
   },
 ];
