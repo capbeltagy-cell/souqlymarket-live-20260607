@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Award, Check, X, DollarSign, Loader2 } from "lucide-react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -63,15 +62,17 @@ function AdminCommissions() {
   const load = async () => {
     setRows(null);
     try {
-      const r = await fList({ data: { status } });
-      setRows(r.commissions as Row[]);
-    } catch (e) {
-      toast.error((e as Error).message);
+      const response = await fList({ data: { status } });
+      setRows(response.commissions as Row[]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
       setRows([]);
     }
   };
+
   useEffect(() => {
-    load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const act = async (id: string, action: "approve" | "reject" | "paid") => {
@@ -81,50 +82,50 @@ function AdminCommissions() {
       toast.success(ar ? "تم التحديث" : "Updated");
       setConfirmReject(null);
       await load();
-    } catch (e) {
-      toast.error((e as Error).message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(null);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-8 flex-1 space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Award className="h-6 w-6 text-primary" />
-            {ar ? "مراجعة العمولات" : "Commissions review"}
-          </h1>
+    <AdminLayout
+      title={ar ? "مراجعة العمولات" : "Commissions review"}
+      breadcrumbs={[{ label: ar ? "العمولات" : "Commissions" }]}
+    >
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Award className="h-5 w-5 text-primary" />
+            <span>
+              {ar
+                ? "راجع العمولات المعلّقة واعتمد المستحق منها قبل تحويلها للمسوّق."
+                : "Review pending commissions before releasing them to marketers."}
+            </span>
+          </div>
           <Button asChild variant="outline" size="sm">
             <Link to="/admin-withdrawals">{ar ? "طلبات السحب" : "Withdrawals"}</Link>
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          {ar
-            ? "العمولات المُنشأة تلقائياً عند دفع الطلبات تظهر هنا كـ«معلّقة». اعتمدها لإضافتها إلى محفظة المسوّق، أو ارفضها لحذفها بأمان."
-            : "Commissions auto-created when orders are paid appear here as pending. Approve to move them toward the marketer's wallet, or reject to safely remove."}
-        </p>
-
         <div className="flex flex-wrap gap-2">
-          {STATUSES.map((s) => (
+          {STATUSES.map((item) => (
             <Button
-              key={s}
+              key={item}
               size="sm"
-              variant={s === status ? "default" : "outline"}
-              onClick={() => setStatus(s)}
+              variant={item === status ? "default" : "outline"}
+              onClick={() => setStatus(item)}
             >
-              {s}
+              {item}
             </Button>
           ))}
         </div>
 
-        <div className="rounded-lg border border-border bg-card shadow-card overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           {rows === null ? (
             <div className="p-10 text-center text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin inline" />
+              <Loader2 className="inline h-5 w-5 animate-spin" />
             </div>
           ) : rows.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
@@ -132,67 +133,75 @@ function AdminCommissions() {
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {rows.map((c) => {
+              {rows.map((commission) => {
                 const marketer =
-                  c.agents?.profiles?.display_name ||
-                  c.agents?.profiles?.full_name ||
-                  c.agent_id?.slice(0, 8) ||
+                  commission.agents?.profiles?.display_name ||
+                  commission.agents?.profiles?.full_name ||
+                  commission.agent_id?.slice(0, 8) ||
                   "—";
                 const listingTitle =
-                  (ar ? c.listings?.title_ar : c.listings?.title_en) ?? c.listings?.title_en ?? "—";
-                const company = (ar ? c.companies?.name_ar : c.companies?.name_en) ?? "—";
-                const isAuto = (c.notes ?? "").startsWith("Auto:");
+                  (ar ? commission.listings?.title_ar : commission.listings?.title_en) ??
+                  commission.listings?.title_en ??
+                  "—";
+                const company =
+                  (ar ? commission.companies?.name_ar : commission.companies?.name_en) ?? "—";
+                const isAuto = (commission.notes ?? "").startsWith("Auto:");
+
                 return (
-                  <div key={c.id} className="p-4 space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div key={commission.id} className="space-y-3 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="font-semibold flex items-center gap-2 flex-wrap">
-                          {formatPrice(Number(c.amount), locale, { showZero: true })}
-                          <Badge variant="outline">{c.status}</Badge>
+                        <div className="flex flex-wrap items-center gap-2 font-semibold">
+                          {formatPrice(Number(commission.amount), locale, { showZero: true })}
+                          <Badge variant="outline">{commission.status}</Badge>
                           {isAuto && (
-                            <Badge className="bg-primary/10 text-primary border-primary/20">
+                            <Badge className="border-primary/20 bg-primary/10 text-primary">
                               {ar ? "تلقائي" : "Auto"}
                             </Badge>
                           )}
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {ar ? "مسوّق" : "Marketer"}:{" "}
-                          <span className="font-medium text-foreground">{marketer}</span>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {ar ? "مسوّق" : "Marketer"}: {marketer}
                           {" · "}
                           {ar ? "شركة" : "Company"}: {company}
                           {" · "}
-                          {new Date(c.created_at).toLocaleString()}
+                          {new Date(commission.created_at).toLocaleString()}
                         </div>
-                        {c.listing_id && (
+                        {commission.listing_id && (
                           <Link
                             to="/listings/$id"
-                            params={{ id: c.listing_id }}
+                            params={{ id: commission.listing_id }}
                             className="text-xs text-primary hover:underline"
                           >
                             {listingTitle}
                           </Link>
                         )}
-                        {c.notes && (
-                          <div className="text-xs text-muted-foreground mt-1">📝 {c.notes}</div>
+                        {commission.notes && (
+                          <div className="mt-1 text-xs text-muted-foreground">📝 {commission.notes}</div>
                         )}
                       </div>
                     </div>
 
-                    {(c.status === "pending" || c.status === "approved") && (
-                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {(commission.status === "pending" || commission.status === "approved") && (
+                      <div className="flex flex-wrap items-center gap-2">
                         <Input
                           placeholder={ar ? "ملاحظة الإدارة (اختياري)" : "Admin note (optional)"}
-                          value={notesMap[c.id] ?? ""}
-                          onChange={(e) => setNotesMap({ ...notesMap, [c.id]: e.target.value })}
-                          className="max-w-xs h-8 text-xs"
+                          value={notesMap[commission.id] ?? ""}
+                          onChange={(event) =>
+                            setNotesMap((current) => ({
+                              ...current,
+                              [commission.id]: event.target.value,
+                            }))
+                          }
+                          className="h-8 max-w-xs text-xs"
                           maxLength={500}
                         />
-                        {c.status === "pending" && (
+                        {commission.status === "pending" && (
                           <>
                             <Button
                               size="sm"
-                              onClick={() => act(c.id, "approve")}
-                              disabled={busy === c.id + "approve"}
+                              onClick={() => act(commission.id, "approve")}
+                              disabled={busy === commission.id + "approve"}
                               className="gap-1"
                             >
                               <Check className="h-4 w-4" />
@@ -201,8 +210,8 @@ function AdminCommissions() {
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => setConfirmReject(c)}
-                              disabled={busy === c.id + "reject"}
+                              onClick={() => setConfirmReject(commission)}
+                              disabled={busy === commission.id + "reject"}
                               className="gap-1"
                             >
                               <X className="h-4 w-4" />
@@ -210,12 +219,12 @@ function AdminCommissions() {
                             </Button>
                           </>
                         )}
-                        {c.status === "approved" && (
+                        {commission.status === "approved" && (
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => act(c.id, "paid")}
-                            disabled={busy === c.id + "paid"}
+                            onClick={() => act(commission.id, "paid")}
+                            disabled={busy === commission.id + "paid"}
                             className="gap-1"
                           >
                             <DollarSign className="h-4 w-4" />
@@ -232,13 +241,13 @@ function AdminCommissions() {
         </div>
       </div>
 
-      <AlertDialog open={!!confirmReject} onOpenChange={(o) => !o && setConfirmReject(null)}>
+      <AlertDialog open={Boolean(confirmReject)} onOpenChange={(open) => !open && setConfirmReject(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{ar ? "رفض العمولة؟" : "Reject commission?"}</AlertDialogTitle>
             <AlertDialogDescription>
               {ar
-                ? "سيتم حذف العمولة المعلّقة نهائياً. لا يمكن التراجع عن هذا الإجراء."
+                ? "سيتم حذف العمولة المعلّقة نهائيًا. لا يمكن التراجع عن هذا الإجراء."
                 : "The pending commission will be permanently deleted. This cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -253,8 +262,6 @@ function AdminCommissions() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <SiteFooter />
-    </div>
+    </AdminLayout>
   );
 }
