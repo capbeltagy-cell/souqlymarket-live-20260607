@@ -33,12 +33,57 @@ jobs:
         run: npm ci
 
       - name: Typecheck
-        run: npm run typecheck
+        id: typecheck
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee typecheck.log
 
       - name: Lint
-        run: npm run lint
+        id: lint
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee lint.log
 
       - name: Production build
+        id: build
+        continue-on-error: true
+        shell: bash
         env:
           NITRO_PRESET: node-server
-        run: npm run build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log
+
+      - name: Upload diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-check-logs
+          path: |
+            typecheck.log
+            lint.log
+            build.log
+          if-no-files-found: warn
+
+      - name: Fail if checks failed
+        if: always()
+        shell: bash
+        run: |
+          failed=0
+          if [ "${{ steps.typecheck.outcome }}" != "success" ]; then
+            echo "Typecheck failed"
+            failed=1
+          fi
+          if [ "${{ steps.lint.outcome }}" != "success" ]; then
+            echo "Lint failed"
+            failed=1
+          fi
+          if [ "${{ steps.build.outcome }}" != "success" ]; then
+            echo "Build failed"
+            failed=1
+          fi
+          exit "$failed"
