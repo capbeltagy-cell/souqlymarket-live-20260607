@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import {
   X,
   LayoutDashboard,
@@ -24,7 +24,6 @@ import {
   Users,
   CreditCard,
 } from "lucide-react";
-import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 
 interface AdminSidebarProps {
@@ -32,46 +31,57 @@ interface AdminSidebarProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const MENU_ITEMS = [
+type MenuItem = {
+  icon: typeof LayoutDashboard;
+  label: string;
+  href?: string;
+};
+
+type MenuSection = {
+  section: string;
+  items: MenuItem[];
+};
+
+const MENU_ITEMS: MenuSection[] = [
   {
-    section: "overview",
+    section: "نظرة عامة",
     items: [
       { icon: LayoutDashboard, label: "الرئيسية", href: "/admin-overview" },
       { icon: BarChart3, label: "اللوحة التنفيذية", href: "/admin-executive" },
     ],
   },
   {
-    section: "platform_management",
+    section: "إدارة المنصة",
     items: [
-      { icon: Users, label: "المستخدمون", href: "#" },
+      { icon: Users, label: "المستخدمون" },
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
-      { icon: Package, label: "المنتجات", href: "#" },
-      { icon: ShoppingBag, label: "الطلبات", href: "#" },
-      { icon: Lightbulb, label: "المناقصات", href: "#" },
-      { icon: ShoppingCart, label: "طلبات الشراء", href: "#" },
-      { icon: AlertCircle, label: "البلاغات", href: "#" },
+      { icon: Package, label: "المنتجات والإعلانات" },
+      { icon: ShoppingBag, label: "الطلبات" },
+      { icon: Lightbulb, label: "المناقصات" },
+      { icon: ShoppingCart, label: "طلبات الشراء" },
+      { icon: AlertCircle, label: "البلاغات والمراجعة" },
     ],
   },
   {
-    section: "financial",
+    section: "المالية",
     items: [
       { icon: CreditCard, label: "المدفوعات", href: "/admin-payments" },
       { icon: DollarSign, label: "الإيداعات", href: "/admin-deposits" },
       { icon: ArrowDownUp, label: "السحوبات", href: "/admin-withdrawals" },
       { icon: TrendingUp, label: "الإيرادات", href: "/admin-revenue" },
       { icon: Percent, label: "العمولات", href: "/admin-commissions" },
-      { icon: Wallet, label: "الاشتراكات", href: "#" },
-      { icon: GripHorizontal, label: "الفواتير", href: "#" },
+      { icon: Wallet, label: "الاشتراكات" },
+      { icon: GripHorizontal, label: "الفواتير" },
     ],
   },
   {
-    section: "content_system",
+    section: "المحتوى والنظام",
     items: [
-      { icon: Bell, label: "الإشعارات", href: "#" },
+      { icon: Bell, label: "الإشعارات" },
       { icon: Zap, label: "محتوى الإطلاق", href: "/admin-launch-content" },
       { icon: Settings, label: "الإعدادات", href: "/admin-platform-settings" },
-      { icon: Archive, label: "سجل العمليات", href: "#" },
+      { icon: Archive, label: "سجل العمليات" },
     ],
   },
 ];
@@ -82,64 +92,70 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
 
   const isActive = (href: string) => location.pathname === href;
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
   return (
     <>
       {open && (
-        <div
+        <button
+          type="button"
+          aria-label="إغلاق القائمة"
           className="fixed inset-0 z-30 bg-black/50 lg:hidden"
           onClick={() => onOpenChange(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 start-0 z-40 w-64 bg-white border-e border-gray-200 overflow-y-auto transition-transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-gray-200 bg-white transition-transform lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4">
           <div>
-            <h2 className="font-bold text-lg text-gray-900">سوقلي</h2>
+            <h2 className="text-lg font-bold text-gray-900">سوقلي</h2>
             <p className="text-xs text-gray-500">لوحة الإدارة</p>
           </div>
           <button
+            type="button"
             onClick={() => onOpenChange(false)}
-            className="lg:hidden inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-gray-100 text-gray-500"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 lg:hidden"
+            aria-label="إغلاق القائمة"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="space-y-4 p-4">
+        <nav className="flex-1 space-y-4 overflow-y-auto p-4 pb-6">
           {MENU_ITEMS.map((section) => (
             <div key={section.section}>
-              <h3 className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <h3 className="px-3 py-2 text-xs font-semibold text-gray-500">
                 {section.section}
               </h3>
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const Icon = item.icon;
-                  const active = isActive(item.href);
-                  const disabled = item.href === "#";
-                  return (
-                    <Link
-                      key={item.href}
-                      to={disabled ? undefined : (item.href as any)}
-                      onClick={() => !disabled && onOpenChange(false)}
-                      className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        disabled
-                          ? "text-gray-400 cursor-not-allowed"
-                          : active
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                  const active = item.href ? isActive(item.href) : false;
+                  const classes = `flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    item.href
+                      ? active
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                      : "cursor-not-allowed text-gray-400"
+                  }`;
+
+                  return item.href ? (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => onOpenChange(false)}
+                      className={classes}
                     >
-                      <Icon className="h-4 w-4 inline me-2" />
-                      {item.label}
-                    </Link>
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </a>
+                  ) : (
+                    <button key={item.label} type="button" disabled className={classes}>
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </button>
                   );
                 })}
               </div>
@@ -147,14 +163,15 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 inset-x-0 border-t border-gray-200 bg-white p-4 space-y-3">
-          <div className="px-3 py-2 rounded-md bg-gray-50">
-            <p className="text-xs text-gray-500">متسجل الدخول</p>
-            <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+        <div className="border-t border-gray-200 bg-white p-4 space-y-3">
+          <div className="rounded-md bg-gray-50 px-3 py-2">
+            <p className="text-xs text-gray-500">الحساب الحالي</p>
+            <p className="truncate text-sm font-medium text-gray-900">{user?.email}</p>
           </div>
           <button
-            onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            type="button"
+            onClick={() => void signOut()}
+            className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
           >
             <LogOut className="h-4 w-4" />
             تسجيل الخروج
