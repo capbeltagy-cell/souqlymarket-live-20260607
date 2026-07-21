@@ -77,7 +77,7 @@ export function SiteHeader() {
         <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
                 {t("nav_marketplace")}
               </button>
             </DropdownMenuTrigger>
@@ -104,7 +104,7 @@ export function SiteHeader() {
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
                 فرص أعمال
               </button>
             </DropdownMenuTrigger>
@@ -119,13 +119,13 @@ export function SiteHeader() {
           </DropdownMenu>
           <Link
             to="/companies"
-            className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition"
+            className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition"
           >
             {t("nav_companies")}
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
                 حلول الشركات
               </button>
             </DropdownMenuTrigger>
@@ -154,7 +154,7 @@ export function SiteHeader() {
           {/* Secondary nav collapsed into "More" */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition">
+              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
                 المزيد
               </button>
             </DropdownMenuTrigger>

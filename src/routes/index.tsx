@@ -83,12 +83,12 @@ function CardSkeleton({ count = 4, aspect = "aspect-[4/3]" }: { count?: number; 
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-white/5 bg-surface-2/40 overflow-hidden animate-pulse"
+          className="rounded-2xl border border-border bg-surface-2/70 overflow-hidden animate-pulse"
         >
-          <div className={`${aspect} bg-white/[0.03]`} />
+          <div className={`${aspect} bg-muted`} />
           <div className="p-3 space-y-2">
-            <div className="h-3 rounded bg-white/[0.05] w-3/4" />
-            <div className="h-3 rounded bg-white/[0.05] w-1/2" />
+            <div className="h-3 rounded bg-border/70 w-3/4" />
+            <div className="h-3 rounded bg-border/70 w-1/2" />
           </div>
         </div>
       ))}
@@ -113,7 +113,7 @@ function SectionHead({ title, href, cta }: { title: string; href: string; cta: s
 function Empty({ label, href }: { label: string; href: string }) {
   const { t } = useI18n();
   return (
-    <div className="rounded-2xl border border-dashed border-white/10 bg-surface/40 p-6 text-center">
+    <div className="rounded-2xl border border-dashed border-border bg-surface/80 p-6 text-center">
       <p className="text-sm text-muted-foreground mb-3">{t("empty_no_items")}</p>
       <Button asChild variant="outline" size="sm">
         <Link to={href}>{label}</Link>

@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { ShieldAlert } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,11 +23,14 @@ export function AdminLayout({
   loading = false,
   error = null,
 }: AdminLayoutProps) {
-  const { locale } = useI18n();
+  const { locale, setLocale } = useI18n();
   const { roles } = useAuth();
-  const ar = locale === "ar";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isAdmin = roles.includes("admin");
+
+  useEffect(() => {
+    if (locale !== "ar") setLocale("ar");
+  }, [locale, setLocale]);
 
   if (!isAdmin) {
     return (
@@ -36,21 +39,15 @@ export function AdminLayout({
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
             <ShieldAlert className="h-6 w-6" />
           </div>
-          <h1 className="mb-2 text-2xl font-bold text-foreground">
-            {ar ? "الوصول غير مسموح" : "Access denied"}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {ar
-              ? "هذا القسم متاح لمسؤولي المنصة فقط."
-              : "This area is available to platform administrators only."}
-          </p>
+          <h1 className="mb-2 text-2xl font-bold text-foreground">الوصول غير مسموح</h1>
+          <p className="text-sm text-muted-foreground">هذا القسم متاح لمسؤولي المنصة فقط.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface-2 text-foreground">
+    <div dir="rtl" lang="ar" className="min-h-screen bg-surface-2 text-foreground">
       <AdminSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
       <div className="lg:ps-64">
@@ -74,9 +71,7 @@ export function AdminLayout({
             <div className="flex min-h-64 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
               <div className="text-center">
                 <div className="inline-flex h-9 w-9 animate-spin rounded-full border-4 border-muted border-t-primary" />
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {ar ? "جاري التحميل..." : "Loading..."}
-                </p>
+                <p className="mt-3 text-sm text-muted-foreground">جاري التحميل...</p>
               </div>
             </div>
           )}

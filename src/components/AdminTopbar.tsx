@@ -1,14 +1,11 @@
 import { Menu, Clock, ShieldCheck } from "lucide-react";
-import { useI18n } from "@/i18n/I18nProvider";
 
 interface AdminTopbarProps {
   onMenuClick: () => void;
 }
 
 export function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
-  const { locale } = useI18n();
-  const ar = locale === "ar";
-  const now = new Date().toLocaleString(ar ? "ar-EG" : "en-GB", {
+  const now = new Date().toLocaleString("ar-EG", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -21,7 +18,7 @@ export function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
             type="button"
             onClick={onMenuClick}
             className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
-            aria-label={ar ? "فتح قائمة الإدارة" : "Open admin menu"}
+            aria-label="فتح قائمة الإدارة"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -31,12 +28,8 @@ export function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">
-                {ar ? "مركز إدارة سوقلي" : "Souqly Admin Center"}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {ar ? "منطقة خاصة بالمشرفين فقط" : "Restricted administrator area"}
-              </p>
+              <p className="truncate text-sm font-semibold text-foreground">مركز إدارة سوقلي</p>
+              <p className="truncate text-xs text-muted-foreground">منطقة خاصة بالمشرفين فقط</p>
             </div>
           </div>
         </div>

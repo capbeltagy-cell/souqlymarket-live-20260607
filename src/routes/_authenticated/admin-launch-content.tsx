@@ -41,6 +41,13 @@ const LISTING_TYPES = [
   "service",
   "business_opportunity",
 ] as const;
+const LISTING_TYPE_LABELS: Record<(typeof LISTING_TYPES)[number], string> = {
+  product: "منتج",
+  land: "أرض",
+  real_estate: "عقار",
+  service: "خدمة",
+  business_opportunity: "فرصة تجارية",
+};
 
 type Batch = {
   id: string;
@@ -345,7 +352,7 @@ function AdminLaunchContent() {
                   <SelectContent>
                     {LISTING_TYPES.map((t) => (
                       <SelectItem key={t} value={t}>
-                        {t}
+                        {LISTING_TYPE_LABELS[t]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -377,7 +384,7 @@ function AdminLaunchContent() {
                 maxLength={300}
               />
               <Input
-                placeholder="Title (EN)"
+                placeholder="الاسم بالإنجليزية (اختياري)"
                 value={form.title_en}
                 onChange={(e) => setForm({ ...form, title_en: e.target.value })}
                 maxLength={300}
