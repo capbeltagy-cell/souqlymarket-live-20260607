@@ -142,7 +142,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function AppChrome() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin-") || location.pathname === "/control-center-x7";
+  const isAdminRoute =
+    location.pathname.startsWith("/admin-") || location.pathname === "/control-center-x7";
 
   return (
     <>

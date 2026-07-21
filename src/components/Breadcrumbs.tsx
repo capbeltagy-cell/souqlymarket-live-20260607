@@ -19,10 +19,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
 
   return (
     <nav className="flex items-center gap-2 text-sm text-gray-600">
-      <Link
-        to="/admin-overview"
-        className="hover:text-gray-900 transition-colors"
-      >
+      <Link to="/admin-overview" className="hover:text-gray-900 transition-colors">
         {ar ? "الرئيسية" : "Home"}
       </Link>
 

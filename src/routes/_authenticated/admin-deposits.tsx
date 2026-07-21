@@ -105,17 +105,23 @@ function AdminDeposits() {
         ) : (
           <div className="space-y-3">
             {rows.map((deposit) => (
-              <article key={String(deposit.id)} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <article
+                key={String(deposit.id)}
+                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="font-semibold text-gray-900">
                       {fmt(deposit.amount)} {String(deposit.currency ?? "EGP")}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {deposit.companies?.name_ar ?? deposit.companies?.name_en ?? deposit.company_id}
+                      {deposit.companies?.name_ar ??
+                        deposit.companies?.name_en ??
+                        deposit.company_id}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(String(deposit.created_at)).toLocaleString("ar-EG")} · {deposit.method_code ?? "—"}
+                      {new Date(String(deposit.created_at)).toLocaleString("ar-EG")} ·{" "}
+                      {deposit.method_code ?? "—"}
                       {deposit.reference ? ` · ${deposit.reference}` : ""}
                     </div>
                     {deposit.proof_url ? (
@@ -129,7 +135,9 @@ function AdminDeposits() {
                       </a>
                     ) : null}
                     {deposit.admin_notes ? (
-                      <div className="mt-1 text-xs text-gray-500">ملاحظة الإدارة: {String(deposit.admin_notes)}</div>
+                      <div className="mt-1 text-xs text-gray-500">
+                        ملاحظة الإدارة: {String(deposit.admin_notes)}
+                      </div>
                     ) : null}
                   </div>
                   <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700">
@@ -144,7 +152,10 @@ function AdminDeposits() {
                       className="h-9 min-w-[220px] flex-1 rounded-md border border-gray-300 bg-white px-3 text-sm"
                       value={notes[String(deposit.id)] ?? ""}
                       onChange={(event) =>
-                        setNotes((current) => ({ ...current, [String(deposit.id)]: event.target.value }))
+                        setNotes((current) => ({
+                          ...current,
+                          [String(deposit.id)]: event.target.value,
+                        }))
                       }
                     />
                     <Button

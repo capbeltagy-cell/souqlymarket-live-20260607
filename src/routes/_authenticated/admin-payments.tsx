@@ -58,7 +58,9 @@ function AdminPayments() {
   }, []);
 
   const update = (id: string, patch: Partial<PaymentMethod>) => {
-    setMethods((current) => current.map((method) => (method.id === id ? { ...method, ...patch } : method)));
+    setMethods((current) =>
+      current.map((method) => (method.id === id ? { ...method, ...patch } : method)),
+    );
   };
 
   const saveMethod = async (method: PaymentMethod) => {
@@ -131,7 +133,10 @@ function AdminPayments() {
                 </div>
               ) : (
                 methods.map((method) => (
-                  <div key={method.id} className="grid gap-3 rounded-xl border border-border bg-card p-4">
+                  <div
+                    key={method.id}
+                    className="grid gap-3 rounded-xl border border-border bg-card p-4"
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="font-semibold">
                         {method.icon} {method.name_ar}{" "}
@@ -141,7 +146,9 @@ function AdminPayments() {
                         <input
                           type="checkbox"
                           checked={Boolean(method.is_active)}
-                          onChange={(event) => update(method.id, { is_active: event.target.checked })}
+                          onChange={(event) =>
+                            update(method.id, { is_active: event.target.checked })
+                          }
                         />
                         نشطة
                       </label>
@@ -161,7 +168,9 @@ function AdminPayments() {
                     <Textarea
                       placeholder="تعليمات الدفع بالعربية"
                       value={method.instructions_ar || ""}
-                      onChange={(event) => update(method.id, { instructions_ar: event.target.value })}
+                      onChange={(event) =>
+                        update(method.id, { instructions_ar: event.target.value })
+                      }
                     />
                     <Textarea
                       placeholder='بيانات الحساب بصيغة JSON، مثال: {"رقم الهاتف":"01000000000"}'
@@ -170,7 +179,9 @@ function AdminPayments() {
                           ? method.account_details
                           : JSON.stringify(method.account_details || {}, null, 2)
                       }
-                      onChange={(event) => update(method.id, { account_details: event.target.value })}
+                      onChange={(event) =>
+                        update(method.id, { account_details: event.target.value })
+                      }
                       className="font-mono text-xs"
                       rows={4}
                     />
@@ -200,11 +211,16 @@ function AdminPayments() {
                     <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <div className="font-semibold">
-                          {Number(proof.amount).toLocaleString("ar-EG")} {proof.currency} — {proof.payment_method_code}
+                          {Number(proof.amount).toLocaleString("ar-EG")} {proof.currency} —{" "}
+                          {proof.payment_method_code}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           طلب:{" "}
-                          <Link to="/orders/$id" params={{ id: proof.order_id }} className="text-primary">
+                          <Link
+                            to="/orders/$id"
+                            params={{ id: proof.order_id }}
+                            className="text-primary"
+                          >
                             #{proof.order_id.slice(0, 8)}
                           </Link>{" "}
                           • {new Date(proof.created_at).toLocaleString("ar-EG")}
@@ -214,7 +230,9 @@ function AdminPayments() {
                             المرجع: <span className="font-mono">{proof.reference}</span>
                           </div>
                         )}
-                        {proof.note && <div className="text-xs text-muted-foreground">{proof.note}</div>}
+                        {proof.note && (
+                          <div className="text-xs text-muted-foreground">{proof.note}</div>
+                        )}
                       </div>
                       {proof.proof_url && (
                         <a

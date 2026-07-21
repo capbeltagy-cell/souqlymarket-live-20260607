@@ -15,15 +15,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { AdminLayout } from "@/components/AdminLayout";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { superCheck, superOverview, superList, superAction } from "@/lib/super-admin.functions";
+import { requireAdminRoute } from "@/lib/route-guards";
 import { toast } from "sonner";
 
 const ALLOWED = ["capbeltagy@gmail.com", "capbeltagy95@gmail.com"];
 
 export const Route = createFileRoute("/control-center-x7")({
   ssr: false,
+  beforeLoad: requireAdminRoute,
   head: () => ({
     meta: [{ title: "Control Center" }, { name: "robots", content: "noindex,nofollow" }],
   }),
@@ -94,30 +96,12 @@ function ControlCenter() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-2">
-      <header className="border-b border-border bg-surface">
-        <div className="container-souqly py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Crown className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold">Super Admin Control Center</h1>
-            <Badge variant="outline" className="text-xs">
-              {user?.email}
-            </Badge>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/";
-            }}
-          >
-            Sign out
-          </Button>
-        </div>
-      </header>
-
-      <main className="container-souqly py-6 space-y-6">
+    <AdminLayout
+      title="Super Admin Control Center"
+      description={`Restricted operations console — ${user?.email ?? "admin"}`}
+      breadcrumbs={[{ label: "Control Center" }]}
+    >
+      <div className="space-y-6">
         {overview && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             <Stat label="Companies" value={overview.counts.companies} />
@@ -173,8 +157,8 @@ function ControlCenter() {
             </TabsContent>
           ))}
         </Tabs>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 

@@ -48,9 +48,18 @@ function AdminOverview() {
               {ar ? "الشركات" : "Companies"}
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Stat label={ar ? "إجمالي الشركات" : "Total companies"} value={data.totals.companies} />
-              <Stat label={ar ? "الشركات المدفوعة" : "Paid companies"} value={data.totals.paidCompanies} />
-              <Stat label={ar ? "الشركات المجانية" : "Free companies"} value={data.totals.freeCompanies} />
+              <Stat
+                label={ar ? "إجمالي الشركات" : "Total companies"}
+                value={data.totals.companies}
+              />
+              <Stat
+                label={ar ? "الشركات المدفوعة" : "Paid companies"}
+                value={data.totals.paidCompanies}
+              />
+              <Stat
+                label={ar ? "الشركات المجانية" : "Free companies"}
+                value={data.totals.freeCompanies}
+              />
             </div>
           </section>
 
@@ -59,7 +68,10 @@ function AdminOverview() {
               {ar ? "نشاط المنصة" : "Platform activity"}
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Stat label={ar ? "إجمالي العملاء المحتملين" : "Total leads"} value={data.totals.leads} />
+              <Stat
+                label={ar ? "إجمالي العملاء المحتملين" : "Total leads"}
+                value={data.totals.leads}
+              />
               <Stat label={ar ? "طلبات الشراء" : "RFQs"} value={data.totals.rfqs} />
               <Stat label={ar ? "المناقصات" : "Tenders"} value={data.totals.tenders} />
             </div>

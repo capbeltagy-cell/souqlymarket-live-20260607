@@ -17,7 +17,7 @@ export async function requireAdminRoute() {
   if (userError || !user) {
     throw redirect({
       to: "/auth",
-      search: { redirect: "/admin-overview" },
+      search: { returnTo: "/admin-overview" },
       replace: true,
     });
   }

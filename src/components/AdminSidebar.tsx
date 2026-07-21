@@ -1,26 +1,20 @@
-import { useLocation } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import {
   X,
   LayoutDashboard,
   Store,
   Building2,
-  ShoppingCart,
   Package,
-  Lightbulb,
-  ShoppingBag,
-  AlertCircle,
   DollarSign,
   Wallet,
   ArrowDownUp,
   TrendingUp,
   Percent,
-  Bell,
   Zap,
   Settings,
   LogOut,
   BarChart3,
   CreditCard,
-  FileText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -55,10 +49,6 @@ const MENU_ITEMS: MenuSection[] = [
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
       { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
-      { icon: ShoppingBag, label: "الطلبات", href: "/orders" },
-      { icon: Lightbulb, label: "المناقصات", href: "/tenders" },
-      { icon: ShoppingCart, label: "طلبات الشراء", href: "/rfq" },
-      { icon: AlertCircle, label: "البلاغات والمراجعة", href: "/moderation" },
     ],
   },
   {
@@ -70,13 +60,11 @@ const MENU_ITEMS: MenuSection[] = [
       { icon: TrendingUp, label: "الإيرادات", href: "/admin-revenue" },
       { icon: Percent, label: "العمولات", href: "/admin-commissions" },
       { icon: Wallet, label: "الاشتراكات", href: "/admin-platform-settings" },
-      { icon: FileText, label: "الفواتير", href: "/invoices" },
     ],
   },
   {
     section: "المحتوى والنظام",
     items: [
-      { icon: Bell, label: "الإشعارات", href: "/admin-overview" },
       { icon: Zap, label: "محتوى الإطلاق", href: "/admin-launch-content" },
       { icon: Settings, label: "الإعدادات", href: "/admin-platform-settings" },
     ],
@@ -88,7 +76,9 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
   const location = useLocation();
 
   const isActive = (item: MenuItem) =>
-    item.exact ? location.pathname === item.href : location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
+    item.exact
+      ? location.pathname === item.href
+      : location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
 
   return (
     <>
@@ -132,9 +122,9 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
                   const Icon = item.icon;
                   const active = isActive(item);
                   return (
-                    <a
+                    <Link
                       key={`${section.section}-${item.label}`}
-                      href={item.href}
+                      to={item.href as never}
                       onClick={() => onOpenChange(false)}
                       aria-current={active ? "page" : undefined}
                       className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
@@ -145,7 +135,7 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>
-                    </a>
+                    </Link>
                   );
                 })}
               </div>
