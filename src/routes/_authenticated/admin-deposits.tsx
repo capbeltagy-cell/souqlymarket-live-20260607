@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Banknote, CheckCircle2, XCircle } from "lucide-react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nProvider";
 import {
@@ -16,15 +15,11 @@ import { requireAdminRoute } from "@/lib/route-guards";
 export const Route = createFileRoute("/_authenticated/admin-deposits")({
   beforeLoad: requireAdminRoute,
   head: () => ({ meta: [{ title: "مراجعة إيداعات الشركات — Admin" }] }),
-  errorComponent: ({ error }) => (
-    <div className="p-8 text-sm text-destructive">{error.message}</div>
-  ),
-  notFoundComponent: () => <div className="p-8">Not found</div>,
   component: AdminDeposits,
 });
 
-function fmt(n: any) {
-  return Number(n ?? 0).toLocaleString("en-EG", { maximumFractionDigits: 2 });
+function fmt(value: unknown) {
+  return Number(value ?? 0).toLocaleString("en-EG", { maximumFractionDigits: 2 });
 }
 
 function AdminDeposits() {
@@ -33,121 +28,149 @@ function AdminDeposits() {
   const fList = useServerFn(adminListCompanyDeposits);
   const fReview = useServerFn(adminReviewCompanyDeposit);
   const [status, setStatus] = useState<"pending" | "approved" | "rejected" | "all">("pending");
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<Array<Record<string, any>>>([]);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
+    setLoading(true);
+    setError(null);
     try {
-      const r = await fList({ data: { status } });
-      setRows(r.deposits);
-    } catch (e) {
-      toast.error((e as Error).message);
+      const result = await fList({ data: { status } });
+      setRows(result.deposits as Array<Record<string, any>>);
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "تعذر تحميل الإيداعات";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   }
+
   useEffect(() => {
-    load();
+    void load();
   }, [status]);
 
   async function act(id: string, action: "approve" | "reject") {
     setBusy(id);
     try {
       await fReview({ data: { id, action, admin_notes: notes[id] ?? null } });
-      toast.success(ar ? "تم الحفظ" : "Saved");
-      load();
-    } catch (e) {
-      toast.error((e as Error).message);
+      toast.success(action === "approve" ? "تم اعتماد الإيداع" : "تم رفض الإيداع");
+      await load();
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "تعذر تحديث الإيداع");
     } finally {
       setBusy(null);
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-8 flex-1">
-        <h1 className="text-2xl font-bold flex items-center gap-2 mb-4">
-          <Banknote className="h-6 w-6 text-primary" />
-          {ar ? "إيداعات الشركات" : "Company Deposits"}
-        </h1>
-        <div className="mb-4 flex gap-2 flex-wrap">
-          {(["pending", "approved", "rejected", "all"] as const).map((s) => (
+    <AdminLayout
+      title={ar ? "إيداعات الشركات" : "Company Deposits"}
+      breadcrumbs={[{ label: ar ? "الإيداعات" : "Deposits" }]}
+      loading={loading}
+      error={error}
+    >
+      <div className="space-y-5">
+        <div className="flex items-center gap-2 text-gray-700">
+          <Banknote className="h-5 w-5 text-blue-600" />
+          <p className="text-sm">راجع إثباتات التحويل قبل إضافة الرصيد لمحافظ الشركات.</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(["pending", "approved", "rejected", "all"] as const).map((item) => (
             <Button
-              key={s}
+              key={item}
               size="sm"
-              variant={status === s ? "default" : "outline"}
-              onClick={() => setStatus(s)}
+              variant={status === item ? "default" : "outline"}
+              onClick={() => setStatus(item)}
             >
-              {s}
+              {item === "pending"
+                ? "قيد المراجعة"
+                : item === "approved"
+                  ? "معتمدة"
+                  : item === "rejected"
+                    ? "مرفوضة"
+                    : "الكل"}
             </Button>
           ))}
         </div>
 
-        {rows.length === 0 ? (
-          <div className="text-sm text-muted-foreground">
-            {ar ? "لا توجد طلبات." : "No deposits."}
+        {!loading && rows.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
+            {ar ? "لا توجد طلبات إيداع في هذه الحالة." : "No deposits in this status."}
           </div>
         ) : (
           <div className="space-y-3">
-            {rows.map((d) => (
-              <div key={d.id} className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <div className="flex justify-between items-start flex-wrap gap-3">
+            {rows.map((deposit) => (
+              <article key={String(deposit.id)} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="font-semibold">
-                      {fmt(d.amount)} {d.currency}
+                    <div className="font-semibold text-gray-900">
+                      {fmt(deposit.amount)} {String(deposit.currency ?? "EGP")}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {d.companies?.name_ar ?? d.companies?.name_en ?? d.company_id}
+                    <div className="text-xs text-gray-500">
+                      {deposit.companies?.name_ar ?? deposit.companies?.name_en ?? deposit.company_id}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(d.created_at).toLocaleString()} · {d.method_code ?? "n/a"}
-                      {d.reference ? ` · ${d.reference}` : ""}
+                    <div className="text-xs text-gray-500">
+                      {new Date(String(deposit.created_at)).toLocaleString("ar-EG")} · {deposit.method_code ?? "—"}
+                      {deposit.reference ? ` · ${deposit.reference}` : ""}
                     </div>
-                    {d.proof_url && (
+                    {deposit.proof_url ? (
                       <a
-                        className="text-xs text-primary underline"
-                        href={d.proof_url}
+                        className="mt-1 inline-block text-xs font-medium text-blue-600 hover:underline"
+                        href={String(deposit.proof_url)}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {ar ? "إثبات التحويل" : "Proof"}
+                        عرض إثبات التحويل
                       </a>
-                    )}
-                    {d.admin_notes && (
-                      <div className="text-xs text-muted-foreground mt-1">📝 {d.admin_notes}</div>
-                    )}
+                    ) : null}
+                    {deposit.admin_notes ? (
+                      <div className="mt-1 text-xs text-gray-500">ملاحظة الإدارة: {String(deposit.admin_notes)}</div>
+                    ) : null}
                   </div>
-                  <div className="text-xs uppercase font-medium">{d.status}</div>
+                  <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700">
+                    {String(deposit.status)}
+                  </span>
                 </div>
-                {["pending", "under_review"].includes(d.status) && (
-                  <div className="mt-3 flex flex-wrap gap-2 items-center">
+
+                {["pending", "under_review"].includes(String(deposit.status)) ? (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
                     <input
-                      placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"}
-                      className="flex-1 min-w-[220px] h-9 rounded-md border border-input bg-background px-3 text-sm"
-                      value={notes[d.id] ?? ""}
-                      onChange={(e) => setNotes({ ...notes, [d.id]: e.target.value })}
+                      placeholder={ar ? "ملاحظة الإدارة (اختياري)" : "Admin note (optional)"}
+                      className="h-9 min-w-[220px] flex-1 rounded-md border border-gray-300 bg-white px-3 text-sm"
+                      value={notes[String(deposit.id)] ?? ""}
+                      onChange={(event) =>
+                        setNotes((current) => ({ ...current, [String(deposit.id)]: event.target.value }))
+                      }
                     />
-                    <Button size="sm" disabled={busy === d.id} onClick={() => act(d.id, "approve")}>
-                      <CheckCircle2 className="h-4 w-4 me-1" />
-                      {ar ? "اعتماد" : "Approve"}
+                    <Button
+                      size="sm"
+                      disabled={busy === String(deposit.id)}
+                      onClick={() => void act(String(deposit.id), "approve")}
+                    >
+                      <CheckCircle2 className="me-1 h-4 w-4" />
+                      اعتماد
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
-                      disabled={busy === d.id}
-                      onClick={() => act(d.id, "reject")}
+                      disabled={busy === String(deposit.id)}
+                      onClick={() => void act(String(deposit.id), "reject")}
                     >
-                      <XCircle className="h-4 w-4 me-1" />
-                      {ar ? "رفض" : "Reject"}
+                      <XCircle className="me-1 h-4 w-4" />
+                      رفض
                     </Button>
                   </div>
-                )}
-              </div>
+                ) : null}
+              </article>
             ))}
           </div>
         )}
       </div>
-      <SiteFooter />
-    </div>
+    </AdminLayout>
   );
 }
