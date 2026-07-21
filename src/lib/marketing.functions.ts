@@ -26,7 +26,7 @@ export const listMyCampaigns = createServerFn({ method: "GET" })
 
 export const createCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         name: z.string().min(2).max(200),
@@ -71,7 +71,7 @@ export const createCampaign = createServerFn({ method: "POST" })
 
 export const updateCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -106,7 +106,7 @@ export const updateCampaign = createServerFn({ method: "POST" })
 
 export const deleteCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("agent_campaigns").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -115,7 +115,7 @@ export const deleteCampaign = createServerFn({ method: "POST" })
 
 export const getCampaignAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const [{ data: refs }, { data: camp }] = await Promise.all([
@@ -148,7 +148,7 @@ export const listMyPayoutMethods = createServerFn({ method: "GET" })
 
 export const createPayoutMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         kind: z.enum([
@@ -189,7 +189,7 @@ export const createPayoutMethod = createServerFn({ method: "POST" })
 
 export const deletePayoutMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("payout_methods").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -212,7 +212,7 @@ export const listMyPayouts = createServerFn({ method: "GET" })
 
 export const requestWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         amount: z.number().positive(),
@@ -279,7 +279,7 @@ export const getPlatformSettings = createServerFn({ method: "GET" })
 
 export const updatePlatformSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         marketer_commission_pct: z.number().min(0).max(100),
@@ -306,7 +306,7 @@ export const updatePlatformSettings = createServerFn({ method: "POST" })
 
 export const adminListWithdrawals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         status: z
@@ -336,7 +336,7 @@ export const adminListWithdrawals = createServerFn({ method: "POST" })
 
 export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -363,7 +363,7 @@ export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
 
 export const cancelWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("payout_requests")
@@ -433,7 +433,7 @@ async function callLovableAI(system: string, user: string): Promise<string> {
 
 export const generateAdCopy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         product: z.string().min(2).max(500),
@@ -454,7 +454,7 @@ export const generateAdCopy = createServerFn({ method: "POST" })
 
 export const generateSocialPost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         topic: z.string().min(2).max(500),
@@ -473,7 +473,7 @@ export const generateSocialPost = createServerFn({ method: "POST" })
 
 export const generateProductPromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         listingId: z.string().uuid().optional().nullable(),

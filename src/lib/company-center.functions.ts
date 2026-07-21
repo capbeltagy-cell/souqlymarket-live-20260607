@@ -421,7 +421,7 @@ export const listCompanyCampaigns = createServerFn({ method: "GET" })
 // ending it releases the unused portion back to the company funding wallet.
 export const setListingPromotionStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),

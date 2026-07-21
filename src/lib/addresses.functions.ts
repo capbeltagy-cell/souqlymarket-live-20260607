@@ -29,7 +29,7 @@ export const listMyAddresses = createServerFn({ method: "GET" })
 
 export const saveMyAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => addressInput.parse(d))
+  .inputValidator((d: unknown) => addressInput.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const payload = {
@@ -74,7 +74,7 @@ export const saveMyAddress = createServerFn({ method: "POST" })
 
 export const deleteMyAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { error } = await supabase

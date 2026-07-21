@@ -85,7 +85,7 @@ export const adminListCompanies = createServerFn({ method: "GET" })
 
 export const adminSetCompanyPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         companyId: z.string().uuid(),
@@ -145,7 +145,7 @@ export const getPricingConfig = createServerFn({ method: "GET" }).handler(async 
 // admins so activation happens after real payment verification.
 export const requestCompanyUpgrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ note: z.string().max(500).optional() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ note: z.string().max(500).optional() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: company } = await supabase

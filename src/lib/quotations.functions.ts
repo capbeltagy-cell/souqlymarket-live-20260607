@@ -28,7 +28,7 @@ function calcTotals(
 
 export const createQuotation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         conversation_id: z.string().uuid(),
@@ -124,7 +124,7 @@ export const createQuotation = createServerFn({ method: "POST" })
 
 export const getQuotation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { data: q, error } = await (supabase.from("quotations" as never) as any)
@@ -142,7 +142,7 @@ export const getQuotation = createServerFn({ method: "POST" })
 
 export const respondToQuotation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),

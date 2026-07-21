@@ -23,7 +23,7 @@ export const listVerificationQueue = createServerFn({ method: "GET" })
 
 export const setCompanyVerified = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z.object({ id: z.string().uuid(), verified: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -37,7 +37,7 @@ export const setCompanyVerified = createServerFn({ method: "POST" })
 
 export const setAgentVerified = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z.object({ id: z.string().uuid(), verified: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {

@@ -66,7 +66,7 @@ type ListingImport = {
 
 export const importLaunchListings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: { rows: ListingImport[]; sourceName?: string; notes?: string }) => {
+  .inputValidator((d: { rows: ListingImport[]; sourceName?: string; notes?: string }) => {
     if (!Array.isArray(d?.rows) || d.rows.length === 0) throw new Error("No rows");
     if (d.rows.length > 500) throw new Error("Max 500 rows per import");
     return d;
@@ -141,7 +141,7 @@ export const listLaunchBatches = createServerFn({ method: "GET" })
 
 export const deleteLaunchBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: { batchId: string }) => {
+  .inputValidator((d: { batchId: string }) => {
     if (!d?.batchId) throw new Error("batchId required");
     return d;
   })
@@ -167,7 +167,7 @@ export const deleteLaunchBatch = createServerFn({ method: "POST" })
 
 export const listLaunchListings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((d: { batchId?: string; governorate?: string; type?: string }) => d ?? {})
+  .inputValidator((d: { batchId?: string; governorate?: string; type?: string }) => d ?? {})
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
     await assertAdmin(ctx);
@@ -189,7 +189,7 @@ export const listLaunchListings = createServerFn({ method: "GET" })
 
 export const adminToggleListingFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: { id: string; field: "featured" | "status"; value: boolean | string }) => {
+  .inputValidator((d: { id: string; field: "featured" | "status"; value: boolean | string }) => {
     if (!d?.id || !d.field) throw new Error("Invalid");
     if (d.field === "status" && typeof d.value !== "string") throw new Error("Invalid status");
     return d;
@@ -205,7 +205,7 @@ export const adminToggleListingFlag = createServerFn({ method: "POST" })
 
 export const adminDeleteLaunchListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: { id: string }) => {
+  .inputValidator((d: { id: string }) => {
     if (!d?.id) throw new Error("id required");
     return d;
   })

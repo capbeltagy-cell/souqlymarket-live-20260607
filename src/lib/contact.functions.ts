@@ -10,7 +10,7 @@ const schema = z.object({
 });
 
 export const submitContactRequest = createServerFn({ method: "POST" })
-  .validator((data: unknown) => schema.parse(data))
+  .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
     // Honeypot: silently succeed for bots
     if (data.website && data.website.length > 0) {

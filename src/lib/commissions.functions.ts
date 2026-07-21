@@ -46,7 +46,7 @@ export const listMyCommissions = createServerFn({ method: "GET" })
 
 export const updateCommissionStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -66,7 +66,7 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
 
 export const requestPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { error } = await supabase
@@ -86,7 +86,7 @@ async function requireAdmin(supabase: any, userId: string) {
 
 export const adminListCommissions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         status: z.enum(["pending", "approved", "paid", "all"]).default("pending"),
@@ -117,7 +117,7 @@ export const adminListCommissions = createServerFn({ method: "POST" })
 
 export const adminReviewCommission = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),

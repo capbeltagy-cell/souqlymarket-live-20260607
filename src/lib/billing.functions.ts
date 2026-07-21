@@ -83,7 +83,7 @@ export const getMyPlan = createServerFn({ method: "GET" })
 
 export const upgradePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z.object({ plan: z.enum(["free", "premium_company", "premium_agent"]) }).parse(d),
   )
   .handler(async ({ context, data }) => {

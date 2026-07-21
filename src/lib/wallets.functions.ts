@@ -13,7 +13,7 @@ export const getMyWallets = createServerFn({ method: "GET" })
 
 export const listMyWalletTransactions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ walletId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ walletId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase

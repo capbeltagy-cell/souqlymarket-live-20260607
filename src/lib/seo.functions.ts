@@ -3,7 +3,7 @@ import { z } from "zod";
 
 // Public read-only meta helpers using the admin client (RLS-safe — we project only public columns).
 export const getListingMeta = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -18,7 +18,7 @@ export const getListingMeta = createServerFn({ method: "GET" })
   });
 
 export const getCompanyMeta = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -32,7 +32,7 @@ export const getCompanyMeta = createServerFn({ method: "GET" })
   });
 
 export const getAgentMeta = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
@@ -50,7 +50,7 @@ export const getAgentMeta = createServerFn({ method: "GET" })
   });
 
 export const getRfqMeta = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Public projection — exclude buyer_id and attachments; only open RFQs.
@@ -64,7 +64,7 @@ export const getRfqMeta = createServerFn({ method: "GET" })
   });
 
 export const getTenderMeta = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Only open tenders — exclude publisher_id.

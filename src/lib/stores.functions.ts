@@ -38,7 +38,7 @@ async function assertOwnedCompany(supabase: any, userId: string, companyId?: str
 
 export const createStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => storeSchema.parse(d))
+  .inputValidator((d: unknown) => storeSchema.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await assertOwnedCompany(supabase, userId, data.company_id);
@@ -62,7 +62,7 @@ export const createStore = createServerFn({ method: "POST" })
 
 export const updateStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => storeSchema.partial().extend({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => storeSchema.partial().extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { id, ...rest } = data;
@@ -79,7 +79,7 @@ export const updateStore = createServerFn({ method: "POST" })
 
 export const submitStoreForReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -132,7 +132,7 @@ export const listPublicStores = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const getStoreBySlug = createServerFn({ method: "POST" })
-  .validator((d: unknown) => z.object({ slug: z.string() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
     const s = createClient<Database>(process.env.SUPABASE_URL!, key, {
@@ -184,7 +184,7 @@ export const getStoreBySlug = createServerFn({ method: "POST" })
 
 export const followStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z.object({ store_id: z.string().uuid(), follow: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -212,7 +212,7 @@ export const followStore = createServerFn({ method: "POST" })
 
 export const listStoreOrders = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -230,7 +230,7 @@ export const listStoreOrders = createServerFn({ method: "POST" })
 
 export const getStoreAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -267,7 +267,7 @@ export const getStoreAnalytics = createServerFn({ method: "POST" })
 
 export const getStoreOperations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)

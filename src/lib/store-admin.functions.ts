@@ -51,7 +51,7 @@ export const adminGetStoreSummary = createServerFn({ method: "GET" })
 
 export const adminListStores = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) =>
+  .inputValidator((d: unknown) =>
     z
       .object({
         status: z
@@ -89,7 +89,7 @@ const actionSchema = z.object({
 
 export const adminUpdateStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => actionSchema.parse(d))
+  .inputValidator((d: unknown) => actionSchema.parse(d))
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
