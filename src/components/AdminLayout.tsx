@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { Breadcrumbs } from "./Breadcrumbs";
+import { hasPlatformAdminAccess } from "@/lib/admin-permissions";
 
 export interface AdminLayoutProps {
   children: ReactNode;
@@ -26,7 +27,7 @@ export function AdminLayout({
   const { locale, setLocale } = useI18n();
   const { roles } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isAdmin = roles.includes("admin");
+  const isAdmin = hasPlatformAdminAccess(roles);
 
   useEffect(() => {
     if (locale !== "ar") setLocale("ar");

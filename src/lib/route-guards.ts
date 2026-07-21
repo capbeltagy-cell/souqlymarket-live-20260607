@@ -1,5 +1,6 @@
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { hasPlatformAdminAccess } from "@/lib/admin-permissions";
 
 /**
  * Client-side navigation guard for administrator screens.
@@ -22,12 +23,12 @@ export async function requireAdminRoute() {
     });
   }
 
-  const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", {
-    _user_id: user.id,
-    _role: "admin",
-  });
+  const { data: roleRows, error: roleError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id);
 
-  if (roleError || !isAdmin) {
+  if (roleError || !hasPlatformAdminAccess((roleRows ?? []).map((row) => row.role))) {
     throw redirect({ to: "/dashboard", replace: true });
   }
 }
