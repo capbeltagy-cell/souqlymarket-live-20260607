@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.admin_order_status_history (
   metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT admin_order_status_history_status_chk CHECK (
-    to_status IN ('pending_payment','paid','confirmed','processing','ready_to_ship','shipped','delivered','completed','cancelled','disputed','refunded')
+    to_status IN ('draft','new','awaiting_seller','accepted','rejected','packed','shipped','delivered','completed','cancelled','returned','fulfilled','paid','refunded')
   )
 );
 CREATE INDEX IF NOT EXISTS admin_order_status_history_order_idx

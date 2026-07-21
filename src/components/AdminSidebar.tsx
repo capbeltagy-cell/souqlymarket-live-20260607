@@ -18,6 +18,10 @@ import {
   Users,
   ScrollText,
   Activity,
+  ShoppingCart,
+  Scale,
+  Shield,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -40,6 +44,15 @@ type MenuSection = {
 
 const MENU_ITEMS: MenuSection[] = [
   {
+    section: "العمليات",
+    items: [
+      { icon: ShoppingCart, label: "الطلبات", href: "/admin-orders" },
+      { icon: Scale, label: "النزاعات", href: "/admin-disputes" },
+      { icon: Shield, label: "الإشراف والبلاغات", href: "/admin-moderation" },
+      { icon: Bell, label: "الإشعارات", href: "/admin-notifications" },
+    ],
+  },
+  {
     section: "نظرة عامة",
     items: [
       { icon: LayoutDashboard, label: "الرئيسية", href: "/admin-overview", exact: true },
@@ -52,7 +65,7 @@ const MENU_ITEMS: MenuSection[] = [
       { icon: Users, label: "المستخدمون", href: "/admin-users" },
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
-      { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
+      { icon: Package, label: "المنتجات والإعلانات", href: "/admin-listings" },
     ],
   },
   {

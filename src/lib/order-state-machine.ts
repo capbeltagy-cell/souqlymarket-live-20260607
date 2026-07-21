@@ -1,38 +1,39 @@
 export const ADMIN_ORDER_STATUSES = [
-  "pending_payment",
-  "paid",
-  "confirmed",
-  "processing",
-  "ready_to_ship",
+  "draft",
+  "new",
+  "awaiting_seller",
+  "accepted",
+  "rejected",
+  "packed",
   "shipped",
   "delivered",
   "completed",
   "cancelled",
-  "disputed",
-  "refunded",
+  "returned",
+  "fulfilled",
 ] as const;
 
 export type AdminOrderStatus = (typeof ADMIN_ORDER_STATUSES)[number];
 export type OrderAction = "manage" | "mark_paid" | "refund" | "resolve_dispute";
 
 const transitions: Record<AdminOrderStatus, readonly AdminOrderStatus[]> = {
-  pending_payment: ["paid", "cancelled", "disputed"],
-  paid: ["confirmed", "cancelled", "disputed"],
-  confirmed: ["processing", "cancelled", "disputed"],
-  processing: ["ready_to_ship", "cancelled", "disputed"],
-  ready_to_ship: ["shipped", "cancelled", "disputed"],
-  shipped: ["delivered", "disputed"],
-  delivered: ["completed", "disputed"],
-  completed: ["disputed"],
+  draft: ["new", "cancelled"],
+  new: ["awaiting_seller", "accepted", "rejected", "cancelled"],
+  awaiting_seller: ["accepted", "rejected", "cancelled"],
+  accepted: ["packed", "cancelled"],
+  rejected: [],
+  packed: ["shipped", "cancelled"],
+  shipped: ["delivered", "returned"],
+  delivered: ["completed", "returned"],
+  completed: ["fulfilled", "returned"],
   cancelled: [],
-  disputed: ["refunded", "completed", "cancelled"],
-  refunded: [],
+  returned: [],
+  fulfilled: [],
 };
 
 export function requiredOrderAction(from: AdminOrderStatus, to: AdminOrderStatus): OrderAction {
-  if (to === "paid") return "mark_paid";
-  if (to === "refunded") return "refund";
-  if (from === "disputed") return "resolve_dispute";
+  void from;
+  void to;
   return "manage";
 }
 

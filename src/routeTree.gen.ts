@@ -91,8 +91,13 @@ import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
+import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin-orders'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin-notifications'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin-moderation'
+import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin-listings'
 import { Route as AuthenticatedAdminLaunchContentRouteImport } from './routes/_authenticated/admin-launch-content'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
+import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin-disputes'
 import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin-deposits'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
@@ -541,6 +546,30 @@ const AuthenticatedAdminOverviewRoute =
     path: '/admin-overview',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminOrdersRoute =
+  AuthenticatedAdminOrdersRouteImport.update({
+    id: '/admin-orders',
+    path: '/admin-orders',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/admin-notifications',
+    path: '/admin-notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/admin-moderation',
+    path: '/admin-moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminListingsRoute =
+  AuthenticatedAdminListingsRouteImport.update({
+    id: '/admin-listings',
+    path: '/admin-listings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminLaunchContentRoute =
   AuthenticatedAdminLaunchContentRouteImport.update({
     id: '/admin-launch-content',
@@ -551,6 +580,12 @@ const AuthenticatedAdminExecutiveRoute =
   AuthenticatedAdminExecutiveRouteImport.update({
     id: '/admin-executive',
     path: '/admin-executive',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminDisputesRoute =
+  AuthenticatedAdminDisputesRouteImport.update({
+    id: '/admin-disputes',
+    path: '/admin-disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminDepositsRoute =
@@ -718,8 +753,13 @@ export interface FileRoutesByFullPath {
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
@@ -825,8 +865,13 @@ export interface FileRoutesByTo {
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
@@ -934,8 +979,13 @@ export interface FileRoutesById {
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/_authenticated/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/_authenticated/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/_authenticated/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/_authenticated/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/_authenticated/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
@@ -1043,8 +1093,13 @@ export interface FileRouteTypes {
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
+    | '/admin-disputes'
     | '/admin-executive'
     | '/admin-launch-content'
+    | '/admin-listings'
+    | '/admin-moderation'
+    | '/admin-notifications'
+    | '/admin-orders'
     | '/admin-overview'
     | '/admin-payments'
     | '/admin-platform-settings'
@@ -1150,8 +1205,13 @@ export interface FileRouteTypes {
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
+    | '/admin-disputes'
     | '/admin-executive'
     | '/admin-launch-content'
+    | '/admin-listings'
+    | '/admin-moderation'
+    | '/admin-notifications'
+    | '/admin-orders'
     | '/admin-overview'
     | '/admin-payments'
     | '/admin-platform-settings'
@@ -1258,8 +1318,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-commissions'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-deposits'
+    | '/_authenticated/admin-disputes'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-launch-content'
+    | '/_authenticated/admin-listings'
+    | '/_authenticated/admin-moderation'
+    | '/_authenticated/admin-notifications'
+    | '/_authenticated/admin-orders'
     | '/_authenticated/admin-overview'
     | '/_authenticated/admin-payments'
     | '/_authenticated/admin-platform-settings'
@@ -1946,6 +2011,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOverviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-orders': {
+      id: '/_authenticated/admin-orders'
+      path: '/admin-orders'
+      fullPath: '/admin-orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-notifications': {
+      id: '/_authenticated/admin-notifications'
+      path: '/admin-notifications'
+      fullPath: '/admin-notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-moderation': {
+      id: '/_authenticated/admin-moderation'
+      path: '/admin-moderation'
+      fullPath: '/admin-moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-listings': {
+      id: '/_authenticated/admin-listings'
+      path: '/admin-listings'
+      fullPath: '/admin-listings'
+      preLoaderRoute: typeof AuthenticatedAdminListingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-launch-content': {
       id: '/_authenticated/admin-launch-content'
       path: '/admin-launch-content'
@@ -1958,6 +2051,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-executive'
       fullPath: '/admin-executive'
       preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-disputes': {
+      id: '/_authenticated/admin-disputes'
+      path: '/admin-disputes'
+      fullPath: '/admin-disputes'
+      preLoaderRoute: typeof AuthenticatedAdminDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin-deposits': {
@@ -2179,8 +2279,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
+  AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminLaunchContentRoute: typeof AuthenticatedAdminLaunchContentRoute
+  AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
+  AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
+  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
@@ -2236,8 +2341,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
+  AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminLaunchContentRoute: AuthenticatedAdminLaunchContentRoute,
+  AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
+  AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
+  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminPlatformSettingsRoute:

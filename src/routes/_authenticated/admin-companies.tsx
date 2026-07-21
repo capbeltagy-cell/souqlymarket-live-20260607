@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, Crown, Loader2, ShieldCheck, ShieldOff } from "lucide-react";
+import { BadgeCheck, Crown, Loader2, Search, ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
@@ -30,7 +31,19 @@ function AdminCompanies() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
   const isAdmin = roles.includes("admin");
+  const filteredRows = useMemo(() => {
+    const value = search.trim().toLocaleLowerCase("ar");
+    if (!rows || !value) return rows;
+    return rows.filter((row) =>
+      [row.name_ar, row.name_en, row.id].some((field) =>
+        String(field ?? "")
+          .toLocaleLowerCase("ar")
+          .includes(value),
+      ),
+    );
+  }, [rows, search]);
 
   const load = () => {
     setError(null);
@@ -88,6 +101,15 @@ function AdminCompanies() {
       error={error}
     >
       <div className="space-y-6">
+        <div className="relative max-w-xl">
+          <Search className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="ابحث باسم الشركة أو المعرّف"
+            className="ps-9"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <Crown className="h-6 w-6 text-primary" />
           <p className="text-sm text-muted-foreground">
@@ -97,11 +119,11 @@ function AdminCompanies() {
           </p>
         </div>
 
-        {rows && rows.length === 0 ? (
+        {filteredRows && filteredRows.length === 0 ? (
           <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
             {ar ? "لا توجد شركات حتى الآن" : "No companies found"}
           </div>
-        ) : rows ? (
+        ) : filteredRows ? (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full min-w-[760px] text-sm">
               <thead className="bg-muted/50">
@@ -114,7 +136,7 @@ function AdminCompanies() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {filteredRows.map((row) => (
                   <tr key={row.id} className="border-t border-border align-middle">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 font-medium">

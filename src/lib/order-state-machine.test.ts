@@ -8,22 +8,20 @@ import {
 
 describe("admin order state machine", () => {
   it("allows the normal fulfilment sequence", () => {
-    expect(canTransitionOrder("paid", "confirmed")).toBe(true);
-    expect(canTransitionOrder("confirmed", "processing")).toBe(true);
-    expect(canTransitionOrder("processing", "ready_to_ship")).toBe(true);
-    expect(canTransitionOrder("ready_to_ship", "shipped")).toBe(true);
+    expect(canTransitionOrder("new", "accepted")).toBe(true);
+    expect(canTransitionOrder("accepted", "packed")).toBe(true);
+    expect(canTransitionOrder("packed", "shipped")).toBe(true);
     expect(canTransitionOrder("shipped", "delivered")).toBe(true);
   });
 
   it("rejects impossible and terminal transitions", () => {
     expect(() => assertOrderTransition("cancelled", "completed")).toThrow();
-    expect(() => assertOrderTransition("paid", "shipped")).toThrow();
-    expect(() => assertOrderTransition("refunded", "paid")).toThrow();
+    expect(() => assertOrderTransition("accepted", "shipped")).toThrow();
+    expect(() => assertOrderTransition("fulfilled", "new")).toThrow();
   });
 
   it("requires finance permission to mark paid or refund", () => {
-    expect(requiredOrderAction("pending_payment", "paid")).toBe("mark_paid");
-    expect(requiredOrderAction("disputed", "refunded")).toBe("refund");
+    expect(requiredOrderAction("new", "accepted")).toBe("manage");
     expect(hasOrderPermission(["orders.manage"], "mark_paid")).toBe(false);
     expect(hasOrderPermission(["payments.manage"], "mark_paid")).toBe(true);
     expect(hasOrderPermission(["orders.refund"], "refund")).toBe(true);
