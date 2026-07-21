@@ -2,18 +2,32 @@ import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Frontend route guard for administration screens.
+ * Client-side navigation guard for administrator screens.
  *
- * This improves navigation safety and UX. Server functions and RLS remain the
- * authoritative security boundary and must keep enforcing the same role.
+ * This guard only protects route entry and user experience. Every sensitive
+ * server function and database table must continue enforcing admin access via
+ * server authorization and Supabase RLS/RPC policies.
  */
 export async function requireAdminRoute() {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: (await supabase.auth.getUser()).data.user?.id ?? "",
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw redirect({
+      to: "/auth",
+      search: { returnTo: "/admin-overview" },
+      replace: true,
+    });
+  }
+
+  const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", {
+    _user_id: user.id,
     _role: "admin",
   });
 
-  if (error || !data) {
+  if (roleError || !isAdmin) {
     throw redirect({ to: "/dashboard", replace: true });
   }
 }

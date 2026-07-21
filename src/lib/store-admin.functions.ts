@@ -38,12 +38,13 @@ export const adminGetStoreSummary = createServerFn({ method: "GET" })
       .eq("table_name", "stores")
       .order("created_at", { ascending: false })
       .limit(30);
+    const statusCounts = Object.fromEntries(counts) as Record<(typeof statuses)[number], number>;
     return {
       counts: {
         total: total ?? 0,
         verified: verified ?? 0,
         featured: featured ?? 0,
-        ...Object.fromEntries(counts),
+        ...statusCounts,
       },
       auditLogs: auditLogs ?? [],
     };

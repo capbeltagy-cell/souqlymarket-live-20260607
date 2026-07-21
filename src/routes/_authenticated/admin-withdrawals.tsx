@@ -49,7 +49,12 @@ function AdminWithdrawals() {
       const result = await fList({ data: { status } });
       setRows(result.payouts);
     } catch (e) {
-      const message = e instanceof Error ? e.message : ar ? "تعذر تحميل طلبات السحب" : "Failed to load withdrawals";
+      const message =
+        e instanceof Error
+          ? e.message
+          : ar
+            ? "تعذر تحميل طلبات السحب"
+            : "Failed to load withdrawals";
       setError(message);
       toast.error(message);
     } finally {
@@ -85,7 +90,11 @@ function AdminWithdrawals() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Banknote className="h-5 w-5 text-primary" />
-            <span>{ar ? "مراجعة واعتماد طلبات سحب عمولات المسوقين فقط." : "Review marketer commission withdrawals."}</span>
+            <span>
+              {ar
+                ? "مراجعة واعتماد طلبات سحب عمولات المسوقين فقط."
+                : "Review marketer commission withdrawals."}
+            </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button asChild variant="outline" size="sm" className="gap-2">
@@ -155,7 +164,9 @@ function AdminWithdrawals() {
                       {row.payout_methods?.label ?? "—"} · {row.payout_methods?.kind ?? "—"}
                       {detailStr && <div className="mt-1">{detailStr}</div>}
                       {row.notes && <div className="mt-1">ملاحظة المسوق: {row.notes}</div>}
-                      {row.admin_notes && <div className="mt-1">ملاحظة الإدارة: {row.admin_notes}</div>}
+                      {row.admin_notes && (
+                        <div className="mt-1">ملاحظة الإدارة: {row.admin_notes}</div>
+                      )}
                     </div>
 
                     {(row.status === "pending" || row.status === "approved") && (

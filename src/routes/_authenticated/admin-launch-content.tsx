@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, Upload, Trash2, Star, Plus, ExternalLink } from "lucide-react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -308,9 +307,8 @@ function AdminLaunchContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-8 flex-1 space-y-6">
+    <AdminLayout title="محتوى الإطلاق" breadcrumbs={[{ label: "محتوى الإطلاق" }]}>
+      <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold">محتوى الإطلاق (إدارة)</h1>
           <Button asChild variant="outline" size="sm">
@@ -675,7 +673,6 @@ function AdminLaunchContent() {
           </TabsContent>
         </Tabs>
       </div>
-      <SiteFooter />
-    </div>
+    </AdminLayout>
   );
 }

@@ -130,7 +130,11 @@ function AdminStoresPage() {
               >
                 <div className="h-12 w-12 overflow-hidden rounded-full bg-gray-100">
                   {store.logo_url ? (
-                    <img src={store.logo_url} alt={store.name_ar ?? "شعار المتجر"} className="h-full w-full object-cover" />
+                    <img
+                      src={store.logo_url}
+                      alt={store.name_ar ?? "شعار المتجر"}
+                      className="h-full w-full object-cover"
+                    />
                   ) : null}
                 </div>
 
@@ -182,14 +186,18 @@ function AdminStoresPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => void act(store.id, store.is_verified ? "unverify" : "verify")}
+                        onClick={() =>
+                          void act(store.id, store.is_verified ? "unverify" : "verify")
+                        }
                       >
                         {store.is_verified ? "إلغاء التوثيق" : "توثيق"}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => void act(store.id, store.is_featured ? "unfeature" : "feature")}
+                        onClick={() =>
+                          void act(store.id, store.is_featured ? "unfeature" : "feature")
+                        }
                       >
                         {store.is_featured ? "إلغاء التمييز" : "تمييز"}
                       </Button>
@@ -225,7 +233,10 @@ function AdminStoresPage() {
             </h2>
             <div className="divide-y divide-gray-100">
               {summary.auditLogs.map((log: AuditLog) => (
-                <div key={log.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
+                <div
+                  key={log.id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-2 text-xs"
+                >
                   <span className="flex items-center gap-1.5 text-gray-700">
                     <Store className="h-3.5 w-3.5 text-gray-400" />
                     {log.action} — {String(log.record_id).slice(0, 8)}

@@ -134,7 +134,9 @@ function AdminCompanies() {
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
                       {row.subscription_expires_at
-                        ? new Date(row.subscription_expires_at).toLocaleDateString(ar ? "ar-EG" : "en-US")
+                        ? new Date(row.subscription_expires_at).toLocaleDateString(
+                            ar ? "ar-EG" : "en-US",
+                          )
                         : "—"}
                     </td>
                     <td className="px-4 py-3">

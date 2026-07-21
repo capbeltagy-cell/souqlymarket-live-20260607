@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
+import { ShieldAlert } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminSidebar } from "./AdminSidebar";
@@ -8,6 +9,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 export interface AdminLayoutProps {
   children: ReactNode;
   title?: string;
+  description?: string;
   breadcrumbs?: Array<{ label: string; href?: string }>;
   loading?: boolean;
   error?: string | null;
@@ -16,6 +18,7 @@ export interface AdminLayoutProps {
 export function AdminLayout({
   children,
   title,
+  description,
   breadcrumbs,
   loading = false,
   error = null,
@@ -28,13 +31,18 @@ export function AdminLayout({
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="text-center max-w-sm">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {ar ? "محظور" : "Access Denied"}
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <ShieldAlert className="h-6 w-6" />
+          </div>
+          <h1 className="mb-2 text-2xl font-bold text-foreground">
+            {ar ? "الوصول غير مسموح" : "Access denied"}
           </h1>
-          <p className="text-gray-600">
-            {ar ? "أنت لا تملك صلاحيات الوصول" : "You don't have access"}
+          <p className="text-sm text-muted-foreground">
+            {ar
+              ? "هذا القسم متاح لمسؤولي المنصة فقط."
+              : "This area is available to platform administrators only."}
           </p>
         </div>
       </div>
@@ -42,26 +50,31 @@ export function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-2 text-foreground">
       <AdminSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
       <div className="lg:ps-64">
-        <AdminTopbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <AdminTopbar onMenuClick={() => setSidebarOpen((open) => !open)} />
 
-        <main className="p-6 lg:p-8">
+        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <div className="mb-6">
+            <div className="mb-5">
               <Breadcrumbs items={breadcrumbs} />
             </div>
           )}
 
-          {title && <h1 className="text-3xl font-bold text-gray-900 mb-6">{title}</h1>}
+          {title && (
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+              {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+            </div>
+          )}
 
           {loading && (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex min-h-64 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
               <div className="text-center">
-                <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-                <p className="mt-2 text-sm text-gray-600">
+                <div className="inline-flex h-9 w-9 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                <p className="mt-3 text-sm text-muted-foreground">
                   {ar ? "جاري التحميل..." : "Loading..."}
                 </p>
               </div>
@@ -69,8 +82,8 @@ export function AdminLayout({
           )}
 
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-6">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 rounded-xl border border-destructive/25 bg-destructive/10 p-4">
+              <p className="text-sm font-medium text-destructive">{error}</p>
             </div>
           )}
 

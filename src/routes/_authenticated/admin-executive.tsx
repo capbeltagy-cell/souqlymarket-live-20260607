@@ -136,9 +136,7 @@ function AdminExecutivePage() {
                         {category.slug}
                       </div>
                       <div className="text-2xl font-bold">{category.leads}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {ar ? "طلبات" : "leads"}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{ar ? "طلبات" : "leads"}</div>
                     </div>
                   ))}
                 </div>

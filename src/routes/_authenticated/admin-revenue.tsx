@@ -33,7 +33,8 @@ function AdminRevenuePage() {
         if (!cancelled) setData(summary);
       })
       .catch((error: unknown) => {
-        if (!cancelled) setErr(error instanceof Error ? error.message : "Failed to load revenue data");
+        if (!cancelled)
+          setErr(error instanceof Error ? error.message : "Failed to load revenue data");
       });
 
     return () => {
@@ -44,7 +45,11 @@ function AdminRevenuePage() {
   return (
     <AdminLayout
       title={ar ? "لوحة الإيرادات" : "Revenue dashboard"}
-      description={ar ? "متابعة دخل المنصة والاشتراكات والعمولات" : "Track platform income, subscriptions and commissions"}
+      description={
+        ar
+          ? "متابعة دخل المنصة والاشتراكات والعمولات"
+          : "Track platform income, subscriptions and commissions"
+      }
     >
       {err && (
         <div className="mb-5 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
@@ -62,7 +67,9 @@ function AdminRevenuePage() {
             <MetricCard
               icon={DollarSign}
               label={ar ? "إجمالي الإيرادات" : "Total revenue"}
-              value={formatPrice(data.totalPaymentsRevenue + data.commissionRevenue, locale, { showZero: true })}
+              value={formatPrice(data.totalPaymentsRevenue + data.commissionRevenue, locale, {
+                showZero: true,
+              })}
               highlight
             />
             <MetricCard
@@ -101,14 +108,20 @@ function AdminRevenuePage() {
           </div>
 
           <section className="rounded-xl border border-border bg-card p-5 shadow-card sm:p-6">
-            <h2 className="mb-4 font-semibold">{ar ? "الاشتراكات حسب الباقة" : "Subscriptions by plan"}</h2>
+            <h2 className="mb-4 font-semibold">
+              {ar ? "الاشتراكات حسب الباقة" : "Subscriptions by plan"}
+            </h2>
             {Object.keys(data.subsByPlan).length === 0 ? (
-              <p className="text-sm text-muted-foreground">{ar ? "لا توجد اشتراكات نشطة" : "No active subscriptions"}</p>
+              <p className="text-sm text-muted-foreground">
+                {ar ? "لا توجد اشتراكات نشطة" : "No active subscriptions"}
+              </p>
             ) : (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {Object.entries(data.subsByPlan).map(([plan, count]) => (
                   <div key={plan} className="rounded-lg border border-border bg-background/40 p-4">
-                    <div className="truncate text-xs font-medium uppercase text-muted-foreground">{plan}</div>
+                    <div className="truncate text-xs font-medium uppercase text-muted-foreground">
+                      {plan}
+                    </div>
                     <div className="mt-1 text-2xl font-bold">{count}</div>
                   </div>
                 ))}
@@ -133,7 +146,9 @@ function MetricCard({
   highlight?: boolean;
 }) {
   return (
-    <div className={`rounded-xl border border-border bg-card p-5 shadow-card ${highlight ? "ring-2 ring-primary" : ""}`}>
+    <div
+      className={`rounded-xl border border-border bg-card p-5 shadow-card ${highlight ? "ring-2 ring-primary" : ""}`}
+    >
       <Icon className="mb-3 h-5 w-5 text-primary" />
       <div className="break-words text-2xl font-bold">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>

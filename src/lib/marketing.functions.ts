@@ -321,17 +321,28 @@ export const adminListWithdrawals = createServerFn({ method: "POST" })
       _role: "admin",
     });
     if (!isAdmin) throw new Error("Forbidden");
-    let q = context.supabase
-      .from("payout_requests")
-      .select(
-        "*, payout_methods(label, kind, details), profiles!payout_requests_user_id_fkey(full_name, display_name)",
-      )
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = (supabaseAdmin.from("payout_requests" as never) as any)
+      .select("*, payout_methods(label, kind, details)")
       .order("created_at", { ascending: false })
       .limit(500);
     if (data.status !== "all") q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return { payouts: rows ?? [] };
+    const userIds = [
+      ...new Set<string>((rows ?? []).map((row: any) => String(row.user_id)).filter(Boolean)),
+    ];
+    const { data: profiles, error: profilesError } = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id, full_name, display_name").in("id", userIds)
+      : { data: [], error: null };
+    if (profilesError) throw new Error(profilesError.message);
+    const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+    return {
+      payouts: (rows ?? []).map((row: any) => ({
+        ...row,
+        profiles: profileById.get(row.user_id) ?? null,
+      })),
+    };
   });
 
 export const adminUpdateWithdrawal = createServerFn({ method: "POST" })

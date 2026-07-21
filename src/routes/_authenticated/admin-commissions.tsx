@@ -177,7 +177,9 @@ function AdminCommissions() {
                           </Link>
                         )}
                         {commission.notes && (
-                          <div className="mt-1 text-xs text-muted-foreground">📝 {commission.notes}</div>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            📝 {commission.notes}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -241,7 +243,10 @@ function AdminCommissions() {
         </div>
       </div>
 
-      <AlertDialog open={Boolean(confirmReject)} onOpenChange={(open) => !open && setConfirmReject(null)}>
+      <AlertDialog
+        open={Boolean(confirmReject)}
+        onOpenChange={(open) => !open && setConfirmReject(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{ar ? "رفض العمولة؟" : "Reject commission?"}</AlertDialogTitle>
