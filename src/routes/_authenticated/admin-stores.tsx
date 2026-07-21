@@ -1,13 +1,12 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "@/components/SiteHeader";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import {
   adminGetStoreSummary,
   adminListStores,
   adminUpdateStore,
 } from "@/lib/store-admin.functions";
-import { useAuth } from "@/hooks/useAuth";
 import { requireAdminRoute } from "@/lib/route-guards";
 import { toast } from "sonner";
 import { BadgeCheck, Star, ExternalLink, History, Store } from "lucide-react";
@@ -18,170 +17,198 @@ export const Route = createFileRoute("/_authenticated/admin-stores")({
   component: AdminStoresPage,
 });
 
+type StoreStatus = "all" | "pending_review" | "published" | "rejected" | "suspended";
+type StoreAction =
+  | "approve"
+  | "reject"
+  | "verify"
+  | "unverify"
+  | "feature"
+  | "unfeature"
+  | "suspend"
+  | "unsuspend";
+
+type StoreListResult = Awaited<ReturnType<typeof adminListStores>>;
+type StoreItem = StoreListResult["items"][number];
+type StoreSummary = Awaited<ReturnType<typeof adminGetStoreSummary>>;
+type AuditLog = StoreSummary["auditLogs"][number];
+
+const STATUS_LABELS: Record<StoreStatus, string> = {
+  all: "الكل",
+  pending_review: "قيد المراجعة",
+  published: "معتمدة",
+  rejected: "مرفوضة",
+  suspended: "موقوفة",
+};
+
 function AdminStoresPage() {
-  const { roles, loading: authLoading } = useAuth();
-  const [items, setItems] = useState<any[]>([]);
-  const [status, setStatus] = useState<
-    "all" | "pending_review" | "published" | "rejected" | "suspended"
-  >("pending_review");
+  const [items, setItems] = useState<StoreItem[]>([]);
+  const [status, setStatus] = useState<StoreStatus>("pending_review");
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState<any>(null);
+  const [summary, setSummary] = useState<StoreSummary | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function reload() {
     setLoading(true);
+    setError(null);
     try {
-      const [r, s] = await Promise.all([
+      const [result, overview] = await Promise.all([
         adminListStores({ data: { status } }),
         adminGetStoreSummary(),
       ]);
-      setItems(r.items);
-      setSummary(s);
-    } catch (e: any) {
-      toast.error(e.message);
+      setItems(result.items);
+      setSummary(overview);
+    } catch (caught: unknown) {
+      const message = caught instanceof Error ? caught.message : "تعذر تحميل المتاجر";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   useEffect(() => {
-    if (!authLoading && roles.includes("admin")) reload();
-  }, [status, authLoading, roles]);
+    void reload();
+  }, [status]);
 
-  if (!authLoading && !roles.includes("admin")) return <Navigate to="/" />;
-
-  async function act(id: string, action: any, reason?: string) {
+  async function act(id: string, action: StoreAction, reason?: string) {
     try {
       await adminUpdateStore({ data: { id, action, reason: reason ?? null } });
-      toast.success("تم");
+      toast.success("تم تحديث حالة المتجر بنجاح");
       await reload();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (caught: unknown) {
+      toast.error(caught instanceof Error ? caught.message : "تعذر تنفيذ الإجراء");
     }
   }
 
   return (
-    <div className="min-h-screen bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-6 space-y-4">
-        <h1 className="text-2xl font-bold">إدارة المتاجر</h1>
+    <AdminLayout
+      title="إدارة المتاجر"
+      breadcrumbs={[{ label: "المتاجر" }]}
+      loading={loading && !summary}
+      error={error}
+    >
+      <div className="space-y-5">
         {summary && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
             <SummaryCard label="الإجمالي" value={summary.counts.total} />
             <SummaryCard label="قيد المراجعة" value={summary.counts.pending_review} />
-            <SummaryCard label="منشور" value={summary.counts.published} />
-            <SummaryCard label="موثّق" value={summary.counts.verified} />
-            <SummaryCard label="مميّز" value={summary.counts.featured} />
-            <SummaryCard label="موقوف" value={summary.counts.suspended} />
+            <SummaryCard label="معتمدة" value={summary.counts.published} />
+            <SummaryCard label="موثّقة" value={summary.counts.verified} />
+            <SummaryCard label="مميّزة" value={summary.counts.featured} />
+            <SummaryCard label="موقوفة" value={summary.counts.suspended} />
           </div>
         )}
-        <div className="flex gap-2 flex-wrap">
-          {(["all", "pending_review", "published", "rejected", "suspended"] as const).map((s) => (
+
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(STATUS_LABELS) as StoreStatus[]).map((value) => (
             <button
-              key={s}
-              onClick={() => setStatus(s)}
-              className={`px-3 py-1.5 rounded-full text-sm border ${status === s ? "bg-primary text-primary-foreground" : "bg-card"}`}
+              type="button"
+              key={value}
+              onClick={() => setStatus(value)}
+              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                status === value
+                  ? "border-blue-700 bg-blue-700 text-white"
+                  : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              {s === "all"
-                ? "الكل"
-                : s === "pending_review"
-                  ? "مراجعة"
-                  : s === "published"
-                    ? "منشور"
-                    : s === "rejected"
-                      ? "مرفوض"
-                      : "موقوف"}
+              {STATUS_LABELS[value]}
             </button>
           ))}
         </div>
 
-        {loading ? (
-          <div className="text-muted-foreground">…</div>
-        ) : items.length === 0 ? (
-          <div className="rounded-xl bg-card border border-border p-8 text-center text-muted-foreground">
-            لا توجد متاجر
+        {!loading && items.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-gray-500">
+            لا توجد متاجر في هذه الحالة
           </div>
         ) : (
           <div className="grid gap-3">
-            {items.map((s) => (
+            {items.map((store) => (
               <div
-                key={s.id}
-                className="rounded-xl bg-card border border-border p-4 flex flex-wrap items-center gap-4"
+                key={store.id}
+                className="flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
               >
-                <div className="h-12 w-12 rounded-full bg-muted overflow-hidden">
-                  {s.logo_url && (
-                    <img src={s.logo_url} alt="" className="h-full w-full object-cover" />
-                  )}
+                <div className="h-12 w-12 overflow-hidden rounded-full bg-gray-100">
+                  {store.logo_url ? (
+                    <img src={store.logo_url} alt={store.name_ar ?? "شعار المتجر"} className="h-full w-full object-cover" />
+                  ) : null}
                 </div>
-                <div className="flex-1 min-w-[200px]">
+
+                <div className="min-w-[220px] flex-1">
                   <div className="flex items-center gap-2">
-                    <div className="font-semibold">{s.name_ar}</div>
-                    {s.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}
-                    {s.is_featured && <Star className="h-4 w-4 text-warning" />}
+                    <div className="font-semibold text-gray-900">{store.name_ar}</div>
+                    {store.is_verified && <BadgeCheck className="h-4 w-4 text-blue-700" />}
+                    {store.is_featured && <Star className="h-4 w-4 text-amber-500" />}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    /stores/{s.slug} • {s.status}
+                  <div className="text-xs text-gray-500">
+                    /stores/{store.slug} • {store.status}
                   </div>
-                  {s.rejection_reason && (
-                    <div className="text-xs text-destructive mt-1">{s.rejection_reason}</div>
-                  )}
+                  {store.rejection_reason ? (
+                    <div className="mt-1 text-xs text-red-600">{store.rejection_reason}</div>
+                  ) : null}
                 </div>
+
                 <a
-                  href={`/stores/${s.slug}`}
+                  href={`/stores/${store.slug}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-primary flex items-center gap-1"
+                  className="flex items-center gap-1 text-sm font-medium text-blue-700"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   معاينة
                 </a>
-                <div className="flex gap-1 flex-wrap">
-                  {s.status === "pending_review" && (
+
+                <div className="flex flex-wrap gap-2">
+                  {store.status === "pending_review" && (
                     <>
-                      <Button size="sm" onClick={() => act(s.id, "approve")}>
-                        موافقة
+                      <Button size="sm" onClick={() => void act(store.id, "approve")}>
+                        اعتماد
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => {
-                          const r = prompt("سبب الرفض؟");
-                          if (r) act(s.id, "reject", r);
+                          const reason = window.prompt("اكتب سبب الرفض");
+                          if (reason?.trim()) void act(store.id, "reject", reason.trim());
                         }}
                       >
                         رفض
                       </Button>
                     </>
                   )}
-                  {s.status === "published" && (
+
+                  {store.status === "published" && (
                     <>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => act(s.id, s.is_verified ? "unverify" : "verify")}
+                        onClick={() => void act(store.id, store.is_verified ? "unverify" : "verify")}
                       >
-                        {s.is_verified ? "إلغاء التوثيق" : "توثيق"}
+                        {store.is_verified ? "إلغاء التوثيق" : "توثيق"}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => act(s.id, s.is_featured ? "unfeature" : "feature")}
+                        onClick={() => void act(store.id, store.is_featured ? "unfeature" : "feature")}
                       >
-                        {s.is_featured ? "إلغاء التميز" : "مميز"}
+                        {store.is_featured ? "إلغاء التمييز" : "تمييز"}
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => {
-                          const r = prompt("سبب الإيقاف؟");
-                          if (r) act(s.id, "suspend", r);
+                          const reason = window.prompt("اكتب سبب الإيقاف");
+                          if (reason?.trim()) void act(store.id, "suspend", reason.trim());
                         }}
                       >
                         إيقاف
                       </Button>
                     </>
                   )}
-                  {s.status === "suspended" && (
-                    <Button size="sm" onClick={() => act(s.id, "unsuspend")}>
-                      إعادة تفعيل
+
+                  {store.status === "suspended" && (
+                    <Button size="sm" onClick={() => void act(store.id, "unsuspend")}>
+                      إعادة التفعيل
                     </Button>
                   )}
                 </div>
@@ -190,40 +217,37 @@ function AdminStoresPage() {
           </div>
         )}
 
-        {summary?.auditLogs?.length > 0 && (
-          <section className="rounded-xl border border-border bg-card p-4">
-            <h2 className="mb-3 flex items-center gap-2 font-semibold">
-              <History className="h-4 w-4 text-primary" />
+        {summary?.auditLogs?.length ? (
+          <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-900">
+              <History className="h-4 w-4 text-blue-700" />
               سجل عمليات المتاجر
             </h2>
-            <div className="divide-y divide-border">
-              {summary.auditLogs.map((log: any) => (
-                <div
-                  key={log.id}
-                  className="flex flex-wrap items-center justify-between gap-2 py-2 text-xs"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Store className="h-3.5 w-3.5 text-muted-foreground" />
+            <div className="divide-y divide-gray-100">
+              {summary.auditLogs.map((log: AuditLog) => (
+                <div key={log.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
+                  <span className="flex items-center gap-1.5 text-gray-700">
+                    <Store className="h-3.5 w-3.5 text-gray-400" />
                     {log.action} — {String(log.record_id).slice(0, 8)}
                   </span>
-                  <time className="text-muted-foreground">
+                  <time className="text-gray-500">
                     {new Date(log.created_at).toLocaleString("ar-EG")}
                   </time>
                 </div>
               ))}
             </div>
           </section>
-        )}
+        ) : null}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 
 function SummaryCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-3">
-      <div className="text-2xl font-bold text-primary">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="text-2xl font-bold text-blue-700">{value}</div>
+      <div className="mt-1 text-xs text-gray-500">{label}</div>
     </div>
   );
 }
