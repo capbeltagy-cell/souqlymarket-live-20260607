@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, Crown, Loader2, ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,7 +14,7 @@ import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-companies")({
   beforeLoad: requireAdminRoute,
-  head: () => ({ meta: [{ title: "Admin · Companies — Souqly" }] }),
+  head: () => ({ meta: [{ title: "إدارة الشركات — سوقلي" }] }),
   component: AdminCompanies,
 });
 
@@ -30,15 +29,21 @@ function AdminCompanies() {
   const setVerified = useServerFn(adminSetCompanyVerified);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const isAdmin = roles.includes("admin");
 
-  const load = () =>
-    list()
+  const load = () => {
+    setError(null);
+    return list()
       .then(setRows)
-      .catch((e: Error) => toast.error(e.message));
+      .catch((e: Error) => {
+        setError(e.message);
+        toast.error(e.message);
+      });
+  };
 
   useEffect(() => {
-    if (isAdmin) load();
+    if (isAdmin) void load();
   }, [isAdmin]);
 
   const toggle = async (row: Row, paid: boolean) => {
@@ -48,15 +53,15 @@ function AdminCompanies() {
       toast.success(
         paid
           ? ar
-            ? "تم تفعيل الاشتراك"
+            ? "تم تفعيل الاشتراك للشركة"
             : "Subscription activated"
           : ar
-            ? "تم إلغاء الاشتراك"
+            ? "تم إلغاء الاشتراك للشركة"
             : "Subscription deactivated",
       );
       await load();
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(e instanceof Error ? e.message : ar ? "تعذر تحديث الاشتراك" : "Update failed");
     } finally {
       setBusy(null);
     }
@@ -66,136 +71,135 @@ function AdminCompanies() {
     setBusy(row.id);
     try {
       await setVerified({ data: { companyId: row.id, verified: !row.is_verified } });
-      toast.success(ar ? "تم تحديث التوثيق" : "Verification updated");
+      toast.success(ar ? "تم تحديث حالة توثيق الشركة" : "Verification updated");
       await load();
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error(e instanceof Error ? e.message : ar ? "تعذر تحديث التوثيق" : "Update failed");
     } finally {
       setBusy(null);
     }
   };
 
-  if (!isAdmin)
-    return (
-      <Shell>
-        <div className="p-10 text-center text-muted-foreground">
-          {ar ? "للمسؤولين فقط" : "Admins only"}
-        </div>
-      </Shell>
-    );
-
   return (
-    <Shell>
-      <div className="flex items-center gap-2 mb-6">
-        <Crown className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold">
-          {ar ? "إدارة اشتراكات الشركات" : "Company subscriptions"}
-        </h1>
-      </div>
-      {!rows ? (
-        <div className="p-10 text-center text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin inline" />
+    <AdminLayout
+      title={ar ? "إدارة الشركات" : "Companies"}
+      breadcrumbs={[{ label: ar ? "الشركات" : "Companies" }]}
+      loading={isAdmin && rows === null && !error}
+      error={error}
+    >
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Crown className="h-6 w-6 text-primary" />
+          <p className="text-sm text-muted-foreground">
+            {ar
+              ? "مراجعة توثيق الشركات وإدارة حالة الاشتراك من مكان واحد."
+              : "Manage company verification and subscription status."}
+          </p>
         </div>
-      ) : rows.length === 0 ? (
-        <div className="p-10 text-center text-muted-foreground">
-          {ar ? "لا توجد شركات" : "No companies"}
-        </div>
-      ) : (
-        <div className="rounded-lg border border-border bg-card overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-surface-2">
-              <tr className="text-start">
-                <th className="px-4 py-3 text-start">{ar ? "الشركة" : "Company"}</th>
-                <th className="px-4 py-3 text-start">{ar ? "الاشتراك" : "Subscription"}</th>
-                <th className="px-4 py-3 text-start">{ar ? "تنتهي" : "Expires"}</th>
-                <th className="px-4 py-3 text-start">{ar ? "التوثيق" : "Verified"}</th>
-                <th className="px-4 py-3 text-end">{ar ? "إجراءات" : "Actions"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-border">
-                  <td className="px-4 py-3">
-                    <div className="font-medium flex items-center gap-1">
-                      {r.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}
-                      {ar ? r.name_ar : r.name_en}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{r.id.slice(0, 8)}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.isPaid ? (
-                      <Badge className="bg-success text-success-foreground hover:bg-success">
-                        {ar ? "مدفوعة" : "Paid"}
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline">{ar ? "مجانية" : "Free"}</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {r.subscription_expires_at
-                      ? new Date(r.subscription_expires_at).toLocaleDateString()
-                      : "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.is_verified ? (
-                      <Badge className="bg-primary text-primary-foreground gap-1">
-                        <BadgeCheck className="h-3 w-3" />
-                        {ar ? "موثقة" : "Verified"}
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline">{ar ? "غير موثقة" : "Unverified"}</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-end space-x-1 rtl:space-x-reverse">
-                    {r.isPaid ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy === r.id}
-                        onClick={() => toggle(r, false)}
-                        className="gap-1"
-                      >
-                        <ShieldOff className="h-4 w-4" />
-                        {ar ? "إلغاء" : "Unpay"}
-                      </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="bg-primary hover:bg-primary-hover gap-1"
-                        disabled={busy === r.id}
-                        onClick={() => toggle(r, true)}
-                      >
-                        <ShieldCheck className="h-4 w-4" />
-                        {ar ? "تفعيل (شهر)" : "Mark paid (1mo)"}
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === r.id}
-                      onClick={() => toggleVerify(r)}
-                      className="gap-1"
-                    >
-                      <BadgeCheck className="h-4 w-4" />
-                      {r.is_verified ? (ar ? "إلغاء توثيق" : "Unverify") : ar ? "توثيق" : "Verify"}
-                    </Button>
-                  </td>
+
+        {rows && rows.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
+            {ar ? "لا توجد شركات حتى الآن" : "No companies found"}
+          </div>
+        ) : rows ? (
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+            <table className="w-full min-w-[760px] text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-3 text-start">{ar ? "الشركة" : "Company"}</th>
+                  <th className="px-4 py-3 text-start">{ar ? "الاشتراك" : "Subscription"}</th>
+                  <th className="px-4 py-3 text-start">{ar ? "تاريخ الانتهاء" : "Expires"}</th>
+                  <th className="px-4 py-3 text-start">{ar ? "التوثيق" : "Verified"}</th>
+                  <th className="px-4 py-3 text-end">{ar ? "الإجراءات" : "Actions"}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Shell>
-  );
-}
-
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen flex flex-col bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-8 flex-1">{children}</div>
-      <SiteFooter />
-    </div>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id} className="border-t border-border align-middle">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 font-medium">
+                        {row.is_verified && <BadgeCheck className="h-4 w-4 text-primary" />}
+                        {ar ? row.name_ar : row.name_en}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{row.id.slice(0, 8)}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {row.isPaid ? (
+                        <Badge className="bg-success text-success-foreground hover:bg-success">
+                          {ar ? "مفعّل" : "Active"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">{ar ? "مجاني" : "Free"}</Badge>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {row.subscription_expires_at
+                        ? new Date(row.subscription_expires_at).toLocaleDateString(ar ? "ar-EG" : "en-US")
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {row.is_verified ? (
+                        <Badge className="gap-1 bg-primary text-primary-foreground">
+                          <BadgeCheck className="h-3 w-3" />
+                          {ar ? "موثقة" : "Verified"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">{ar ? "غير موثقة" : "Unverified"}</Badge>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-end">
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {row.isPaid ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy === row.id}
+                            onClick={() => void toggle(row, false)}
+                            className="gap-1"
+                          >
+                            <ShieldOff className="h-4 w-4" />
+                            {ar ? "إلغاء الاشتراك" : "Deactivate"}
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            disabled={busy === row.id}
+                            onClick={() => void toggle(row, true)}
+                            className="gap-1"
+                          >
+                            <ShieldCheck className="h-4 w-4" />
+                            {ar ? "تفعيل شهر" : "Activate 1 month"}
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={busy === row.id}
+                          onClick={() => void toggleVerify(row)}
+                          className="gap-1"
+                        >
+                          {busy === row.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <BadgeCheck className="h-4 w-4" />
+                          )}
+                          {row.is_verified
+                            ? ar
+                              ? "إلغاء التوثيق"
+                              : "Unverify"
+                            : ar
+                              ? "توثيق"
+                              : "Verify"}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+      </div>
+    </AdminLayout>
   );
 }
