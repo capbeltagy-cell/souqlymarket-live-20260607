@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -139,15 +140,26 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AppChrome() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin-") || location.pathname === "/control-center-x7";
+
+  return (
+    <>
+      <Outlet />
+      {!isAdminRoute && <MobileTabBar />}
+      <Toaster />
+    </>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
-          <Outlet />
-          <MobileTabBar />
-          <Toaster />
+          <AppChrome />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
