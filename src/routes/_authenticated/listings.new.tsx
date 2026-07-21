@@ -93,6 +93,17 @@ function NewListing() {
   const [submitting, setSubmitting] = useState(false);
   const [forceDup, setForceDup] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
+  const titleLabel: Record<ListingType, string> = {
+    product: "اسم المنتج",
+    service: "اسم الخدمة",
+    real_estate: "اسم أو عنوان العقار",
+    land: "اسم أو وصف الأرض",
+    factory: "اسم المصنع",
+    company: "اسم الشركة",
+    opportunity: "اسم الفرصة",
+    market: "اسم المنتج",
+    fish_shed: "اسم بيت السمك",
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -340,12 +351,12 @@ function NewListing() {
             </Field>
 
             {/* Title */}
-            <Field label="العنوان" required>
+            <Field label={titleLabel[type]} required>
               <Input
                 maxLength={200}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="اكتب عنوان واضح ومختصر"
+                placeholder={`اكتب ${titleLabel[type]} بشكل واضح ومختصر`}
               />
             </Field>
 
@@ -488,8 +499,8 @@ function NewListing() {
                         onChange={(e) => setConversionGoal(e.target.value)}
                         className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                       >
-                        <option value="order_paid">طلب مدفوع (Order Paid)</option>
-                        <option value="lead">استفسار / عميل محتمل (Lead)</option>
+                        <option value="order_paid">طلب مدفوع</option>
+                        <option value="lead">استفسار أو عميل محتمل</option>
                         <option value="quotation">طلب عرض سعر</option>
                       </select>
                     </Field>

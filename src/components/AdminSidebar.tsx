@@ -93,7 +93,7 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
 
       <aside
         className={`fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-border bg-card shadow-xl transition-transform duration-200 lg:translate-x-0 lg:shadow-none ${
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between border-b border-border p-4">

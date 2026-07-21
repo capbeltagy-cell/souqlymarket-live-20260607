@@ -22,12 +22,37 @@ import { requireAdminRoute } from "@/lib/route-guards";
 import { toast } from "sonner";
 
 const ALLOWED = ["capbeltagy@gmail.com", "capbeltagy95@gmail.com"];
+const ENTITY_LABELS: Record<string, string> = {
+  companies: "الشركات",
+  users: "المستخدمون",
+  agents: "المسوقون",
+  listings: "الإعلانات والمنتجات",
+  leads: "العملاء المحتملون",
+  rfqs: "طلبات عروض الأسعار",
+  wholesale_listings: "تجارة الجملة",
+  factories: "المصانع",
+  tenders: "المناقصات",
+  subscriptions: "الاشتراكات",
+  company_referrals: "إحالات الشركات",
+};
+const STATUS_LABELS: Record<string, string> = {
+  pending: "قيد المراجعة",
+  pending_review: "قيد المراجعة",
+  approved: "مقبول",
+  rejected: "مرفوض",
+  active: "نشط",
+  suspended: "موقوف",
+  published: "منشور",
+  draft: "مسودة",
+  completed: "مكتمل",
+  failed: "فشل",
+};
 
 export const Route = createFileRoute("/control-center-x7")({
   ssr: false,
   beforeLoad: requireAdminRoute,
   head: () => ({
-    meta: [{ title: "Control Center" }, { name: "robots", content: "noindex,nofollow" }],
+    meta: [{ title: "مركز التحكم — سوقلي" }, { name: "robots", content: "noindex,nofollow" }],
   }),
   component: ControlCenter,
 });
@@ -74,11 +99,9 @@ function ControlCenter() {
       <div className="min-h-screen grid place-items-center bg-background p-6">
         <div className="text-center max-w-sm">
           <ShieldAlert className="h-12 w-12 text-destructive mx-auto mb-3" />
-          <h1 className="text-2xl font-bold">Access Denied</h1>
+          <h1 className="text-2xl font-bold">الوصول غير مسموح</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            {user
-              ? "You are not authorized to view this page."
-              : "Please sign in with an authorized account."}
+            {user ? "لا تملك صلاحية فتح هذه الصفحة." : "سجّل الدخول بحساب إداري مصرح له."}
           </p>
           {!user && (
             <Button
@@ -87,7 +110,7 @@ function ControlCenter() {
                 window.location.href = "/auth";
               }}
             >
-              Sign in
+              تسجيل الدخول
             </Button>
           )}
         </div>
@@ -97,25 +120,25 @@ function ControlCenter() {
 
   return (
     <AdminLayout
-      title="Super Admin Control Center"
-      description={`Restricted operations console — ${user?.email ?? "admin"}`}
-      breadcrumbs={[{ label: "Control Center" }]}
+      title="مركز التحكم المتقدم"
+      description={`منطقة عمليات مقيّدة — ${user?.email ?? "حساب إداري"}`}
+      breadcrumbs={[{ label: "مركز التحكم" }]}
     >
       <div className="space-y-6">
         {overview && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            <Stat label="Companies" value={overview.counts.companies} />
-            <Stat label="Paid" value={overview.paidCompanies} />
-            <Stat label="Verified" value={overview.verifiedCompanies} />
-            <Stat label="Agents" value={overview.counts.agents} />
-            <Stat label="Listings" value={overview.counts.listings} />
-            <Stat label="Featured" value={overview.featuredListings} />
-            <Stat label="Leads" value={overview.counts.leads} />
-            <Stat label="RFQs" value={overview.counts.rfqs} />
-            <Stat label="Wholesale" value={overview.counts.wholesale_listings} />
-            <Stat label="Factories" value={overview.counts.factories} />
-            <Stat label="Tenders" value={overview.counts.tenders} />
-            <Stat label="Users" value={overview.counts.profiles} />
+            <Stat label="الشركات" value={overview.counts.companies} />
+            <Stat label="الاشتراكات المدفوعة" value={overview.paidCompanies} />
+            <Stat label="الشركات الموثقة" value={overview.verifiedCompanies} />
+            <Stat label="المسوقون" value={overview.counts.agents} />
+            <Stat label="الإعلانات" value={overview.counts.listings} />
+            <Stat label="الإعلانات المميزة" value={overview.featuredListings} />
+            <Stat label="العملاء المحتملون" value={overview.counts.leads} />
+            <Stat label="طلبات عروض الأسعار" value={overview.counts.rfqs} />
+            <Stat label="تجارة الجملة" value={overview.counts.wholesale_listings} />
+            <Stat label="المصانع" value={overview.counts.factories} />
+            <Stat label="المناقصات" value={overview.counts.tenders} />
+            <Stat label="المستخدمون" value={overview.counts.profiles} />
           </div>
         )}
 
@@ -135,7 +158,7 @@ function ControlCenter() {
               "company_referrals",
             ].map((e) => (
               <TabsTrigger key={e} value={e}>
-                {e.replace("_", " ")}
+                {ENTITY_LABELS[e] ?? e}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -194,7 +217,7 @@ function EntityPanel({ entity }: { entity: string }) {
   const run = async (action: string, id: string, payload?: any) => {
     try {
       await act({ data: { action: action as any, entity, id, payload } });
-      toast.success("Done");
+      toast.success("تم تنفيذ الإجراء");
       refresh();
     } catch (e) {
       toast.error((e as Error).message);
@@ -207,11 +230,12 @@ function EntityPanel({ entity }: { entity: string }) {
         <Loader2 className="h-5 w-5 animate-spin inline" />
       </div>
     );
-  if (!rows.length) return <div className="py-8 text-center text-muted-foreground">No data</div>;
+  if (!rows.length)
+    return <div className="py-8 text-center text-muted-foreground">لا توجد بيانات</div>;
 
   return (
     <div className="space-y-2">
-      <div className="text-xs text-muted-foreground">{rows.length} rows</div>
+      <div className="text-xs text-muted-foreground">عدد السجلات: {rows.length}</div>
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full text-sm">
           <tbody>
@@ -235,27 +259,27 @@ function EntityPanel({ entity }: { entity: string }) {
                   <div className="flex gap-1 mt-1 flex-wrap">
                     {r.is_verified && (
                       <Badge variant="outline" className="text-[10px]">
-                        verified
+                        موثّق
                       </Badge>
                     )}
                     {r.featured && (
                       <Badge variant="outline" className="text-[10px]">
-                        featured
+                        مميّز
                       </Badge>
                     )}
                     {r.subscription_plan === "paid" && (
                       <Badge variant="outline" className="text-[10px]">
-                        paid
+                        مدفوع
                       </Badge>
                     )}
                     {r.status && (
                       <Badge variant="outline" className="text-[10px]">
-                        {r.status}
+                        {STATUS_LABELS[r.status] ?? r.status}
                       </Badge>
                     )}
                     {r.banned_until && (
                       <Badge variant="destructive" className="text-[10px]">
-                        banned
+                        محظور
                       </Badge>
                     )}
                   </div>
@@ -265,6 +289,8 @@ function EntityPanel({ entity }: { entity: string }) {
                     {entity === "companies" && (
                       <>
                         <Button
+                          aria-label={r.is_verified ? "إلغاء توثيق الشركة" : "توثيق الشركة"}
+                          title={r.is_verified ? "إلغاء توثيق الشركة" : "توثيق الشركة"}
                           size="sm"
                           variant="outline"
                           onClick={() =>
@@ -274,6 +300,12 @@ function EntityPanel({ entity }: { entity: string }) {
                           <BadgeCheck className="h-3 w-3" />
                         </Button>
                         <Button
+                          aria-label={
+                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                          }
+                          title={
+                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                          }
                           size="sm"
                           variant="outline"
                           onClick={() =>
@@ -287,6 +319,8 @@ function EntityPanel({ entity }: { entity: string }) {
                     {entity === "listings" && (
                       <>
                         <Button
+                          aria-label="اعتماد الإعلان"
+                          title="اعتماد الإعلان"
                           size="sm"
                           variant="outline"
                           onClick={() => run("approve_listing", r.id)}
@@ -294,6 +328,8 @@ function EntityPanel({ entity }: { entity: string }) {
                           <CheckCircle2 className="h-3 w-3" />
                         </Button>
                         <Button
+                          aria-label="رفض الإعلان"
+                          title="رفض الإعلان"
                           size="sm"
                           variant="outline"
                           onClick={() => run("reject_listing", r.id)}
@@ -301,6 +337,8 @@ function EntityPanel({ entity }: { entity: string }) {
                           <XCircle className="h-3 w-3" />
                         </Button>
                         <Button
+                          aria-label={r.featured ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"}
+                          title={r.featured ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"}
                           size="sm"
                           variant="outline"
                           onClick={() =>
@@ -315,6 +353,8 @@ function EntityPanel({ entity }: { entity: string }) {
                     )}
                     {entity === "users" && (
                       <Button
+                        aria-label={r.banned_until ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
+                        title={r.banned_until ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
                         size="sm"
                         variant="outline"
                         onClick={() => run(r.banned_until ? "unban_user" : "ban_user", r.id)}
@@ -324,11 +364,13 @@ function EntityPanel({ entity }: { entity: string }) {
                     )}
                     {entity !== "users" && (
                       <Button
+                        aria-label="حذف السجل"
+                        title="حذف السجل"
                         size="sm"
                         variant="ghost"
                         className="text-destructive"
                         onClick={() => {
-                          if (confirm("Delete?")) run("delete", r.id);
+                          if (confirm("هل تريد حذف هذا السجل؟")) run("delete", r.id);
                         }}
                       >
                         <Trash2 className="h-3 w-3" />

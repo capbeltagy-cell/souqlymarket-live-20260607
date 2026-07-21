@@ -47,29 +47,29 @@
 :root {
   --radius: 0.875rem;
 
-  /* Souqly — Egyptian midnight, turquoise & warm gold */
-  --background: #06131c;
-  --foreground: #f3f8f7;
-  --surface: #0b1d28;
-  --surface-2: #102733;
+  /* Souqly — clean Egyptian marketplace, turquoise & warm gold */
+  --background: #f7faf9;
+  --foreground: #10242b;
+  --surface: #ffffff;
+  --surface-2: #eef6f4;
 
-  --card: #0b1d28;
-  --card-foreground: #f3f8f7;
-  --popover: #102733;
-  --popover-foreground: #f3f8f7;
+  --card: #ffffff;
+  --card-foreground: #10242b;
+  --popover: #ffffff;
+  --popover-foreground: #10242b;
 
   --gold: #f1b84b;
   --gold-soft: #ffe09b;
 
   --primary: #24c7a5;
-  --primary-foreground: #03130f;
-  --primary-hover: #39d8b6;
+  --primary-foreground: #05251e;
+  --primary-hover: #18b897;
 
-  --secondary: #173441;
-  --secondary-foreground: #d9fbf3;
+  --secondary: #e3f3ef;
+  --secondary-foreground: #123f36;
 
-  --muted: #173441;
-  --muted-foreground: #91aeb7;
+  --muted: #e9f1ef;
+  --muted-foreground: #61777d;
 
   --accent: #f1b84b;
   --accent-foreground: #171005;
@@ -81,16 +81,16 @@
   --destructive: #d97565;
   --destructive-foreground: #0a0a0a;
 
-  --border: rgba(93, 210, 190, 0.16);
-  --input: rgba(93, 210, 190, 0.2);
+  --border: rgba(31, 112, 96, 0.18);
+  --input: rgba(31, 112, 96, 0.24);
   --ring: #24c7a5;
 
-  --font-display: "Instrument Serif", "Cairo", "Times New Roman", serif;
-  --font-body: "Work Sans", "Cairo", system-ui, sans-serif;
+  --font-display: "Cairo", "Instrument Serif", "Times New Roman", serif;
+  --font-body: "Cairo", "Work Sans", system-ui, sans-serif;
 
-  --shadow-card: 0 1px 0 rgba(99, 235, 207, 0.07) inset, 0 24px 60px -32px rgba(0, 0, 0, 0.72);
-  --shadow-elev: 0 32px 90px -40px rgba(0, 0, 0, 0.85);
-  --shadow-gold: 0 18px 65px -24px rgba(36, 199, 165, 0.38);
+  --shadow-card: 0 1px 2px rgba(16, 36, 43, 0.05), 0 14px 35px -24px rgba(16, 80, 67, 0.3);
+  --shadow-elev: 0 24px 60px -32px rgba(16, 65, 55, 0.42);
+  --shadow-gold: 0 18px 50px -28px rgba(36, 199, 165, 0.45);
 }
 
 .dark {
@@ -116,8 +116,8 @@
     line-height: 1.65;
     font-feature-settings: "ss01", "cv11";
     background-image:
-      radial-gradient(ellipse at top, rgba(36, 199, 165, 0.09), transparent 60%),
-      radial-gradient(ellipse at bottom right, rgba(241, 184, 75, 0.05), transparent 50%);
+      radial-gradient(ellipse at top, rgba(36, 199, 165, 0.08), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(241, 184, 75, 0.06), transparent 50%);
     padding-bottom: calc(72px + env(safe-area-inset-bottom));
     overscroll-behavior-y: none;
   }
@@ -175,7 +175,7 @@
     font-family: var(--font-display);
   }
   .glass-card {
-    background: rgba(20, 20, 20, 0.7);
+    background: rgba(255, 255, 255, 0.86);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(201, 168, 76, 0.18);
     box-shadow: var(--shadow-card);
@@ -195,7 +195,7 @@
   .premium-panel {
     background:
       radial-gradient(circle at top right, rgba(36, 199, 165, 0.1), transparent 58%),
-      linear-gradient(180deg, rgba(15, 39, 51, 0.96), rgba(7, 22, 31, 0.98));
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 246, 244, 0.98));
     border: 1px solid rgba(93, 210, 190, 0.16);
     box-shadow: var(--shadow-card);
   }
@@ -210,7 +210,7 @@
     padding: 1.25rem;
     background:
       linear-gradient(135deg, rgba(201, 168, 76, 0.09), transparent 48%),
-      linear-gradient(180deg, #151515, #0d0d0d);
+      linear-gradient(180deg, #ffffff, #eef6f4);
     box-shadow: var(--shadow-card);
     transition:
       border-color 220ms ease,
@@ -247,7 +247,7 @@
     place-items: center;
     border-radius: 1rem;
     background: rgba(201, 168, 76, 0.12);
-    color: var(--gold-soft);
+    color: #8a5b06;
     border: 1px solid rgba(201, 168, 76, 0.2);
   }
   .status-pill {
@@ -477,7 +477,7 @@
 
 @utility hero-gradient {
   background:
-    radial-gradient(circle at 12% 18%, rgba(36, 199, 165, 0.22), transparent 42%),
-    radial-gradient(circle at 86% 80%, rgba(241, 184, 75, 0.13), transparent 48%),
-    linear-gradient(145deg, #06131c 0%, #0a2531 50%, #071923 100%);
+    radial-gradient(circle at 12% 18%, rgba(36, 199, 165, 0.2), transparent 42%),
+    radial-gradient(circle at 86% 80%, rgba(241, 184, 75, 0.14), transparent 48%),
+    linear-gradient(145deg, #ffffff 0%, #edf8f5 52%, #fff9ed 100%);
 }

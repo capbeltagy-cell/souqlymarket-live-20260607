@@ -24,7 +24,7 @@ export function CompanyCard({ c }: { c: CompanyCardData }) {
     <Link
       to="/companies/$id"
       params={{ id: c.id }}
-      className="block rounded-[1.5rem] border border-white/10 bg-surface-2 p-5 shadow-elev transition duration-200 hover:-translate-y-1 hover:bg-surface"
+      className="block rounded-[1.5rem] border border-border bg-card p-5 shadow-card transition duration-200 hover:-translate-y-1 hover:border-primary/35 hover:shadow-elev"
     >
       <div className="flex items-start gap-4">
         {c.logo_url ? (
