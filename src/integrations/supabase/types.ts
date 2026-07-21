@@ -2453,6 +2453,7 @@ export type Database = {
           created_at: string
           description_ar: string | null
           description_en: string | null
+          first_published_at: string | null
           followers_count: number
           governorate: string | null
           id: string
@@ -2474,6 +2475,11 @@ export type Database = {
           slug: string
           socials: Json
           status: Database["public"]["Enums"]["store_status"]
+          subscription_current_period_end: string | null
+          subscription_monthly_egp: number
+          subscription_status: Database["public"]["Enums"]["store_sub_status"]
+          trial_ends_at: string | null
+          trial_started_at: string | null
           updated_at: string
         }
         Insert: {
@@ -2486,6 +2492,7 @@ export type Database = {
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
+          first_published_at?: string | null
           followers_count?: number
           governorate?: string | null
           id?: string
@@ -2507,6 +2514,11 @@ export type Database = {
           slug: string
           socials?: Json
           status?: Database["public"]["Enums"]["store_status"]
+          subscription_current_period_end?: string | null
+          subscription_monthly_egp?: number
+          subscription_status?: Database["public"]["Enums"]["store_sub_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -2519,6 +2531,7 @@ export type Database = {
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
+          first_published_at?: string | null
           followers_count?: number
           governorate?: string | null
           id?: string
@@ -2540,6 +2553,11 @@ export type Database = {
           slug?: string
           socials?: Json
           status?: Database["public"]["Enums"]["store_status"]
+          subscription_current_period_end?: string | null
+          subscription_monthly_egp?: number
+          subscription_status?: Database["public"]["Enums"]["store_sub_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -3353,6 +3371,12 @@ export type Database = {
         | "published"
         | "suspended"
         | "rejected"
+      store_sub_status:
+        | "trial"
+        | "active"
+        | "past_due"
+        | "expired"
+        | "cancelled"
       subscription_plan: "free" | "premium_company" | "premium_agent"
       wallet_kind: "company" | "agent" | "platform" | "company_funding"
       wallet_tx_reason:
@@ -3550,6 +3574,7 @@ export const Constants = {
         "suspended",
         "rejected",
       ],
+      store_sub_status: ["trial", "active", "past_due", "expired", "cancelled"],
       subscription_plan: ["free", "premium_company", "premium_agent"],
       wallet_kind: ["company", "agent", "platform", "company_funding"],
       wallet_tx_reason: [
