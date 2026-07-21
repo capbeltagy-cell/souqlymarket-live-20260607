@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { Loader2, Save, Settings2 } from "lucide-react";
 import { toast } from "sonner";
-import { Settings2 } from "lucide-react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,152 +17,180 @@ export const Route = createFileRoute("/_authenticated/admin-platform-settings")(
   component: SettingsPage,
 });
 
+type Settings = Awaited<ReturnType<typeof getPlatformSettings>>["settings"];
+
 function SettingsPage() {
   const { locale } = useI18n();
   const ar = locale === "ar";
-  const fGet = useServerFn(getPlatformSettings);
-  const fSave = useServerFn(updatePlatformSettings);
-  const [s, setS] = useState<any>(null);
+  const fetchSettings = useServerFn(getPlatformSettings);
+  const saveSettings = useServerFn(updatePlatformSettings);
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    fGet()
-      .then((r) => setS(r.settings))
-      .catch((e) => toast.error(e.message));
-  }, []);
+    let active = true;
+    setLoadingError(null);
 
-  if (!s)
-    return (
-      <div className="p-8 text-center text-sm text-muted-foreground">
-        {ar ? "جاري التحميل..." : "Loading..."}
-      </div>
-    );
+    fetchSettings()
+      .then((result) => {
+        if (active) setSettings(result.settings);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        const message = error instanceof Error ? error.message : ar ? "تعذر تحميل الإعدادات" : "Unable to load settings";
+        setLoadingError(message);
+        toast.error(message);
+      });
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault();
+    return () => {
+      active = false;
+    };
+  }, [ar, fetchSettings]);
+
+  const updateField = <K extends keyof Settings>(key: K, value: Settings[K]) => {
+    setSettings((current) => (current ? { ...current, [key]: value } : current));
+  };
+
+  const save = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!settings || busy) return;
+
     setBusy(true);
     try {
-      const platform = Number(s.platform_commission_pct);
-      const marketer = Number(s.marketer_commission_pct);
-      if (Math.abs(platform + marketer - 100) > 0.01)
-        throw new Error(ar ? "مجموع النسبتين يجب أن يساوي 100%" : "Percentages must sum to 100%");
-      await fSave({
+      const platform = Number(settings.platform_commission_pct);
+      const marketer = Number(settings.marketer_commission_pct);
+      const minimumWithdrawal = Number(settings.min_withdrawal_amount);
+      const subscriptionCommission = Number(settings.subscription_marketer_commission_pct ?? 15);
+      const subscriptionPrice = Number(settings.subscription_plan_price_egp ?? 499);
+
+      const numericValues = [platform, marketer, minimumWithdrawal, subscriptionCommission, subscriptionPrice];
+      if (numericValues.some((value) => !Number.isFinite(value) || value < 0)) {
+        throw new Error(ar ? "أدخل أرقامًا صحيحة غير سالبة" : "Enter valid non-negative numbers");
+      }
+      if (platform > 100 || marketer > 100 || subscriptionCommission > 100) {
+        throw new Error(ar ? "نسب العمولة لا يمكن أن تتجاوز 100%" : "Commission percentages cannot exceed 100%");
+      }
+      if (Math.abs(platform + marketer - 100) > 0.01) {
+        throw new Error(ar ? "مجموع نسبة المنصة والمسوق يجب أن يساوي 100%" : "Platform and marketer percentages must total 100%");
+      }
+
+      await saveSettings({
         data: {
           platform_commission_pct: platform,
           marketer_commission_pct: marketer,
-          min_withdrawal_amount: Number(s.min_withdrawal_amount),
-          withdrawal_review_mode: s.withdrawal_review_mode,
-          subscription_marketer_commission_pct: Number(
-            s.subscription_marketer_commission_pct ?? 15,
-          ),
-          subscription_plan_price_egp: Number(s.subscription_plan_price_egp ?? 499),
+          min_withdrawal_amount: minimumWithdrawal,
+          withdrawal_review_mode: settings.withdrawal_review_mode,
+          subscription_marketer_commission_pct: subscriptionCommission,
+          subscription_plan_price_egp: subscriptionPrice,
         },
       });
-      toast.success(ar ? "تم الحفظ" : "Saved");
-    } catch (e) {
-      toast.error((e as Error).message);
+
+      setSettings((current) =>
+        current
+          ? {
+              ...current,
+              platform_commission_pct: platform,
+              marketer_commission_pct: marketer,
+              min_withdrawal_amount: minimumWithdrawal,
+              subscription_marketer_commission_pct: subscriptionCommission,
+              subscription_plan_price_egp: subscriptionPrice,
+            }
+          : current,
+      );
+      toast.success(ar ? "تم حفظ الإعدادات" : "Settings saved");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : ar ? "تعذر الحفظ" : "Unable to save");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-2">
-      <SiteHeader />
-      <div className="container-souqly py-8 flex-1">
-        <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
-          <Settings2 className="h-6 w-6 text-primary" />
-          {ar ? "إعدادات المنصة" : "Platform settings"}
-        </h1>
-        <form
-          onSubmit={save}
-          className="max-w-2xl space-y-4 rounded-lg border border-border bg-card p-6 shadow-card"
-        >
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label>{ar ? "نسبة المسوق %" : "Marketer commission %"}</Label>
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                step="0.01"
-                value={s.marketer_commission_pct}
-                onChange={(e) => setS({ ...s, marketer_commission_pct: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>{ar ? "نسبة المنصة %" : "Platform commission %"}</Label>
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                step="0.01"
-                value={s.platform_commission_pct}
-                onChange={(e) => setS({ ...s, platform_commission_pct: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>{ar ? "الحد الأدنى للسحب" : "Minimum withdrawal amount"}</Label>
-              <Input
-                type="number"
-                min={0}
-                step="1"
-                value={s.min_withdrawal_amount}
-                onChange={(e) => setS({ ...s, min_withdrawal_amount: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>{ar ? "وضع مراجعة السحب" : "Withdrawal review mode"}</Label>
-              <select
-                value={s.withdrawal_review_mode}
-                onChange={(e) => setS({ ...s, withdrawal_review_mode: e.target.value })}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="manual">
-                  {ar ? "يدوي (موافقة الأدمن)" : "Manual (admin approval)"}
-                </option>
-                <option value="auto">{ar ? "تلقائي" : "Auto"}</option>
-              </select>
-            </div>
-            <div>
-              <Label>
-                {ar
-                  ? "نسبة عمولة المسوق على اشتراك الشركة %"
-                  : "Subscription referral commission %"}
-              </Label>
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                step="0.01"
-                value={s.subscription_marketer_commission_pct ?? 15}
-                onChange={(e) =>
-                  setS({ ...s, subscription_marketer_commission_pct: e.target.value })
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {ar
-                  ? "تُحسب على سعر الاشتراك عند التفعيل."
-                  : "Applied to the subscription price when a company activates the paid plan."}
-              </p>
-            </div>
-            <div>
-              <Label>{ar ? "سعر اشتراك الشركة (جنيه)" : "Company subscription price (EGP)"}</Label>
-              <Input
-                type="number"
-                min={0}
-                step="1"
-                value={s.subscription_plan_price_egp ?? 499}
-                onChange={(e) => setS({ ...s, subscription_plan_price_egp: e.target.value })}
-              />
-            </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <Settings2 className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-bold">{ar ? "إعدادات المنصة" : "Platform settings"}</h1>
           </div>
-          <Button type="submit" disabled={busy}>
-            {ar ? "حفظ" : "Save"}
-          </Button>
-        </form>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {ar ? "تحكم في العمولات والسحب وأسعار الاشتراكات." : "Manage commissions, withdrawals, and subscription pricing."}
+          </p>
+        </div>
+
+        {loadingError && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            {loadingError}
+          </div>
+        )}
+
+        {!settings ? (
+          <div className="flex min-h-48 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
+            <Loader2 className="me-2 h-5 w-5 animate-spin" />
+            {ar ? "جاري تحميل الإعدادات..." : "Loading settings..."}
+          </div>
+        ) : (
+          <form onSubmit={save} className="max-w-3xl space-y-6 rounded-xl border border-border bg-card p-5 shadow-card md:p-6">
+            <section>
+              <h2 className="mb-4 font-semibold">{ar ? "العمولات الأساسية" : "Core commissions"}</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label={ar ? "نسبة المسوق %" : "Marketer commission %"}>
+                  <Input type="number" min={0} max={100} step="0.01" value={settings.marketer_commission_pct} onChange={(event) => updateField("marketer_commission_pct", event.target.value as Settings["marketer_commission_pct"])} />
+                </Field>
+                <Field label={ar ? "نسبة المنصة %" : "Platform commission %"}>
+                  <Input type="number" min={0} max={100} step="0.01" value={settings.platform_commission_pct} onChange={(event) => updateField("platform_commission_pct", event.target.value as Settings["platform_commission_pct"])} />
+                </Field>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">{ar ? "يجب أن يكون مجموع النسبتين 100%." : "The two percentages must total 100%."}</p>
+            </section>
+
+            <section className="border-t border-border pt-6">
+              <h2 className="mb-4 font-semibold">{ar ? "إعدادات السحب" : "Withdrawal settings"}</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label={ar ? "الحد الأدنى للسحب" : "Minimum withdrawal amount"}>
+                  <Input type="number" min={0} step="1" value={settings.min_withdrawal_amount} onChange={(event) => updateField("min_withdrawal_amount", event.target.value as Settings["min_withdrawal_amount"])} />
+                </Field>
+                <Field label={ar ? "وضع مراجعة السحب" : "Withdrawal review mode"}>
+                  <select value={settings.withdrawal_review_mode} onChange={(event) => updateField("withdrawal_review_mode", event.target.value as Settings["withdrawal_review_mode"])} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                    <option value="manual">{ar ? "يدوي — موافقة الأدمن" : "Manual — admin approval"}</option>
+                    <option value="auto">{ar ? "تلقائي" : "Automatic"}</option>
+                  </select>
+                </Field>
+              </div>
+            </section>
+
+            <section className="border-t border-border pt-6">
+              <h2 className="mb-4 font-semibold">{ar ? "اشتراكات الشركات" : "Company subscriptions"}</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label={ar ? "عمولة المسوق على الاشتراك %" : "Subscription referral commission %"} hint={ar ? "تُحسب عند تفعيل الاشتراك المدفوع." : "Applied when the paid subscription is activated."}>
+                  <Input type="number" min={0} max={100} step="0.01" value={settings.subscription_marketer_commission_pct ?? 15} onChange={(event) => updateField("subscription_marketer_commission_pct", event.target.value as Settings["subscription_marketer_commission_pct"])} />
+                </Field>
+                <Field label={ar ? "سعر اشتراك الشركة (جنيه)" : "Company subscription price (EGP)"}>
+                  <Input type="number" min={0} step="1" value={settings.subscription_plan_price_egp ?? 499} onChange={(event) => updateField("subscription_plan_price_egp", event.target.value as Settings["subscription_plan_price_egp"])} />
+                </Field>
+              </div>
+            </section>
+
+            <div className="flex justify-end border-t border-border pt-5">
+              <Button type="submit" disabled={busy}>
+                {busy ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Save className="me-2 h-4 w-4" />}
+                {busy ? (ar ? "جاري الحفظ..." : "Saving...") : ar ? "حفظ الإعدادات" : "Save settings"}
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
-      <SiteFooter />
+    </AdminLayout>
+  );
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      {children}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
