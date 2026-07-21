@@ -18,6 +18,7 @@ import { createOrderFromListing } from "@/lib/orders.functions";
 import { listMyAddresses, saveMyAddress, deleteMyAddress } from "@/lib/addresses.functions";
 import { getShippingQuote } from "@/lib/shipping";
 import { getArabicErrorMessage } from "@/lib/user-error";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({
@@ -42,6 +43,7 @@ type Address = {
 
 function CheckoutPage() {
   const { locale } = useI18n();
+  const { user } = useAuth();
   const ar = locale === "ar";
   const navigate = useNavigate();
   const createOrder = useServerFn(createOrderFromListing);
@@ -69,6 +71,26 @@ function CheckoutPage() {
     is_default: true,
   });
 
+  const addressCacheKey = `souqly.checkout-address.${user?.id ?? "current"}`;
+
+  function cacheAddress(address: typeof f) {
+    try {
+      localStorage.setItem(addressCacheKey, JSON.stringify(address));
+    } catch {
+      // Database persistence remains the source of truth when storage is unavailable.
+    }
+  }
+
+  function isAddressComplete(address: typeof f) {
+    return Boolean(
+      address.recipient_name.trim() &&
+      address.phone.trim() &&
+      address.governorate.trim() &&
+      address.city.trim() &&
+      address.address_line.trim(),
+    );
+  }
+
   useEffect(() => {
     setItems(getCart());
     const unsub = subscribeCart(() => setItems(getCart()));
@@ -87,6 +109,14 @@ function CheckoutPage() {
         setSelectedId(def.id);
         setShowForm(false);
       } else {
+        try {
+          const cached = JSON.parse(localStorage.getItem(addressCacheKey) || "null");
+          if (cached && typeof cached === "object") {
+            setF((current) => ({ ...current, ...cached }));
+          }
+        } catch {
+          // Ignore an unavailable or malformed same-device cache.
+        }
         setShowForm(true);
       }
     } catch (e) {
@@ -103,6 +133,7 @@ function CheckoutPage() {
     }
     try {
       const { id } = await saveAddr({ data: { ...f, label: f.label || null } });
+      cacheAddress(f);
       setF({
         label: "",
         recipient_name: "",
@@ -134,7 +165,9 @@ function CheckoutPage() {
   const groups = groupByCompany(items);
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const currency = items[0]?.currency ?? "EGP";
-  const selectedAddress = addresses.find((a) => a.id === selectedId);
+  const selectedAddress =
+    addresses.find((a) => a.id === selectedId) ??
+    (showForm && isAddressComplete(f) ? f : undefined);
   const shipping = selectedAddress ? getShippingQuote(selectedAddress.governorate) : null;
   // Checkout currently creates one independently payable/shippable order per item.
   const shippingTotal = shipping ? shipping.amount * items.length : 0;
@@ -142,7 +175,10 @@ function CheckoutPage() {
 
   async function placeOrders() {
     if (items.length === 0) return;
-    const addr = addresses.find((a) => a.id === selectedId);
+    let addr = addresses.find((a) => a.id === selectedId);
+    if (!addr && showForm && isAddressComplete(f)) {
+      addr = { id: "new", ...f, label: f.label || null };
+    }
     if (!addr) {
       toast.error(ar ? "اختر عنوان الشحن" : "Choose a shipping address");
       return;
@@ -156,6 +192,14 @@ function CheckoutPage() {
     }
     const created: string[] = [];
     try {
+      if (addr.id === "new") {
+        cacheAddress(f);
+        try {
+          await saveAddr({ data: { ...f, label: f.label || null, is_default: true } });
+        } catch {
+          // The order still contains the full address; the device cache avoids re-entry.
+        }
+      }
       for (const it of items) {
         const { id } = await createOrder({
           data: {
@@ -454,7 +498,7 @@ function CheckoutPage() {
             <Button
               className="w-full bg-primary hover:bg-primary-hover"
               onClick={placeOrders}
-              disabled={placing || !selectedId}
+              disabled={placing || (!selectedId && (!showForm || !isAddressComplete(f)))}
             >
               {placing && <Loader2 className="h-4 w-4 animate-spin me-2" />}
               {ar ? "تأكيد الطلب" : "Place order"}

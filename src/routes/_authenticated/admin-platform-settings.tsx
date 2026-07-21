@@ -38,7 +38,12 @@ function SettingsPage() {
       })
       .catch((error: unknown) => {
         if (!active) return;
-        const message = error instanceof Error ? error.message : ar ? "تعذر تحميل الإعدادات" : "Unable to load settings";
+        const message =
+          error instanceof Error
+            ? error.message
+            : ar
+              ? "تعذر تحميل الإعدادات"
+              : "Unable to load settings";
         setLoadingError(message);
         toast.error(message);
       });
@@ -49,7 +54,7 @@ function SettingsPage() {
   }, [ar, fetchSettings]);
 
   const updateField = <K extends keyof Settings>(key: K, value: Settings[K]) => {
-    setSettings((current) => (current ? { ...current, [key]: value } : current));
+    setSettings((current: Settings | null) => (current ? { ...current, [key]: value } : current));
   };
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
@@ -64,15 +69,27 @@ function SettingsPage() {
       const subscriptionCommission = Number(settings.subscription_marketer_commission_pct ?? 15);
       const subscriptionPrice = Number(settings.subscription_plan_price_egp ?? 499);
 
-      const numericValues = [platform, marketer, minimumWithdrawal, subscriptionCommission, subscriptionPrice];
+      const numericValues = [
+        platform,
+        marketer,
+        minimumWithdrawal,
+        subscriptionCommission,
+        subscriptionPrice,
+      ];
       if (numericValues.some((value) => !Number.isFinite(value) || value < 0)) {
         throw new Error(ar ? "أدخل أرقامًا صحيحة غير سالبة" : "Enter valid non-negative numbers");
       }
       if (platform > 100 || marketer > 100 || subscriptionCommission > 100) {
-        throw new Error(ar ? "نسب العمولة لا يمكن أن تتجاوز 100%" : "Commission percentages cannot exceed 100%");
+        throw new Error(
+          ar ? "نسب العمولة لا يمكن أن تتجاوز 100%" : "Commission percentages cannot exceed 100%",
+        );
       }
       if (Math.abs(platform + marketer - 100) > 0.01) {
-        throw new Error(ar ? "مجموع نسبة المنصة والمسوق يجب أن يساوي 100%" : "Platform and marketer percentages must total 100%");
+        throw new Error(
+          ar
+            ? "مجموع نسبة المنصة والمسوق يجب أن يساوي 100%"
+            : "Platform and marketer percentages must total 100%",
+        );
       }
 
       await saveSettings({
@@ -86,7 +103,7 @@ function SettingsPage() {
         },
       });
 
-      setSettings((current) =>
+      setSettings((current: Settings | null) =>
         current
           ? {
               ...current,
@@ -115,7 +132,9 @@ function SettingsPage() {
             <h1 className="text-2xl font-bold">{ar ? "إعدادات المنصة" : "Platform settings"}</h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {ar ? "تحكم في العمولات والسحب وأسعار الاشتراكات." : "Manage commissions, withdrawals, and subscription pricing."}
+            {ar
+              ? "تحكم في العمولات والسحب وأسعار الاشتراكات."
+              : "Manage commissions, withdrawals, and subscription pricing."}
           </p>
         </div>
 
@@ -131,29 +150,82 @@ function SettingsPage() {
             {ar ? "جاري تحميل الإعدادات..." : "Loading settings..."}
           </div>
         ) : (
-          <form onSubmit={save} className="max-w-3xl space-y-6 rounded-xl border border-border bg-card p-5 shadow-card md:p-6">
+          <form
+            onSubmit={save}
+            className="max-w-3xl space-y-6 rounded-xl border border-border bg-card p-5 shadow-card md:p-6"
+          >
             <section>
-              <h2 className="mb-4 font-semibold">{ar ? "العمولات الأساسية" : "Core commissions"}</h2>
+              <h2 className="mb-4 font-semibold">
+                {ar ? "العمولات الأساسية" : "Core commissions"}
+              </h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label={ar ? "نسبة المسوق %" : "Marketer commission %"}>
-                  <Input type="number" min={0} max={100} step="0.01" value={settings.marketer_commission_pct} onChange={(event) => updateField("marketer_commission_pct", event.target.value as Settings["marketer_commission_pct"])} />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.01"
+                    value={settings.marketer_commission_pct}
+                    onChange={(event) =>
+                      updateField(
+                        "marketer_commission_pct",
+                        event.target.value as Settings["marketer_commission_pct"],
+                      )
+                    }
+                  />
                 </Field>
                 <Field label={ar ? "نسبة المنصة %" : "Platform commission %"}>
-                  <Input type="number" min={0} max={100} step="0.01" value={settings.platform_commission_pct} onChange={(event) => updateField("platform_commission_pct", event.target.value as Settings["platform_commission_pct"])} />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.01"
+                    value={settings.platform_commission_pct}
+                    onChange={(event) =>
+                      updateField(
+                        "platform_commission_pct",
+                        event.target.value as Settings["platform_commission_pct"],
+                      )
+                    }
+                  />
                 </Field>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">{ar ? "يجب أن يكون مجموع النسبتين 100%." : "The two percentages must total 100%."}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {ar ? "يجب أن يكون مجموع النسبتين 100%." : "The two percentages must total 100%."}
+              </p>
             </section>
 
             <section className="border-t border-border pt-6">
               <h2 className="mb-4 font-semibold">{ar ? "إعدادات السحب" : "Withdrawal settings"}</h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label={ar ? "الحد الأدنى للسحب" : "Minimum withdrawal amount"}>
-                  <Input type="number" min={0} step="1" value={settings.min_withdrawal_amount} onChange={(event) => updateField("min_withdrawal_amount", event.target.value as Settings["min_withdrawal_amount"])} />
+                  <Input
+                    type="number"
+                    min={0}
+                    step="1"
+                    value={settings.min_withdrawal_amount}
+                    onChange={(event) =>
+                      updateField(
+                        "min_withdrawal_amount",
+                        event.target.value as Settings["min_withdrawal_amount"],
+                      )
+                    }
+                  />
                 </Field>
                 <Field label={ar ? "وضع مراجعة السحب" : "Withdrawal review mode"}>
-                  <select value={settings.withdrawal_review_mode} onChange={(event) => updateField("withdrawal_review_mode", event.target.value as Settings["withdrawal_review_mode"])} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                    <option value="manual">{ar ? "يدوي — موافقة الأدمن" : "Manual — admin approval"}</option>
+                  <select
+                    value={settings.withdrawal_review_mode}
+                    onChange={(event) =>
+                      updateField(
+                        "withdrawal_review_mode",
+                        event.target.value as Settings["withdrawal_review_mode"],
+                      )
+                    }
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="manual">
+                      {ar ? "يدوي — موافقة الأدمن" : "Manual — admin approval"}
+                    </option>
                     <option value="auto">{ar ? "تلقائي" : "Automatic"}</option>
                   </select>
                 </Field>
@@ -161,21 +233,63 @@ function SettingsPage() {
             </section>
 
             <section className="border-t border-border pt-6">
-              <h2 className="mb-4 font-semibold">{ar ? "اشتراكات الشركات" : "Company subscriptions"}</h2>
+              <h2 className="mb-4 font-semibold">
+                {ar ? "اشتراكات الشركات" : "Company subscriptions"}
+              </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={ar ? "عمولة المسوق على الاشتراك %" : "Subscription referral commission %"} hint={ar ? "تُحسب عند تفعيل الاشتراك المدفوع." : "Applied when the paid subscription is activated."}>
-                  <Input type="number" min={0} max={100} step="0.01" value={settings.subscription_marketer_commission_pct ?? 15} onChange={(event) => updateField("subscription_marketer_commission_pct", event.target.value as Settings["subscription_marketer_commission_pct"])} />
+                <Field
+                  label={ar ? "عمولة المسوق على الاشتراك %" : "Subscription referral commission %"}
+                  hint={
+                    ar
+                      ? "تُحسب عند تفعيل الاشتراك المدفوع."
+                      : "Applied when the paid subscription is activated."
+                  }
+                >
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.01"
+                    value={settings.subscription_marketer_commission_pct ?? 15}
+                    onChange={(event) =>
+                      updateField(
+                        "subscription_marketer_commission_pct",
+                        event.target.value as Settings["subscription_marketer_commission_pct"],
+                      )
+                    }
+                  />
                 </Field>
                 <Field label={ar ? "سعر اشتراك الشركة (جنيه)" : "Company subscription price (EGP)"}>
-                  <Input type="number" min={0} step="1" value={settings.subscription_plan_price_egp ?? 499} onChange={(event) => updateField("subscription_plan_price_egp", event.target.value as Settings["subscription_plan_price_egp"])} />
+                  <Input
+                    type="number"
+                    min={0}
+                    step="1"
+                    value={settings.subscription_plan_price_egp ?? 499}
+                    onChange={(event) =>
+                      updateField(
+                        "subscription_plan_price_egp",
+                        event.target.value as Settings["subscription_plan_price_egp"],
+                      )
+                    }
+                  />
                 </Field>
               </div>
             </section>
 
             <div className="flex justify-end border-t border-border pt-5">
               <Button type="submit" disabled={busy}>
-                {busy ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Save className="me-2 h-4 w-4" />}
-                {busy ? (ar ? "جاري الحفظ..." : "Saving...") : ar ? "حفظ الإعدادات" : "Save settings"}
+                {busy ? (
+                  <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="me-2 h-4 w-4" />
+                )}
+                {busy
+                  ? ar
+                    ? "جاري الحفظ..."
+                    : "Saving..."
+                  : ar
+                    ? "حفظ الإعدادات"
+                    : "Save settings"}
               </Button>
             </div>
           </form>
@@ -185,7 +299,15 @@ function SettingsPage() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
