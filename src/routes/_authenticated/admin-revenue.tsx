@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { LucideIcon } from "lucide-react";
-import { DollarSign, TrendingUp, Star, CreditCard, Users } from "lucide-react";
+import { CreditCard, DollarSign, Star, TrendingUp, Users } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
@@ -15,7 +15,16 @@ export const Route = createFileRoute("/_authenticated/admin-revenue")({
   component: AdminRevenuePage,
 });
 
-type RevenueSummary = Awaited<ReturnType<typeof getAdminRevenueSummary>>;
+type RevenueSummary = {
+  totalPaymentsRevenue: number;
+  subscriptionRevenue: number;
+  featuredRevenue: number;
+  commissionRevenue: number;
+  platformBalance: number;
+  paidCommissions: number;
+  activeSubscriptions: number;
+  subsByPlan: Record<string, number>;
+};
 
 function AdminRevenuePage() {
   const { locale } = useI18n();
@@ -25,11 +34,27 @@ function AdminRevenuePage() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
+    setErr(null);
+
     fetchSummary()
-      .then(setData)
-      .catch((error: unknown) =>
-        setErr(error instanceof Error ? error.message : ar ? "تعذر تحميل الإيرادات" : "Unable to load revenue"),
-      );
+      .then((result) => {
+        if (active) setData(result as RevenueSummary);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setErr(
+          error instanceof Error
+            ? error.message
+            : ar
+              ? "تعذر تحميل الإيرادات"
+              : "Unable to load revenue",
+        );
+      });
+
+    return () => {
+      active = false;
+    };
   }, [ar, fetchSummary]);
 
   return (
@@ -90,7 +115,7 @@ function AdminRevenuePage() {
               {ar ? "الاشتراكات حسب الباقة" : "Subscriptions by plan"}
             </h2>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {Object.entries(data.subsByPlan as Record<string, number>).map(([plan, count]) => (
+              {Object.entries(data.subsByPlan).map(([plan, count]) => (
                 <div key={plan} className="rounded-lg border border-border p-4">
                   <div className="text-xs uppercase text-muted-foreground">{plan}</div>
                   <div className="text-2xl font-bold">{count}</div>
