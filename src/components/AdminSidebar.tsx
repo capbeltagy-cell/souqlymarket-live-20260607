@@ -14,15 +14,13 @@ import {
   ArrowDownUp,
   TrendingUp,
   Percent,
-  GripHorizontal,
   Bell,
   Zap,
   Settings,
-  Archive,
   LogOut,
   BarChart3,
-  Users,
   CreditCard,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -34,7 +32,8 @@ interface AdminSidebarProps {
 type MenuItem = {
   icon: typeof LayoutDashboard;
   label: string;
-  href?: string;
+  href: string;
+  exact?: boolean;
 };
 
 type MenuSection = {
@@ -46,21 +45,20 @@ const MENU_ITEMS: MenuSection[] = [
   {
     section: "نظرة عامة",
     items: [
-      { icon: LayoutDashboard, label: "الرئيسية", href: "/admin-overview" },
-      { icon: BarChart3, label: "اللوحة التنفيذية", href: "/admin-executive" },
+      { icon: LayoutDashboard, label: "الرئيسية", href: "/admin-overview", exact: true },
+      { icon: BarChart3, label: "اللوحة التنفيذية", href: "/admin-executive", exact: true },
     ],
   },
   {
     section: "إدارة المنصة",
     items: [
-      { icon: Users, label: "المستخدمون" },
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
-      { icon: Package, label: "المنتجات والإعلانات" },
-      { icon: ShoppingBag, label: "الطلبات" },
-      { icon: Lightbulb, label: "المناقصات" },
-      { icon: ShoppingCart, label: "طلبات الشراء" },
-      { icon: AlertCircle, label: "البلاغات والمراجعة" },
+      { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
+      { icon: ShoppingBag, label: "الطلبات", href: "/orders" },
+      { icon: Lightbulb, label: "المناقصات", href: "/tenders" },
+      { icon: ShoppingCart, label: "طلبات الشراء", href: "/rfq" },
+      { icon: AlertCircle, label: "البلاغات والمراجعة", href: "/moderation" },
     ],
   },
   {
@@ -71,17 +69,16 @@ const MENU_ITEMS: MenuSection[] = [
       { icon: ArrowDownUp, label: "السحوبات", href: "/admin-withdrawals" },
       { icon: TrendingUp, label: "الإيرادات", href: "/admin-revenue" },
       { icon: Percent, label: "العمولات", href: "/admin-commissions" },
-      { icon: Wallet, label: "الاشتراكات" },
-      { icon: GripHorizontal, label: "الفواتير" },
+      { icon: Wallet, label: "الاشتراكات", href: "/admin-platform-settings" },
+      { icon: FileText, label: "الفواتير", href: "/invoices" },
     ],
   },
   {
     section: "المحتوى والنظام",
     items: [
-      { icon: Bell, label: "الإشعارات" },
+      { icon: Bell, label: "الإشعارات", href: "/admin-overview" },
       { icon: Zap, label: "محتوى الإطلاق", href: "/admin-launch-content" },
       { icon: Settings, label: "الإعدادات", href: "/admin-platform-settings" },
-      { icon: Archive, label: "سجل العمليات" },
     ],
   },
 ];
@@ -90,7 +87,8 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
   const { user, signOut } = useAuth();
   const location = useLocation();
 
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (item: MenuItem) =>
+    item.exact ? location.pathname === item.href : location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
 
   return (
     <>
@@ -98,25 +96,25 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
         <button
           type="button"
           aria-label="إغلاق القائمة"
-          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-foreground/40 backdrop-blur-sm lg:hidden"
           onClick={() => onOpenChange(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-gray-200 bg-white transition-transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-border bg-card shadow-xl transition-transform duration-200 lg:translate-x-0 lg:shadow-none ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-gray-200 p-4">
+        <div className="flex items-center justify-between border-b border-border p-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">سوقلي</h2>
-            <p className="text-xs text-gray-500">لوحة الإدارة</p>
+            <h2 className="text-lg font-bold text-foreground">سوقلي</h2>
+            <p className="text-xs text-muted-foreground">لوحة الإدارة</p>
           </div>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 lg:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
             aria-label="إغلاق القائمة"
           >
             <X className="h-5 w-5" />
@@ -126,36 +124,28 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
         <nav className="flex-1 space-y-4 overflow-y-auto p-4 pb-6">
           {MENU_ITEMS.map((section) => (
             <div key={section.section}>
-              <h3 className="px-3 py-2 text-xs font-semibold text-gray-500">
+              <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground">
                 {section.section}
               </h3>
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const Icon = item.icon;
-                  const active = item.href ? isActive(item.href) : false;
-                  const classes = `flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                    item.href
-                      ? active
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-700 hover:bg-gray-100"
-                      : "cursor-not-allowed text-gray-400"
-                  }`;
-
-                  return item.href ? (
+                  const active = isActive(item);
+                  return (
                     <a
-                      key={item.label}
+                      key={`${section.section}-${item.label}`}
                       href={item.href}
                       onClick={() => onOpenChange(false)}
-                      className={classes}
+                      aria-current={active ? "page" : undefined}
+                      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>
                     </a>
-                  ) : (
-                    <button key={item.label} type="button" disabled className={classes}>
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </button>
                   );
                 })}
               </div>
@@ -163,15 +153,15 @@ export function AdminSidebar({ open, onOpenChange }: AdminSidebarProps) {
           ))}
         </nav>
 
-        <div className="border-t border-gray-200 bg-white p-4 space-y-3">
-          <div className="rounded-md bg-gray-50 px-3 py-2">
-            <p className="text-xs text-gray-500">الحساب الحالي</p>
-            <p className="truncate text-sm font-medium text-gray-900">{user?.email}</p>
+        <div className="space-y-3 border-t border-border bg-card p-4">
+          <div className="rounded-lg bg-muted px-3 py-2">
+            <p className="text-xs text-muted-foreground">الحساب الحالي</p>
+            <p className="truncate text-sm font-medium text-foreground">{user?.email}</p>
           </div>
           <button
             type="button"
             onClick={() => void signOut()}
-            className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+            className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="h-4 w-4" />
             تسجيل الخروج
