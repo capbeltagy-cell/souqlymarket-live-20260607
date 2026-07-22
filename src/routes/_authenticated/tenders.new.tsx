@@ -24,11 +24,18 @@ function NewTender() {
   const [budget, setBudget] = useState("");
   const [deadline, setDeadline] = useState("");
   const [cats, setCats] = useState<{ slug: string; name_ar: string; name_en: string }[]>([]);
+  const [busy, setBusy] = useState(false);
   useEffect(() => {
-    listCategories().then((r) => setCats(r.categories));
+    listCategories()
+      .then((r) => setCats(r.categories))
+      .catch(() => setCats([]));
   }, []);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!title.trim()) return toast.error(ar ? "أدخل عنوان المناقصة" : "Enter a title");
+    if (deadline && new Date(deadline).getTime() <= Date.now())
+      return toast.error(ar ? "اختر موعدًا نهائيًا في المستقبل" : "Choose a future deadline");
+    setBusy(true);
     try {
       const r = await createTender({
         data: {
@@ -42,8 +49,16 @@ function NewTender() {
       });
       toast.success(ar ? "تم نشر المناقصة" : "Tender published");
       nav({ to: "/tenders/$id", params: { id: r.id } });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : ar
+            ? "تعذر نشر المناقصة"
+            : "Unable to publish tender",
+      );
+    } finally {
+      setBusy(false);
     }
   }
   return (
@@ -92,7 +107,7 @@ function NewTender() {
             />
             <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
           </div>
-          <Button type="submit" className="bg-primary hover:bg-primary-hover">
+          <Button type="submit" disabled={busy} className="bg-primary hover:bg-primary-hover">
             {ar ? "نشر" : "Publish"}
           </Button>
         </form>

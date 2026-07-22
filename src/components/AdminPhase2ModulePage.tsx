@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { Eye, Loader2, Search, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
@@ -99,7 +99,7 @@ export function AdminPhase2ModulePage({ module }: { module: AdminModule }) {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const result = await adminPhase2List({
@@ -113,11 +113,11 @@ export function AdminPhase2ModulePage({ module }: { module: AdminModule }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [module, page, search, status]);
 
   useEffect(() => {
     void load();
-  }, [module, page, status]);
+  }, [load]);
 
   async function open(id: string) {
     setSelected(id);
@@ -173,7 +173,7 @@ export function AdminPhase2ModulePage({ module }: { module: AdminModule }) {
       loading={loading && rows.length === 0}
     >
       <div className="space-y-5">
-        {module === "notifications" && (
+        {module === "notifications" && !message && (
           <NotificationComposer onCreated={load} onUnavailable={setMessage} />
         )}
         {message && (
@@ -552,7 +552,7 @@ function NotificationComposer({
         </Button>
         <Button type="submit">
           <Send className="me-1 h-4 w-4" />
-          إنشاء
+          حفظ الإشعار
         </Button>
       </div>
       {preview && (

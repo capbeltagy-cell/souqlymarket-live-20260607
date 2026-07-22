@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Phase 2 tables are intentionally absent from generated Production types until migrations are approved. */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -154,6 +155,12 @@ export const adminPhase2Action = createServerFn({ method: "POST" })
     await requireAdmin(context.userId);
     const table = tableByModule[data.module];
     if (data.module === "orders") {
+      const historyAvailability = await (supabaseAdmin as any)
+        .from("admin_order_status_history")
+        .select("id", { head: true, count: "exact" });
+      if (missingTable(historyAvailability.error))
+        return { available: false as const, message: MODULE_UNAVAILABLE };
+      if (historyAvailability.error) throw new Error(historyAvailability.error.message);
       const current = await (supabaseAdmin as any)
         .from(table)
         .select("status, payment_status")
@@ -284,7 +291,7 @@ export const adminCreateNotification = createServerFn({ method: "POST" })
         target_id: data.targetId ?? null,
         target_role: data.targetRole ?? null,
         target_audience: data.targetKind === "broadcast" ? "all" : null,
-        status: data.scheduledAt ? "scheduled" : "processing",
+        status: data.scheduledAt ? "scheduled" : "draft",
         scheduled_at: data.scheduledAt ?? null,
         created_by: context.userId,
       })
