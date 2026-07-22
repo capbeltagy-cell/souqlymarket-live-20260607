@@ -9,29 +9,29 @@ export type BusinessModuleDefinition = {
   href: string;
 };
 
-// The catalog is the single navigation source for business modules. New modules
-// can be registered here without changing the page layout or main navigation.
+// Single navigation source for business modules. Core operational modules now
+// open the unified company workspace instead of old placeholder destinations.
 export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
   {
     key: "crm",
     name: "إدارة العملاء CRM",
-    description: "متابعة العملاء المحتملين ومسار التواصل.",
+    description: "إضافة العملاء ومتابعة بيانات التواصل من مساحة عمل واحدة.",
     icon: ContactRound,
-    href: "/leads",
+    href: "/business-suite?tab=crm",
   },
   {
     key: "inventory",
     name: "المخزون",
-    description: "متابعة المنتجات والكميات المتاحة.",
+    description: "إدارة الأصناف والكميات وحدود التنبيه والأسعار.",
     icon: Boxes,
-    href: "/store#inventory",
+    href: "/business-suite?tab=inventory",
   },
   {
     key: "invoices",
     name: "الفواتير",
-    description: "عرض فواتير الحساب والطلبات.",
+    description: "متابعة الفواتير والمبالغ المدفوعة والمستحقة.",
     icon: ReceiptText,
-    href: "/invoices",
+    href: "/business-suite?tab=invoices",
   },
   {
     key: "marketing",
