@@ -8,7 +8,16 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { listRfqs } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/rfq")({
-  head: () => ({ meta: [{ title: "طلبات عروض الأسعار — Souqly" }] }),
+  head: () => ({
+    meta: [
+      { title: "طلبات عروض الأسعار — Souqly" },
+      {
+        name: "description",
+        content: "استعرض طلبات عروض الأسعار الحقيقية من المشترين والشركات على سوقلي.",
+      },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/rfq" }],
+  }),
   component: RfqList,
 });
 

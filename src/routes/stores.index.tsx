@@ -14,6 +14,7 @@ export const Route = createFileRoute("/stores/")({
       { property: "og:title", content: "متاجر سوقلي" },
       { property: "og:description", content: "متاجر مصرية معتمدة، ادفع واستلم من داخل المنصة." },
     ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/stores" }],
   }),
   component: StoresPage,
 });

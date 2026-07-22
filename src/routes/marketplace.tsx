@@ -28,6 +28,7 @@ export const Route = createFileRoute("/marketplace")({
         content: "Browse B2B products, services, real estate, factories and opportunities.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/marketplace" }],
   }),
   component: Marketplace,
 });

@@ -13,6 +13,7 @@ export const Route = createFileRoute("/wholesale")({
       { title: "سوق الجملة — Souqly" },
       { name: "description", content: "اشتري بالجملة من مصانع وموردين موثوقين" },
     ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/wholesale" }],
   }),
   component: WholesalePage,
 });
