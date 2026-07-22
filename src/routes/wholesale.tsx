@@ -124,7 +124,13 @@ function WholesalePage() {
                 className="rounded-lg border border-border bg-card overflow-hidden hover:shadow-md transition"
               >
                 {it.images?.[0] && (
-                  <img src={it.images[0]} alt="" className="aspect-video w-full object-cover" />
+                  <img
+                    src={it.images[0]}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-video w-full object-cover"
+                  />
                 )}
                 <div className="p-4 space-y-1">
                   <div className="font-semibold line-clamp-1">{it.title}</div>
