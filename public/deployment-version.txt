@@ -1,4 +1,4 @@
-Souqly production release
-source_commit=895a41ec2f7f1258c3fc31d8169a54aaed0792c9
+Souqly Production Release Candidate 1
+source_branch=feat/multi-vendor-stores
+release=rc1
 release_trigger=2026-07-22
-purpose=force-production-redeploy-and-alias-refresh

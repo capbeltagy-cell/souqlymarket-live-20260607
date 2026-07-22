@@ -1,1 +1,1 @@
-export const BUILD_VERSION = "souqly-admin-phase-2-ui-final";
+export const BUILD_VERSION = "souqly-production-rc1-20260722";
