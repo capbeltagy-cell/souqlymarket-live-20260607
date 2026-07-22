@@ -14,6 +14,7 @@ const STATIC_PATHS = [
   "/terms",
   "/refund-policy",
   "/marketplace",
+  "/stores",
   "/companies",
   "/agents",
   "/factories",
@@ -27,9 +28,8 @@ const STATIC_PATHS = [
   "/search",
   "/search-all",
   "/subscribe",
-  "/auth",
-  "/forgot-password",
-  "/reset-password",
+  "/business-solutions",
+  "/digital-products",
 ];
 
 export const Route = createFileRoute("/sitemap.xml")({

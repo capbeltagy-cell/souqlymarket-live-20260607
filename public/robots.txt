@@ -1,6 +1,13 @@
 User-agent: *
 Allow: /
 Disallow: /control-center-x7
+Disallow: /admin-
+Disallow: /auth
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /checkout
 Disallow: /seed
 
 Sitemap: https://souqlymarket.com/sitemap.xml
