@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Bot, Boxes, ContactRound, Megaphone, ReceiptText } from "lucide-react";
+import { BarChart3, Bot, Boxes, ContactRound, Megaphone, ReceiptText, ShoppingCart, Truck } from "lucide-react";
 
 export type BusinessModuleDefinition = {
   key: string;
@@ -9,29 +9,43 @@ export type BusinessModuleDefinition = {
   href: string;
 };
 
-// Single navigation source for business modules. Core operational modules now
-// open the unified company workspace instead of old placeholder destinations.
+// Single navigation source for business modules. Operational modules open the
+// unified company workspace so every visible card leads to a working flow.
 export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
   {
     key: "crm",
     name: "إدارة العملاء CRM",
     description: "إضافة العملاء ومتابعة بيانات التواصل من مساحة عمل واحدة.",
     icon: ContactRound,
-    href: "/business-suite?tab=crm",
+    href: "/business-suite",
   },
   {
     key: "inventory",
     name: "المخزون",
     description: "إدارة الأصناف والكميات وحدود التنبيه والأسعار.",
     icon: Boxes,
-    href: "/business-suite?tab=inventory",
+    href: "/business-suite",
   },
   {
     key: "invoices",
     name: "الفواتير",
-    description: "متابعة الفواتير والمبالغ المدفوعة والمستحقة.",
+    description: "إصدار الفواتير ومتابعة المدفوع والمستحق.",
     icon: ReceiptText,
-    href: "/business-suite?tab=invoices",
+    href: "/business-suite",
+  },
+  {
+    key: "sales",
+    name: "المبيعات",
+    description: "إنشاء أوامر البيع وربطها بالعملاء ومتابعة قيمتها.",
+    icon: ShoppingCart,
+    href: "/business-suite",
+  },
+  {
+    key: "purchases",
+    name: "المشتريات والموردون",
+    description: "إدارة الموردين وإنشاء أوامر الشراء ومواعيد التوريد.",
+    icon: Truck,
+    href: "/business-suite",
   },
   {
     key: "marketing",
