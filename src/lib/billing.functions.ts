@@ -13,7 +13,6 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: boolean;
     landingPages: boolean;
     prioritySupport: boolean;
-    priceMonthly: number;
   }
 > = {
   free: {
@@ -23,7 +22,6 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: false,
     landingPages: false,
     prioritySupport: false,
-    priceMonthly: 0,
   },
   premium_company: {
     maxListings: -1,
@@ -32,7 +30,6 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: true,
     landingPages: false,
     prioritySupport: true,
-    priceMonthly: 79,
   },
   premium_agent: {
     maxListings: 5,
@@ -41,7 +38,6 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: true,
     landingPages: true,
     prioritySupport: true,
-    priceMonthly: 29,
   },
 };
 
@@ -81,6 +77,11 @@ export const getMyPlan = createServerFn({ method: "GET" })
     };
   });
 
+// Removed free upgradePlan. Premium activation requires verified payment
+// or admin approval. Use requestCompanyUpgrade (subscription.functions.ts)
+// to file a request, and adminSetCompanyPaid to activate after payment.
+// This function is kept only as a no-op for backward compatibility so
+// existing callers don't crash - it never flips the plan.
 export const upgradePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
@@ -88,30 +89,20 @@ export const upgradePlan = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    // deactivate existing
-    await supabase
-      .from("subscriptions")
-      .update({ is_active: false })
-      .eq("user_id", userId)
-      .eq("is_active", true);
-    const expires = new Date();
-    expires.setMonth(expires.getMonth() + 1);
-    const { error } = await supabase.from("subscriptions").insert({
-      user_id: userId,
-      plan: data.plan,
-      is_active: true,
-      expires_at: expires.toISOString(),
-    });
-    if (error) throw new Error(error.message);
-    // mirror plan onto company/agent record if present
-    if (data.plan === "premium_company") {
+    if (data.plan === "free") {
+      // Downgrade to free is allowed (no payment needed to remove perks).
       await supabase
-        .from("companies")
-        .update({ subscription_plan: data.plan })
-        .eq("owner_id", userId);
+        .from("subscriptions")
+        .update({ is_active: false })
+        .eq("user_id", userId)
+        .eq("is_active", true);
+      await supabase.from("companies").update({ subscription_plan: "free" }).eq("owner_id", userId);
+      await supabase.from("agents").update({ subscription_plan: "free" }).eq("user_id", userId);
+      return { ok: true, plan: "free" as const };
     }
-    if (data.plan === "premium_agent") {
-      await supabase.from("agents").update({ subscription_plan: data.plan }).eq("user_id", userId);
-    }
-    return { ok: true, plan: data.plan };
+    // Premium plans require admin approval or verified payment.
+    // Direct self-upgrade is blocked.
+    throw new Error(
+      "لا يمكن ترقية حسابك مباشرة. اطلب الترقية من لوحة التحكم وسيتم تفعيلها بعد التحقق من الدفع.",
+    );
   });

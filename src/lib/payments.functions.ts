@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const listActivePaymentMethods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -143,12 +144,42 @@ export const listOrderProofs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { data: visibleOrder } = await (context.supabase.from("wholesale_orders" as never) as any)
-      .select("id")
+    const { supabase, userId } = context;
+    // Fetch the order via admin client to verify ownership regardless of RLS.
+    const { data: order } = await (supabaseAdmin.from("wholesale_orders" as never) as any)
+      .select("id, buyer_id, product_listing_id, listing_id")
       .eq("id", data.order_id)
       .maybeSingle();
-    if (!visibleOrder) throw new Error("غير مسموح لك بعرض بيانات دفع هذا الطلب");
-    const { data: items } = await (context.supabase.from("payment_proofs" as never) as any)
+    if (!order) throw new Error("غير مسموح لك بعرض بيانات دفع هذا الطلب");
+
+    // Authorization: only buyer, seller, or admin may view proofs.
+    const { data: isAdmin } = await (supabase.rpc as any)("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const isBuyer = order.buyer_id === userId;
+    let isSeller = false;
+    const lid = order.product_listing_id ?? order.listing_id;
+    if (lid) {
+      const { data: listing } = await supabaseAdmin
+        .from("listings")
+        .select("company_id")
+        .eq("id", lid)
+        .maybeSingle();
+      if (listing?.company_id) {
+        const { data: company } = await supabaseAdmin
+          .from("companies")
+          .select("owner_id")
+          .eq("id", listing.company_id)
+          .maybeSingle();
+        isSeller = company?.owner_id === userId;
+      }
+    }
+    if (!isAdmin && !isBuyer && !isSeller) {
+      throw new Error("غير مسموح لك بعرض بيانات دفع هذا الطلب");
+    }
+
+    const { data: items } = await (supabaseAdmin.from("payment_proofs" as never) as any)
       .select("*")
       .eq("order_id", data.order_id)
       .order("created_at", { ascending: false });
@@ -183,16 +214,31 @@ export const reviewPaymentProof = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userId,
       _role: "admin",
     });
     if (!isAdmin) throw new Error("Forbidden");
-    const { error } = await (context.supabase.from("payment_proofs" as never) as any)
+
+    // Idempotency: block re-reviewing an already-reviewed proof.
+    // The on_payment_proof_review trigger fires on status change, so
+    // a second approval would re-mark the order paid. We prevent that
+    // by refusing to touch a proof whose status is already final.
+    const { data: existing } = await (supabaseAdmin.from("payment_proofs" as never) as any)
+      .select("id, status, order_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!existing) throw new Error("Proof not found");
+    if (existing.status === "approved" || existing.status === "rejected") {
+      throw new Error("تمت مراجعة هذا الإثبات بالفعل");
+    }
+
+    const { error } = await (supabaseAdmin.from("payment_proofs" as never) as any)
       .update({
         status: data.action === "approve" ? "approved" : "rejected",
         review_note: data.review_note ?? null,
-        reviewed_by: context.userId,
+        reviewed_by: userId,
         reviewed_at: new Date().toISOString(),
       })
       .eq("id", data.id);

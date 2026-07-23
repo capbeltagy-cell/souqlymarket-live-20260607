@@ -29,6 +29,7 @@ import { Progress } from "@/components/ui/progress";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { getCompanyCommandCenter, type CommandCenterPayload } from "@/lib/company-center.functions";
+import { getPricingConfig } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/company-center")({
   head: () => ({ meta: [{ title: "مركز قيادة الشركة — Souqly" }] }),
@@ -41,14 +42,15 @@ function CommandCenter() {
   const ar = locale === "ar";
   const navigate = useNavigate();
   const fetchCC = useServerFn(getCompanyCommandCenter);
+  const fetchPricing = useServerFn(getPricingConfig);
+  const [priceEgp, setPriceEgp] = useState<number>(499);
   const [d, setD] = useState<CommandCenterPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCC()
-      .then(setD)
-      .finally(() => setLoading(false));
-  }, [fetchCC]);
+    fetchCC().then(setD).finally(() => setLoading(false));
+    fetchPricing().then((c) => setPriceEgp(c.companyPremiumPriceEgp)).catch(() => {});
+  }, [fetchCC, fetchPricing]);
 
   if (loading || !d) {
     return (
@@ -158,8 +160,8 @@ function CommandCenter() {
                       ? "بدون تاريخ انتهاء"
                       : "No expiry"
                   : ar
-                    ? "ترقّية لإعلانات غير محدودة (499 ج.م / شهر)"
-                    : "Upgrade for unlimited listings (499 EGP/mo)"}
+                    ? `ترقّية لإعلانات غير محدودة (${priceEgp} ج.م / شهر)`
+                    : `Upgrade for unlimited listings (${priceEgp} EGP/mo)`}
               </div>
             </div>
           </div>

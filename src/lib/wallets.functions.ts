@@ -15,7 +15,21 @@ export const listMyWalletTransactions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ walletId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // Ownership check: verify the wallet belongs to the caller (or admin).
+    const { data: wallet } = await supabase
+      .from("wallets")
+      .select("id, user_id")
+      .eq("id", data.walletId)
+      .maybeSingle();
+    if (!wallet) throw new Error("Wallet not found");
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (!isAdmin && wallet.user_id !== userId) {
+      throw new Error("غير مسموح لك بعرض معاملات هذه المحفظة");
+    }
     const { data: rows, error } = await supabase
       .from("wallet_transactions")
       .select("*")
