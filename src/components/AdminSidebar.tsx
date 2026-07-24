@@ -16,6 +16,7 @@ import {
   BarChart3,
   CreditCard,
   ContactRound,
+  BadgeCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -49,6 +50,7 @@ const MENU_ITEMS: MenuSection[] = [
     items: [
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
       { icon: ContactRound, label: "قاعدة الشركات والتواصل", href: "/admin-company-prospects" },
+      { icon: BadgeCheck, label: "طلبات ملكية الشركات", href: "/admin-company-claims" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
       { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
     ],
