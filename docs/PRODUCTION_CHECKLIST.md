@@ -1,6 +1,6 @@
 # Souqly — Production Environment Checklist
 
-## 1. Lovable Cloud / Supabase
+## 1. Supabase
 - [x] RLS enabled on every public table (11/11).
 - [x] `has_role` SECURITY DEFINER + separate `user_roles` table.
 - [x] `convert_referral` execute revoked from `anon`.
@@ -13,7 +13,7 @@
 ## 2. Auth
 - [x] Email/password sign-up + sign-in.
 - [x] Forgot password + `/reset-password` flow.
-- [x] Google OAuth via Lovable broker.
+- [ ] Google OAuth redirect and provider credentials verified directly in Supabase.
 - [x] Default role `agent`, upgradeable to `company`/`admin`.
 - [ ] Auth email branding (requires email domain setup — see Blockers).
 

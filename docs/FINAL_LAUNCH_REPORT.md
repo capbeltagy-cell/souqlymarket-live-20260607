@@ -1,7 +1,7 @@
 # Souqly — Final Production Readiness Audit
 
 **Date:** 2026-06-09
-**Build:** ✅ Green (`bun run build` succeeds; TS strict passes)
+**Build:** ✅ Green (`npm run build` succeeds; TypeScript strict checks pass)
 **Production Readiness Score:** **93 / 100**
 
 ---

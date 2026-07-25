@@ -11,11 +11,17 @@ Set these in Coolify. Never commit real values.
 | `SUPABASE_URL`                  | Runtime        | Yes                       |
 | `SUPABASE_PUBLISHABLE_KEY`      | Runtime        | Yes                       |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Runtime secret | Yes; server only          |
-| `SUPER_ADMIN_EMAILS`            | Runtime secret | Yes                       |
 | `NODE_ENV=production`           | Runtime        | Yes                       |
 | `HOST=0.0.0.0`                  | Runtime        | Yes                       |
 | `PORT=3000`                     | Runtime        | Yes                       |
 | `NITRO_PRESET=node-server`      | Build          | Recommended               |
+| `AI_GATEWAY_URL`                | Runtime        | Optional; server only     |
+| `AI_API_KEY`                    | Runtime secret | Optional; server only     |
+| `AI_MODEL`                      | Runtime        | Optional                  |
+
+The three `AI_*` variables are required only when enabling the marketing AI tools.
+`AI_GATEWAY_URL` must be an OpenAI-compatible chat-completions endpoint. Never use
+a `VITE_` prefix for `AI_API_KEY`.
 
 ## 2. Supabase setup
 
@@ -34,6 +40,7 @@ The launch bundle contains the equivalent of these new migrations in this order:
 2. `20260723113000_company_crm_inventory.sql`
 3. `20260723120000_company_invitation_acceptance.sql`
 4. `20260725190000_permission_wildcard.sql`
+5. `20260725210000_listing_owner_integrity.sql`
 
 Do not apply both the individual files and `launch_bundle.sql` to the same environment
 as separate launch steps. The bundle is the reviewed release path; migration history

@@ -36,7 +36,7 @@ Breakdown by track:
 | # | Blocker | Owner | Steps |
 |---|---|---|---|
 | 1 | **Custom domain** | You | Project Settings → Domains → "Connect domain" → enter `souqly.com` (or chosen). Add the A + TXT records at your registrar. Wait ≤ 72h for DNS. |
-| 2 | **Email sender domain** | You | Click "Set up email domain" in any email tool. Add the NS records Lovable returns at your registrar. Lovable will then auto-issue SPF/DKIM. Required before branded auth emails. |
+| 2 | **Email sender domain** | You | Configure the production sender domain with the selected email provider, then verify SPF and DKIM before enabling branded authentication emails. |
 | 3 | **Stripe payments** | You | Tell me "enable Stripe", fill the form (business name, EG country). I'll create products + checkout in the next pass. |
 | 4 | **Legal pages** | You / counsel | Provide Terms of Service, Privacy Policy, Refund Policy in EN + AR. I'll wire them into `/terms`, `/privacy`, `/refunds`. |
 | 5 | **Real partner content** | You | At least 10 verified companies and 30 real listings before the public link. |
@@ -46,7 +46,8 @@ Breakdown by track:
 
 **The platform IS ready for private beta testing now**, under these conditions:
 
-- Distribute the preview/published `*.lovable.app` URL to a closed list of ≤ 20 partner companies and ≤ 50 agents.
+- Distribute the protected Coolify staging URL to a closed list of ≤ 20 partner
+  companies and ≤ 50 agents.
 - Use the existing seed + manually-created content; do not promote publicly yet.
 - Treat subscriptions as "free during beta" — no money should flow until Stripe is enabled.
 - Commission payouts during beta will be manual via bank/Instapay (the new payout workflow supports this).

@@ -1,7 +1,8 @@
 # Souqly — Backup & Recovery Plan
 
 ## What is automatically backed up
-- **Database**: Supabase (Lovable Cloud) takes automatic daily backups and provides Point-In-Time Recovery (PITR) within the retention window of the project's plan.
+- **Database**: Supabase backups and Point-In-Time Recovery (PITR) depend on the
+  active project plan and must be verified in the Supabase dashboard before launch.
 - **Storage**: `listing-media`, `company-assets`, `avatars` buckets are replicated by Supabase.
 - **Auth users**: stored in the same Postgres cluster, covered by the same backups.
 
@@ -24,7 +25,7 @@
 1. Create a **staging Supabase project**.
 2. Restore the latest weekly logical export.
 3. Verify row counts on `listings`, `companies`, `agents`, `commissions`, `subscriptions`.
-4. Boot Lovable preview against the staging project; verify login + a sample listing.
+4. Deploy the staging branch through Coolify; verify login and a sample listing.
 5. Tear down staging.
 6. Record date + outcome in `docs/DRILL_LOG.md`.
 

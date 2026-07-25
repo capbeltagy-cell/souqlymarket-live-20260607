@@ -419,14 +419,23 @@ export const getMyAchievements = createServerFn({ method: "GET" })
   });
 
 // ============ AI Generators ============
-async function callLovableAI(system: string, user: string): Promise<string> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("AI is not configured");
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+type AiChatResponse = {
+  choices?: Array<{ message?: { content?: string } }>;
+};
+
+async function callMarketingAI(system: string, user: string): Promise<string> {
+  const endpoint = process.env.AI_GATEWAY_URL?.trim();
+  const key = process.env.AI_API_KEY?.trim();
+  const model = process.env.AI_MODEL?.trim();
+  if (!endpoint || !key || !model) {
+    throw new Error("أدوات الذكاء الاصطناعي غير مفعلة حاليًا.");
+  }
+
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -434,12 +443,14 @@ async function callLovableAI(system: string, user: string): Promise<string> {
     }),
   });
   if (!res.ok) {
-    if (res.status === 429) throw new Error("Rate limited. Try again shortly.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please add credits.");
-    throw new Error(`AI error ${res.status}`);
+    if (res.status === 429) throw new Error("تم تجاوز حد الاستخدام. حاول مرة أخرى بعد قليل.");
+    if (res.status === 402) throw new Error("رصيد خدمة الذكاء الاصطناعي غير كافٍ.");
+    throw new Error("تعذر تشغيل أداة الذكاء الاصطناعي حاليًا.");
   }
-  const j = await res.json();
-  return j?.choices?.[0]?.message?.content ?? "";
+  const payload = (await res.json()) as AiChatResponse;
+  const content = payload.choices?.[0]?.message?.content?.trim();
+  if (!content) throw new Error("لم تُرجع خدمة الذكاء الاصطناعي محتوى صالحًا.");
+  return content;
 }
 
 export const generateAdCopy = createServerFn({ method: "POST" })
@@ -460,7 +471,7 @@ export const generateAdCopy = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const sys = `You are a top Egyptian marketing copywriter. Write ${data.variants} short high-converting ad copy variants in ${data.locale === "ar" ? "Arabic" : "English"}. Use ${data.tone} tone. Include a strong hook and a clear CTA. Return each variant on its own line, prefixed with "— ".`;
     const usr = `Product/Offer: ${data.product}${data.audience ? `\nAudience: ${data.audience}` : ""}`;
-    return { text: await callLovableAI(sys, usr) };
+    return { text: await callMarketingAI(sys, usr) };
   });
 
 export const generateSocialPost = createServerFn({ method: "POST" })
@@ -479,7 +490,7 @@ export const generateSocialPost = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sys = `You write engaging ${data.platform} posts in ${data.locale === "ar" ? "Arabic" : "English"}. Keep it native to ${data.platform} (length, emojis, tone). ${data.includeHashtags ? "Add 3-6 relevant hashtags at the end." : "No hashtags."} Add a clear CTA to click the referral link.`;
-    return { text: await callLovableAI(sys, `Topic: ${data.topic}`) };
+    return { text: await callMarketingAI(sys, `Topic: ${data.topic}`) };
   });
 
 export const generateProductPromotion = createServerFn({ method: "POST" })
@@ -511,5 +522,5 @@ export const generateProductPromotion = createServerFn({ method: "POST" })
     }
     if (!product) throw new Error("Provide a product or listing");
     const sys = `You are a persuasive product-promotion writer for the ${data.channel} channel in ${data.locale === "ar" ? "Arabic (Egyptian dialect friendly)" : "English"}. Keep length appropriate for ${data.channel}. End with a clear CTA to click the referral link and buy now.`;
-    return { text: await callLovableAI(sys, product) };
+    return { text: await callMarketingAI(sys, product) };
   });
