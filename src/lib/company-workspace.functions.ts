@@ -133,13 +133,91 @@ export const listCompanyMembers = createServerFn({ method: "GET" })
           .in("id", userIds)
       : { data: [] };
     const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+    const { data: invitations } = workspace.canManageMembers
+      ? await db
+          .from("company_invitations")
+          .select("id, email, role, status, expires_at, created_at")
+          .eq("company_id", workspace.companyId)
+          .eq("status", "pending")
+          .order("created_at", { ascending: false })
+      : { data: [] };
     return {
       workspace,
       members: (data ?? []).map((member: any) => ({
         ...member,
         profile: profileMap.get(member.user_id) ?? null,
       })),
+      invitations: invitations ?? [],
     };
+  });
+
+const inviteSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .transform((email) => email.toLowerCase()),
+  role: z.enum(["admin", "manager", "sales", "inventory", "viewer"]),
+});
+
+async function sha256(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export const inviteCompanyMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => inviteSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const workspace = await resolveWorkspace(context.supabase, context.userId);
+    if (!workspace?.canManageMembers) throw new Error("لا تملك صلاحية دعوة أعضاء للشركة.");
+    const token = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
+    const tokenHash = await sha256(token);
+    const db = context.supabase as any;
+    const { error } = await db.from("company_invitations").insert({
+      company_id: workspace.companyId,
+      email: data.email,
+      role: data.role,
+      token_hash: tokenHash,
+      invited_by: context.userId,
+    });
+    if (error?.code === "23505") throw new Error("توجد دعوة معلقة لهذا البريد بالفعل.");
+    if (error) throw new Error("تعذر إنشاء دعوة العضو.");
+    return { invitationPath: `/company-invitations/${token}` };
+  });
+
+export const revokeCompanyInvitation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ invitationId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const workspace = await resolveWorkspace(context.supabase, context.userId);
+    if (!workspace?.canManageMembers) throw new Error("لا تملك صلاحية إلغاء الدعوات.");
+    const db = context.supabase as any;
+    const { error } = await db
+      .from("company_invitations")
+      .update({ status: "revoked", updated_at: new Date().toISOString() })
+      .eq("id", data.invitationId)
+      .eq("company_id", workspace.companyId)
+      .eq("status", "pending");
+    if (error) throw new Error("تعذر إلغاء الدعوة.");
+    return { success: true };
+  });
+
+export const acceptCompanyInvitation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ token: z.string().min(32).max(256) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const db = context.supabase as any;
+    const { data: companyId, error } = await db.rpc("accept_company_invitation", {
+      _token: data.token,
+    });
+    if (error?.message?.includes("invitation_expired")) throw new Error("انتهت صلاحية هذه الدعوة.");
+    if (error?.message?.includes("invitation_email_mismatch"))
+      throw new Error("هذه الدعوة مخصصة لبريد إلكتروني آخر.");
+    if (error) throw new Error("الدعوة غير صالحة أو تم استخدامها مسبقًا.");
+    return { companyId };
   });
 
 const updateMemberSchema = z.object({

@@ -112,6 +112,7 @@ import { Route as AuthenticatedCompanyWorkspaceMembersRouteImport } from './rout
 import { Route as AuthenticatedCompanyWorkspaceInventoryRouteImport } from './routes/_authenticated/company-workspace.inventory'
 import { Route as AuthenticatedCompanyWorkspaceCrmRouteImport } from './routes/_authenticated/company-workspace.crm'
 import { Route as AuthenticatedCompanyWalletDepositRouteImport } from './routes/_authenticated/company-wallet.deposit'
+import { Route as AuthenticatedCompanyInvitationsTokenRouteImport } from './routes/_authenticated/company-invitations.$token'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
 import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
 import { Route as AuthenticatedOrdersIdConfirmationRouteImport } from './routes/_authenticated/orders.$id.confirmation'
@@ -663,6 +664,12 @@ const AuthenticatedCompanyWalletDepositRoute =
     path: '/deposit',
     getParentRoute: () => AuthenticatedCompanyWalletRoute,
   } as any)
+const AuthenticatedCompanyInvitationsTokenRoute =
+  AuthenticatedCompanyInvitationsTokenRouteImport.update({
+    id: '/company-invitations/$token',
+    path: '/company-invitations/$token',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCampaignsIdRoute =
   AuthenticatedCampaignsIdRouteImport.update({
     id: '/$id',
@@ -776,6 +783,7 @@ export interface FileRoutesByFullPath {
   '/companies/': typeof CompaniesIndexRoute
   '/stores/': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
   '/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
@@ -884,6 +892,7 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesIndexRoute
   '/stores': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
   '/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
@@ -994,6 +1003,7 @@ export interface FileRoutesById {
   '/companies/': typeof CompaniesIndexRoute
   '/stores/': typeof StoresIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
+  '/_authenticated/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/_authenticated/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
   '/_authenticated/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
   '/_authenticated/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
@@ -1104,6 +1114,7 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/stores/'
     | '/campaigns/$id'
+    | '/company-invitations/$token'
     | '/company-wallet/deposit'
     | '/company-workspace/crm'
     | '/company-workspace/inventory'
@@ -1212,6 +1223,7 @@ export interface FileRouteTypes {
     | '/companies'
     | '/stores'
     | '/campaigns/$id'
+    | '/company-invitations/$token'
     | '/company-wallet/deposit'
     | '/company-workspace/crm'
     | '/company-workspace/inventory'
@@ -1321,6 +1333,7 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/stores/'
     | '/_authenticated/campaigns/$id'
+    | '/_authenticated/company-invitations/$token'
     | '/_authenticated/company-wallet/deposit'
     | '/_authenticated/company-workspace/crm'
     | '/_authenticated/company-workspace/inventory'
@@ -2108,6 +2121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompanyWalletDepositRouteImport
       parentRoute: typeof AuthenticatedCompanyWalletRoute
     }
+    '/_authenticated/company-invitations/$token': {
+      id: '/_authenticated/company-invitations/$token'
+      path: '/company-invitations/$token'
+      fullPath: '/company-invitations/$token'
+      preLoaderRoute: typeof AuthenticatedCompanyInvitationsTokenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns/$id': {
       id: '/_authenticated/campaigns/$id'
       path: '/$id'
@@ -2257,6 +2277,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedCompanyInvitationsTokenRoute: typeof AuthenticatedCompanyInvitationsTokenRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
   AuthenticatedQuotationsIdRoute: typeof AuthenticatedQuotationsIdRoute
   AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
@@ -2314,6 +2335,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedCompanyInvitationsTokenRoute:
+    AuthenticatedCompanyInvitationsTokenRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
   AuthenticatedQuotationsIdRoute: AuthenticatedQuotationsIdRoute,
   AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
