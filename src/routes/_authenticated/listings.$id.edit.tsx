@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/listings/$id/edit")({
 type Row = {
   id: string;
   company_id: string;
+  store_id: string | null;
   type: string;
   title_ar: string;
   title_en: string;
@@ -104,7 +105,7 @@ function EditListing() {
       const { data } = (await supabase
         .from("listings")
         .select(
-          "id, company_id, type, title_ar, title_en, description_ar, description_en, category, price, track_inventory, stock_quantity, min_order_quantity, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)",
+          "id, company_id, store_id, type, title_ar, title_en, description_ar, description_en, category, price, track_inventory, stock_quantity, min_order_quantity, city, governorate, images, image_sources, phone, whatsapp, status, commission_percentage, marketer_promotion_enabled, commission_type, commission_fixed_amount, conversion_goal, promotion_conditions, promotion_status, campaign_budget_egp, campaign_max_conversions, companies!inner(owner_id)",
         )
         .eq("id", id)
         .maybeSingle()) as { data: (Row & { companies: { owner_id: string } | null }) | null };
@@ -200,7 +201,8 @@ function EditListing() {
         },
       });
       toast.success(ar ? "تم حفظ التغييرات" : "Saved");
-      navigate({ to: "/listings/$id", params: { id } });
+      if (row?.store_id) navigate({ to: "/store" });
+      else navigate({ to: "/listings/$id", params: { id } });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -213,7 +215,7 @@ function EditListing() {
     try {
       await remove({ data: { id } });
       toast.success(ar ? "تم الحذف" : "Deleted");
-      navigate({ to: "/dashboard" });
+      navigate({ to: row?.store_id ? "/store" : "/dashboard" });
     } catch (err) {
       toast.error((err as Error).message);
     }
@@ -258,9 +260,12 @@ function EditListing() {
       <form onSubmit={onSave} className="container-souqly py-6 flex-1 space-y-6 max-w-3xl">
         <div className="flex items-center justify-between">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/listings/$id" params={{ id }}>
+            <Link
+              to={row.store_id ? "/store" : "/listings/$id"}
+              params={row.store_id ? undefined : { id }}
+            >
               <ArrowLeft className="h-4 w-4 mr-1" />
-              {ar ? "العودة للإعلان" : "Back"}
+              {row.store_id ? "العودة للمتجر" : ar ? "العودة للإعلان" : "Back"}
             </Link>
           </Button>
           <h1 className="text-2xl font-bold">{ar ? "تعديل الإعلان" : "Edit listing"}</h1>
