@@ -50,8 +50,12 @@ function CommandCenter() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCC().then(setD).finally(() => setLoading(false));
-    fetchPricing().then((c) => setPriceEgp(c.companyPremiumPriceEgp)).catch(() => {});
+    fetchCC()
+      .then(setD)
+      .finally(() => setLoading(false));
+    fetchPricing()
+      .then((c) => setPriceEgp(c.companyPremiumPriceEgp))
+      .catch(() => {});
   }, [fetchCC, fetchPricing]);
 
   if (loading || !d) {

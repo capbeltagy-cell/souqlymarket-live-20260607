@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { asCompanyProspectClient } from "@/lib/company-prospect.database";
 
 const statusSchema = z.enum([
   "new",
@@ -42,7 +43,7 @@ async function assertAdmin(userId: string) {
     _role: "admin",
   });
   if (error || !data) throw new Error("غير مصرح لك بإدارة قاعدة الشركات");
-  return supabaseAdmin;
+  return asCompanyProspectClient(supabaseAdmin);
 }
 
 export const listCompanyProspects = createServerFn({ method: "GET" })
@@ -66,7 +67,9 @@ export const listCompanyProspects = createServerFn({ method: "GET" })
     if (data.status) query = query.eq("contact_status", data.status);
     if (data.search?.trim()) {
       const q = data.search.trim().replace(/[%_,]/g, " ");
-      query = query.or(`name_ar.ilike.%${q}%,name_en.ilike.%${q}%,industry.ilike.%${q}%,city.ilike.%${q}%,phone.ilike.%${q}%`);
+      query = query.or(
+        `name_ar.ilike.%${q}%,name_en.ilike.%${q}%,industry.ilike.%${q}%,city.ilike.%${q}%,phone.ilike.%${q}%`,
+      );
     }
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
@@ -78,7 +81,8 @@ export const createCompanyProspect = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => prospectSchema.parse(input))
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await assertAdmin(context.userId);
-    const score = [data.email, data.phone, data.website, data.industry, data.city].filter(Boolean).length * 20;
+    const score =
+      [data.email, data.phone, data.website, data.industry, data.city].filter(Boolean).length * 20;
     const { data: row, error } = await supabaseAdmin
       .from("company_prospects")
       .insert({
@@ -89,14 +93,21 @@ export const createCompanyProspect = createServerFn({ method: "POST" })
       })
       .select("*")
       .single();
-    if (error) throw new Error(error.code === "23505" ? "الشركة مكررة بالبريد أو الهاتف" : error.message);
+    if (error)
+      throw new Error(error.code === "23505" ? "الشركة مكررة بالبريد أو الهاتف" : error.message);
     return row;
   });
 
 export const updateCompanyProspectStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid(), status: statusSchema, note: z.string().max(2000).optional() }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        status: statusSchema,
+        note: z.string().max(2000).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await assertAdmin(context.userId);
@@ -106,10 +117,20 @@ export const updateCompanyProspectStatus = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .single();
     if (currentError) throw new Error(currentError.message);
-    const contacted = ["whatsapp_sent", "email_sent", "called", "interested", "follow_up", "joined"].includes(data.status);
+    const contacted = [
+      "whatsapp_sent",
+      "email_sent",
+      "called",
+      "interested",
+      "follow_up",
+      "joined",
+    ].includes(data.status);
     const { error } = await supabaseAdmin
       .from("company_prospects")
-      .update({ contact_status: data.status, last_contacted_at: contacted ? new Date().toISOString() : undefined })
+      .update({
+        contact_status: data.status,
+        last_contacted_at: contacted ? new Date().toISOString() : undefined,
+      })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     await supabaseAdmin.from("company_prospect_activities").insert({
@@ -126,7 +147,13 @@ export const updateCompanyProspectStatus = createServerFn({ method: "POST" })
 export const scheduleCompanyProspectFollowUp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid(), at: z.string().datetime(), note: z.string().max(2000).optional() }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        at: z.string().datetime(),
+        note: z.string().max(2000).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await assertAdmin(context.userId);

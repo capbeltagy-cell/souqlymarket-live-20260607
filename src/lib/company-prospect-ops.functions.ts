@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { asCompanyProspectClient } from "@/lib/company-prospect.database";
 
 async function adminClient(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error || !data) throw new Error("غير مصرح لك");
-  return supabaseAdmin;
+  return asCompanyProspectClient(supabaseAdmin);
 }
 
 const rowSchema = z.object({
@@ -35,19 +36,22 @@ const normalizePhone = (value?: string | null) => {
 
 export const bulkImportCompanyProspects = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ rows: z.array(rowSchema).min(1).max(500) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ rows: z.array(rowSchema).min(1).max(500) }).parse(input),
+  )
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await adminClient(context.userId);
     const rows = data.rows.map((row) => {
       const phone = normalizePhone(row.phone);
       const whatsapp = normalizePhone(row.whatsapp || row.phone);
-      const score = [row.email, phone, row.website, row.industry, row.city].filter(Boolean).length * 20;
+      const score =
+        [row.email, phone, row.website, row.industry, row.city].filter(Boolean).length * 20;
       return {
         ...row,
         email: row.email || null,
         phone,
         whatsapp,
-        contact_status: "not_contacted",
+        contact_status: "not_contacted" as const,
         created_by: context.userId,
         data_quality_score: score,
         is_published: false,
@@ -58,7 +62,11 @@ export const bulkImportCompanyProspects = createServerFn({ method: "POST" })
       .upsert(rows, { onConflict: "phone", ignoreDuplicates: true })
       .select("id");
     if (error) throw new Error(error.message);
-    return { requested: rows.length, inserted: inserted?.length ?? 0, skipped: rows.length - (inserted?.length ?? 0) };
+    return {
+      requested: rows.length,
+      inserted: inserted?.length ?? 0,
+      skipped: rows.length - (inserted?.length ?? 0),
+    };
   });
 
 export const deleteCompanyProspect = createServerFn({ method: "POST" })
@@ -73,28 +81,36 @@ export const deleteCompanyProspect = createServerFn({ method: "POST" })
 
 export const requestCompanyClaim = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({
-    prospectId: z.string().uuid(),
-    requesterName: z.string().trim().min(2).max(200),
-    requesterPhone: z.string().trim().max(40).optional(),
-    requesterEmail: z.string().trim().email().optional(),
-    jobTitle: z.string().trim().max(120).optional(),
-    evidenceUrl: z.string().trim().url().optional(),
-    note: z.string().trim().max(2000).optional(),
-  }).parse(input))
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        prospectId: z.string().uuid(),
+        requesterName: z.string().trim().min(2).max(200),
+        requesterPhone: z.string().trim().max(40).optional(),
+        requesterEmail: z.string().trim().email().optional(),
+        jobTitle: z.string().trim().max(120).optional(),
+        evidenceUrl: z.string().trim().url().optional(),
+        note: z.string().trim().max(2000).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("company_claim_requests").upsert({
-      prospect_id: data.prospectId,
-      requester_id: context.userId,
-      requester_name: data.requesterName,
-      requester_phone: normalizePhone(data.requesterPhone),
-      requester_email: data.requesterEmail || null,
-      job_title: data.jobTitle || null,
-      evidence_url: data.evidenceUrl || null,
-      note: data.note || null,
-      status: "pending",
-    }, { onConflict: "prospect_id,requester_id" });
+    const prospectClient = asCompanyProspectClient(supabaseAdmin);
+    const { error } = await prospectClient.from("company_claim_requests").upsert(
+      {
+        prospect_id: data.prospectId,
+        requester_id: context.userId,
+        requester_name: data.requesterName,
+        requester_phone: normalizePhone(data.requesterPhone),
+        requester_email: data.requesterEmail || null,
+        job_title: data.jobTitle || null,
+        evidence_url: data.evidenceUrl || null,
+        note: data.note || null,
+        status: "pending",
+      },
+      { onConflict: "prospect_id,requester_id" },
+    );
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -113,15 +129,26 @@ export const listCompanyClaimRequests = createServerFn({ method: "GET" })
 
 export const reviewCompanyClaimRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), status: z.enum(["approved", "rejected"]), note: z.string().max(2000).optional() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["approved", "rejected"]),
+        note: z.string().max(2000).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await adminClient(context.userId);
-    const { error } = await supabaseAdmin.from("company_claim_requests").update({
-      status: data.status,
-      review_note: data.note || null,
-      reviewed_by: context.userId,
-      reviewed_at: new Date().toISOString(),
-    }).eq("id", data.id);
+    const { error } = await supabaseAdmin
+      .from("company_claim_requests")
+      .update({
+        status: data.status,
+        review_note: data.note || null,
+        reviewed_by: context.userId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
