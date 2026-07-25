@@ -11,8 +11,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getRfq, listRfqOffers, submitRfqOffer, awardRfq } from "@/lib/phase3.functions";
 
-const DEFAULT_OG =
-  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8fff3fe8-f141-43f1-a7f7-cfccdc44dc2d/id-preview-c33bd721--690a1256-6676-460f-acc1-0cfe17aec9a4.lovable.app-1780835126873.png";
+const DEFAULT_OG = "https://souqlymarket.com/favicon.ico";
 
 export const Route = createFileRoute("/rfq/$id")({
   loader: async ({ params }) => {
