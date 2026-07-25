@@ -83,14 +83,16 @@ BEGIN
   IF cardinality(missing) > 0 THEN RAISE EXCEPTION 'Missing launch objects: %', array_to_string(missing, ', '); END IF;
 END $$;
 
--- RLS and core policies, including Storage.
+-- RLS, privileged functions, ownership invariants, and Storage.
 DO $$
-DECLARE missing text[] := ARRAY[]::text[];
+DECLARE
+  missing text[] := ARRAY[]::text[];
+  bucket_name text;
 BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='public' AND c.relname IN (
-      'stores','store_coupons','store_reviews','auth_rate_limits',
+      'stores','store_coupons','store_reviews','auth_rate_limits','listings','leads',
       'company_members','company_invitations','crm_activities',
       'inventory_locations','inventory_movements'
     )
@@ -106,9 +108,130 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='crm_activities' AND policyname='crm_activities_company_insert') THEN missing := array_append(missing, 'CRM activity insert policy'); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='inventory_locations' AND policyname='inventory_locations_company_manage') THEN missing := array_append(missing, 'inventory locations manage policy'); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='inventory_movements' AND policyname='inventory_movements_company_insert') THEN missing := array_append(missing, 'inventory movements insert policy'); END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%listing%') THEN missing := array_append(missing, 'listing media storage policy'); END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%company-assets%') THEN missing := array_append(missing, 'company assets storage policy'); END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%avatars%') THEN missing := array_append(missing, 'avatars storage policy'); END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.role_routine_grants
+    WHERE specific_schema = 'public'
+      AND grantee = 'PUBLIC'
+      AND privilege_type = 'EXECUTE'
+      AND routine_name IN (
+        'consume_auth_rate_limit',
+        'recompute_store_coupon_used_count',
+        'protect_store_review_fields',
+        'is_company_member',
+        'has_company_permission',
+        'adjust_company_inventory',
+        'accept_company_invitation',
+        'has_permission',
+        'has_role',
+        'enforce_listing_owner'
+      )
+  ) THEN
+    missing := array_append(missing, 'PUBLIC execute on a sensitive launch function');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+        'consume_auth_rate_limit',
+        'recompute_store_coupon_used_count',
+        'protect_store_review_fields',
+        'is_company_member',
+        'has_company_permission',
+        'adjust_company_inventory',
+        'accept_company_invitation',
+        'has_permission',
+        'has_role',
+        'enforce_listing_owner'
+      )
+      AND p.prosecdef
+      AND NOT EXISTS (
+        SELECT 1
+        FROM unnest(COALESCE(p.proconfig, ARRAY[]::text[])) AS setting
+        WHERE setting LIKE 'search_path=%'
+      )
+  ) THEN
+    missing := array_append(missing, 'SECURITY DEFINER function without fixed search_path');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.listings listing
+    JOIN public.companies company ON company.id = listing.company_id
+    WHERE listing.owner_id IS DISTINCT FROM company.owner_id
+  ) THEN
+    missing := array_append(missing, 'listing ownership drift');
+  END IF;
+
+  FOREACH bucket_name IN ARRAY ARRAY[
+    'company-assets',
+    'avatars',
+    'listing-media',
+    'company-catalogs',
+    'rfq-attachments'
+  ] LOOP
+    IF NOT EXISTS (
+      SELECT 1 FROM storage.buckets WHERE id = bucket_name
+    ) THEN
+      missing := array_append(missing, 'storage bucket ' || bucket_name);
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = 'storage'
+        AND tablename = 'objects'
+        AND cmd = 'SELECT'
+        AND (
+          COALESCE(qual, '') ILIKE '%' || bucket_name || '%'
+          OR COALESCE(with_check, '') ILIKE '%' || bucket_name || '%'
+        )
+    ) THEN
+      missing := array_append(missing, 'storage SELECT policy for ' || bucket_name);
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = 'storage'
+        AND tablename = 'objects'
+        AND cmd = 'INSERT'
+        AND COALESCE(with_check, '') ILIKE '%' || bucket_name || '%'
+        AND COALESCE(with_check, '') ILIKE '%auth.uid()%'
+    ) THEN
+      missing := array_append(missing, 'owner-scoped storage INSERT policy for ' || bucket_name);
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = 'storage'
+        AND tablename = 'objects'
+        AND cmd = 'UPDATE'
+        AND COALESCE(qual, '') ILIKE '%' || bucket_name || '%'
+        AND COALESCE(qual, '') ILIKE '%auth.uid()%'
+        AND COALESCE(with_check, '') ILIKE '%' || bucket_name || '%'
+        AND COALESCE(with_check, '') ILIKE '%auth.uid()%'
+    ) THEN
+      missing := array_append(missing, 'owner-scoped storage UPDATE policy for ' || bucket_name);
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = 'storage'
+        AND tablename = 'objects'
+        AND cmd = 'DELETE'
+        AND COALESCE(qual, '') ILIKE '%' || bucket_name || '%'
+        AND COALESCE(qual, '') ILIKE '%auth.uid()%'
+    ) THEN
+      missing := array_append(missing, 'owner-scoped storage DELETE policy for ' || bucket_name);
+    END IF;
+  END LOOP;
 
   IF cardinality(missing) > 0 THEN RAISE EXCEPTION 'Security verification failed: %', array_to_string(missing, ', '); END IF;
 END $$;
@@ -117,5 +240,5 @@ END $$;
 SELECT 'tables' AS category, count(*)::text AS result FROM information_schema.tables WHERE table_schema='public'
 UNION ALL SELECT 'public policies', count(*)::text FROM pg_policies WHERE schemaname='public'
 UNION ALL SELECT 'storage policies', count(*)::text FROM pg_policies WHERE schemaname='storage'
-UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership') AND NOT tgisinternal
+UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership','trg_enforce_listing_owner') AND NOT tgisinternal
 UNION ALL SELECT 'verification', 'PASS';

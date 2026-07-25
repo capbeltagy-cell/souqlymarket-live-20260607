@@ -33,6 +33,11 @@ application rollback. If the ownership trigger causes an incident, disable only
 `trg_enforce_listing_owner` temporarily after rolling the application back; do not
 clear or rewrite existing owner values.
 
+The Storage hardening migration only replaces UPDATE policies so that both the old
+and new object paths must remain owner-scoped. Do not restore the previous
+USING-only policies during an application rollback; they permit namespace changes
+that the launch verification intentionally rejects.
+
 ## Safe recovery order
 
 1. Put the application in Coolify maintenance mode or roll back to the previous image.

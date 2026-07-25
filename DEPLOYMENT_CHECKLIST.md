@@ -41,6 +41,7 @@ The launch bundle contains the equivalent of these new migrations in this order:
 3. `20260723120000_company_invitation_acceptance.sql`
 4. `20260725190000_permission_wildcard.sql`
 5. `20260725210000_listing_owner_integrity.sql`
+6. `20260725220000_storage_update_ownership.sql`
 
 Do not apply both the individual files and `launch_bundle.sql` to the same environment
 as separate launch steps. The bundle is the reviewed release path; migration history

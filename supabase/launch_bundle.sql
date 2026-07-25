@@ -802,4 +802,79 @@ CREATE TRIGGER trg_enforce_listing_owner
 BEFORE INSERT OR UPDATE OF company_id, owner_id ON public.listings
 FOR EACH ROW EXECUTE FUNCTION public.enforce_listing_owner();
 
+-- ---------------------------------------------------------------------------
+-- 9. Storage UPDATE ownership checks.
+-- ---------------------------------------------------------------------------
+-- UPDATE policies need USING for the old row and WITH CHECK for the new row.
+-- Without both, an owner could move an object into another user's namespace.
+DROP POLICY IF EXISTS "Authenticated update own listing-media" ON storage.objects;
+CREATE POLICY "Authenticated update own listing-media"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'listing-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+)
+WITH CHECK (
+  bucket_id = 'listing-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Authenticated update own company-assets" ON storage.objects;
+CREATE POLICY "Authenticated update own company-assets"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'company-assets'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+)
+WITH CHECK (
+  bucket_id = 'company-assets'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Authenticated update own avatars" ON storage.objects;
+CREATE POLICY "Authenticated update own avatars"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'avatars'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+)
+WITH CHECK (
+  bucket_id = 'avatars'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "company-catalogs owner update" ON storage.objects;
+CREATE POLICY "company-catalogs owner update"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'company-catalogs'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+)
+WITH CHECK (
+  bucket_id = 'company-catalogs'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+DROP POLICY IF EXISTS "rfq-attachments buyer update" ON storage.objects;
+CREATE POLICY "rfq-attachments buyer update"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'rfq-attachments'
+  AND EXISTS (
+    SELECT 1
+    FROM public.rfqs r
+    WHERE r.id::text = (storage.foldername(name))[1]
+      AND r.buyer_id = auth.uid()
+  )
+)
+WITH CHECK (
+  bucket_id = 'rfq-attachments'
+  AND EXISTS (
+    SELECT 1
+    FROM public.rfqs r
+    WHERE r.id::text = (storage.foldername(name))[1]
+      AND r.buyer_id = auth.uid()
+  )
+);
+
 COMMIT;
