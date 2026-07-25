@@ -8,8 +8,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { adjustCompanyInventory, getCompanyInventory } from "@/lib/company-erp.functions";
+import { requireCompanyWorkspaceRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-workspace/inventory")({
+  beforeLoad: requireCompanyWorkspaceRoute,
   head: () => ({ meta: [{ title: "مخزون الشركة — سوقلي" }] }),
   component: CompanyInventoryPage,
 });
@@ -66,7 +68,7 @@ function CompanyInventoryPage() {
           <div className="rounded-2xl border border-dashed bg-card p-12 text-center">
             <p className="text-muted-foreground">لا توجد منتجات مرتبطة بالشركة بعد.</p>
             <Button asChild className="mt-4">
-              <Link to="/listings/new">إضافة منتج</Link>
+              <Link to="/store/products/new">إضافة منتج إلى المتجر</Link>
             </Button>
           </div>
         ) : (

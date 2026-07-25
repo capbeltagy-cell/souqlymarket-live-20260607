@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, PlusCircle, MessageSquare, User as UserIcon } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 
 type Tab = { to: string; icon: typeof Home; ar: string; en: string; match: (p: string) => boolean };
 
@@ -11,7 +11,7 @@ export function MobileTabBar() {
   const { user, roles } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPureAgent =
-    roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+    roles.includes("agent") && !roles.includes("company") && !hasAnyRole(roles, ADMIN_ROLES);
 
   const centerTab: Tab = isPureAgent
     ? {

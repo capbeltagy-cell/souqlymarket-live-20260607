@@ -21,8 +21,10 @@ import {
   revokeCompanyInvitation,
   updateCompanyMember,
 } from "@/lib/company-workspace.functions";
+import { requireCompanyWorkspaceRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-workspace/members")({
+  beforeLoad: requireCompanyWorkspaceRoute,
   head: () => ({ meta: [{ title: "أعضاء الشركة — سوقلي" }] }),
   component: CompanyMembersPage,
 });

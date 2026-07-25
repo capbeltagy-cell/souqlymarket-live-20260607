@@ -16,8 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCompanyCrm, updateCompanyCrmLead } from "@/lib/company-erp.functions";
+import { requireCompanyWorkspaceRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-workspace/crm")({
+  beforeLoad: requireCompanyWorkspaceRoute,
   head: () => ({ meta: [{ title: "إدارة العملاء CRM — سوقلي" }] }),
   component: CompanyCrmPage,
 });

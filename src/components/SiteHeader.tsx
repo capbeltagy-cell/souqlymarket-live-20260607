@@ -27,7 +27,7 @@ import { LanguageToggle } from "./LanguageToggle";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationBell } from "./NotificationBell";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +43,7 @@ import {
 export function SiteHeader() {
   const { t } = useI18n();
   const { user, roles, signOut } = useAuth();
-  const isAdmin = roles.includes("admin");
+  const isAdmin = hasAnyRole(roles, ADMIN_ROLES);
   const isCompany = roles.includes("company");
   const isAgent = roles.includes("agent");
   const isPureAgent = isAgent && !isCompany && !isAdmin;

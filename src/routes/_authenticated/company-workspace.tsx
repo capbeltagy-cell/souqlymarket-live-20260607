@@ -6,8 +6,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { getMyCompanyWorkspace } from "@/lib/company-workspace.functions";
+import { requireCompanyWorkspaceRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-workspace")({
+  beforeLoad: requireCompanyWorkspaceRoute,
   head: () => ({ meta: [{ title: "مساحة عمل الشركة — سوقلي" }] }),
   component: CompanyWorkspacePage,
 });

@@ -15,7 +15,7 @@ import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
 import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
 import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/agent")({
@@ -60,7 +60,7 @@ function AgentEdit() {
   useEffect(() => {
     if (rolesLoading) return;
     const isCompany =
-      roles.includes("company") && !roles.includes("agent") && !roles.includes("admin");
+      roles.includes("company") && !roles.includes("agent") && !hasAnyRole(roles, ADMIN_ROLES);
     if (isCompany) {
       toast.error(
         locale === "ar"

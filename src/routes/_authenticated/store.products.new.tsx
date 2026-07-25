@@ -18,9 +18,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createStoreProduct } from "@/lib/listings.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 import { getMyStore } from "@/lib/stores.functions";
 
 export const Route = createFileRoute("/_authenticated/store/products/new")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "إضافة منتج إلى متجرك — Souqly" }] }),
   component: NewStoreProduct,
 });

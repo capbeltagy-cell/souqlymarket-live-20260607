@@ -2,19 +2,30 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const ALLOWED = ["capbeltagy@gmail.com", "capbeltagy95@gmail.com"];
+const ADMIN_ENTITIES = [
+  "companies",
+  "agents",
+  "listings",
+  "leads",
+  "rfqs",
+  "wholesale_listings",
+  "factories",
+  "tenders",
+  "subscriptions",
+  "company_referrals",
+] as const;
 
-async function assertSuper(ctx: { userId: string; supabase: any }) {
+type AdminEntity = (typeof ADMIN_ENTITIES)[number];
+
+async function assertSuper(ctx: { userId: string }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin.auth.admin.getUserById(ctx.userId);
-  if (error || !data?.user) throw new Error("Unauthorized");
-  const email = (data.user.email ?? "").toLowerCase();
-  if (!ALLOWED.includes(email)) throw new Error("Access denied");
-  // ensure admin role
-  await supabaseAdmin
+  const { data: roles, error } = await supabaseAdmin
     .from("user_roles")
-    .upsert({ user_id: ctx.userId, role: "admin" }, { onConflict: "user_id,role" });
-  return supabaseAdmin as any;
+    .select("role")
+    .eq("user_id", ctx.userId)
+    .in("role", ["super_admin"]);
+  if (error || !roles?.length) throw new Error("لا تملك صلاحية مدير النظام.");
+  return supabaseAdmin;
 }
 
 export const superCheck = createServerFn({ method: "POST" })
@@ -41,16 +52,16 @@ export const superOverview = createServerFn({ method: "POST" })
       "company_referrals",
       "user_roles",
       "profiles",
-    ];
+    ] as const;
     const out: Record<string, number> = {};
     for (const t of tables) {
-      const { count } = await admin.from(t).select("id", { count: "exact", head: true });
+      const { count } = await countAdminRows(admin, t);
       out[t] = count ?? 0;
     }
     const { count: paid } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
-      .eq("subscription_plan", "paid");
+      .eq("subscription_plan", "premium_company");
     const { count: verified } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
@@ -94,48 +105,52 @@ export const superList = createServerFn({ method: "POST" })
     if (data.entity === "users") {
       const { data: users } = await admin.auth.admin.listUsers({ perPage: data.limit });
       return (
-        users?.users?.map((u: any) => ({
-          id: u.id,
-          email: u.email,
-          created_at: u.created_at,
-          banned_until: u.banned_until,
+        users?.users?.map((user) => ({
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at,
+          banned_until: user.banned_until,
         })) ?? []
       );
     }
-    const { data: rows, error } = await admin
-      .from(data.entity)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(data.limit);
+    if (data.entity === "factories") {
+      const { data: rows, error } = await admin
+        .from("factories")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(data.limit);
+      if (error) throw error;
+      return (rows ?? []).map((row) => ({ ...row, id: row.company_id }));
+    }
+    const { data: rows, error } = await listAdminRows(admin, data.entity, data.limit);
     if (error) throw error;
     return rows ?? [];
   });
 
 export const superAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { action: string; entity?: string; id?: string; payload?: Record<string, any> }) =>
-      z
-        .object({
-          action: z.enum([
-            "verify_company",
-            "unverify_company",
-            "mark_paid",
-            "mark_unpaid",
-            "feature_listing",
-            "unfeature_listing",
-            "approve_listing",
-            "reject_listing",
-            "hide_listing",
-            "delete",
-            "ban_user",
-            "unban_user",
-          ]),
-          entity: z.string().optional(),
-          id: z.string().uuid().optional(),
-          payload: z.record(z.string(), z.any()).optional(),
-        })
-        .parse(d),
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        action: z.enum([
+          "verify_company",
+          "unverify_company",
+          "mark_paid",
+          "mark_unpaid",
+          "feature_listing",
+          "unfeature_listing",
+          "approve_listing",
+          "reject_listing",
+          "hide_listing",
+          "delete",
+          "ban_user",
+          "unban_user",
+        ]),
+        entity: z.string().optional(),
+        id: z.string().uuid().optional(),
+        payload: z.record(z.string(), z.unknown()).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const admin = await assertSuper(context);
@@ -151,7 +166,7 @@ export const superAction = createServerFn({ method: "POST" })
         await admin
           .from("companies")
           .update({
-            subscription_plan: "paid",
+            subscription_plan: "premium_company",
             subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
           })
           .eq("id", id);
@@ -183,11 +198,14 @@ export const superAction = createServerFn({ method: "POST" })
         await admin.from("listings").update({ status: "rejected" }).eq("id", id);
         break;
       case "hide_listing":
-        await admin.from("listings").update({ status: "hidden" }).eq("id", id);
+        await admin.from("listings").update({ status: "draft" }).eq("id", id);
         break;
       case "delete": {
         if (!data.entity) throw new Error("entity required");
-        await admin.from(data.entity).delete().eq("id", id);
+        if (!ADMIN_ENTITIES.includes(data.entity as AdminEntity)) {
+          throw new Error("نوع السجل غير مدعوم.");
+        }
+        await deleteAdminRow(admin, data.entity as AdminEntity, id);
         break;
       }
       case "ban_user":
@@ -199,3 +217,116 @@ export const superAction = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+type AdminClient = Awaited<ReturnType<typeof assertSuper>>;
+
+async function countAdminRows(admin: AdminClient, table: AdminEntity | "user_roles" | "profiles") {
+  switch (table) {
+    case "companies":
+      return admin.from("companies").select("id", { count: "exact", head: true });
+    case "agents":
+      return admin.from("agents").select("id", { count: "exact", head: true });
+    case "listings":
+      return admin.from("listings").select("id", { count: "exact", head: true });
+    case "leads":
+      return admin.from("leads").select("id", { count: "exact", head: true });
+    case "rfqs":
+      return admin.from("rfqs").select("id", { count: "exact", head: true });
+    case "wholesale_listings":
+      return admin.from("wholesale_listings").select("id", { count: "exact", head: true });
+    case "factories":
+      return admin.from("factories").select("id", { count: "exact", head: true });
+    case "tenders":
+      return admin.from("tenders").select("id", { count: "exact", head: true });
+    case "subscriptions":
+      return admin.from("subscriptions").select("id", { count: "exact", head: true });
+    case "company_referrals":
+      return admin.from("company_referrals").select("id", { count: "exact", head: true });
+    case "user_roles":
+      return admin.from("user_roles").select("id", { count: "exact", head: true });
+    case "profiles":
+      return admin.from("profiles").select("id", { count: "exact", head: true });
+  }
+}
+
+function listAdminRows(admin: AdminClient, table: AdminEntity, limit: number) {
+  switch (table) {
+    case "companies":
+      return admin
+        .from("companies")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "agents":
+      return admin
+        .from("agents")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "listings":
+      return admin
+        .from("listings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "leads":
+      return admin.from("leads").select("*").order("created_at", { ascending: false }).limit(limit);
+    case "rfqs":
+      return admin.from("rfqs").select("*").order("created_at", { ascending: false }).limit(limit);
+    case "wholesale_listings":
+      return admin
+        .from("wholesale_listings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "factories":
+      return admin
+        .from("factories")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "tenders":
+      return admin
+        .from("tenders")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "subscriptions":
+      return admin
+        .from("subscriptions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    case "company_referrals":
+      return admin
+        .from("company_referrals")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+  }
+}
+
+async function deleteAdminRow(admin: AdminClient, table: AdminEntity, id: string) {
+  switch (table) {
+    case "companies":
+      return admin.from("companies").delete().eq("id", id);
+    case "agents":
+      return admin.from("agents").delete().eq("id", id);
+    case "listings":
+      return admin.from("listings").delete().eq("id", id);
+    case "leads":
+      return admin.from("leads").delete().eq("id", id);
+    case "rfqs":
+      return admin.from("rfqs").delete().eq("id", id);
+    case "wholesale_listings":
+      return admin.from("wholesale_listings").delete().eq("id", id);
+    case "factories":
+      return admin.from("factories").delete().eq("company_id", id);
+    case "tenders":
+      return admin.from("tenders").delete().eq("id", id);
+    case "subscriptions":
+      return admin.from("subscriptions").delete().eq("id", id);
+    case "company_referrals":
+      return admin.from("company_referrals").delete().eq("id", id);
+  }
+}

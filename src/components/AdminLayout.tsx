@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { ShieldAlert } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -26,7 +26,7 @@ export function AdminLayout({
   const { locale, setLocale } = useI18n();
   const { roles } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isAdmin = roles.includes("admin");
+  const isAdmin = hasAnyRole(roles, ADMIN_ROLES);
 
   useEffect(() => {
     if (locale !== "ar") setLocale("ar");

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ShieldAlert,
@@ -21,7 +21,6 @@ import { superCheck, superOverview, superList, superAction } from "@/lib/super-a
 import { requireAdminRoute } from "@/lib/route-guards";
 import { toast } from "sonner";
 
-const ALLOWED = ["capbeltagy@gmail.com", "capbeltagy95@gmail.com"];
 const ENTITY_LABELS: Record<string, string> = {
   companies: "الشركات",
   users: "المستخدمون",
@@ -47,6 +46,46 @@ const STATUS_LABELS: Record<string, string> = {
   completed: "مكتمل",
   failed: "فشل",
 };
+const ENTITIES = [
+  "companies",
+  "users",
+  "agents",
+  "listings",
+  "leads",
+  "rfqs",
+  "wholesale_listings",
+  "factories",
+  "tenders",
+  "subscriptions",
+  "company_referrals",
+] as const;
+type Entity = (typeof ENTITIES)[number];
+type AdminAction =
+  | "verify_company"
+  | "unverify_company"
+  | "mark_paid"
+  | "mark_unpaid"
+  | "feature_listing"
+  | "unfeature_listing"
+  | "approve_listing"
+  | "reject_listing"
+  | "hide_listing"
+  | "delete"
+  | "ban_user"
+  | "unban_user";
+type AdminRow = {
+  id: string;
+  [key: string]: unknown;
+};
+
+function readText(row: AdminRow, key: string) {
+  const value = row[key];
+  return typeof value === "string" ? value : "";
+}
+
+function readBoolean(row: AdminRow, key: string) {
+  return row[key] === true;
+}
 
 export const Route = createFileRoute("/control-center-x7")({
   ssr: false,
@@ -60,7 +99,7 @@ export const Route = createFileRoute("/control-center-x7")({
 function ControlCenter() {
   const { user, roles, loading } = useAuth();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
-  const [overview, setOverview] = useState<any>(null);
+  const [overview, setOverview] = useState<Awaited<ReturnType<typeof superOverview>> | null>(null);
   const check = useServerFn(superCheck);
   const ov = useServerFn(superOverview);
 
@@ -70,9 +109,7 @@ function ControlCenter() {
       setAuthorized(false);
       return;
     }
-    const email = (user.email ?? "").toLowerCase();
-    const isAdmin = roles.includes("admin");
-    if (!ALLOWED.includes(email) || !isAdmin) {
+    if (!roles.includes("super_admin")) {
       setAuthorized(false);
       return;
     }
@@ -84,7 +121,7 @@ function ControlCenter() {
           .catch(() => {});
       })
       .catch(() => setAuthorized(false));
-  }, [user, roles, loading]);
+  }, [check, loading, ov, roles, user]);
 
   if (loading || authorized === null) {
     return (
@@ -144,37 +181,13 @@ function ControlCenter() {
 
         <Tabs defaultValue="companies">
           <TabsList className="flex-wrap h-auto">
-            {[
-              "companies",
-              "users",
-              "agents",
-              "listings",
-              "leads",
-              "rfqs",
-              "wholesale_listings",
-              "factories",
-              "tenders",
-              "subscriptions",
-              "company_referrals",
-            ].map((e) => (
+            {ENTITIES.map((e) => (
               <TabsTrigger key={e} value={e}>
                 {ENTITY_LABELS[e] ?? e}
               </TabsTrigger>
             ))}
           </TabsList>
-          {[
-            "companies",
-            "users",
-            "agents",
-            "listings",
-            "leads",
-            "rfqs",
-            "wholesale_listings",
-            "factories",
-            "tenders",
-            "subscriptions",
-            "company_referrals",
-          ].map((e) => (
+          {ENTITIES.map((e) => (
             <TabsContent key={e} value={e}>
               <EntityPanel entity={e} />
             </TabsContent>
@@ -194,31 +207,40 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
-function EntityPanel({ entity }: { entity: string }) {
-  const [rows, setRows] = useState<any[]>([]);
+function EntityPanel({ entity }: { entity: Entity }) {
+  const [rows, setRows] = useState<AdminRow[]>([]);
   const [busy, setBusy] = useState(false);
   const list = useServerFn(superList);
   const act = useServerFn(superAction);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setBusy(true);
     try {
-      setRows(await list({ data: { entity: entity as any, limit: 100 } }));
+      const result = await list({ data: { entity, limit: 100 } });
+      setRows(
+        (result as unknown[]).filter(
+          (row): row is AdminRow =>
+            typeof row === "object" &&
+            row !== null &&
+            "id" in row &&
+            typeof (row as { id?: unknown }).id === "string",
+        ),
+      );
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setBusy(false);
     }
-  };
+  }, [entity, list]);
   useEffect(() => {
-    refresh();
-  }, [entity]);
+    void refresh();
+  }, [refresh]);
 
-  const run = async (action: string, id: string, payload?: any) => {
+  const run = async (action: AdminAction, id: string, payload?: Record<string, unknown>) => {
     try {
-      await act({ data: { action: action as any, entity, id, payload } });
+      await act({ data: { action, entity, id, payload } });
       toast.success("تم تنفيذ الإجراء");
-      refresh();
+      await refresh();
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -243,41 +265,41 @@ function EntityPanel({ entity }: { entity: string }) {
               <tr key={r.id} className="border-b border-border last:border-0">
                 <td className="p-3 align-top">
                   <div className="font-medium truncate max-w-md">
-                    {r.title_ar ||
-                      r.title_en ||
-                      r.title ||
-                      r.name_ar ||
-                      r.name_en ||
-                      r.name ||
-                      r.email ||
-                      r.subject ||
+                    {readText(r, "title_ar") ||
+                      readText(r, "title_en") ||
+                      readText(r, "title") ||
+                      readText(r, "name_ar") ||
+                      readText(r, "name_en") ||
+                      readText(r, "name") ||
+                      readText(r, "email") ||
+                      readText(r, "subject") ||
                       r.id}
                   </div>
                   <div className="text-[11px] text-muted-foreground font-mono truncate max-w-md">
                     {r.id}
                   </div>
                   <div className="flex gap-1 mt-1 flex-wrap">
-                    {r.is_verified && (
+                    {readBoolean(r, "is_verified") && (
                       <Badge variant="outline" className="text-[10px]">
                         موثّق
                       </Badge>
                     )}
-                    {r.featured && (
+                    {readBoolean(r, "featured") && (
                       <Badge variant="outline" className="text-[10px]">
                         مميّز
                       </Badge>
                     )}
-                    {r.subscription_plan === "paid" && (
+                    {r.subscription_plan === "premium_company" && (
                       <Badge variant="outline" className="text-[10px]">
                         مدفوع
                       </Badge>
                     )}
-                    {r.status && (
+                    {readText(r, "status") && (
                       <Badge variant="outline" className="text-[10px]">
-                        {STATUS_LABELS[r.status] ?? r.status}
+                        {STATUS_LABELS[readText(r, "status")] ?? readText(r, "status")}
                       </Badge>
                     )}
-                    {r.banned_until && (
+                    {readText(r, "banned_until") && (
                       <Badge variant="destructive" className="text-[10px]">
                         محظور
                       </Badge>
@@ -289,27 +311,43 @@ function EntityPanel({ entity }: { entity: string }) {
                     {entity === "companies" && (
                       <>
                         <Button
-                          aria-label={r.is_verified ? "إلغاء توثيق الشركة" : "توثيق الشركة"}
-                          title={r.is_verified ? "إلغاء توثيق الشركة" : "توثيق الشركة"}
+                          aria-label={
+                            readBoolean(r, "is_verified") ? "إلغاء توثيق الشركة" : "توثيق الشركة"
+                          }
+                          title={
+                            readBoolean(r, "is_verified") ? "إلغاء توثيق الشركة" : "توثيق الشركة"
+                          }
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            run(r.is_verified ? "unverify_company" : "verify_company", r.id)
+                            run(
+                              readBoolean(r, "is_verified") ? "unverify_company" : "verify_company",
+                              r.id,
+                            )
                           }
                         >
                           <BadgeCheck className="h-3 w-3" />
                         </Button>
                         <Button
                           aria-label={
-                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                            r.subscription_plan === "premium_company"
+                              ? "إلغاء الاشتراك"
+                              : "تفعيل الاشتراك"
                           }
                           title={
-                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                            r.subscription_plan === "premium_company"
+                              ? "إلغاء الاشتراك"
+                              : "تفعيل الاشتراك"
                           }
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            run(r.subscription_plan === "paid" ? "mark_unpaid" : "mark_paid", r.id)
+                            run(
+                              r.subscription_plan === "premium_company"
+                                ? "mark_unpaid"
+                                : "mark_paid",
+                              r.id,
+                            )
                           }
                         >
                           <Crown className="h-3 w-3" />
@@ -337,14 +375,20 @@ function EntityPanel({ entity }: { entity: string }) {
                           <XCircle className="h-3 w-3" />
                         </Button>
                         <Button
-                          aria-label={r.featured ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"}
-                          title={r.featured ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"}
+                          aria-label={
+                            readBoolean(r, "featured") ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"
+                          }
+                          title={
+                            readBoolean(r, "featured") ? "إلغاء تمييز الإعلان" : "تمييز الإعلان"
+                          }
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            run(r.featured ? "unfeature_listing" : "feature_listing", r.id, {
-                              days: 7,
-                            })
+                            run(
+                              readBoolean(r, "featured") ? "unfeature_listing" : "feature_listing",
+                              r.id,
+                              { days: 7 },
+                            )
                           }
                         >
                           <Star className="h-3 w-3" />
@@ -353,11 +397,15 @@ function EntityPanel({ entity }: { entity: string }) {
                     )}
                     {entity === "users" && (
                       <Button
-                        aria-label={r.banned_until ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
-                        title={r.banned_until ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
+                        aria-label={
+                          readText(r, "banned_until") ? "إلغاء حظر المستخدم" : "حظر المستخدم"
+                        }
+                        title={readText(r, "banned_until") ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
                         size="sm"
                         variant="outline"
-                        onClick={() => run(r.banned_until ? "unban_user" : "ban_user", r.id)}
+                        onClick={() =>
+                          run(readText(r, "banned_until") ? "unban_user" : "ban_user", r.id)
+                        }
                       >
                         <Ban className="h-3 w-3" />
                       </Button>

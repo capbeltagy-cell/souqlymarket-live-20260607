@@ -13,7 +13,7 @@ import {
   setCompanyVerified,
   setAgentVerified,
 } from "@/lib/verification.functions";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/verification")({
@@ -32,7 +32,7 @@ function VerificationPage() {
   const [agents, setAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isAdmin = roles.includes("admin");
+  const isAdmin = hasAnyRole(roles, ADMIN_ROLES);
 
   const load = async () => {
     if (!isAdmin) {
@@ -59,7 +59,7 @@ function VerificationPage() {
       <div className="min-h-screen flex flex-col bg-surface-2">
         <SiteHeader />
         <div className="container-souqly py-10 flex-1 text-center text-muted-foreground">
-          Admin only
+          هذه الصفحة متاحة لمسؤولي المنصة فقط.
         </div>
         <SiteFooter />
       </div>

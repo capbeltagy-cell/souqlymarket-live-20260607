@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import {
   getPricingConfig,
   getMyCompanySubscription,
@@ -71,7 +71,7 @@ function Pricing() {
   }, [user]);
 
   const isPureAgent =
-    roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+    roles.includes("agent") && !roles.includes("company") && !hasAnyRole(roles, ADMIN_ROLES);
   const price = cfg?.companyPremiumPriceEgp ?? 499;
   const pct = cfg?.marketerCommissionPct ?? 15;
 

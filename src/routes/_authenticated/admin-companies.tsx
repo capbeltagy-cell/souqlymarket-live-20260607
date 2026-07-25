@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { adminListCompanies, adminSetCompanyPaid } from "@/lib/subscription.functions";
 import { adminSetCompanyVerified } from "@/lib/phase2.functions";
@@ -30,7 +30,7 @@ function AdminCompanies() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const isAdmin = roles.includes("admin");
+  const isAdmin = hasAnyRole(roles, ADMIN_ROLES);
 
   const load = () => {
     setError(null);
