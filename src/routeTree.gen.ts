@@ -58,11 +58,13 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedReferralProgramRouteImport } from './routes/_authenticated/referral-program'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPayoutsRouteImport } from './routes/_authenticated/payouts'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarketingCenterRouteImport } from './routes/_authenticated/marketing-center'
@@ -366,6 +368,11 @@ const AuthenticatedVerificationRoute =
     path: '/verification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -392,6 +399,12 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
   id: '/moderation',
   path: '/moderation',
@@ -785,11 +798,13 @@ export interface FileRoutesByFullPath {
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -897,11 +912,13 @@ export interface FileRoutesByTo {
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/payouts': typeof AuthenticatedPayoutsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/referral-program': typeof AuthenticatedReferralProgramRoute
   '/referrals': typeof AuthenticatedReferralsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/verification': typeof AuthenticatedVerificationRoute
   '/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -1011,11 +1028,13 @@ export interface FileRoutesById {
   '/_authenticated/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRouteWithChildren
   '/_authenticated/payouts': typeof AuthenticatedPayoutsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/referral-program': typeof AuthenticatedReferralProgramRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -1125,11 +1144,13 @@ export interface FileRouteTypes {
     | '/marketing-center'
     | '/messages'
     | '/moderation'
+    | '/notifications'
     | '/orders'
     | '/payouts'
     | '/profile'
     | '/referral-program'
     | '/referrals'
+    | '/settings'
     | '/verification'
     | '/wallet'
     | '/agents/$id'
@@ -1237,11 +1258,13 @@ export interface FileRouteTypes {
     | '/marketing-center'
     | '/messages'
     | '/moderation'
+    | '/notifications'
     | '/orders'
     | '/payouts'
     | '/profile'
     | '/referral-program'
     | '/referrals'
+    | '/settings'
     | '/verification'
     | '/wallet'
     | '/agents/$id'
@@ -1350,11 +1373,13 @@ export interface FileRouteTypes {
     | '/_authenticated/marketing-center'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
+    | '/_authenticated/notifications'
     | '/_authenticated/orders'
     | '/_authenticated/payouts'
     | '/_authenticated/profile'
     | '/_authenticated/referral-program'
     | '/_authenticated/referrals'
+    | '/_authenticated/settings'
     | '/_authenticated/verification'
     | '/_authenticated/wallet'
     | '/agents/$id'
@@ -1782,6 +1807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/referrals': {
       id: '/_authenticated/referrals'
       path: '/referrals'
@@ -1815,6 +1847,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/moderation': {
@@ -2332,11 +2371,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketingCenterRoute: typeof AuthenticatedMarketingCenterRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRouteWithChildren
   AuthenticatedPayoutsRoute: typeof AuthenticatedPayoutsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReferralProgramRoute: typeof AuthenticatedReferralProgramRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedCompanyInvitationsTokenRoute: typeof AuthenticatedCompanyInvitationsTokenRoute
@@ -2394,11 +2435,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketingCenterRoute: AuthenticatedMarketingCenterRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRouteWithChildren,
   AuthenticatedPayoutsRoute: AuthenticatedPayoutsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReferralProgramRoute: AuthenticatedReferralProgramRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedCompanyInvitationsTokenRoute:

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { normalizeNotificationLink } from "@/lib/notifications.functions";
 
 type Notif = {
   id: string;
@@ -32,8 +33,9 @@ export function NotificationBell() {
   const load = async () => {
     if (!user) return;
     const { data } = await supabase
-      .from("notifications" as never)
+      .from("notifications")
       .select("*")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(20);
     setItems((data ?? []) as unknown as Notif[]);
@@ -80,8 +82,10 @@ export function NotificationBell() {
 
   const markAllRead = async () => {
     if (!user || unread === 0) return;
-    await (supabase.from("notifications" as never) as any)
+    await supabase
+      .from("notifications")
       .update({ read_at: new Date().toISOString() })
+      .eq("user_id", user.id)
       .is("read_at", null);
     load();
   };
@@ -97,7 +101,7 @@ export function NotificationBell() {
       }}
     >
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative" aria-label="Notifications">
+        <Button variant="ghost" size="sm" className="relative" aria-label="الإشعارات">
           <Bell className="h-5 w-5" />
           {unread > 0 && (
             <span className="absolute -top-0.5 -end-0.5 h-4 min-w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold grid place-items-center px-1">
@@ -114,7 +118,10 @@ export function NotificationBell() {
         ) : (
           items.slice(0, 8).map((n) => (
             <DropdownMenuItem key={n.id} asChild>
-              <Link to={n.link ?? "/dashboard"} className="flex flex-col items-start gap-0.5 py-2">
+              <a
+                href={normalizeNotificationLink(n.link)}
+                className="flex flex-col items-start gap-0.5 py-2"
+              >
                 <div className="text-sm font-medium">{n.title}</div>
                 {n.body && (
                   <div className="text-xs text-muted-foreground line-clamp-2">{n.body}</div>
@@ -122,10 +129,16 @@ export function NotificationBell() {
                 <div className="text-[10px] text-muted-foreground">
                   {new Date(n.created_at).toLocaleString("ar-EG")}
                 </div>
-              </Link>
+              </a>
             </DropdownMenuItem>
           ))
         )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/notifications" className="justify-center font-medium text-primary">
+            عرض كل الإشعارات
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
