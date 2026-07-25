@@ -34,7 +34,7 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     description: "متابعة العملاء المحتملين ومسار التواصل.",
     icon: ContactRound,
     status: "available",
-    href: "/leads",
+    href: "/company-workspace/crm",
   },
   {
     key: "inventory",
@@ -42,7 +42,7 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     description: "متابعة المنتجات والكميات المتاحة.",
     icon: Boxes,
     status: "available",
-    href: "/store#inventory",
+    href: "/company-workspace/inventory",
   },
   {
     key: "invoices",
