@@ -64,6 +64,7 @@ type Msg = {
 
 function MessagesPage() {
   const { user } = useAuth();
+  const userId = user?.id;
   const { c: initialC } = Route.useSearch();
   const [convs, setConvs] = useState<Conv[]>([]);
   const [activeId, setActiveId] = useState<string | null>(initialC ?? null);
@@ -81,7 +82,8 @@ function MessagesPage() {
 
   const loadConvs = async () => {
     if (!user) return;
-    const { data } = await (supabase.from("conversations" as never) as any)
+    const { data } = await supabase
+      .from("conversations")
       .select("*")
       .order("last_message_at", { ascending: false });
     const arr = (data ?? []) as Conv[];
@@ -96,7 +98,8 @@ function MessagesPage() {
     );
 
   const loadMsgs = async (convId: string) => {
-    const { data } = await (supabase.from("messages" as never) as any)
+    const { data } = await supabase
+      .from("messages")
       .select("*")
       .eq("conversation_id", convId)
       .order("created_at", { ascending: true });
@@ -104,7 +107,8 @@ function MessagesPage() {
     scrollBottom();
     // Mark unread as read
     if (user) {
-      await (supabase.from("messages" as never) as any)
+      await supabase
+        .from("messages")
         .update({ read_at: new Date().toISOString() })
         .eq("conversation_id", convId)
         .is("read_at", null)
@@ -136,10 +140,8 @@ function MessagesPage() {
           const m = payload.new as Msg;
           setMsgs((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
           scrollBottom();
-          if (user && m.sender_id !== user.id) {
-            (supabase.from("messages" as never) as any)
-              .update({ read_at: new Date().toISOString() })
-              .eq("id", m.id);
+          if (userId && m.sender_id !== userId) {
+            supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", m.id);
           }
         },
       )
@@ -160,15 +162,15 @@ function MessagesPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [activeId, user?.id]);
+  }, [activeId, userId]);
 
   // Typing broadcast
   useEffect(() => {
-    if (!activeId || !user) return;
+    if (!activeId || !userId) return;
     const ch = supabase
       .channel(`typing-${activeId}`, { config: { broadcast: { self: false } } })
       .on("broadcast", { event: "typing" }, (payload) => {
-        if ((payload.payload as any)?.user !== user.id) {
+        if ((payload.payload as { user?: string })?.user !== userId) {
           setOtherTyping(true);
           if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
           typingTimerRef.current = setTimeout(() => setOtherTyping(false), 2500);
@@ -180,7 +182,7 @@ function MessagesPage() {
       supabase.removeChannel(ch);
       typingChanRef.current = null;
     };
-  }, [activeId, user?.id]);
+  }, [activeId, userId]);
 
   const emitTyping = () => {
     if (!typingChanRef.current || !user) return;
@@ -201,7 +203,7 @@ function MessagesPage() {
       .from("listing-media")
       .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
     if (sErr || !data?.signedUrl) {
-      toast.error(sErr?.message ?? "Sign URL failed");
+      toast.error(sErr?.message ?? "تعذر إنشاء رابط آمن للمرفق");
       return null;
     }
     return data.signedUrl;
@@ -209,7 +211,7 @@ function MessagesPage() {
 
   const sendMessage = async (payload: Partial<Msg>) => {
     if (!activeId || !user) return;
-    const { error } = await (supabase.from("messages" as never) as any).insert({
+    const { error } = await supabase.from("messages").insert({
       conversation_id: activeId,
       sender_id: user.id,
       body: payload.body ?? "",

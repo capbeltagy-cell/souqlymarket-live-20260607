@@ -82,6 +82,20 @@ const FILTERS: Array<{ key: string; label: string; match: (s: string) => boolean
   },
 ];
 
+function filterOrders(orders: Order[], query: string, filterKey: string) {
+  const selectedFilter = FILTERS.find((item) => item.key === filterKey) ?? FILTERS[0];
+  const normalizedQuery = query.trim().toLowerCase();
+
+  return orders.filter((order) => {
+    if (!selectedFilter.match(order.status)) return false;
+    if (!normalizedQuery) return true;
+
+    const searchableText =
+      `${order.id} ${order._listing?.title_ar ?? ""} ${order._listing?.title_en ?? ""} ${order._company?.name_ar ?? ""} ${order._company?.name_en ?? ""}`.toLowerCase();
+    return searchableText.includes(normalizedQuery);
+  });
+}
+
 function OrdersPage() {
   const fetchOrders = useServerFn(listMyOrders);
   const [buyer, setBuyer] = useState<Order[]>([]);
@@ -100,20 +114,8 @@ function OrdersPage() {
       .catch(() => setLoading(false));
   }, [fetchOrders]);
 
-  const applyFilters = (orders: Order[]) => {
-    const f = FILTERS.find((x) => x.key === filter) ?? FILTERS[0];
-    const ql = q.trim().toLowerCase();
-    return orders.filter((o) => {
-      if (!f.match(o.status)) return false;
-      if (!ql) return true;
-      const hay =
-        `${o.id} ${o._listing?.title_ar ?? ""} ${o._listing?.title_en ?? ""} ${o._company?.name_ar ?? ""} ${o._company?.name_en ?? ""}`.toLowerCase();
-      return hay.includes(ql);
-    });
-  };
-
-  const filteredBuyer = useMemo(() => applyFilters(buyer), [buyer, q, filter]);
-  const filteredSeller = useMemo(() => applyFilters(seller), [seller, q, filter]);
+  const filteredBuyer = useMemo(() => filterOrders(buyer, q, filter), [buyer, q, filter]);
+  const filteredSeller = useMemo(() => filterOrders(seller, q, filter), [seller, q, filter]);
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -4,9 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Wallet, TrendingUp, Clock, ArrowDownToLine } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getMyWallets, listMyWalletTransactions } from "@/lib/wallets.functions";
+import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
   head: () => ({ meta: [{ title: "المحفظة — سوقلي" }] }),
@@ -18,8 +20,11 @@ function WalletPage() {
   const ar = locale === "ar";
   const fetchWallets = useServerFn(getMyWallets);
   const fetchTx = useServerFn(listMyWalletTransactions);
-  const [wallets, setWallets] = useState<any[]>([]);
-  const [txByWallet, setTxByWallet] = useState<Record<string, any[]>>({});
+  type WalletRow = Database["public"]["Tables"]["wallets"]["Row"];
+  type WalletTransactionRow = Database["public"]["Tables"]["wallet_transactions"]["Row"];
+
+  const [wallets, setWallets] = useState<WalletRow[]>([]);
+  const [txByWallet, setTxByWallet] = useState<Record<string, WalletTransactionRow[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,9 +32,9 @@ function WalletPage() {
       try {
         const res = await fetchWallets();
         setWallets(res.wallets);
-        const map: Record<string, any[]> = {};
+        const map: Record<string, WalletTransactionRow[]> = {};
         await Promise.all(
-          res.wallets.map(async (w: any) => {
+          res.wallets.map(async (w) => {
             const tx = await fetchTx({ data: { walletId: w.id } });
             map[w.id] = tx.transactions;
           }),
@@ -39,7 +44,7 @@ function WalletPage() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [fetchTx, fetchWallets]);
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
@@ -132,7 +137,7 @@ function WalletPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+function Stat({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="rounded-md border border-border p-4">
       <Icon className="h-4 w-4 text-primary mb-2" />
