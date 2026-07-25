@@ -15,7 +15,13 @@ Apply these files in timestamp order on a staging project before Production:
 3. `20260723120000_company_invitation_acceptance.sql`
    - Adds hashed, email-bound invitation acceptance.
 
-After applying all three, run `supabase/tests/company_erp_sprint_1.sql` in the SQL editor or against a disposable local database.
+4. `20260725190000_permission_wildcard.sql`
+   - Makes the existing `super_admin` role satisfy legacy admin checks.
+   - Honors the existing `*` role permission in server-side permission checks.
+
+For the release, apply the reviewed, consolidated `supabase/launch_bundle.sql`
+instead of running these files one by one. Then run `supabase/verify_launch.sql`
+and `supabase/tests/company_erp_sprint_1.sql` in a staging or disposable database.
 
 ## Safety and data impact
 
@@ -39,3 +45,6 @@ After applying all three, run `supabase/tests/company_erp_sprint_1.sql` in the S
 - Application TypeScript, ESLint and production Node build pass.
 - SQL catalog assertions are included in `supabase/tests/company_erp_sprint_1.sql`.
 - Supabase local reset was not executable in this workspace because Docker is not installed. No Production connection or migration command was attempted.
+- `supabase/launch_bundle.sql` is transaction-wrapped, dependency-guarded, additive,
+  and uses convergent policy/trigger replacement so it can be safely reviewed and
+  rerun after a successful baseline deployment.

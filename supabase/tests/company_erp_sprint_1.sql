@@ -29,6 +29,12 @@ BEGIN
   IF to_regprocedure('public.accept_company_invitation(text)') IS NULL THEN
     RAISE EXCEPTION 'Missing function public.accept_company_invitation(text)';
   END IF;
+  IF to_regprocedure('public.has_permission(uuid,text)') IS NULL THEN
+    RAISE EXCEPTION 'Missing function public.has_permission(uuid,text)';
+  END IF;
+  IF to_regprocedure('public.has_role(uuid,public.app_role)') IS NULL THEN
+    RAISE EXCEPTION 'Missing function public.has_role(uuid,public.app_role)';
+  END IF;
 
   IF EXISTS (
     SELECT 1
@@ -51,6 +57,28 @@ BEGIN
         'inventory_locations', 'inventory_movements'
       )) < 10 THEN
     RAISE EXCEPTION 'Expected ERP RLS policies were not installed';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'trg_sync_company_owner_membership' AND NOT tgisinternal
+  ) THEN
+    RAISE EXCEPTION 'Missing company owner membership trigger';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.role_routine_grants
+    WHERE specific_schema = 'public'
+      AND grantee = 'PUBLIC'
+      AND privilege_type = 'EXECUTE'
+      AND routine_name IN (
+        'adjust_company_inventory',
+        'accept_company_invitation',
+        'has_company_permission'
+      )
+  ) THEN
+    RAISE EXCEPTION 'A sensitive ERP function is executable by PUBLIC';
   END IF;
 
   RAISE NOTICE 'Souqly ERP Sprint 1 schema verification passed.';

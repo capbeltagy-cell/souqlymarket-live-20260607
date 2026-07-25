@@ -1,36 +1,74 @@
 # Souqly — Project Status
 
-_Last updated: 2026-06-12_
+_Last updated: 2026-07-25_
 
-## What was fixed this pass
+## Current release branch
 
-- **Site-wide 401 “permission denied” on public reads.** Root cause: no public schema table had any `GRANT` to `anon`/`authenticated`/`service_role`. RLS policies were in place, but PostgREST rejected requests at the grant layer before policies ever ran.
-  - Granted `SELECT, INSERT, UPDATE, DELETE` to `authenticated` on all 26 public tables.
-  - Granted `ALL` to `service_role` on all 26 public tables.
-  - Granted `SELECT` to `anon` on tables whose RLS allows public reads: `companies`, `listings`, `agents`, `factories`, `tenders`, `rfqs`, `wholesale_listings`, `business_categories`, `company_profiles_extra`, `agent_landing_pages`.
-  - Granted `INSERT` to `anon` on `leads` (anon RLS policy already allowed lead capture).
-  - Granted `EXECUTE` on `public.has_role(uuid, app_role)` to `anon, authenticated` so RLS policies that call `has_role()` no longer fail for signed-out visitors.
-- **Verified:** anonymous `GET /rest/v1/listings?select=id,companies(name_en)&status=eq.approved` now returns 200 with rows. Home page, marketplace, company directory, factories, RFQs, tenders, wholesale listings can load again.
+`feature/business-solutions-erp-sprint-1`
 
-## Previously fixed (still in place)
+The application code and database release files are prepared locally. Nothing in
+this Sprint has been applied to the Production Supabase project or merged to
+`main`.
 
-- Email/password-only auth — Google/phone/OTP removed.
-- Profile + default role auto-provisioned via `handle_new_user` trigger.
-- Storage buckets exist (`company-assets`, `avatars`, `listing-media`, `company-catalogs`, `rfq-attachments`) with a `SELECT` policy on `storage.buckets` so the client can resolve bucket metadata before upload.
-- `src/server.ts` resolves Supabase env at request time with fallbacks (process.env → worker env → VITE_*).
+## Ready in code
 
-## What is still broken / needs verification
+- Persisted role-based route guards for admin, company, store, marketer, and
+  customer entry points.
+- Company Workspace membership, invitations, scoped permissions, CRM activities,
+  inventory locations, inventory movements, and atomic stock adjustments.
+- Existing `leads` and `listings` remain the CRM and inventory sources of truth;
+  no parallel product/customer system was created.
+- Secure invitation acceptance uses SHA-256 token hashes and verifies the signed-in
+  email.
+- Super-admin compatibility and wildcard permission handling are enforced by
+  database functions.
+- Store product creation is preserved on
+  `feature/store-production-readiness-sprint-1` at commit `c10bf8f`.
+- Coolify Node-server build, start command, port 3000, and `/health` endpoint are
+  configured.
+- Consolidated release, verification, and rollback files are present:
+  `supabase/launch_bundle.sql`, `supabase/verify_launch.sql`, and
+  `supabase/rollback_notes.md`.
 
-The grant fix unblocks all read paths. End-to-end happy-path testing of signup, listing create, image upload, wallet, referrals, and admin pages was **not** re-run in this pass — the production preview should be exercised manually now that PostgREST no longer 401s. If anything still errors, it’s likely scoped to a specific feature rather than the platform-wide outage.
+## Required before Production
 
-## What needs owner configuration
+1. Push the local feature branches when GitHub credentials are available and open
+   reviewed pull requests. Do not merge automatically.
+2. Apply `supabase/launch_bundle.sql` to a staging clone, then run
+   `supabase/verify_launch.sql` and
+   `supabase/tests/company_erp_sprint_1.sql`.
+3. Take a Production backup, apply the reviewed bundle, verify it, then deploy the
+   matching Coolify image and complete the post-deployment tests in
+   `DEPLOYMENT_CHECKLIST.md`.
 
-These are Supabase warnings unrelated to the runtime fix; flagged for the owner:
+## Known blockers and risks
 
-1. **Leaked Password Protection disabled.** Enable in Cloud → Users → Auth Settings (Password HIBP Check).
-2. **SECURITY DEFINER functions are EXECUTE-able by `public`.** Project-wide convention; not introduced by this pass. If tightening is desired, revoke EXECUTE from `public` on each definer function and grant only to required roles.
-3. **Pre-existing security scan findings** on `companies`, `company_profiles_extra`, `profiles` (publicly readable contact fields) — owner to decide whether to restrict via views or accept as a public B2B directory.
+- Docker is not installed in this workspace, so `supabase start`,
+  `supabase db reset`, migration listing, Docker image build, and local SQL
+  execution could not be performed here.
+- GitHub HTTPS credentials are unavailable in this environment, so local commits
+  cannot currently be pushed.
+- Production data and authentication journeys have intentionally not been mutated
+  or exercised from this workspace.
+- The application build still reports a non-failing main-bundle size warning; it
+  does not block the Node build but remains a performance follow-up.
 
-## Production readiness score
+## Latest local quality gate
 
-**4 / 5** — Platform-level data API is healthy again; remaining items are policy/feature-level decisions, not outages.
+Run on 2026-07-25 from this branch:
+
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with zero errors and 339 pre-existing warnings.
+- `NITRO_PRESET=node-server npm run build`: passed.
+- Built Node server startup: passed.
+- `GET /health`: returned JSON status `ok`.
+- `HEAD /health`: returned HTTP 204.
+- Supabase SQL execution: not run because Docker/Supabase local are unavailable.
+
+## Release claim
+
+The code quality gate passes when the commands recorded in the latest Sprint report
+pass. Production readiness is conditional on staging SQL verification, Production
+backup/migration verification, GitHub review, Coolify deployment, and role-based
+smoke tests. The project must not be described as fully launched before those
+external steps succeed.

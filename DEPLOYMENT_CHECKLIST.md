@@ -22,9 +22,22 @@ Set these in Coolify. Never commit real values.
 - Site URL: `https://souqlymarket.com`
 - Redirect URLs: `https://souqlymarket.com/auth/callback` and the exact `www` variant if used.
 - Add the Coolify preview domain only while testing, then remove it.
-- Apply `supabase/launch_bundle.sql` in the SQL editor.
+- Take a fresh database backup and record its restore point.
+- Apply `supabase/launch_bundle.sql` once as a single transaction in the SQL editor.
 - Run `supabase/verify_launch.sql` and require the final `verification = PASS` row.
+- Do not deploy the new application image when verification raises any exception.
 - Confirm Storage buckets and policies for `listing-media`, `company-assets`, `avatars`, `company-catalogs`, and `rfq-attachments`.
+
+The launch bundle contains the equivalent of these new migrations in this order:
+
+1. `20260723110000_company_workspace_members.sql`
+2. `20260723113000_company_crm_inventory.sql`
+3. `20260723120000_company_invitation_acceptance.sql`
+4. `20260725190000_permission_wildcard.sql`
+
+Do not apply both the individual files and `launch_bundle.sql` to the same environment
+as separate launch steps. The bundle is the reviewed release path; migration history
+can be reconciled afterward through the normal Supabase process.
 
 ## 3. Coolify application settings
 
@@ -54,6 +67,8 @@ Set these in Coolify. Never commit real values.
 - `NITRO_PRESET=node-server npm run build`
 - Build the Dockerfile and confirm `/health` from inside the deployment network.
 - Confirm `.env` is ignored and no service-role key appears in Git history.
+- Apply the bundle to a disposable/staging clone and run
+  `supabase/tests/company_erp_sprint_1.sql`.
 - On a workstation with Docker available: `supabase start`, `supabase db reset`,
   `supabase migration list --local`, then `supabase db push --local --dry-run`.
 
@@ -63,6 +78,8 @@ Set these in Coolify. Never commit real values.
 - Sign in and verify `/auth/callback` returns to the intended page.
 - Test profile save, saved address, cart, checkout preview, and order history.
 - Test company, marketer, store, and admin guards with separate accounts.
+- Test company owner/member invitations, CRM activity creation, inventory location
+  access, and one positive plus one rejected negative stock adjustment.
 - Upload one permitted image and reject an invalid type/oversized image.
 - Verify store approval publishes it publicly.
 - Check `/health`, browser console, server logs, and Supabase logs.
