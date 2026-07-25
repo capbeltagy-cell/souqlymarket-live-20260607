@@ -201,7 +201,7 @@ export const superAction = createServerFn({ method: "POST" })
         await admin.from("listings").update({ status: "draft" }).eq("id", id);
         break;
       case "delete": {
-        if (!data.entity) throw new Error("entity required");
+        if (!data.entity) throw new Error("نوع السجل مطلوب.");
         if (!ADMIN_ENTITIES.includes(data.entity as AdminEntity)) {
           throw new Error("نوع السجل غير مدعوم.");
         }

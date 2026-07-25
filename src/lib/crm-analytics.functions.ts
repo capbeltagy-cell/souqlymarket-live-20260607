@@ -102,7 +102,7 @@ export const getAdminExecutiveDashboard = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
     const since30 = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();

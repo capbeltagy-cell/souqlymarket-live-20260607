@@ -9,7 +9,7 @@ type Ctx = { supabase: any; userId: string };
 async function assertAdmin({ supabase, userId }: Ctx) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden");
+  if (!data) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
 }
 
 async function ensureLaunchCompany({ supabase, userId }: Ctx): Promise<string> {
@@ -67,8 +67,8 @@ type ListingImport = {
 export const importLaunchListings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { rows: ListingImport[]; sourceName?: string; notes?: string }) => {
-    if (!Array.isArray(d?.rows) || d.rows.length === 0) throw new Error("No rows");
-    if (d.rows.length > 500) throw new Error("Max 500 rows per import");
+    if (!Array.isArray(d?.rows) || d.rows.length === 0) throw new Error("لا توجد صفوف للاستيراد.");
+    if (d.rows.length > 500) throw new Error("الحد الأقصى هو 500 صف في كل عملية استيراد.");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -142,7 +142,7 @@ export const listLaunchBatches = createServerFn({ method: "GET" })
 export const deleteLaunchBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { batchId: string }) => {
-    if (!d?.batchId) throw new Error("batchId required");
+    if (!d?.batchId) throw new Error("معرّف دفعة الاستيراد مطلوب.");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -190,8 +190,9 @@ export const listLaunchListings = createServerFn({ method: "GET" })
 export const adminToggleListingFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string; field: "featured" | "status"; value: boolean | string }) => {
-    if (!d?.id || !d.field) throw new Error("Invalid");
-    if (d.field === "status" && typeof d.value !== "string") throw new Error("Invalid status");
+    if (!d?.id || !d.field) throw new Error("بيانات التعديل غير صالحة.");
+    if (d.field === "status" && typeof d.value !== "string")
+      throw new Error("حالة السجل غير صالحة.");
     return d;
   })
   .handler(async ({ data, context }) => {
@@ -206,7 +207,7 @@ export const adminToggleListingFlag = createServerFn({ method: "POST" })
 export const adminDeleteLaunchListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => {
-    if (!d?.id) throw new Error("id required");
+    if (!d?.id) throw new Error("معرّف السجل مطلوب.");
     return d;
   })
   .handler(async ({ data, context }) => {

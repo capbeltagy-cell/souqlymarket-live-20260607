@@ -48,7 +48,7 @@ export const createCampaign = createServerFn({ method: "POST" })
       .select("id")
       .eq("user_id", userId)
       .maybeSingle();
-    if (!ag) throw new Error("Create an agent profile first");
+    if (!ag) throw new Error("أنشئ ملف المسوق أولًا.");
     const { data: row, error } = await supabase
       .from("agent_campaigns")
       .insert({
@@ -249,8 +249,8 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
       .select("id, balance")
       .eq("id", walletId as string)
       .maybeSingle();
-    if (!wallet) throw new Error("Wallet could not be created");
-    if (Number(wallet.balance) < data.amount) throw new Error("Insufficient balance");
+    if (!wallet) throw new Error("تعذر إنشاء المحفظة.");
+    if (Number(wallet.balance) < data.amount) throw new Error("الرصيد المتاح غير كافٍ.");
     const { data: row, error } = await supabase
       .from("payout_requests")
       .insert({
@@ -296,7 +296,7 @@ export const updatePlatformSettings = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await (context.supabase.from("platform_settings" as never) as any)
       .update({ ...data, updated_by: context.userId, updated_at: new Date().toISOString() })
       .eq("id", true);
@@ -320,7 +320,7 @@ export const adminListWithdrawals = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = (supabaseAdmin.from("payout_requests" as never) as any)
       .select("*, payout_methods(label, kind, details)")
@@ -361,7 +361,7 @@ export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const status =
       data.action === "approve" ? "approved" : data.action === "reject" ? "rejected" : "paid";
     const { error } = await context.supabase
@@ -520,7 +520,7 @@ export const generateProductPromotion = createServerFn({ method: "POST" })
         product = `${title}\n${desc}${l.price ? `\nPrice: ${l.price} EGP` : ""}`;
       }
     }
-    if (!product) throw new Error("Provide a product or listing");
+    if (!product) throw new Error("اختر منتجًا أو أدخل بيانات العرض.");
     const sys = `You are a persuasive product-promotion writer for the ${data.channel} channel in ${data.locale === "ar" ? "Arabic (Egyptian dialect friendly)" : "English"}. Keep length appropriate for ${data.channel}. End with a clear CTA to click the referral link and buy now.`;
     return { text: await callMarketingAI(sys, product) };
   });

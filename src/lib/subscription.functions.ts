@@ -66,7 +66,7 @@ export const adminListCompanies = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { data, error } = await supabase
       .from("companies")
       .select(
@@ -97,7 +97,7 @@ export const adminSetCompanyPaid = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const expires = new Date();
     expires.setMonth(expires.getMonth() + data.months);
     const update = data.paid
@@ -153,7 +153,7 @@ export const requestCompanyUpgrade = createServerFn({ method: "POST" })
       .select("id, name_ar, name_en, subscription_plan")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!company) throw new Error("NO_COMPANY: Create your company profile first.");
+    if (!company) throw new Error("NO_COMPANY: أنشئ ملف شركتك أولًا.");
     if (company.subscription_plan === "premium_company") {
       return { ok: true, alreadyPremium: true as const };
     }

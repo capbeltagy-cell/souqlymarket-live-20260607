@@ -24,9 +24,9 @@ export const featureMyListing = createServerFn({ method: "POST" })
       .eq("id", data.listingId)
       .maybeSingle();
     if (lErr) throw new Error(lErr.message);
-    if (!row) throw new Error("Listing not found");
+    if (!row) throw new Error("الإعلان المطلوب غير موجود.");
     const ownerId = (row as { companies?: { owner_id?: string } }).companies?.owner_id;
-    if (ownerId !== userId) throw new Error("Forbidden");
+    if (ownerId !== userId) throw new Error("لا تملك صلاحية تنفيذ هذه العملية.");
 
     // Extend featured_until: start from greater of now / current featured_until
     const { data: existing } = await supabase
@@ -112,10 +112,10 @@ export const submitLead = createServerFn({ method: "POST" })
       .eq("id", data.listingId)
       .maybeSingle();
     if (lErr) throw new Error(lErr.message);
-    if (!listing || listing.status !== "approved") throw new Error("Listing not available");
+    if (!listing || listing.status !== "approved") throw new Error("الإعلان غير متاح حاليًا.");
 
     if (!data.buyer_email && !data.buyer_phone) {
-      throw new Error("Provide email or phone so the company can reach you");
+      throw new Error("أدخل البريد الإلكتروني أو رقم الهاتف حتى تتمكن الشركة من التواصل معك.");
     }
 
     const { error } = await supabaseAdmin.from("leads").insert({
@@ -248,7 +248,7 @@ export const adminSetCompanyVerified = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await supabase
       .from("companies")
       .update({ is_verified: data.verified })

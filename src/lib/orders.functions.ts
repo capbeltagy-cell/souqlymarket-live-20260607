@@ -138,7 +138,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (orderError) throw new Error(orderError.message);
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new Error("الطلب المطلوب غير موجود.");
 
     const listingId = order.product_listing_id ?? order.listing_id;
     let sellerId: string | null = null;
@@ -298,7 +298,7 @@ export const getOrder = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new Error("الطلب المطلوب غير موجود.");
 
     // Authorization: only buyer, seller, or admin may view.
     const actor = await resolveOrderActor(order, userId, supabaseAdmin);

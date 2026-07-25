@@ -14,14 +14,14 @@ export const startConversationForListing = createServerFn({ method: "POST" })
       .eq("id", data.listing_id)
       .maybeSingle();
     if (le) throw le;
-    if (!listing?.company_id) throw new Error("Listing has no company");
+    if (!listing?.company_id) throw new Error("الإعلان غير مرتبط بشركة.");
     const { data: company, error: ce } = await supabase
       .from("companies")
       .select("owner_id")
       .eq("id", listing.company_id)
       .maybeSingle();
     if (ce) throw ce;
-    if (!company?.owner_id) throw new Error("Company owner not found");
+    if (!company?.owner_id) throw new Error("تعذر تحديد مالك الشركة.");
     if (company.owner_id === userId) throw new Error("لا يمكنك مراسلة نفسك");
 
     const { data: existing } = await (supabase.from("conversations" as never) as any)

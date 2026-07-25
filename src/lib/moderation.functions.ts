@@ -7,7 +7,7 @@ export const listModerationQueue = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Admin only");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { data, error } = await supabase
       .from("listings")
       .select(
@@ -32,7 +32,7 @@ export const setListingStatus = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Admin only");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await supabase
       .from("listings")
       .update({ status: data.status })
@@ -47,7 +47,7 @@ export const adminDeleteListing = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Admin only");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await supabase.from("listings").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };

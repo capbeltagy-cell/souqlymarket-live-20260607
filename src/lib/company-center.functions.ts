@@ -436,14 +436,14 @@ export const setListingPromotionStatus = createServerFn({ method: "POST" })
       .select("id, company_id")
       .eq("id", data.id)
       .maybeSingle();
-    if (!row) throw new Error("Listing not found");
+    if (!row) throw new Error("الإعلان المطلوب غير موجود.");
     const { data: comp } = await supabase
       .from("companies")
       .select("id")
       .eq("id", row.company_id)
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!comp) throw new Error("Not authorized");
+    if (!comp) throw new Error("لا تملك صلاحية تنفيذ هذه العملية.");
     if (data.status === "active") {
       const { error } = await supabase.rpc(
         "activate_listing_promotion" as never,

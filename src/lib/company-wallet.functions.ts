@@ -34,7 +34,7 @@ export const getMyCompanyFundingWallet = createServerFn({ method: "GET" })
         .maybeSingle();
       wallet = created;
     }
-    if (!wallet) throw new Error("Wallet not found");
+    if (!wallet) throw new Error("محفظة الشركة غير موجودة.");
 
     const { data: tx } = await supabase
       .from("wallet_transactions")
@@ -65,7 +65,7 @@ export const createCompanyDeposit = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!company) throw new Error("Create a company profile first.");
+    if (!company) throw new Error("أنشئ ملف شركتك أولًا.");
     const { data: row, error } = await supabase
       .from("company_deposits" as never)
       .insert({
@@ -112,7 +112,7 @@ export const cancelMyCompanyDeposit = createServerFn({ method: "POST" })
 // -------- Admin --------
 async function assertAdmin(supabase: any, userId: string) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  if (!data) throw new Error("Forbidden");
+  if (!data) throw new Error("لا تملك صلاحية تنفيذ هذه العملية.");
 }
 
 export const adminListCompanyDeposits = createServerFn({ method: "POST" })
@@ -194,14 +194,14 @@ export const activateListingPromotion = createServerFn({ method: "POST" })
       .select("id, company_id")
       .eq("id", data.listing_id)
       .maybeSingle();
-    if (!l) throw new Error("Listing not found");
+    if (!l) throw new Error("الإعلان المطلوب غير موجود.");
     const { data: c } = await supabase
       .from("companies")
       .select("id")
       .eq("id", l.company_id)
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!c) throw new Error("Not authorized");
+    if (!c) throw new Error("لا تملك صلاحية تنفيذ هذه العملية.");
 
     // Persist campaign caps if provided
     const patch: Record<string, unknown> = {};

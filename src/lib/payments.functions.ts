@@ -47,7 +47,7 @@ export const upsertPaymentMethod = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const payload = { ...data };
     const { error } = await (context.supabase.from("payment_methods" as never) as any).upsert(
       payload,
@@ -80,7 +80,7 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
       )
       .eq("id", data.order_id)
       .maybeSingle();
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new Error("الطلب المطلوب غير موجود.");
     if (order.buyer_id !== userId) throw new Error("فقط المشتري يمكنه رفع إثبات الدفع");
     if (order.payment_status === "paid") throw new Error("تم دفع هذا الطلب بالفعل");
     if (Math.abs(Number(order.total_amount) - data.amount) > 0.01) {
@@ -193,7 +193,7 @@ export const listPendingProofs = createServerFn({ method: "GET" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { data } = await (context.supabase.from("payment_proofs" as never) as any)
       .select("*")
       .eq("status", "pending")
@@ -219,7 +219,7 @@ export const reviewPaymentProof = createServerFn({ method: "POST" })
       _user_id: userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
 
     // Idempotency: block re-reviewing an already-reviewed proof.
     // The on_payment_proof_review trigger fires on status change, so
@@ -229,7 +229,7 @@ export const reviewPaymentProof = createServerFn({ method: "POST" })
       .select("id, status, order_id")
       .eq("id", data.id)
       .maybeSingle();
-    if (!existing) throw new Error("Proof not found");
+    if (!existing) throw new Error("إثبات الدفع المطلوب غير موجود.");
     if (existing.status === "approved" || existing.status === "rejected") {
       throw new Error("تمت مراجعة هذا الإثبات بالفعل");
     }

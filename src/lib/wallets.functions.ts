@@ -22,7 +22,7 @@ export const listMyWalletTransactions = createServerFn({ method: "POST" })
       .select("id, user_id")
       .eq("id", data.walletId)
       .maybeSingle();
-    if (!wallet) throw new Error("Wallet not found");
+    if (!wallet) throw new Error("المحفظة المطلوبة غير موجودة.");
     const { data: isAdmin } = await supabase.rpc("has_role", {
       _user_id: userId,
       _role: "admin",
@@ -63,7 +63,7 @@ export const getAdminRevenueSummary = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle();
-    if (!roleRow) throw new Error("Admins only");
+    if (!roleRow) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

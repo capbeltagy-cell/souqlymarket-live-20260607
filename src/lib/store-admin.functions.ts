@@ -7,7 +7,7 @@ async function assertAdmin(context: any) {
     _user_id: context.userId,
     _role: "admin",
   });
-  if (!data) throw new Error("Forbidden");
+  if (!data) throw new Error("لا تملك صلاحية إدارة المتاجر.");
 }
 
 export const adminGetStoreSummary = createServerFn({ method: "GET" })

@@ -106,7 +106,7 @@ export const createListing = createServerFn({ method: "POST" })
       .eq("owner_id", userId)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
-    if (!company) throw new Error("Create a company profile before posting listings.");
+    if (!company) throw new Error("أنشئ ملف شركتك أولًا قبل إضافة إعلان.");
 
     const exp =
       (company as { subscription_expires_at?: string | null }).subscription_expires_at ?? null;
@@ -293,7 +293,7 @@ export const deleteListing = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (listingError) throw new Error(listingError.message);
-    if (!listing?.company_id) throw new Error("Listing not found");
+    if (!listing?.company_id) throw new Error("الإعلان المطلوب غير موجود.");
 
     const { data: company, error: companyError } = await supabase
       .from("companies")
@@ -302,7 +302,7 @@ export const deleteListing = createServerFn({ method: "POST" })
       .eq("owner_id", userId)
       .maybeSingle();
     if (companyError) throw new Error(companyError.message);
-    if (!company) throw new Error("You do not own this listing");
+    if (!company) throw new Error("لا تملك صلاحية حذف هذا الإعلان.");
 
     const { error } = await supabase
       .from("listings")
@@ -380,14 +380,14 @@ export const updateListing = createServerFn({ method: "POST" })
       .eq("id", id)
       .maybeSingle();
     if (rErr) throw new Error(rErr.message);
-    if (!row) throw new Error("Listing not found");
+    if (!row) throw new Error("الإعلان المطلوب غير موجود.");
     const { data: comp } = await supabase
       .from("companies")
       .select("id")
       .eq("id", row.company_id)
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!comp) throw new Error("Not authorized to edit this listing");
+    if (!comp) throw new Error("لا تملك صلاحية تعديل هذا الإعلان.");
     // Route promotion_status changes through the reserve RPCs. Owners cannot
     // set "active" via a bare update — that would bypass the campaign reserve.
     const promoStatusChange = rest.promotion_status;

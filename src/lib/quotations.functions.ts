@@ -51,7 +51,7 @@ export const createQuotation = createServerFn({ method: "POST" })
       .eq("id", data.conversation_id)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
-    if (!conv) throw new Error("Conversation not found");
+    if (!conv) throw new Error("المحادثة المطلوبة غير موجودة.");
     if (conv.seller_id !== userId) throw new Error("فقط البائع يمكنه إنشاء عرض السعر");
 
     let sellerCompanyId: string | null = null;
@@ -132,7 +132,7 @@ export const getQuotation = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!q) throw new Error("Quotation not found");
+    if (!q) throw new Error("عرض السعر المطلوب غير موجود.");
     const { data: items } = await (supabase.from("quotation_items" as never) as any)
       .select("*")
       .eq("quotation_id", data.id)
@@ -166,7 +166,7 @@ export const respondToQuotation = createServerFn({ method: "POST" })
       .select("*")
       .eq("id", data.id)
       .maybeSingle();
-    if (!q) throw new Error("Quotation not found");
+    if (!q) throw new Error("عرض السعر المطلوب غير موجود.");
     if (q.buyer_id !== userId) throw new Error("فقط المشتري يمكنه الرد");
     if (!["sent", "draft"].includes(q.status)) throw new Error("لا يمكن تعديل هذا العرض");
 

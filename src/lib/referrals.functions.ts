@@ -40,7 +40,7 @@ export const createReferral = createServerFn({ method: "POST" })
       .select("id")
       .eq("user_id", userId)
       .maybeSingle();
-    if (!agent) throw new Error("Create an agent profile first.");
+    if (!agent) throw new Error("أنشئ ملف المسوق أولًا.");
     // dedupe (unique on agent_id+listing_id)
     const { data: existing } = await supabase
       .from("referrals")
@@ -80,7 +80,7 @@ export const convertReferral = createServerFn({ method: "POST" })
       .select("id, agent_id")
       .eq("id", data.referralId)
       .maybeSingle();
-    if (!referral) throw new Error("Referral not found");
+    if (!referral) throw new Error("رابط الإحالة المطلوب غير موجود.");
     const { data: agent } = await supabase
       .from("agents")
       .select("id")

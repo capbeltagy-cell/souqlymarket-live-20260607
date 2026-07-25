@@ -117,7 +117,7 @@ export const getRfq = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("status", "open")
       .maybeSingle();
-    if (!rfq) throw new Error("RFQ not found");
+    if (!rfq) throw new Error("طلب عرض السعر غير موجود.");
     return { rfq };
   });
 
@@ -166,7 +166,7 @@ export const submitRfqOffer = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!c) throw new Error("Only companies can submit offers");
+    if (!c) throw new Error("إرسال العروض متاح لحسابات الشركات فقط.");
     const { error } = await supabase.from(T("rfq_offers")).insert({
       rfq_id: data.rfqId,
       company_id: c.id,
@@ -191,7 +191,8 @@ export const awardRfq = createServerFn({ method: "POST" })
       .select("buyer_id")
       .eq("id", data.rfqId)
       .maybeSingle();
-    if (!rfq || (rfq as any).buyer_id !== userId) throw new Error("Forbidden");
+    if (!rfq || (rfq as any).buyer_id !== userId)
+      throw new Error("لا تملك صلاحية إدارة طلب عرض السعر هذا.");
     await supabase.from(T("rfq_offers")).update({ status: "rejected" }).eq("rfq_id", data.rfqId);
     await supabase.from(T("rfq_offers")).update({ status: "accepted" }).eq("id", data.offerId);
     const { error } = await supabase
@@ -243,7 +244,7 @@ export const getWholesale = createServerFn({ method: "POST" })
       .select("*, companies(id, name_ar, name_en, logo_url, is_verified)")
       .eq("id", data.id)
       .maybeSingle();
-    if (!row) throw new Error("Not found");
+    if (!row) throw new Error("السجل المطلوب غير موجود.");
     return { item: row };
   });
 
@@ -278,7 +279,7 @@ export const createWholesale = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!c) throw new Error("Create a company first");
+    if (!c) throw new Error("أنشئ ملف شركتك أولًا.");
     const { data: row, error } = await supabase
       .from(T("wholesale_listings"))
       .insert({
@@ -382,7 +383,7 @@ export const upsertMyFactory = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!c) throw new Error("Create a company first");
+    if (!c) throw new Error("أنشئ ملف شركتك أولًا.");
     const { error } = await supabase.from(T("factories")).upsert({
       company_id: c.id,
       production_capacity: data.production_capacity ?? null,
@@ -404,7 +405,7 @@ export const adminVerifyFactory = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await context.supabase
       .from(T("factories"))
       .update({ verified: data.verified })
@@ -486,7 +487,7 @@ export const getTender = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("status", "open")
       .maybeSingle();
-    if (!row) throw new Error("Not found");
+    if (!row) throw new Error("السجل المطلوب غير موجود.");
     return { tender: row };
   });
 
@@ -519,7 +520,7 @@ export const submitTenderProposal = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", context.userId)
       .maybeSingle();
-    if (!c) throw new Error("Only companies can submit proposals");
+    if (!c) throw new Error("تقديم العروض متاح لحسابات الشركات فقط.");
     const { error } = await context.supabase.from(T("tender_proposals")).insert({
       tender_id: data.tenderId,
       company_id: c.id,
@@ -555,7 +556,8 @@ export const awardTender = createServerFn({ method: "POST" })
       .select("publisher_id")
       .eq("id", data.tenderId)
       .maybeSingle();
-    if (!t || (t as any).publisher_id !== context.userId) throw new Error("Forbidden");
+    if (!t || (t as any).publisher_id !== context.userId)
+      throw new Error("لا تملك صلاحية إدارة هذه المناقصة.");
     await context.supabase
       .from(T("tender_proposals"))
       .update({ status: "rejected" })
@@ -647,7 +649,7 @@ export const upsertMyCompanyProfileExtra = createServerFn({ method: "POST" })
       .select("id")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!c) throw new Error("Create a company first");
+    if (!c) throw new Error("أنشئ ملف شركتك أولًا.");
     const { error } = await supabase.from(T("company_profiles_extra")).upsert({
       company_id: c.id,
       cover_url: data.cover_url ?? null,
@@ -788,7 +790,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date().toISOString();
     const [companies, leads, rfqs, tenders, refs, payments] = await Promise.all([

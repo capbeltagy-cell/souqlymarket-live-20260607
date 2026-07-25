@@ -63,7 +63,7 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
       _user_id: userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { error } = await supabase
       .from("commissions")
       .update({ status: data.status })
@@ -82,7 +82,7 @@ export const requestPayout = createServerFn({ method: "POST" })
       .select("id, agent_id")
       .eq("id", data.id)
       .maybeSingle();
-    if (!commission) throw new Error("Commission not found");
+    if (!commission) throw new Error("العمولة المطلوبة غير موجودة.");
     const { data: agent } = await (supabase.from("agents" as never) as any)
       .select("id")
       .eq("user_id", userId)
@@ -101,7 +101,7 @@ export const requestPayout = createServerFn({ method: "POST" })
 async function requireAdmin(supabase: any, userId: string) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden");
+  if (!data) throw new Error("لا تملك صلاحية تنفيذ هذه العملية.");
 }
 
 export const adminListCommissions = createServerFn({ method: "POST" })
@@ -157,9 +157,8 @@ export const adminReviewCommission = createServerFn({ method: "POST" })
         .eq("id", data.id)
         .maybeSingle();
       if (eErr) throw new Error(eErr.message);
-      if (!existing) throw new Error("Commission not found");
-      if (existing.status !== "pending")
-        throw new Error("Only pending commissions can be rejected");
+      if (!existing) throw new Error("العمولة المطلوبة غير موجودة.");
+      if (existing.status !== "pending") throw new Error("يمكن رفض العمولات المعلقة فقط.");
       const { error } = await supabase.from("commissions").delete().eq("id", data.id);
       if (error) throw new Error(error.message);
       return { ok: true, deleted: true };

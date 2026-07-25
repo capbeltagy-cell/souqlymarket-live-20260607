@@ -7,7 +7,7 @@ export const listVerificationQueue = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Admin only");
+    if (!isAdmin) throw new Error("هذه العملية متاحة لمسؤولي المنصة فقط.");
     const { data: companies } = await supabase
       .from("companies")
       .select("id, name_en, name_ar, country, industry, is_verified, created_at")

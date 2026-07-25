@@ -17,11 +17,11 @@ export async function assertNotPureMarketer(
   userId: string,
 ): Promise<void> {
   const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-  if (error) throw new Error("Role lookup failed");
+  if (error) throw new Error("تعذر التحقق من صلاحيات الحساب.");
   const roles = (data ?? []).map((r) => r.role);
   const isPureAgent =
     roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
   if (isPureAgent) {
-    throw new Error("MARKETER_FORBIDDEN: Marketers cannot publish or create business content.");
+    throw new Error("MARKETER_FORBIDDEN: حساب المسوق لا يمكنه نشر محتوى تجاري.");
   }
 }

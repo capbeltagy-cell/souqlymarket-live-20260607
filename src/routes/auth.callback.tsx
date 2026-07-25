@@ -50,7 +50,7 @@ function AuthCallback() {
           // Hash-based (implicit) flow: detectSessionInUrl in the client handles it.
           await new Promise((r) => setTimeout(r, 150));
           const { data } = await supabase.auth.getSession();
-          if (!data.session) throw new Error("No session returned from provider");
+          if (!data.session) throw new Error("لم تكتمل جلسة تسجيل الدخول.");
         }
 
         if (type === "recovery") {
