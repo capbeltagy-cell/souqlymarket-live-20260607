@@ -65,9 +65,11 @@ function CompanyProspectsPage() {
     const q = search.trim().toLowerCase();
     return rows.filter((row) => {
       const statusOk = filter === "all" || row.contact_status === filter;
-      const searchOk = !q || [row.name_ar, row.name_en, row.industry, row.city, row.phone]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(q));
+      const searchOk =
+        !q ||
+        [row.name_ar, row.name_en, row.industry, row.city, row.phone]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(q));
       return statusOk && searchOk;
     });
   }, [rows, search, filter]);
@@ -107,7 +109,9 @@ function CompanyProspectsPage() {
   const setStatus = async (row: Row, status: Status) => {
     try {
       await changeStatus({ data: { id: row.id, status } });
-      setRows((current) => current.map((item) => item.id === row.id ? { ...item, contact_status: status } : item));
+      setRows((current) =>
+        current.map((item) => (item.id === row.id ? { ...item, contact_status: status } : item)),
+      );
       toast.success("تم تحديث حالة التواصل");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "تعذر تحديث الحالة");
@@ -123,25 +127,53 @@ function CompanyProspectsPage() {
       <div className="space-y-5" dir="rtl">
         <section className="grid gap-3 sm:grid-cols-3">
           <Stat label="إجمالي الشركات" value={rows.length} />
-          <Stat label="شركات مهتمة" value={rows.filter((r) => r.contact_status === "interested").length} />
-          <Stat label="انضمت لسوقلي" value={rows.filter((r) => r.contact_status === "joined").length} />
+          <Stat
+            label="شركات مهتمة"
+            value={rows.filter((r) => r.contact_status === "interested").length}
+          />
+          <Stat
+            label="انضمت لسوقلي"
+            value={rows.filter((r) => r.contact_status === "joined").length}
+          />
         </section>
 
         <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 lg:flex-row lg:items-center">
           <div className="relative flex-1">
             <Search className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث بالاسم أو النشاط أو المدينة أو الهاتف" className="pr-9" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="ابحث بالاسم أو النشاط أو المدينة أو الهاتف"
+              className="pr-9"
+            />
           </div>
-          <select value={filter} onChange={(e) => setFilter(e.target.value as Status | "all")} className="h-10 rounded-md border bg-background px-3 text-sm">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as Status | "all")}
+            className="h-10 rounded-md border bg-background px-3 text-sm"
+          >
             <option value="all">كل الحالات</option>
-            {statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
+            {statuses.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
           </select>
-          <Button variant="outline" onClick={() => void load()} className="gap-2"><RefreshCw className="h-4 w-4" />تحديث</Button>
-          <Button onClick={() => setShowForm((value) => !value)} className="gap-2"><Plus className="h-4 w-4" />إضافة شركة</Button>
+          <Button variant="outline" onClick={() => void load()} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            تحديث
+          </Button>
+          <Button onClick={() => setShowForm((value) => !value)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            إضافة شركة
+          </Button>
         </div>
 
         {showForm && (
-          <form onSubmit={submit} className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2 lg:grid-cols-3">
+          <form
+            onSubmit={submit}
+            className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2 lg:grid-cols-3"
+          >
             <Input name="name_ar" required placeholder="اسم الشركة بالعربي *" />
             <Input name="name_en" placeholder="اسم الشركة بالإنجليزي" />
             <Input name="industry" placeholder="النشاط" />
@@ -155,8 +187,12 @@ function CompanyProspectsPage() {
             <Input name="source_url" placeholder="رابط المصدر" />
             <Input name="notes" placeholder="ملاحظات" />
             <div className="md:col-span-2 lg:col-span-3 flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>إلغاء</Button>
-              <Button type="submit" disabled={saving}>{saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}حفظ الشركة</Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                إلغاء
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}حفظ الشركة
+              </Button>
             </div>
           </form>
         )}
@@ -176,27 +212,65 @@ function CompanyProspectsPage() {
             <tbody>
               {visible.map((row) => (
                 <tr key={row.id} className="border-t align-top">
-                  <td className="px-4 py-3"><div className="font-semibold">{row.name_ar}</div><div className="text-xs text-muted-foreground">{row.name_en || row.source_name || "—"}</div></td>
-                  <td className="px-4 py-3"><div>{row.industry || "غير محدد"}</div><div className="text-xs text-muted-foreground">{[row.governorate, row.city].filter(Boolean).join(" - ") || "—"}</div></td>
-                  <td className="px-4 py-3"><div>{row.phone || row.whatsapp || "—"}</div><div className="text-xs text-muted-foreground">{row.email || row.website || "—"}</div></td>
-                  <td className="px-4 py-3"><Badge variant="outline">{row.data_quality_score}%</Badge></td>
                   <td className="px-4 py-3">
-                    <select value={row.contact_status} onChange={(e) => void setStatus(row, e.target.value as Status)} className="h-9 rounded-md border bg-background px-2 text-xs">
-                      {statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
+                    <div className="font-semibold">{row.name_ar}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {row.name_en || row.source_name || "—"}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div>{row.industry || "غير محدد"}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {[row.governorate, row.city].filter(Boolean).join(" - ") || "—"}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div>{row.phone || row.whatsapp || "—"}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {row.email || row.website || "—"}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant="outline">{row.data_quality_score}%</Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <select
+                      value={row.contact_status}
+                      onChange={(e) => void setStatus(row, e.target.value as Status)}
+                      className="h-9 rounded-md border bg-background px-2 text-xs"
+                    >
+                      {statuses.map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
                     </select>
                   </td>
                   <td className="px-4 py-3">
                     {row.whatsapp || row.phone ? (
                       <Button size="sm" variant="outline" asChild className="gap-1">
-                        <a target="_blank" rel="noreferrer" href={`https://wa.me/${String(row.whatsapp || row.phone).replace(/\D/g, "")}?text=${encodeURIComponent(`أهلًا ${row.name_ar}، أنشأنا لكم صفحة تعريفية مجانية على منصة سوقلي لعرض شركتكم أمام المشترين والشركات. نرحب بمراجعة البيانات والمطالبة بإدارة الصفحة مجانًا.`)}`}>
-                          <MessageCircle className="h-4 w-4" />واتساب
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://wa.me/${String(row.whatsapp || row.phone).replace(/\D/g, "")}?text=${encodeURIComponent(`أهلًا ${row.name_ar}، أنشأنا لكم صفحة تعريفية مجانية على منصة سوقلي لعرض شركتكم أمام المشترين والشركات. نرحب بمراجعة البيانات والمطالبة بإدارة الصفحة مجانًا.`)}`}
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          واتساب
                         </a>
                       </Button>
-                    ) : "—"}
+                    ) : (
+                      "—"
+                    )}
                   </td>
                 </tr>
               ))}
-              {!visible.length && !loading && <tr><td colSpan={6} className="p-10 text-center text-muted-foreground">لا توجد شركات مطابقة</td></tr>}
+              {!visible.length && !loading && (
+                <tr>
+                  <td colSpan={6} className="p-10 text-center text-muted-foreground">
+                    لا توجد شركات مطابقة
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -206,5 +280,13 @@ function CompanyProspectsPage() {
 }
 
 function Stat({ label, value }: { label: string; value: number }) {
-  return <div className="rounded-xl border bg-card p-4"><div className="mb-2 flex items-center gap-2 text-muted-foreground"><Building2 className="h-4 w-4" />{label}</div><div className="text-3xl font-bold">{value.toLocaleString("ar-EG")}</div></div>;
+  return (
+    <div className="rounded-xl border bg-card p-4">
+      <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+        <Building2 className="h-4 w-4" />
+        {label}
+      </div>
+      <div className="text-3xl font-bold">{value.toLocaleString("ar-EG")}</div>
+    </div>
+  );
 }

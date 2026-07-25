@@ -96,24 +96,21 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
 
     // Delegate to the atomic RPC: all validation, pricing, coupon usage,
     // and order insert happen in a single transaction. No partial state.
-    const { data: result, error: rpcError } = await (supabase.rpc as any)(
-      "create_order_atomic",
-      {
-        p_buyer_id: userId,
-        p_listing_id: data.listing_id,
-        p_quantity: data.quantity,
-        p_notes: data.notes ?? null,
-        p_contact_phone: data.contact_phone ?? null,
-        p_shipping_address: data.shipping_address ?? null,
-        p_shipping_amount: shippingQuote.amount,
-        p_shipping_eta_min_days: shippingQuote.etaMinDays || null,
-        p_shipping_eta_max_days: shippingQuote.etaMaxDays || null,
-        p_checkout_session_id: data.checkout_session_id ?? null,
-        p_referral_code: data.referral_code ?? null,
-        p_coupon_code: data.coupon_code ?? null,
-        p_conversation_id: data.conversation_id ?? null,
-      },
-    );
+    const { data: result, error: rpcError } = await (supabase.rpc as any)("create_order_atomic", {
+      p_buyer_id: userId,
+      p_listing_id: data.listing_id,
+      p_quantity: data.quantity,
+      p_notes: data.notes ?? null,
+      p_contact_phone: data.contact_phone ?? null,
+      p_shipping_address: data.shipping_address ?? null,
+      p_shipping_amount: shippingQuote.amount,
+      p_shipping_eta_min_days: shippingQuote.etaMinDays || null,
+      p_shipping_eta_max_days: shippingQuote.etaMaxDays || null,
+      p_checkout_session_id: data.checkout_session_id ?? null,
+      p_referral_code: data.referral_code ?? null,
+      p_coupon_code: data.coupon_code ?? null,
+      p_conversation_id: data.conversation_id ?? null,
+    });
     if (rpcError) throw new Error(rpcError.message);
     if (!result?.order_id) throw new Error("تعذر إنشاء الطلب");
     return { id: result.order_id as string };
