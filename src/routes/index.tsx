@@ -142,7 +142,8 @@ function Landing() {
         supabase
           .from("listings")
           .select("id", { count: "exact", head: true })
-          .eq("status", "approved"),
+          .eq("status", "approved")
+          .eq("visible_in_marketplace", true),
         supabase.from("agents").select("id", { count: "exact", head: true }),
       ]);
       setCounts({
@@ -160,6 +161,7 @@ function Landing() {
           .from("listings")
           .select(listingSelect)
           .eq("status", "approved")
+          .eq("visible_in_marketplace", true)
           .eq("type", "product")
           .order("created_at", { ascending: false })
           .limit(40),
