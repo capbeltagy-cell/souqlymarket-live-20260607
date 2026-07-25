@@ -26,6 +26,9 @@ BEGIN
   IF to_regprocedure('public.adjust_company_inventory(uuid,integer,text,uuid)') IS NULL THEN
     RAISE EXCEPTION 'Missing function public.adjust_company_inventory(uuid,integer,text,uuid)';
   END IF;
+  IF to_regprocedure('public.accept_company_invitation(text)') IS NULL THEN
+    RAISE EXCEPTION 'Missing function public.accept_company_invitation(text)';
+  END IF;
 
   IF EXISTS (
     SELECT 1
