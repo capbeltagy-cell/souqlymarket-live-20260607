@@ -12,7 +12,8 @@ Do not remove tables or columns. Restore the pre-launch backup if service is aff
 
 1. Disable only the trigger directly involved in the incident. Launch triggers are
    `trg_recompute_store_coupon_used_count`, `audit_stores`, `audit_wholesale_orders`,
-   `trg_protect_store_review_fields`, and `trg_sync_company_owner_membership`.
+   `trg_protect_store_review_fields`, `trg_sync_company_owner_membership`, and
+   `trg_enforce_listing_owner`.
 2. Restore the previous `store_reviews_author_insert` policy from the migration history only after confirming the security impact.
 3. Revoke execute on `consume_auth_rate_limit` instead of deleting `auth_rate_limits`; keeping its rows is harmless and preserves diagnostics.
 4. Revoke execute on `adjust_company_inventory` or `accept_company_invitation` if one
@@ -26,6 +27,11 @@ The new indexes and additive `leads` columns can remain in place during rollback
 They do not change existing data semantics. Avoid dropping `auth_rate_limits`,
 Company Workspace, CRM, or inventory tables because they may contain useful records
 or incident evidence.
+
+The additive `listings.owner_id` column and its index should remain during an
+application rollback. If the ownership trigger causes an incident, disable only
+`trg_enforce_listing_owner` temporarily after rolling the application back; do not
+clear or rewrite existing owner values.
 
 ## Safe recovery order
 

@@ -141,6 +141,7 @@ export const createListing = createServerFn({ method: "POST" })
       .from("listings")
       .insert({
         company_id: company.id,
+        owner_id: userId,
         type: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
@@ -248,6 +249,7 @@ export const createStoreProduct = createServerFn({ method: "POST" })
       .from("listings")
       .insert({
         company_id: companyId,
+        owner_id: userId,
         store_id: store.id,
         type: "product",
         title_ar: data.title_ar,

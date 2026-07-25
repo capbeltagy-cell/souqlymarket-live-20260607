@@ -26,7 +26,8 @@ BEGIN
     'public.adjust_company_inventory(uuid,integer,text,uuid)',
     'public.accept_company_invitation(text)',
     'public.has_permission(uuid,text)',
-    'public.has_role(uuid,public.app_role)'
+    'public.has_role(uuid,public.app_role)',
+    'public.enforce_listing_owner()'
   ] LOOP
     IF to_regprocedure(item) IS NULL THEN missing := array_append(missing, 'function ' || item); END IF;
   END LOOP;
@@ -42,6 +43,7 @@ DECLARE
   missing text[] := ARRAY[]::text[];
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='store_id') THEN missing := array_append(missing, 'listings.store_id'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='owner_id' AND is_nullable='NO') THEN missing := array_append(missing, 'listings.owner_id NOT NULL'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='stock_quantity') THEN missing := array_append(missing, 'listings.stock_quantity'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='store_id') THEN missing := array_append(missing, 'wholesale_orders.store_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='checkout_session_id') THEN missing := array_append(missing, 'wholesale_orders.checkout_session_id'); END IF;
@@ -60,6 +62,7 @@ DECLARE missing text[] := ARRAY[]::text[]; item text;
 BEGIN
   FOREACH item IN ARRAY ARRAY[
     'wholesale_orders_store_created_idx','listings_store_status_idx',
+    'listings_owner_created_idx',
     'store_coupon_usage_order_uidx','auth_rate_limits_window_idx',
     'company_members_user_idx','company_members_company_idx',
     'company_invitations_pending_email_idx','company_invitations_company_idx',
@@ -72,7 +75,8 @@ BEGIN
   END LOOP;
   FOREACH item IN ARRAY ARRAY[
     'trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders',
-    'trg_protect_store_review_fields','trg_sync_company_owner_membership'
+    'trg_protect_store_review_fields','trg_sync_company_owner_membership',
+    'trg_enforce_listing_owner'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname=item AND NOT tgisinternal) THEN missing := array_append(missing, 'trigger ' || item); END IF;
   END LOOP;
