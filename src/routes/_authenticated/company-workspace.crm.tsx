@@ -22,14 +22,6 @@ export const Route = createFileRoute("/_authenticated/company-workspace/crm")({
   component: CompanyCrmPage,
 });
 type Payload = Awaited<ReturnType<typeof getCompanyCrm>>;
-type CrmLead = {
-  id: string;
-  buyer_name: string;
-  buyer_email: string | null;
-  buyer_phone: string | null;
-  status: string;
-  listings: { title_ar: string | null; title_en: string | null } | null;
-};
 const labels: Record<string, string> = {
   new: "جديد",
   contacted: "تم التواصل",
@@ -56,7 +48,7 @@ function CompanyCrmPage() {
   }, [load]);
   const leads = useMemo(
     () =>
-      (payload?.leads ?? []).filter((lead: CrmLead) =>
+      (payload?.leads ?? []).filter((lead) =>
         `${lead.buyer_name} ${lead.buyer_email ?? ""} ${lead.buyer_phone ?? ""}`
           .toLowerCase()
           .includes(query.toLowerCase()),
@@ -110,7 +102,7 @@ function CompanyCrmPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {leads.map((lead: CrmLead) => (
+            {leads.map((lead) => (
               <div
                 key={lead.id}
                 className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card p-4"

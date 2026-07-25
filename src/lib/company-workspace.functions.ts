@@ -1,10 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-/* New ERP tables are shipped by migration and intentionally typed locally until
- * Supabase production applies the migration and generated types are refreshed. */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Database } from "@/integrations/supabase/types";
+import { asErpClient } from "@/lib/company-erp.database";
 
 export type CompanyWorkspaceAccess = {
   companyId: string;
@@ -17,7 +16,7 @@ export type CompanyWorkspaceAccess = {
 };
 
 async function resolveWorkspace(
-  supabase: any,
+  supabase: SupabaseClient<Database>,
   userId: string,
 ): Promise<CompanyWorkspaceAccess | null> {
   const { data: owned } = await supabase
@@ -38,9 +37,10 @@ async function resolveWorkspace(
     };
   }
 
-  const { data: membership } = await supabase
+  const db = asErpClient(supabase);
+  const { data: membership } = await db
     .from("company_members")
-    .select("company_id, role, permissions, companies(name_ar, name_en)")
+    .select("company_id, role, permissions")
     .eq("user_id", userId)
     .eq("status", "active")
     .order("joined_at", { ascending: true })
@@ -51,7 +51,11 @@ async function resolveWorkspace(
   const permissions = membership.permissions ?? [];
   const elevated = ["owner", "admin"].includes(membership.role);
   const manager = membership.role === "manager";
-  const company = membership.companies;
+  const { data: company } = await supabase
+    .from("companies")
+    .select("name_ar, name_en")
+    .eq("id", membership.company_id)
+    .maybeSingle();
   return {
     companyId: membership.company_id,
     companyName: company?.name_ar || company?.name_en || "مساحة الشركة",
@@ -74,7 +78,7 @@ export const getMyCompanyWorkspace = createServerFn({ method: "GET" })
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace) return { hasWorkspace: false as const, workspace: null };
 
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const [{ count: members }, { count: leads }, { count: products }, { count: lowStock }] =
       await Promise.all([
         db
@@ -117,7 +121,7 @@ export const listCompanyMembers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace) throw new Error("لا توجد شركة مرتبطة بهذا الحساب.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data, error } = await db
       .from("company_members")
       .select("id, user_id, role, permissions, status, joined_at")
@@ -125,14 +129,14 @@ export const listCompanyMembers = createServerFn({ method: "GET" })
       .order("joined_at");
     if (error) throw new Error("تعذر تحميل أعضاء الشركة.");
 
-    const userIds = (data ?? []).map((member: any) => member.user_id);
+    const userIds = (data ?? []).map((member) => member.user_id);
     const { data: profiles } = userIds.length
       ? await db
           .from("profiles")
           .select("id, full_name, display_name, avatar_url")
           .in("id", userIds)
       : { data: [] };
-    const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+    const profileMap = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
     const { data: invitations } = workspace.canManageMembers
       ? await db
           .from("company_invitations")
@@ -143,7 +147,7 @@ export const listCompanyMembers = createServerFn({ method: "GET" })
       : { data: [] };
     return {
       workspace,
-      members: (data ?? []).map((member: any) => ({
+      members: (data ?? []).map((member) => ({
         ...member,
         profile: profileMap.get(member.user_id) ?? null,
       })),
@@ -175,7 +179,7 @@ export const inviteCompanyMember = createServerFn({ method: "POST" })
     if (!workspace?.canManageMembers) throw new Error("لا تملك صلاحية دعوة أعضاء للشركة.");
     const token = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
     const tokenHash = await sha256(token);
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { error } = await db.from("company_invitations").insert({
       company_id: workspace.companyId,
       email: data.email,
@@ -194,7 +198,7 @@ export const revokeCompanyInvitation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace?.canManageMembers) throw new Error("لا تملك صلاحية إلغاء الدعوات.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { error } = await db
       .from("company_invitations")
       .update({ status: "revoked", updated_at: new Date().toISOString() })
@@ -209,7 +213,7 @@ export const acceptCompanyInvitation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ token: z.string().min(32).max(256) }).parse(input))
   .handler(async ({ data, context }) => {
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data: companyId, error } = await db.rpc("accept_company_invitation", {
       _token: data.token,
     });
@@ -232,7 +236,7 @@ export const updateCompanyMember = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace?.canManageMembers) throw new Error("لا تملك صلاحية إدارة أعضاء الشركة.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data: member } = await db
       .from("company_members")
       .select("id, company_id, role")

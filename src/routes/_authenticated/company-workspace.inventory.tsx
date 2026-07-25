@@ -14,13 +14,6 @@ export const Route = createFileRoute("/_authenticated/company-workspace/inventor
   component: CompanyInventoryPage,
 });
 type Payload = Awaited<ReturnType<typeof getCompanyInventory>>;
-type InventoryProduct = {
-  id: string;
-  title_ar: string | null;
-  title_en: string | null;
-  sku: string | null;
-  stock_quantity: number | null;
-};
 
 function CompanyInventoryPage() {
   const fetchInventory = useServerFn(getCompanyInventory);
@@ -78,7 +71,7 @@ function CompanyInventoryPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {payload.products.map((product: InventoryProduct) => {
+            {payload.products.map((product) => {
               const stock = product.stock_quantity ?? 0;
               return (
                 <div

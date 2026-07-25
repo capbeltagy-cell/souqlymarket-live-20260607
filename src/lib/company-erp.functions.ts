@@ -2,15 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { resolveWorkspace } from "@/lib/company-workspace.functions";
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { asErpClient } from "@/lib/company-erp.database";
 
 export const getCompanyCrm = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace) throw new Error("لا توجد شركة مرتبطة بهذا الحساب.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data, error } = await db
       .from("leads")
       .select(
@@ -36,7 +35,7 @@ export const updateCompanyCrmLead = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace?.canManageCrm) throw new Error("لا تملك صلاحية تعديل بيانات العملاء.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data: lead } = await db
       .from("leads")
       .select("id, company_id, status")
@@ -45,7 +44,12 @@ export const updateCompanyCrmLead = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!lead) throw new Error("العميل المطلوب غير موجود.");
 
-    const patch: Record<string, unknown> = {
+    const patch: {
+      status: "new" | "contacted" | "negotiating" | "won" | "lost";
+      updated_at: string;
+      estimated_value?: number | null;
+      next_follow_up_at?: string | null;
+    } = {
       status: data.status,
       updated_at: new Date().toISOString(),
     };
@@ -73,7 +77,7 @@ export const getCompanyInventory = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace) throw new Error("لا توجد شركة مرتبطة بهذا الحساب.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const [{ data: products, error }, { data: movements }] = await Promise.all([
       db
         .from("listings")
@@ -109,7 +113,7 @@ export const adjustCompanyInventory = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const workspace = await resolveWorkspace(context.supabase, context.userId);
     if (!workspace?.canManageInventory) throw new Error("لا تملك صلاحية تعديل المخزون.");
-    const db = context.supabase as any;
+    const db = asErpClient(context.supabase);
     const { data: product } = await db
       .from("listings")
       .select("id")

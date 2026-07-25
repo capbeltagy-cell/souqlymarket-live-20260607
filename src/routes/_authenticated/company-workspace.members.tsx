@@ -28,14 +28,6 @@ export const Route = createFileRoute("/_authenticated/company-workspace/members"
 });
 
 type Payload = Awaited<ReturnType<typeof listCompanyMembers>>;
-type CompanyMember = {
-  id: string;
-  role: string;
-  status: string;
-  joined_at: string;
-  profile: { display_name?: string | null; full_name?: string | null } | null;
-};
-type CompanyInvitation = { id: string; email: string; role: string; expires_at: string };
 
 function CompanyMembersPage() {
   const fetchMembers = useServerFn(listCompanyMembers);
@@ -182,7 +174,7 @@ function CompanyMembersPage() {
               <section>
                 <h2 className="mb-3 font-semibold">الدعوات المعلقة</h2>
                 <div className="space-y-2">
-                  {payload.invitations.map((invitation: CompanyInvitation) => (
+                  {payload.invitations.map((invitation) => (
                     <div
                       key={invitation.id}
                       className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4"
@@ -222,7 +214,7 @@ function CompanyMembersPage() {
             <section>
               <h2 className="mb-3 font-semibold">الأعضاء النشطون</h2>
               <div className="space-y-3">
-                {payload.members.map((member: CompanyMember) => {
+                {payload.members.map((member) => {
                   const owner = member.role === "owner";
                   const name =
                     member.profile?.display_name || member.profile?.full_name || "عضو الشركة";
