@@ -29,8 +29,10 @@ import { StoreSubscriptionCard } from "@/components/StoreSubscriptionCard";
 import { getArabicErrorMessage } from "@/lib/user-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/store/")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "متجري — سوقلي" }] }),
   component: StoreDashboard,
 });

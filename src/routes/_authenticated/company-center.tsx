@@ -30,8 +30,10 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { getCompanyCommandCenter, type CommandCenterPayload } from "@/lib/company-center.functions";
 import { getPricingConfig } from "@/lib/subscription.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-center")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "مركز قيادة الشركة — Souqly" }] }),
   component: CommandCenter,
 });

@@ -8,8 +8,10 @@ import { getMyStore } from "@/lib/stores.functions";
 import { listCoupons, upsertCoupon, deleteCoupon } from "@/lib/store-coupons.functions";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/store/coupons")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "كوبونات المتجر — سوقلي" }] }),
   component: StoreCouponsPage,
 });

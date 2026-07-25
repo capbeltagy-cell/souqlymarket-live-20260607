@@ -16,8 +16,10 @@ import { BilingualField } from "@/components/BilingualField";
 import { SearchableMultiSelect } from "@/components/SearchableMultiSelect";
 import { MARKETER_SPECIALTIES, MARKETER_LANGUAGES } from "@/lib/marketer.taxonomy";
 import { useAuth } from "@/hooks/useAuth";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/agent")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Agent profile — Souqly" }] }),
   component: AgentEdit,
 });

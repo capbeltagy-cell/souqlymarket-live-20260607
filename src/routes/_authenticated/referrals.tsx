@@ -26,8 +26,10 @@ import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { ShareMenu } from "@/components/ShareMenu";
 import { referralCaption } from "@/lib/share-captions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Referrals — Souqly" }] }),
   component: ReferralsPage,
 });

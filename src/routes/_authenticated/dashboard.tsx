@@ -27,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useAuth } from "@/hooks/useAuth";
+import { ADMIN_ROLES, BUSINESS_ROLES, BUYER_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -57,9 +57,14 @@ function Dashboard() {
   const { t, locale } = useI18n();
   const ar = locale === "ar";
   const navigate = useNavigate();
-  const hasAppRole =
-    roles.includes("admin") || roles.includes("company") || roles.includes("agent");
-  const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
+  const hasAppRole = roles.length > 0;
+  const role = hasAnyRole(roles, ADMIN_ROLES)
+    ? "admin"
+    : hasAnyRole(roles, BUSINESS_ROLES)
+      ? "company"
+      : roles.includes("agent")
+        ? "agent"
+        : "customer";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [sub, setSub] = useState<CompanySubscriptionInfo | null>(null);
@@ -69,21 +74,16 @@ function Dashboard() {
   useEffect(() => {
     if (loading || !user) return;
     if (hasAppRole) return;
-    let choice: string | null = null;
-    try {
-      choice = localStorage.getItem("souqly:role_choice");
-    } catch {
-      // Storage is optional; fall back to the server-backed role flow.
-    }
-    if (choice === "customer") {
-      navigate({ to: "/marketplace", replace: true });
-    } else {
-      navigate({ to: "/choose-role", replace: true });
-    }
+    navigate({ to: "/choose-role", replace: true });
   }, [loading, user, hasAppRole, navigate]);
 
   useEffect(() => {
-    if (!user || !hasAppRole) return;
+    if (loading || !user || !hasAnyRole(roles, BUYER_ROLES)) return;
+    navigate({ to: "/marketplace", replace: true });
+  }, [loading, user, roles, navigate]);
+
+  useEffect(() => {
+    if (!user || !hasAppRole || role === "customer") return;
     const zero: Counts = {
       listings: 0,
       companies: 0,

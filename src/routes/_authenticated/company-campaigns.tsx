@@ -25,8 +25,10 @@ import {
   setListingPromotionStatus,
   type CompanyCampaignRow,
 } from "@/lib/company-center.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-campaigns")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "حملات شركتي — Souqly" }] }),
   component: CompanyCampaignsPage,
 });

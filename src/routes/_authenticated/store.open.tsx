@@ -11,8 +11,10 @@ import { toast } from "sonner";
 import { EGYPT_GOVERNORATES } from "@/lib/egypt.locations";
 import { useEffect } from "react";
 import { getArabicErrorMessage } from "@/lib/user-error";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/store/open")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "افتح متجرك — سوقلي" }] }),
   component: OpenStoreWizard,
 });

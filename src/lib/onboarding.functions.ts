@@ -2,10 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const roleSchema = z.object({ role: z.enum(["company", "agent"]) });
+const roleSchema = z.object({ role: z.enum(["company", "agent", "customer"]) });
 
 /**
- * Assigns a role (company or agent) to the current authenticated user.
+ * Assigns a non-privileged onboarding role to the current authenticated user.
  * Admin role can never be self-assigned. Uses service role because the
  * `user_roles` table only allows admins to insert via RLS.
  * Row scope is enforced explicitly via the authenticated userId.

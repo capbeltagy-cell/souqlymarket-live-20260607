@@ -11,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import { useI18n } from "@/i18n/I18nProvider";
 import { createCompanyDeposit } from "@/lib/company-wallet.functions";
 import { listActivePaymentMethods } from "@/lib/payments.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-wallet/deposit")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "شحن رصيد الشركة — Souqly" }] }),
   errorComponent: ({ error }) => (
     <div className="p-8 text-sm text-destructive">{error.message}</div>

@@ -10,8 +10,10 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getCompanyProfileExtra, upsertMyCompanyProfileExtra } from "@/lib/phase3.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company-profile-extra")({
+  beforeLoad: requireBusinessRoute,
   component: CompanyProfileExtra,
 });
 

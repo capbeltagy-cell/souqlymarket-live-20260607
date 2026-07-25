@@ -29,8 +29,10 @@ import { LocationPicker } from "@/components/LocationPicker";
 import { BilingualField } from "@/components/BilingualField";
 import { translateEgyptCity, translateEgyptGovernorate } from "@/lib/egypt.locations";
 import { getArabicErrorMessage } from "@/lib/user-error";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/company")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "شركتي — سوقلي" }] }),
   component: CompanyEdit,
 });

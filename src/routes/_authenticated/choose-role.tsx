@@ -31,7 +31,7 @@ function ChooseRolePage() {
   useEffect(() => {
     if (loading) return;
     if (!user) return;
-    if (roles.includes("admin") || roles.includes("company") || roles.includes("agent")) {
+    if (roles.length > 0) {
       navigate({ to: "/dashboard", replace: true });
     }
   }, [loading, user, roles, navigate]);
@@ -40,24 +40,11 @@ function ChooseRolePage() {
     if (busy) return;
     setBusy(choice);
     try {
-      if (choice === "customer") {
-        try {
-          localStorage.setItem("souqly:role_choice", "customer");
-        } catch {
-          // Storage may be unavailable in privacy mode; navigation can continue.
-        }
-        toast.success(ar ? "استكشف السوق" : "Explore the marketplace");
-        navigate({ to: "/marketplace" });
-        return;
-      }
       await assign({ data: { role: choice } });
-      try {
-        localStorage.setItem("souqly:role_choice", choice);
-      } catch {
-        // Storage may be unavailable in privacy mode; role assignment already succeeded.
-      }
       toast.success(ar ? "تم اختيار الدور" : "Role selected");
-      navigate({ to: choice === "company" ? "/company" : "/agent" });
+      navigate({
+        to: choice === "company" ? "/company" : choice === "agent" ? "/agent" : "/marketplace",
+      });
     } catch (e) {
       toast.error((e as Error).message);
       setBusy(null);

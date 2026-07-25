@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
+import { BUSINESS_ROLES, hasAnyRole, useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 /**
@@ -13,7 +13,10 @@ export function useMarketerGuard() {
   useEffect(() => {
     if (loading || !user) return;
     const isPureAgent =
-      roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+      roles.includes("agent") &&
+      !hasAnyRole(roles, BUSINESS_ROLES) &&
+      !roles.includes("admin") &&
+      !roles.includes("super_admin");
     if (isPureAgent) {
       toast.error("هذه الصفحة مخصصة للشركات فقط");
       navigate({ to: "/dashboard", replace: true });
@@ -21,6 +24,11 @@ export function useMarketerGuard() {
   }, [loading, user, roles, navigate]);
 }
 
-export function isPureMarketer(roles: string[]): boolean {
-  return roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+export function isPureMarketer(roles: Parameters<typeof hasAnyRole>[0]): boolean {
+  return (
+    roles.includes("agent") &&
+    !hasAnyRole(roles, BUSINESS_ROLES) &&
+    !roles.includes("admin") &&
+    !roles.includes("super_admin")
+  );
 }

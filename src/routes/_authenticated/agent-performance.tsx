@@ -15,8 +15,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatPrice } from "@/lib/currency";
 import { getAgentPerformance } from "@/lib/crm-analytics.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/agent-performance")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Agent performance — Souqly" }] }),
   component: AgentPerformancePage,
 });

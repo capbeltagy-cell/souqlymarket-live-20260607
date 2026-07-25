@@ -29,8 +29,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MapView } from "@/components/MapView";
 import { ImageUploader, type UploadedImage, toLegacyShape } from "@/components/ImageUploader";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "إعلان جديد — Souqly" }] }),
   component: NewListing,
 });

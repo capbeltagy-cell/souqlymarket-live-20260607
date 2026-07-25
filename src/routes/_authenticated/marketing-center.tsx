@@ -23,8 +23,10 @@ import { formatPrice } from "@/lib/currency";
 import { getMyWallets } from "@/lib/wallets.functions";
 import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { getMyAchievements } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/marketing-center")({
+  beforeLoad: requireAgentRoute,
   head: () => ({
     meta: [
       { title: "Marketing Center — مركز التسويق" },
