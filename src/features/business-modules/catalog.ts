@@ -1,5 +1,14 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Bot, Boxes, ContactRound, Megaphone, ReceiptText, ShoppingCart, Truck } from "lucide-react";
+import {
+  BarChart3,
+  Bot,
+  Boxes,
+  ContactRound,
+  Megaphone,
+  ReceiptText,
+  ShoppingCart,
+  Truck,
+} from "lucide-react";
 
 export type BusinessModuleDefinition = {
   key: string;

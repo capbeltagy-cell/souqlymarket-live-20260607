@@ -79,6 +79,7 @@ import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedChooseRoleRouteImport } from './routes/_authenticated/choose-role'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
+import { Route as AuthenticatedBusinessSuiteRouteImport } from './routes/_authenticated/business-suite'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticated/ai-tools'
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
@@ -478,6 +479,12 @@ const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   path: '/campaigns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBusinessSuiteRoute =
+  AuthenticatedBusinessSuiteRouteImport.update({
+    id: '/business-suite',
+    path: '/business-suite',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -772,6 +779,7 @@ export interface FileRoutesByFullPath {
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -884,6 +892,7 @@ export interface FileRoutesByTo {
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -998,6 +1007,7 @@ export interface FileRoutesById {
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/_authenticated/ai-tools': typeof AuthenticatedAiToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -1112,6 +1122,7 @@ export interface FileRouteTypes {
     | '/agent-performance'
     | '/ai-tools'
     | '/analytics'
+    | '/business-suite'
     | '/campaigns'
     | '/checkout'
     | '/choose-role'
@@ -1224,6 +1235,7 @@ export interface FileRouteTypes {
     | '/agent-performance'
     | '/ai-tools'
     | '/analytics'
+    | '/business-suite'
     | '/campaigns'
     | '/checkout'
     | '/choose-role'
@@ -1337,6 +1349,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agent-performance'
     | '/_authenticated/ai-tools'
     | '/_authenticated/analytics'
+    | '/_authenticated/business-suite'
     | '/_authenticated/campaigns'
     | '/_authenticated/checkout'
     | '/_authenticated/choose-role'
@@ -1927,6 +1940,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/business-suite': {
+      id: '/_authenticated/business-suite'
+      path: '/business-suite'
+      fullPath: '/business-suite'
+      preLoaderRoute: typeof AuthenticatedBusinessSuiteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
@@ -2298,6 +2318,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
   AuthenticatedAiToolsRoute: typeof AuthenticatedAiToolsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedBusinessSuiteRoute: typeof AuthenticatedBusinessSuiteRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
   AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedChooseRoleRoute: typeof AuthenticatedChooseRoleRoute
@@ -2361,6 +2382,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
   AuthenticatedAiToolsRoute: AuthenticatedAiToolsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedBusinessSuiteRoute: AuthenticatedBusinessSuiteRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
   AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedChooseRoleRoute: AuthenticatedChooseRoleRoute,
