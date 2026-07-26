@@ -79,21 +79,30 @@ import { Route as AuthenticatedCommissionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedChooseRoleRouteImport } from './routes/_authenticated/choose-role'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
+import { Route as AuthenticatedBusinessSuiteRouteImport } from './routes/_authenticated/business-suite'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAiToolsRouteImport } from './routes/_authenticated/ai-tools'
 import { Route as AuthenticatedAgentPerformanceRouteImport } from './routes/_authenticated/agent-performance'
 import { Route as AuthenticatedAgentRouteImport } from './routes/_authenticated/agent'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin-withdrawals'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin-users'
+import { Route as AuthenticatedAdminSystemStatusRouteImport } from './routes/_authenticated/admin-system-status'
 import { Route as AuthenticatedAdminStoresRouteImport } from './routes/_authenticated/admin-stores'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin-revenue'
 import { Route as AuthenticatedAdminPlatformSettingsRouteImport } from './routes/_authenticated/admin-platform-settings'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin-payments'
 import { Route as AuthenticatedAdminOverviewRouteImport } from './routes/_authenticated/admin-overview'
+import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin-orders'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin-notifications'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin-moderation'
+import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin-listings'
 import { Route as AuthenticatedAdminLaunchContentRouteImport } from './routes/_authenticated/admin-launch-content'
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
+import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authenticated/admin-disputes'
 import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin-deposits'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin-companies'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin-audit'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
 import { Route as AuthenticatedWholesaleNewRouteImport } from './routes/_authenticated/wholesale.new'
@@ -470,6 +479,12 @@ const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   path: '/campaigns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBusinessSuiteRoute =
+  AuthenticatedBusinessSuiteRouteImport.update({
+    id: '/business-suite',
+    path: '/business-suite',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -495,6 +510,17 @@ const AuthenticatedAdminWithdrawalsRoute =
   AuthenticatedAdminWithdrawalsRouteImport.update({
     id: '/admin-withdrawals',
     path: '/admin-withdrawals',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/admin-users',
+  path: '/admin-users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminSystemStatusRoute =
+  AuthenticatedAdminSystemStatusRouteImport.update({
+    id: '/admin-system-status',
+    path: '/admin-system-status',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminStoresRoute =
@@ -527,6 +553,30 @@ const AuthenticatedAdminOverviewRoute =
     path: '/admin-overview',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminOrdersRoute =
+  AuthenticatedAdminOrdersRouteImport.update({
+    id: '/admin-orders',
+    path: '/admin-orders',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/admin-notifications',
+    path: '/admin-notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/admin-moderation',
+    path: '/admin-moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminListingsRoute =
+  AuthenticatedAdminListingsRouteImport.update({
+    id: '/admin-listings',
+    path: '/admin-listings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminLaunchContentRoute =
   AuthenticatedAdminLaunchContentRouteImport.update({
     id: '/admin-launch-content',
@@ -537,6 +587,12 @@ const AuthenticatedAdminExecutiveRoute =
   AuthenticatedAdminExecutiveRouteImport.update({
     id: '/admin-executive',
     path: '/admin-executive',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminDisputesRoute =
+  AuthenticatedAdminDisputesRouteImport.update({
+    id: '/admin-disputes',
+    path: '/admin-disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminDepositsRoute =
@@ -557,6 +613,11 @@ const AuthenticatedAdminCommissionsRoute =
     path: '/admin-commissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin-audit',
+  path: '/admin-audit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAchievementsRoute =
   AuthenticatedAchievementsRouteImport.update({
     id: '/achievements',
@@ -695,21 +756,30 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/admin-users': typeof AuthenticatedAdminUsersRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -799,21 +869,30 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/admin-users': typeof AuthenticatedAdminUsersRoute
   '/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/agent': typeof AuthenticatedAgentRoute
   '/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/ai-tools': typeof AuthenticatedAiToolsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -905,21 +984,30 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin-companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin-deposits': typeof AuthenticatedAdminDepositsRoute
+  '/_authenticated/admin-disputes': typeof AuthenticatedAdminDisputesRoute
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
+  '/_authenticated/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/_authenticated/admin-moderation': typeof AuthenticatedAdminModerationRoute
+  '/_authenticated/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
+  '/_authenticated/admin-orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin-overview': typeof AuthenticatedAdminOverviewRoute
   '/_authenticated/admin-payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/admin-platform-settings': typeof AuthenticatedAdminPlatformSettingsRoute
   '/_authenticated/admin-revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/admin-stores': typeof AuthenticatedAdminStoresRoute
+  '/_authenticated/admin-system-status': typeof AuthenticatedAdminSystemStatusRoute
+  '/_authenticated/admin-users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin-withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/agent': typeof AuthenticatedAgentRoute
   '/_authenticated/agent-performance': typeof AuthenticatedAgentPerformanceRoute
   '/_authenticated/ai-tools': typeof AuthenticatedAiToolsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/business-suite': typeof AuthenticatedBusinessSuiteRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRouteWithChildren
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/choose-role': typeof AuthenticatedChooseRoleRoute
@@ -1011,21 +1099,30 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/achievements'
+    | '/admin-audit'
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
+    | '/admin-disputes'
     | '/admin-executive'
     | '/admin-launch-content'
+    | '/admin-listings'
+    | '/admin-moderation'
+    | '/admin-notifications'
+    | '/admin-orders'
     | '/admin-overview'
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-stores'
+    | '/admin-system-status'
+    | '/admin-users'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
     | '/ai-tools'
     | '/analytics'
+    | '/business-suite'
     | '/campaigns'
     | '/checkout'
     | '/choose-role'
@@ -1115,21 +1212,30 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/achievements'
+    | '/admin-audit'
     | '/admin-commissions'
     | '/admin-companies'
     | '/admin-deposits'
+    | '/admin-disputes'
     | '/admin-executive'
     | '/admin-launch-content'
+    | '/admin-listings'
+    | '/admin-moderation'
+    | '/admin-notifications'
+    | '/admin-orders'
     | '/admin-overview'
     | '/admin-payments'
     | '/admin-platform-settings'
     | '/admin-revenue'
     | '/admin-stores'
+    | '/admin-system-status'
+    | '/admin-users'
     | '/admin-withdrawals'
     | '/agent'
     | '/agent-performance'
     | '/ai-tools'
     | '/analytics'
+    | '/business-suite'
     | '/campaigns'
     | '/checkout'
     | '/choose-role'
@@ -1220,21 +1326,30 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wholesale'
     | '/_authenticated/achievements'
+    | '/_authenticated/admin-audit'
     | '/_authenticated/admin-commissions'
     | '/_authenticated/admin-companies'
     | '/_authenticated/admin-deposits'
+    | '/_authenticated/admin-disputes'
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-launch-content'
+    | '/_authenticated/admin-listings'
+    | '/_authenticated/admin-moderation'
+    | '/_authenticated/admin-notifications'
+    | '/_authenticated/admin-orders'
     | '/_authenticated/admin-overview'
     | '/_authenticated/admin-payments'
     | '/_authenticated/admin-platform-settings'
     | '/_authenticated/admin-revenue'
     | '/_authenticated/admin-stores'
+    | '/_authenticated/admin-system-status'
+    | '/_authenticated/admin-users'
     | '/_authenticated/admin-withdrawals'
     | '/_authenticated/agent'
     | '/_authenticated/agent-performance'
     | '/_authenticated/ai-tools'
     | '/_authenticated/analytics'
+    | '/_authenticated/business-suite'
     | '/_authenticated/campaigns'
     | '/_authenticated/checkout'
     | '/_authenticated/choose-role'
@@ -1825,6 +1940,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/business-suite': {
+      id: '/_authenticated/business-suite'
+      path: '/business-suite'
+      fullPath: '/business-suite'
+      preLoaderRoute: typeof AuthenticatedBusinessSuiteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
@@ -1858,6 +1980,20 @@ declare module '@tanstack/react-router' {
       path: '/admin-withdrawals'
       fullPath: '/admin-withdrawals'
       preLoaderRoute: typeof AuthenticatedAdminWithdrawalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-users': {
+      id: '/_authenticated/admin-users'
+      path: '/admin-users'
+      fullPath: '/admin-users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-system-status': {
+      id: '/_authenticated/admin-system-status'
+      path: '/admin-system-status'
+      fullPath: '/admin-system-status'
+      preLoaderRoute: typeof AuthenticatedAdminSystemStatusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin-stores': {
@@ -1895,6 +2031,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOverviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-orders': {
+      id: '/_authenticated/admin-orders'
+      path: '/admin-orders'
+      fullPath: '/admin-orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-notifications': {
+      id: '/_authenticated/admin-notifications'
+      path: '/admin-notifications'
+      fullPath: '/admin-notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-moderation': {
+      id: '/_authenticated/admin-moderation'
+      path: '/admin-moderation'
+      fullPath: '/admin-moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-listings': {
+      id: '/_authenticated/admin-listings'
+      path: '/admin-listings'
+      fullPath: '/admin-listings'
+      preLoaderRoute: typeof AuthenticatedAdminListingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-launch-content': {
       id: '/_authenticated/admin-launch-content'
       path: '/admin-launch-content'
@@ -1907,6 +2071,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-executive'
       fullPath: '/admin-executive'
       preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-disputes': {
+      id: '/_authenticated/admin-disputes'
+      path: '/admin-disputes'
+      fullPath: '/admin-disputes'
+      preLoaderRoute: typeof AuthenticatedAdminDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin-deposits': {
@@ -1928,6 +2099,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-commissions'
       fullPath: '/admin-commissions'
       preLoaderRoute: typeof AuthenticatedAdminCommissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin-audit': {
+      id: '/_authenticated/admin-audit'
+      path: '/admin-audit'
+      fullPath: '/admin-audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/achievements': {
@@ -2117,21 +2295,30 @@ const AuthenticatedOrdersRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
+  AuthenticatedAdminDisputesRoute: typeof AuthenticatedAdminDisputesRoute
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminLaunchContentRoute: typeof AuthenticatedAdminLaunchContentRoute
+  AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
+  AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
+  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminOverviewRoute: typeof AuthenticatedAdminOverviewRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminPlatformSettingsRoute: typeof AuthenticatedAdminPlatformSettingsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAdminStoresRoute: typeof AuthenticatedAdminStoresRoute
+  AuthenticatedAdminSystemStatusRoute: typeof AuthenticatedAdminSystemStatusRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAgentRoute: typeof AuthenticatedAgentRoute
   AuthenticatedAgentPerformanceRoute: typeof AuthenticatedAgentPerformanceRoute
   AuthenticatedAiToolsRoute: typeof AuthenticatedAiToolsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedBusinessSuiteRoute: typeof AuthenticatedBusinessSuiteRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRouteWithChildren
   AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedChooseRoleRoute: typeof AuthenticatedChooseRoleRoute
@@ -2171,22 +2358,31 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
+  AuthenticatedAdminDisputesRoute: AuthenticatedAdminDisputesRoute,
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminLaunchContentRoute: AuthenticatedAdminLaunchContentRoute,
+  AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
+  AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
+  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminOverviewRoute: AuthenticatedAdminOverviewRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminPlatformSettingsRoute:
     AuthenticatedAdminPlatformSettingsRoute,
   AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
   AuthenticatedAdminStoresRoute: AuthenticatedAdminStoresRoute,
+  AuthenticatedAdminSystemStatusRoute: AuthenticatedAdminSystemStatusRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAgentRoute: AuthenticatedAgentRoute,
   AuthenticatedAgentPerformanceRoute: AuthenticatedAgentPerformanceRoute,
   AuthenticatedAiToolsRoute: AuthenticatedAiToolsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedBusinessSuiteRoute: AuthenticatedBusinessSuiteRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRouteWithChildren,
   AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedChooseRoleRoute: AuthenticatedChooseRoleRoute,

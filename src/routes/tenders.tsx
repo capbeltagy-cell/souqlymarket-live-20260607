@@ -8,7 +8,13 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { listTenders } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/tenders")({
-  head: () => ({ meta: [{ title: "المناقصات والمشاريع — Souqly" }] }),
+  head: () => ({
+    meta: [
+      { title: "المناقصات والمشاريع — Souqly" },
+      { name: "description", content: "مناقصات وفرص مشاريع فعلية للشركات والموردين على سوقلي." },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/tenders" }],
+  }),
   component: TendersList,
 });
 

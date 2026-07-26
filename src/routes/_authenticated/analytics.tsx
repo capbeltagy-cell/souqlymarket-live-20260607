@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
+  AlertTriangle,
   BadgeCheck,
   Eye,
   Inbox,
@@ -15,6 +16,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getCompanyAnalytics } from "@/lib/phase2.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({ meta: [{ title: "التحليلات — سوقلي" }] }),
@@ -28,10 +30,29 @@ function Analytics() {
   const ar = locale === "ar";
   const fetchAnalytics = useServerFn(getCompanyAnalytics);
   const [data, setData] = useState<Data | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchAnalytics().then(setData);
-  }, [fetchAnalytics]);
+    setData(null);
+    setLoadError(null);
+    fetchAnalytics()
+      .then(setData)
+      .catch((error: Error) => setLoadError(error.message));
+  }, [fetchAnalytics, retryKey]);
+
+  if (loadError)
+    return (
+      <Shell>
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-8 text-center">
+          <AlertTriangle className="mx-auto h-6 w-6 text-destructive" />
+          <p className="mt-2 text-muted-foreground">تعذر تحميل التقارير.</p>
+          <Button className="mt-4" variant="outline" onClick={() => setRetryKey((key) => key + 1)}>
+            إعادة المحاولة
+          </Button>
+        </div>
+      </Shell>
+    );
 
   if (!data)
     return (

@@ -26,12 +26,25 @@ function NewRfq() {
   const [bmax, setBmax] = useState("");
   const [gov, setGov] = useState("");
   const [cats, setCats] = useState<{ slug: string; name_ar: string; name_en: string }[]>([]);
+  const [busy, setBusy] = useState(false);
   useEffect(() => {
-    listCategories().then((r) => setCats(r.categories));
+    listCategories()
+      .then((r) => setCats(r.categories))
+      .catch(() => setCats([]));
   }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const min = bmin ? Number(bmin) : undefined;
+    const max = bmax ? Number(bmax) : undefined;
+    if (!title.trim()) return toast.error(ar ? "أدخل عنوان الطلب" : "Enter a title");
+    if (min !== undefined && max !== undefined && max < min)
+      return toast.error(
+        ar
+          ? "الحد الأقصى للميزانية يجب ألا يقل عن الحد الأدنى"
+          : "Maximum budget must be at least the minimum",
+      );
+    setBusy(true);
     try {
       const r = await createRfq({
         data: {
@@ -40,15 +53,19 @@ function NewRfq() {
           category_slug: cat || undefined,
           quantity: qty ? Number(qty) : undefined,
           unit: unit || undefined,
-          budget_min: bmin ? Number(bmin) : undefined,
-          budget_max: bmax ? Number(bmax) : undefined,
+          budget_min: min,
+          budget_max: max,
           governorate: gov || undefined,
         },
       });
       toast.success(ar ? "تم النشر" : "Posted");
       nav({ to: "/rfq/$id", params: { id: r.id } });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : ar ? "تعذر نشر الطلب" : "Unable to publish RFQ",
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -121,7 +138,7 @@ function NewRfq() {
               ? "يمكنك إضافة المرفقات لاحقاً عبر روابط الملفات."
               : "You can attach file URLs later."}
           </p>
-          <Button type="submit" className="bg-primary hover:bg-primary-hover">
+          <Button type="submit" disabled={busy} className="bg-primary hover:bg-primary-hover">
             {ar ? "نشر الطلب" : "Publish"}
           </Button>
         </form>

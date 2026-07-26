@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - feature/store-production-readiness-sprint-1
+      - feat/multi-vendor-stores
       - main
   pull_request:
     branches:
       - feature/store-production-readiness-sprint-1
+      - feat/multi-vendor-stores
       - main
 
 permissions:
@@ -41,6 +43,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Tests
+        run: npm test
 
       - name: Production build
         env:

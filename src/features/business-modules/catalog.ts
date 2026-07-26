@@ -3,61 +3,64 @@ import {
   BarChart3,
   Bot,
   Boxes,
-  Calculator,
   ContactRound,
-  FileText,
   Megaphone,
-  MonitorSmartphone,
-  PackageCheck,
   ReceiptText,
   ShoppingCart,
-  UsersRound,
+  Truck,
 } from "lucide-react";
-
-export type BusinessModuleStatus = "available" | "planned";
 
 export type BusinessModuleDefinition = {
   key: string;
   name: string;
   description: string;
   icon: LucideIcon;
-  status: BusinessModuleStatus;
-  href?: string;
+  href: string;
 };
 
-// The catalog is the single navigation source for business modules. New modules
-// can be registered here without changing the page layout or main navigation.
+// Single navigation source for business modules. Operational modules open the
+// unified company workspace so every visible card leads to a working flow.
 export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
   {
     key: "crm",
     name: "إدارة العملاء CRM",
-    description: "متابعة العملاء المحتملين ومسار التواصل.",
+    description: "إضافة العملاء ومتابعة بيانات التواصل من مساحة عمل واحدة.",
     icon: ContactRound,
-    status: "available",
-    href: "/leads",
+    href: "/business-suite",
   },
   {
     key: "inventory",
     name: "المخزون",
-    description: "متابعة المنتجات والكميات المتاحة.",
+    description: "إدارة الأصناف والكميات وحدود التنبيه والأسعار.",
     icon: Boxes,
-    status: "available",
-    href: "/store#inventory",
+    href: "/business-suite",
   },
   {
     key: "invoices",
     name: "الفواتير",
-    description: "عرض فواتير الحساب والطلبات.",
+    description: "إصدار الفواتير ومتابعة المدفوع والمستحق.",
     icon: ReceiptText,
-    status: "available",
-    href: "/invoices",
+    href: "/business-suite",
+  },
+  {
+    key: "sales",
+    name: "المبيعات",
+    description: "إنشاء أوامر البيع وربطها بالعملاء ومتابعة قيمتها.",
+    icon: ShoppingCart,
+    href: "/business-suite",
+  },
+  {
+    key: "purchases",
+    name: "المشتريات والموردون",
+    description: "إدارة الموردين وإنشاء أوامر الشراء ومواعيد التوريد.",
+    icon: Truck,
+    href: "/business-suite",
   },
   {
     key: "marketing",
     name: "التسويق",
     description: "إدارة الحملات وفرص المسوقين.",
     icon: Megaphone,
-    status: "available",
     href: "/marketing-center",
   },
   {
@@ -65,7 +68,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "أدوات الذكاء الاصطناعي",
     description: "أدوات مساعدة لإعداد المحتوى التسويقي.",
     icon: Bot,
-    status: "available",
     href: "/ai-tools",
   },
   {
@@ -73,49 +75,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     name: "التقارير",
     description: "مؤشرات الأداء وتحليلات النشاط.",
     icon: BarChart3,
-    status: "available",
     href: "/analytics",
-  },
-  {
-    key: "purchases",
-    name: "المشتريات",
-    description: "تنظيم أوامر الشراء والموردين.",
-    icon: ShoppingCart,
-    status: "planned",
-  },
-  {
-    key: "sales",
-    name: "المبيعات",
-    description: "إدارة دورة البيع في مساحة عمل موحدة.",
-    icon: PackageCheck,
-    status: "planned",
-  },
-  {
-    key: "hr",
-    name: "الموارد البشرية",
-    description: "إدارة الفريق والصلاحيات التشغيلية.",
-    icon: UsersRound,
-    status: "planned",
-  },
-  {
-    key: "accounting",
-    name: "المحاسبة",
-    description: "القيود والتقارير المالية المتقدمة.",
-    icon: Calculator,
-    status: "planned",
-  },
-  {
-    key: "documents",
-    name: "المستندات",
-    description: "تنظيم مستندات الشركة والتعاملات.",
-    icon: FileText,
-    status: "planned",
-  },
-  {
-    key: "pos",
-    name: "نقاط البيع POS",
-    description: "إدارة المبيعات المباشرة والفروع.",
-    icon: MonitorSmartphone,
-    status: "planned",
   },
 ];

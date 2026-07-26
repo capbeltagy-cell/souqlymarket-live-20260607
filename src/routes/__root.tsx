@@ -11,11 +11,12 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportClientError } from "../lib/client-error-reporting";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTabBar } from "@/components/MobileTabBar";
+import { BUILD_VERSION } from "@/lib/build-info";
 
 function NotFoundComponent() {
   return (
@@ -42,7 +43,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportClientError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -69,6 +70,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "souqly-build", content: BUILD_VERSION },
       { title: "سوقلي | منصة الأعمال والتجارة في مصر" },
       {
         name: "description",
@@ -77,9 +79,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Souqly — سوقلي" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#0f766e" },
+      { name: "application-name", content: "Souqly" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icon.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

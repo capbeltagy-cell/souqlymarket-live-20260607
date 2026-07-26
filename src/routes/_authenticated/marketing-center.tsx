@@ -15,6 +15,9 @@ import {
   TrendingUp,
   Users,
   Target,
+  AlertTriangle,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -23,6 +26,7 @@ import { formatPrice } from "@/lib/currency";
 import { getMyWallets } from "@/lib/wallets.functions";
 import { getMyReferralAnalytics } from "@/lib/crm-analytics.functions";
 import { getMyAchievements } from "@/lib/marketing.functions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/marketing-center")({
   head: () => ({
@@ -46,20 +50,63 @@ function MarketingCenter() {
   const [wallet, setWallet] = useState<any>(null);
   const [an, setAn] = useState<any>(null);
   const [ach, setAch] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fWallets()
-      .then((r) =>
-        setWallet(r.wallets.find((w: any) => w.kind === "agent") ?? r.wallets[0] ?? null),
-      )
-      .catch(() => undefined);
-    fAnalytics()
-      .then(setAn)
-      .catch(() => undefined);
-    fAch()
-      .then((r) => setAch(r.achievements))
-      .catch(() => undefined);
-  }, []);
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    Promise.all([fWallets(), fAnalytics(), fAch()])
+      .then(([walletsResult, analyticsResult, achievementsResult]) => {
+        if (!active) return;
+        setWallet(
+          walletsResult.wallets.find((item: any) => item.kind === "agent") ??
+            walletsResult.wallets[0] ??
+            null,
+        );
+        setAn(analyticsResult);
+        setAch(achievementsResult.achievements);
+      })
+      .catch((error: Error) => {
+        if (active) setLoadError(error.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [retryKey]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface-2">
+        <SiteHeader />
+        <div className="container-souqly py-16 text-center text-muted-foreground">
+          <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+          <p className="mt-3">جارٍ تحميل بيانات التسويق…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-surface-2">
+        <SiteHeader />
+        <div className="container-souqly py-16 text-center">
+          <AlertTriangle className="mx-auto h-7 w-7 text-destructive" />
+          <p className="mt-3 text-muted-foreground">تعذر تحميل بيانات مركز التسويق.</p>
+          <Button className="mt-4" variant="outline" onClick={() => setRetryKey((key) => key + 1)}>
+            <RefreshCw className="me-2 h-4 w-4" />
+            إعادة المحاولة
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">

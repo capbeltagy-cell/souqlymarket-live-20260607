@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getCityVariants, getGovernorateVariants } from "@/lib/egypt.locations";
 import { assertNotPureMarketer } from "@/lib/marketer-guard";
+import { hasPlatformAdminAccess } from "@/lib/admin-permissions";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const T = (s: string) => s as any; // bypass generated types for new tables
@@ -400,11 +401,13 @@ export const adminVerifyFactory = createServerFn({ method: "POST" })
     z.object({ companyId: z.string().uuid(), verified: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: roleRows, error: roleError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (roleError || !hasPlatformAdminAccess((roleRows ?? []).map((row) => row.role))) {
+      throw new Error("Forbidden");
+    }
     const { error } = await context.supabase
       .from(T("factories"))
       .update({ verified: data.verified })
@@ -784,11 +787,13 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: roleRows, error: roleError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (roleError || !hasPlatformAdminAccess((roleRows ?? []).map((row) => row.role))) {
+      throw new Error("Forbidden");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date().toISOString();
     const [companies, leads, rfqs, tenders, refs, payments] = await Promise.all([

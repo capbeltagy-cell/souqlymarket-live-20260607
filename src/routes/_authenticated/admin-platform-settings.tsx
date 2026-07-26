@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getPlatformSettings, updatePlatformSettings } from "@/lib/marketing.functions";
 import { requireAdminRoute } from "@/lib/route-guards";
+import { adminSettingsHistory } from "@/lib/admin-phase2-ui.functions";
 
 export const Route = createFileRoute("/_authenticated/admin-platform-settings")({
   beforeLoad: requireAdminRoute,
@@ -27,6 +28,8 @@ function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [history, setHistory] = useState<unknown[]>([]);
+  const [historyMessage, setHistoryMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -47,6 +50,12 @@ function SettingsPage() {
         setLoadingError(message);
         toast.error(message);
       });
+    adminSettingsHistory()
+      .then((result) => {
+        setHistory(result.rows);
+        setHistoryMessage(result.available ? null : result.message);
+      })
+      .catch(() => setHistoryMessage("تعذر تحميل سجل تغييرات الإعدادات"));
 
     return () => {
       active = false;
@@ -294,6 +303,24 @@ function SettingsPage() {
             </div>
           </form>
         )}
+        <section className="rounded-xl border border-border bg-card p-5">
+          <h2 className="mb-3 font-semibold">سجل تغييرات الإعدادات</h2>
+          {historyMessage ? (
+            <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+              {historyMessage}
+            </p>
+          ) : history.length === 0 ? (
+            <p className="text-sm text-muted-foreground">لا توجد تغييرات مسجلة.</p>
+          ) : (
+            <div className="space-y-2">
+              {history.map((row, index) => (
+                <pre key={index} className="overflow-x-auto rounded-lg bg-muted p-3 text-xs">
+                  {JSON.stringify(row, null, 2)}
+                </pre>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </AdminLayout>
   );

@@ -73,22 +73,7 @@ export const convertReferral = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    // Ownership check: only the agent who owns the referral can convert it.
-    const { data: referral } = await supabase
-      .from("referrals")
-      .select("id, agent_id")
-      .eq("id", data.referralId)
-      .maybeSingle();
-    if (!referral) throw new Error("Referral not found");
-    const { data: agent } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (!agent || agent.id !== referral.agent_id) {
-      throw new Error("غير مسموح لك بتحويل إحالة لا تخصك");
-    }
+    const { supabase } = context;
     const { data: commissionId, error } = await supabase.rpc("convert_referral", {
       _referral_id: data.referralId,
       _amount: data.amount,

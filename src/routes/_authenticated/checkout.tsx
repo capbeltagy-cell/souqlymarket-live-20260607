@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin, Plus, ShoppingBag, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -91,15 +91,7 @@ function CheckoutPage() {
     );
   }
 
-  useEffect(() => {
-    setItems(getCart());
-    const unsub = subscribeCart(() => setItems(getCart()));
-    reloadAddresses();
-    return unsub;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function reloadAddresses() {
+  const reloadAddresses = useCallback(async () => {
     setLoading(true);
     try {
       const list = (await loadAddrs()) as Address[];
@@ -124,7 +116,14 @@ function CheckoutPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [addressCacheKey, loadAddrs]);
+
+  useEffect(() => {
+    setItems(getCart());
+    const unsub = subscribeCart(() => setItems(getCart()));
+    void reloadAddresses();
+    return unsub;
+  }, [reloadAddresses]);
 
   async function submitAddress() {
     if (!f.recipient_name || !f.phone || !f.governorate || !f.city || !f.address_line) {

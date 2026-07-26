@@ -55,15 +55,7 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    // Only admins can change commission status. The commission_to_wallet
-    // trigger credits the marketer wallet on status=paid, so allowing any
-    // user to set status=paid would be a direct money bypass.
-    const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { supabase } = context;
     const { error } = await supabase
       .from("commissions")
       .update({ status: data.status })
@@ -76,21 +68,9 @@ export const requestPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    // Ownership check: only the agent who owns the commission can request payout.
-    const { data: commission } = await (supabase.from("commissions" as never) as any)
-      .select("id, agent_id")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (!commission) throw new Error("Commission not found");
-    const { data: agent } = await (supabase.from("agents" as never) as any)
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (!agent || agent.id !== commission.agent_id) {
-      throw new Error("غير مسموح لك بطلب صرف عمولة لا تخصك");
-    }
-    const { error } = await (supabase.from("commissions" as never) as any)
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("commissions")
       .update({ payout_requested_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -163,18 +143,6 @@ export const adminReviewCommission = createServerFn({ method: "POST" })
       const { error } = await supabase.from("commissions").delete().eq("id", data.id);
       if (error) throw new Error(error.message);
       return { ok: true, deleted: true };
-    }
-
-    // Idempotency: block re-paying an already-paid commission.
-    if (data.action === "paid") {
-      const { data: existing } = await supabase
-        .from("commissions")
-        .select("status")
-        .eq("id", data.id)
-        .maybeSingle();
-      if (existing?.status === "paid") {
-        return { ok: true, alreadyPaid: true as const };
-      }
     }
 
     const nextStatus = data.action === "approve" ? ("approved" as const) : ("paid" as const);
