@@ -1,1 +1,1 @@
-export const BUILD_VERSION = "souqly-safe-code-cleanup-20260722";
+export const BUILD_VERSION = "souqly-investor-demo-20260726";

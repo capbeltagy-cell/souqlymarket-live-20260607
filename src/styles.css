@@ -1,7 +1,15 @@
 /* SOUQLY ARABIC LIGHT FINAL 20260722 */
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+
+/* The hosted build may inject a builder attribution badge after hydration.
+   It is not part of Souqly's product UI and must never appear to visitors. */
+[aria-label="Edit with Lovable"],
+aside:has(a[href*="utm_source=lovable-badge"]) {
+  display: none !important;
+}
 
 @custom-variant dark (&:is(.dark *));
 
