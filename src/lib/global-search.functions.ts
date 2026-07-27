@@ -63,11 +63,13 @@ export const globalSearch = createServerFn({ method: "POST" })
           .select(
             "id, title, description, governorate, quantity, unit, budget_min, budget_max, currency, status",
           )
+          .eq("status", "open")
           .or(`title.ilike.${like},description.ilike.${like}`)
           .limit(lim),
         supabaseAdmin
           .from("tenders")
           .select("id, title, description, governorate, budget, currency, deadline, status")
+          .eq("status", "open")
           .or(`title.ilike.${like},description.ilike.${like}`)
           .limit(lim),
         supabaseAdmin
