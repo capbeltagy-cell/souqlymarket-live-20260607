@@ -134,9 +134,13 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
       note: data.note ?? null,
     });
     if (error) throw new Error(error.message);
-    await (supabase.from("wholesale_orders" as never) as any)
+    const { error: orderUpdateError } = await (
+      supabaseAdmin.from("wholesale_orders" as never) as any
+    )
       .update({ payment_status: "pending_review" })
-      .eq("id", data.order_id);
+      .eq("id", data.order_id)
+      .eq("buyer_id", userId);
+    if (orderUpdateError) throw new Error(orderUpdateError.message);
     return { ok: true };
   });
 

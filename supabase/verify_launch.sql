@@ -239,6 +239,10 @@ BEGIN
     missing := array_append(missing, 'direct Data API order insert privilege');
   END IF;
 
+  IF has_table_privilege('authenticated', 'public.wholesale_orders', 'UPDATE') THEN
+    missing := array_append(missing, 'direct Data API order update privilege');
+  END IF;
+
   IF has_table_privilege('authenticated', 'public.store_coupon_usage', 'INSERT') THEN
     missing := array_append(missing, 'direct Data API coupon usage insert privilege');
   END IF;

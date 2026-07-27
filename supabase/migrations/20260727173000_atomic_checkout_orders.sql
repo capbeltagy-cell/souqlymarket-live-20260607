@@ -437,6 +437,8 @@ FOR EACH ROW EXECUTE FUNCTION public.record_released_order_inventory();
 -- All client order creation now goes through the two validated RPCs above.
 DROP POLICY IF EXISTS "wholesale_orders buyer insert" ON public.wholesale_orders;
 REVOKE INSERT ON public.wholesale_orders FROM authenticated;
+DROP POLICY IF EXISTS "wholesale_orders company update" ON public.wholesale_orders;
+REVOKE UPDATE ON public.wholesale_orders FROM authenticated;
 DROP POLICY IF EXISTS "store_coupon_usage_self_insert" ON public.store_coupon_usage;
 REVOKE INSERT ON public.store_coupon_usage FROM authenticated;
 
