@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listFactories } from "@/lib/phase3.functions";
+import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/factories")({
   head: () => ({
@@ -23,15 +24,23 @@ function FactoriesList() {
   const [exportOnly, setExportOnly] = useState(false);
   const [gov, setGov] = useState("");
   const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     listFactories({
       data: {
         verified: verified || undefined,
         export_available: exportOnly || undefined,
         governorate: gov || undefined,
       },
-    }).then((r) => setRows(r.factories));
-  }, [verified, exportOnly, gov]);
+    })
+      .then((r) => setRows(r.factories))
+      .catch(() => setError(ar ? "تعذر تحميل دليل المصانع." : "Unable to load factories."))
+      .finally(() => setLoading(false));
+  }, [ar, verified, exportOnly, gov, retryToken]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -97,42 +106,52 @@ function FactoriesList() {
             </label>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {rows.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-10">
-              {ar ? "لا توجد مصانع" : "No factories"}
-            </div>
-          )}
-          {rows.map((f) => (
-            <Link
-              key={f.company_id}
-              to="/factories/$id"
-              params={{ id: f.company_id }}
-              className="rounded-[1.5rem] border border-border bg-surface-2 p-5 hover:bg-surface shadow-elev transition"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="font-semibold">
-                  {ar ? f.companies?.name_ar : f.companies?.name_en}
-                </div>
-                {f.verified && <Badge variant="secondary">{ar ? "موثق" : "Verified"}</Badge>}
-              </div>
-              <div className="text-sm text-muted-foreground mt-2">
-                {f.companies?.governorate || f.companies?.city || f.companies?.country}
-              </div>
-              <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {f.production_capacity && (
-                  <div>
-                    {ar ? "الطاقة الإنتاجية:" : "Capacity:"}{" "}
-                    <span className="text-foreground">{f.production_capacity}</span>
+        <CollectionState
+          loading={loading}
+          error={error}
+          empty={rows.length === 0}
+          emptyTitle={ar ? "لا توجد مصانع مطابقة" : "No matching factories"}
+          emptyDescription={
+            ar
+              ? "غيّر المحافظة أو ألغِ بعض عوامل التصفية."
+              : "Change the governorate or clear a filter."
+          }
+          retryLabel={ar ? "إعادة المحاولة" : "Try again"}
+          onRetry={() => setRetryToken((value) => value + 1)}
+        />
+        {!loading && !error && rows.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {rows.map((f) => (
+              <Link
+                key={f.company_id}
+                to="/factories/$id"
+                params={{ id: f.company_id }}
+                className="rounded-[1.5rem] border border-border bg-surface-2 p-5 hover:bg-surface shadow-elev transition"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-semibold">
+                    {ar ? f.companies?.name_ar : f.companies?.name_en}
                   </div>
-                )}
-                {f.export_available && (
-                  <Badge variant="secondary">{ar ? "متاح للتصدير" : "Export"}</Badge>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+                  {f.verified && <Badge variant="secondary">{ar ? "موثق" : "Verified"}</Badge>}
+                </div>
+                <div className="text-sm text-muted-foreground mt-2">
+                  {f.companies?.governorate || f.companies?.city || f.companies?.country}
+                </div>
+                <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                  {f.production_capacity && (
+                    <div>
+                      {ar ? "الطاقة الإنتاجية:" : "Capacity:"}{" "}
+                      <span className="text-foreground">{f.production_capacity}</span>
+                    </div>
+                  )}
+                  {f.export_available && (
+                    <Badge variant="secondary">{ar ? "متاح للتصدير" : "Export"}</Badge>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
       <SiteFooter />
     </div>

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listPublicStores } from "@/lib/stores.functions";
 import { BadgeCheck, Store as StoreIcon } from "lucide-react";
+import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/stores/")({
   head: () => ({
@@ -22,26 +23,39 @@ function StoresPage() {
   const { locale } = useI18n();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     listPublicStores()
       .then((r) => {
         setItems(r.items);
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() =>
+        setError(locale === "ar" ? "تعذر تحميل المتاجر حاليًا." : "Unable to load stores."),
+      )
+      .finally(() => setLoading(false));
+  }, [locale, retryToken]);
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
       <section className="container-souqly py-10">
         <h1 className="text-3xl font-bold mb-6">{locale === "ar" ? "المتاجر" : "Stores"}</h1>
-        {loading ? (
-          <div className="text-muted-foreground">…</div>
-        ) : items.length === 0 ? (
-          <div className="text-muted-foreground">
-            {locale === "ar" ? "لا توجد متاجر منشورة حاليًا" : "No published stores yet"}
-          </div>
-        ) : (
+        <CollectionState
+          loading={loading}
+          error={error}
+          empty={items.length === 0}
+          emptyTitle={locale === "ar" ? "لا توجد متاجر منشورة حاليًا" : "No published stores yet"}
+          emptyDescription={
+            locale === "ar"
+              ? "ستظهر هنا المتاجر بعد اعتمادها ونشرها."
+              : "Approved stores will appear here once published."
+          }
+          retryLabel={locale === "ar" ? "إعادة المحاولة" : "Try again"}
+          onRetry={() => setRetryToken((value) => value + 1)}
+        />
+        {!loading && !error && items.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((s) => (
               <Link

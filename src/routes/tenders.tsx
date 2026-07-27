@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listTenders } from "@/lib/phase3.functions";
+import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/tenders")({
   head: () => ({ meta: [{ title: "المناقصات والمشاريع — Souqly" }] }),
@@ -17,9 +18,17 @@ function TendersList() {
   const ar = locale === "ar";
   const [status, setStatus] = useState<"" | "open" | "closed" | "awarded">("");
   const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   useEffect(() => {
-    listTenders({ data: { status: status || undefined } }).then((r) => setRows(r.tenders));
-  }, [status]);
+    setLoading(true);
+    setError(null);
+    listTenders({ data: { status: status || undefined } })
+      .then((r) => setRows(r.tenders))
+      .catch(() => setError(ar ? "تعذر تحميل المناقصات حاليًا." : "Unable to load tenders."))
+      .finally(() => setLoading(false));
+  }, [ar, status, retryToken]);
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -57,52 +66,66 @@ function TendersList() {
             </Button>
           ))}
         </div>
-        <div className="grid gap-4">
-          {rows.length === 0 && (
-            <div className="text-center text-muted-foreground py-12">
-              {ar ? "لا توجد مناقصات" : "No tenders"}
-            </div>
-          )}
-          {rows.map((t) => (
-            <Link
-              key={t.id}
-              to="/tenders/$id"
-              params={{ id: t.id }}
-              className="block rounded-[1.5rem] border border-border bg-surface-2 p-6 hover:bg-surface shadow-elev transition"
-            >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-xl">{t.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{t.description}</p>
-                  <div className="flex flex-wrap gap-2 mt-4 text-sm text-muted-foreground">
-                    {t.category_slug && (
-                      <span className="rounded-2xl bg-white/5 px-3 py-1">{t.category_slug}</span>
-                    )}
-                    {t.governorate && (
-                      <span className="rounded-2xl bg-white/5 px-3 py-1">{t.governorate}</span>
-                    )}
-                    {t.budget && (
-                      <span>
-                        {ar ? "الميزانية:" : "Budget:"} {t.budget} {t.currency}
-                      </span>
-                    )}
-                    {t.deadline && (
-                      <span>
-                        {ar ? "ينتهي:" : "Deadline:"} {t.deadline}
-                      </span>
-                    )}
+        <CollectionState
+          loading={loading}
+          error={error}
+          empty={rows.length === 0}
+          emptyTitle={ar ? "لا توجد مناقصات مطابقة" : "No matching tenders"}
+          emptyDescription={
+            ar
+              ? "جرّب تغيير حالة التصفية أو انشر مناقصة جديدة."
+              : "Change the filter or create a new tender."
+          }
+          retryLabel={ar ? "إعادة المحاولة" : "Try again"}
+          onRetry={() => setRetryToken((value) => value + 1)}
+        />
+        {!loading && !error && rows.length > 0 && (
+          <div className="grid gap-4">
+            {rows.map((t) => (
+              <Link
+                key={t.id}
+                to="/tenders/$id"
+                params={{ id: t.id }}
+                className="block rounded-[1.5rem] border border-border bg-surface-2 p-6 hover:bg-surface shadow-elev transition"
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-xl">{t.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                      {t.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-4 text-sm text-muted-foreground">
+                      {t.category_slug && (
+                        <span className="rounded-2xl bg-white/5 px-3 py-1">{t.category_slug}</span>
+                      )}
+                      {t.governorate && (
+                        <span className="rounded-2xl bg-white/5 px-3 py-1">{t.governorate}</span>
+                      )}
+                      {t.budget && (
+                        <span>
+                          {ar ? "الميزانية:" : "Budget:"} {t.budget} {t.currency}
+                        </span>
+                      )}
+                      {t.deadline && (
+                        <span>
+                          {ar ? "ينتهي:" : "Deadline:"} {t.deadline}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3 items-start sm:items-end">
+                    <Badge variant={t.status === "open" ? "default" : "secondary"}>
+                      {t.status}
+                    </Badge>
+                    <div className="text-sm text-muted-foreground">
+                      {ar ? "قدم على العرض قبل:" : "Apply by:"} {t.deadline ?? "—"}
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-3 items-start sm:items-end">
-                  <Badge variant={t.status === "open" ? "default" : "secondary"}>{t.status}</Badge>
-                  <div className="text-sm text-muted-foreground">
-                    {ar ? "قدم على العرض قبل:" : "Apply by:"} {t.deadline ?? "—"}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
       <SiteFooter />
     </div>
