@@ -178,44 +178,24 @@ export const respondToQuotation = createServerFn({ method: "POST" })
       return { ok: true };
     }
 
-    // Accept → create order
-    const { data: items } = await (supabase.from("quotation_items" as never) as any)
-      .select("*")
-      .eq("quotation_id", data.id);
-    const firstListingId = items?.find((i: any) => i.listing_id)?.listing_id ?? null;
-    const totalQty = (items ?? []).reduce((s: number, i: any) => s + Number(i.quantity), 0);
-
-    const { data: order, error: oErr } = await (supabase.from("wholesale_orders" as never) as any)
-      .insert({
-        buyer_id: q.buyer_id,
-        product_listing_id: firstListingId,
-        quantity: Math.max(1, Math.round(totalQty)),
-        status: "accepted",
-        unit_price: q.total / Math.max(1, totalQty),
-        total_amount: q.total,
-        currency: q.currency,
-        shipping_address: data.shipping_address ?? null,
-        conversation_id: q.conversation_id,
-        payment_status: "unpaid",
-        quotation_id: q.id,
-        notes: q.notes,
-      })
-      .select("id")
-      .single();
-    if (oErr) throw new Error(oErr.message);
-
-    await (supabase.from("quotations" as never) as any)
-      .update({ status: "converted", order_id: order.id })
-      .eq("id", data.id);
+    const { data: result, error: orderError } = await (supabase.rpc as any)(
+      "accept_quotation_atomic",
+      {
+        p_quotation_id: data.id,
+        p_shipping_address: data.shipping_address ?? null,
+      },
+    );
+    if (orderError) throw new Error(orderError.message);
+    if (!result?.order_id) throw new Error("تعذر إنشاء الطلب من عرض السعر.");
 
     if (q.conversation_id) {
       await (supabase.from("messages" as never) as any).insert({
         conversation_id: q.conversation_id,
         sender_id: userId,
-        body: `[[order:${order.id}]] تم إنشاء طلب من عرض السعر`,
+        body: `[[order:${result.order_id}]] تم إنشاء طلب من عرض السعر`,
       });
     }
-    return { ok: true, order_id: order.id as string };
+    return { ok: true, order_id: result.order_id as string };
   });
 
 export const listMyQuotations = createServerFn({ method: "GET" })

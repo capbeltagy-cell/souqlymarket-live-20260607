@@ -44,6 +44,18 @@ legacy client depends on direct writes, keep the application rolled back and
 replace that path with a narrow validated RPC; do not restore the permissive
 company/buyer/status spoofing policy.
 
+Direct authenticated INSERT on `wholesale_orders` and `store_coupon_usage` is also
+intentionally revoked. Orders must be created through `create_order_atomic` or
+`accept_quotation_atomic`, which derive price, seller, store, coupon, shipping, and
+inventory values on the server. During an application rollback, roll back the
+application and database backup together; do not restore the permissive direct
+INSERT policies independently.
+
+`trg_record_released_order_inventory` records the compensating inventory movement
+after the existing inventory trigger restores stock. If this logging trigger
+fails, disable only that trigger after preserving the incident details; never
+manually edit stock balances or delete inventory movement rows.
+
 The Storage hardening migration only replaces UPDATE policies so that both the old
 and new object paths must remain owner-scoped. Do not restore the previous
 USING-only policies during an application rollback; they permit namespace changes

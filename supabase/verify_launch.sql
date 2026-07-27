@@ -29,7 +29,10 @@ BEGIN
     'public.has_role(uuid,public.app_role)',
     'public.handle_new_user()',
     'public.enforce_company_member_owner_role()',
-    'public.enforce_listing_owner()'
+    'public.enforce_listing_owner()',
+    'public.create_order_atomic(uuid,uuid,integer,text,text,jsonb,numeric,integer,integer,uuid,text,text,uuid)',
+    'public.accept_quotation_atomic(uuid,jsonb)',
+    'public.record_released_order_inventory()'
   ] LOOP
     IF to_regprocedure(item) IS NULL THEN missing := array_append(missing, 'function ' || item); END IF;
   END LOOP;
@@ -79,7 +82,7 @@ BEGIN
     'trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders',
     'trg_protect_store_review_fields','trg_sync_company_owner_membership',
     'trg_enforce_company_member_owner_role',
-    'trg_enforce_listing_owner'
+    'trg_enforce_listing_owner','trg_record_released_order_inventory'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname=item AND NOT tgisinternal) THEN missing := array_append(missing, 'trigger ' || item); END IF;
   END LOOP;
@@ -130,7 +133,10 @@ BEGIN
         'has_role',
         'handle_new_user',
         'enforce_company_member_owner_role',
-        'enforce_listing_owner'
+        'enforce_listing_owner',
+        'create_order_atomic',
+        'accept_quotation_atomic',
+        'record_released_order_inventory'
       )
   ) THEN
     missing := array_append(missing, 'PUBLIC execute on a sensitive launch function');
@@ -153,7 +159,10 @@ BEGIN
         'has_role',
         'handle_new_user',
         'enforce_company_member_owner_role',
-        'enforce_listing_owner'
+        'enforce_listing_owner',
+        'create_order_atomic',
+        'accept_quotation_atomic',
+        'record_released_order_inventory'
       )
       AND p.prosecdef
       AND NOT EXISTS (
@@ -224,6 +233,30 @@ BEGIN
   IF has_table_privilege('anon', 'public.leads', 'INSERT')
      OR has_table_privilege('authenticated', 'public.leads', 'INSERT') THEN
     missing := array_append(missing, 'direct Data API lead insert privilege');
+  END IF;
+
+  IF has_table_privilege('authenticated', 'public.wholesale_orders', 'INSERT') THEN
+    missing := array_append(missing, 'direct Data API order insert privilege');
+  END IF;
+
+  IF has_table_privilege('authenticated', 'public.store_coupon_usage', 'INSERT') THEN
+    missing := array_append(missing, 'direct Data API coupon usage insert privilege');
+  END IF;
+
+  IF NOT has_function_privilege(
+    'authenticated',
+    'public.create_order_atomic(uuid,uuid,integer,text,text,jsonb,numeric,integer,integer,uuid,text,text,uuid)',
+    'EXECUTE'
+  ) THEN
+    missing := array_append(missing, 'authenticated checkout RPC execute privilege');
+  END IF;
+
+  IF NOT has_function_privilege(
+    'authenticated',
+    'public.accept_quotation_atomic(uuid,jsonb)',
+    'EXECUTE'
+  ) THEN
+    missing := array_append(missing, 'authenticated quotation RPC execute privilege');
   END IF;
 
   IF pg_get_functiondef('public.handle_new_user()'::regprocedure)
@@ -306,5 +339,5 @@ END $$;
 SELECT 'tables' AS category, count(*)::text AS result FROM information_schema.tables WHERE table_schema='public'
 UNION ALL SELECT 'public policies', count(*)::text FROM pg_policies WHERE schemaname='public'
 UNION ALL SELECT 'storage policies', count(*)::text FROM pg_policies WHERE schemaname='storage'
-UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership','trg_enforce_company_member_owner_role','trg_enforce_listing_owner') AND NOT tgisinternal
+UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership','trg_enforce_company_member_owner_role','trg_enforce_listing_owner','trg_record_released_order_inventory') AND NOT tgisinternal
 UNION ALL SELECT 'verification', 'PASS';
