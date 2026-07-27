@@ -15,8 +15,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getCompanyAnalytics } from "@/lib/phase2.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "التحليلات — سوقلي" }] }),
   component: Analytics,
 });

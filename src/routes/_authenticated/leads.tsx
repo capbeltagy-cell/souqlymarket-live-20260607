@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listMyLeads, updateLeadStatus } from "@/lib/phase2.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/leads")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "Leads — Souqly" }] }),
   component: LeadsPage,
 });
