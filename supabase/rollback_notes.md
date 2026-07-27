@@ -12,8 +12,8 @@ Do not remove tables or columns. Restore the pre-launch backup if service is aff
 
 1. Disable only the trigger directly involved in the incident. Launch triggers are
    `trg_recompute_store_coupon_used_count`, `audit_stores`, `audit_wholesale_orders`,
-   `trg_protect_store_review_fields`, `trg_sync_company_owner_membership`, and
-   `trg_enforce_listing_owner`.
+   `trg_protect_store_review_fields`, `trg_sync_company_owner_membership`,
+   `trg_enforce_company_member_owner_role`, and `trg_enforce_listing_owner`.
 2. Restore the previous `store_reviews_author_insert` policy from the migration history only after confirming the security impact.
 3. Revoke execute on `consume_auth_rate_limit` instead of deleting `auth_rate_limits`; keeping its rows is harmless and preserves diagnostics.
 4. Revoke execute on `adjust_company_inventory` or `accept_company_invitation` if one
@@ -32,6 +32,17 @@ The additive `listings.owner_id` column and its index should remain during an
 application rollback. If the ownership trigger causes an incident, disable only
 `trg_enforce_listing_owner` temporarily after rolling the application back; do not
 clear or rewrite existing owner values.
+
+Do not restore the metadata-driven version of `handle_new_user`: it permits a
+public signup to request operational roles. If signup provisioning fails, fix the
+specific profile/role constraint in a new migration while preserving the explicit
+`company`, `agent`, and `customer` allowlist.
+
+Direct `anon`/`authenticated` INSERT on `leads` is intentionally revoked because
+the validated server function is the canonical creation path. If an undocumented
+legacy client depends on direct writes, keep the application rolled back and
+replace that path with a narrow validated RPC; do not restore the permissive
+company/buyer/status spoofing policy.
 
 The Storage hardening migration only replaces UPDATE policies so that both the old
 and new object paths must remain owner-scoped. Do not restore the previous

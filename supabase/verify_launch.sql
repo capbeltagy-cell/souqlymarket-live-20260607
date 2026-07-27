@@ -27,6 +27,8 @@ BEGIN
     'public.accept_company_invitation(text)',
     'public.has_permission(uuid,text)',
     'public.has_role(uuid,public.app_role)',
+    'public.handle_new_user()',
+    'public.enforce_company_member_owner_role()',
     'public.enforce_listing_owner()'
   ] LOOP
     IF to_regprocedure(item) IS NULL THEN missing := array_append(missing, 'function ' || item); END IF;
@@ -76,6 +78,7 @@ BEGIN
   FOREACH item IN ARRAY ARRAY[
     'trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders',
     'trg_protect_store_review_fields','trg_sync_company_owner_membership',
+    'trg_enforce_company_member_owner_role',
     'trg_enforce_listing_owner'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname=item AND NOT tgisinternal) THEN missing := array_append(missing, 'trigger ' || item); END IF;
@@ -125,6 +128,8 @@ BEGIN
         'accept_company_invitation',
         'has_permission',
         'has_role',
+        'handle_new_user',
+        'enforce_company_member_owner_role',
         'enforce_listing_owner'
       )
   ) THEN
@@ -146,6 +151,8 @@ BEGIN
         'accept_company_invitation',
         'has_permission',
         'has_role',
+        'handle_new_user',
+        'enforce_company_member_owner_role',
         'enforce_listing_owner'
       )
       AND p.prosecdef
@@ -165,6 +172,65 @@ BEGIN
     WHERE listing.owner_id IS DISTINCT FROM company.owner_id
   ) THEN
     missing := array_append(missing, 'listing ownership drift');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.listings listing
+    JOIN public.companies company ON company.id = listing.company_id
+    JOIN public.stores store ON store.id = listing.store_id
+    WHERE listing.store_id IS NOT NULL
+      AND (
+        store.company_id IS DISTINCT FROM listing.company_id
+        OR store.owner_id IS DISTINCT FROM company.owner_id
+      )
+  ) THEN
+    missing := array_append(missing, 'listing store tenant drift');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.listings listing
+    JOIN public.store_categories category ON category.id = listing.store_category_id
+    WHERE listing.store_category_id IS NOT NULL
+      AND (
+        listing.store_id IS NULL
+        OR category.store_id IS DISTINCT FROM listing.store_id
+      )
+  ) THEN
+    missing := array_append(missing, 'listing store category drift');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.company_members member
+    JOIN public.companies company ON company.id = member.company_id
+    WHERE member.role = 'owner'
+      AND member.user_id IS DISTINCT FROM company.owner_id
+  ) THEN
+    missing := array_append(missing, 'company workspace owner drift');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.crm_activities activity
+    LEFT JOIN public.leads lead ON lead.id = activity.lead_id
+    WHERE lead.id IS NULL
+      OR lead.company_id IS DISTINCT FROM activity.company_id
+  ) THEN
+    missing := array_append(missing, 'CRM activity tenant drift');
+  END IF;
+
+  IF has_table_privilege('anon', 'public.leads', 'INSERT')
+     OR has_table_privilege('authenticated', 'public.leads', 'INSERT') THEN
+    missing := array_append(missing, 'direct Data API lead insert privilege');
+  END IF;
+
+  IF pg_get_functiondef('public.handle_new_user()'::regprocedure)
+       ~* 'raw_user_meta_data.*role.*::public[.]app_role'
+     AND pg_get_functiondef('public.handle_new_user()'::regprocedure)
+       !~* 'WHEN ''company''.*WHEN ''agent''.*WHEN ''customer''' THEN
+    missing := array_append(missing, 'unsafe public signup role mapping');
   END IF;
 
   FOREACH bucket_name IN ARRAY ARRAY[
@@ -240,5 +306,5 @@ END $$;
 SELECT 'tables' AS category, count(*)::text AS result FROM information_schema.tables WHERE table_schema='public'
 UNION ALL SELECT 'public policies', count(*)::text FROM pg_policies WHERE schemaname='public'
 UNION ALL SELECT 'storage policies', count(*)::text FROM pg_policies WHERE schemaname='storage'
-UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership','trg_enforce_listing_owner') AND NOT tgisinternal
+UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields','trg_sync_company_owner_membership','trg_enforce_company_member_owner_role','trg_enforce_listing_owner') AND NOT tgisinternal
 UNION ALL SELECT 'verification', 'PASS';
