@@ -14,6 +14,7 @@ export const Route = createFileRoute("/companies/")({
       { title: "Companies — Souqly" },
       { name: "description", content: "Discover verified B2B companies on Souqly." },
     ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/companies" }],
   }),
   component: CompaniesPage,
 });

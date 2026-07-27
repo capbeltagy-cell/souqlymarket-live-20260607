@@ -9,7 +9,16 @@ import { listRfqs } from "@/lib/phase3.functions";
 import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/rfq")({
-  head: () => ({ meta: [{ title: "طلبات عروض الأسعار — Souqly" }] }),
+  head: () => ({
+    meta: [
+      { title: "طلبات عروض الأسعار — Souqly" },
+      {
+        name: "description",
+        content: "استعرض طلبات عروض الأسعار الحقيقية من المشترين والشركات على سوقلي.",
+      },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/rfq" }],
+  }),
   component: RfqList,
 });
 

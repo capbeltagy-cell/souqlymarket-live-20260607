@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getAdminOverview } from "@/lib/phase3.functions";
+import { adminPhase2DashboardMetrics } from "@/lib/admin-phase2-ui.functions";
 import { requireAdminRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/admin-overview")({
@@ -15,6 +16,7 @@ function AdminOverview() {
   const ar = locale === "ar";
   const [data, setData] = useState<Awaited<ReturnType<typeof getAdminOverview>> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [phase2, setPhase2] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
     let active = true;
@@ -28,6 +30,9 @@ function AdminOverview() {
           setError(caught instanceof Error ? caught.message : "تعذر تحميل بيانات لوحة الإدارة");
         }
       });
+    adminPhase2DashboardMetrics()
+      .then(setPhase2)
+      .catch(() => setPhase2({}));
 
     return () => {
       active = false;
@@ -43,6 +48,27 @@ function AdminOverview() {
     >
       {data && (
         <div className="space-y-8">
+          <section>
+            <h2 className="mb-3 text-base font-semibold text-gray-900">مؤشرات التشغيل والإدارة</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+              {Object.entries({
+                orders: "الطلبات",
+                disputes: "النزاعات",
+                reports: "البلاغات",
+                notifications: "الإشعارات",
+                listings: "الإعلانات",
+                stores: "المتاجر",
+              }).map(([key, label]) => (
+                <Stat key={key} label={label} value={phase2[key] ?? "—"} />
+              ))}
+            </div>
+            {Object.values(phase2).some((value) => value === null) && (
+              <p className="mt-2 text-sm text-amber-700">
+                هذه الوحدة جاهزة وستعمل بعد تطبيق تحديثات قاعدة البيانات.
+              </p>
+            )}
+          </section>
+
           <section>
             <h2 className="mb-3 text-base font-semibold text-gray-900">
               {ar ? "الشركات" : "Companies"}

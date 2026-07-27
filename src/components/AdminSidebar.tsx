@@ -15,8 +15,13 @@ import {
   LogOut,
   BarChart3,
   CreditCard,
-  ContactRound,
-  BadgeCheck,
+  Users,
+  ScrollText,
+  Activity,
+  ShoppingCart,
+  Scale,
+  Shield,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -39,6 +44,15 @@ type MenuSection = {
 
 const MENU_ITEMS: MenuSection[] = [
   {
+    section: "العمليات",
+    items: [
+      { icon: ShoppingCart, label: "الطلبات", href: "/admin-orders" },
+      { icon: Scale, label: "النزاعات", href: "/admin-disputes" },
+      { icon: Shield, label: "الإشراف والبلاغات", href: "/admin-moderation" },
+      { icon: Bell, label: "الإشعارات", href: "/admin-notifications" },
+    ],
+  },
+  {
     section: "نظرة عامة",
     items: [
       { icon: LayoutDashboard, label: "الرئيسية", href: "/admin-overview", exact: true },
@@ -46,13 +60,12 @@ const MENU_ITEMS: MenuSection[] = [
     ],
   },
   {
-    section: "إدارة المنصة",
+    section: "المستخدمون والمنصة",
     items: [
+      { icon: Users, label: "المستخدمون", href: "/admin-users" },
       { icon: Building2, label: "الشركات", href: "/admin-companies" },
-      { icon: ContactRound, label: "قاعدة الشركات والتواصل", href: "/admin-company-prospects" },
-      { icon: BadgeCheck, label: "طلبات ملكية الشركات", href: "/admin-company-claims" },
       { icon: Store, label: "المتاجر", href: "/admin-stores" },
-      { icon: Package, label: "المنتجات والإعلانات", href: "/admin-launch-content" },
+      { icon: Package, label: "المنتجات والإعلانات", href: "/admin-listings" },
     ],
   },
   {
@@ -71,6 +84,8 @@ const MENU_ITEMS: MenuSection[] = [
     items: [
       { icon: Zap, label: "محتوى الإطلاق", href: "/admin-launch-content" },
       { icon: Settings, label: "الإعدادات", href: "/admin-platform-settings" },
+      { icon: ScrollText, label: "سجل العمليات", href: "/admin-audit" },
+      { icon: Activity, label: "حالة النظام", href: "/admin-system-status" },
     ],
   },
 ];

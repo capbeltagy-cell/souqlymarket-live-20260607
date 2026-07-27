@@ -9,7 +9,13 @@ import { listTenders } from "@/lib/phase3.functions";
 import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/tenders")({
-  head: () => ({ meta: [{ title: "المناقصات والمشاريع — Souqly" }] }),
+  head: () => ({
+    meta: [
+      { title: "المناقصات والمشاريع — Souqly" },
+      { name: "description", content: "مناقصات وفرص مشاريع فعلية للشركات والموردين على سوقلي." },
+    ],
+    links: [{ rel: "canonical", href: "https://souqlymarket.com/tenders" }],
+  }),
   component: TendersList,
 });
 
