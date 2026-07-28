@@ -48,7 +48,10 @@ export const adminDeleteListing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Admin only");
-    const { error } = await supabase.from("listings").delete().eq("id", data.id);
+    const { error } = await supabase
+      .from("listings")
+      .update({ status: "rejected" })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return { ok: true, softDeleted: true };
   });

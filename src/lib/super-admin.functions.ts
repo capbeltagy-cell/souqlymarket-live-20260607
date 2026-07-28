@@ -10,10 +10,15 @@ async function assertSuper(ctx: { userId: string; supabase: any }) {
   if (error || !data?.user) throw new Error("Unauthorized");
   const email = (data.user.email ?? "").toLowerCase();
   if (!ALLOWED.includes(email)) throw new Error("Access denied");
-  // ensure admin role
-  await supabaseAdmin
+  const { data: roles, error: rolesError } = await supabaseAdmin
     .from("user_roles")
-    .upsert({ user_id: ctx.userId, role: "admin" }, { onConflict: "user_id,role" });
+    .select("role")
+    .eq("user_id", ctx.userId);
+  if (rolesError) throw new Error("Unable to verify permissions");
+  const hasAdminRole = (roles ?? []).some(({ role }: { role: string }) =>
+    ["admin", "super_admin"].includes(role),
+  );
+  if (!hasAdminRole) throw new Error("Access denied");
   return supabaseAdmin as any;
 }
 
@@ -127,7 +132,6 @@ export const superAction = createServerFn({ method: "POST" })
             "approve_listing",
             "reject_listing",
             "hide_listing",
-            "delete",
             "ban_user",
             "unban_user",
           ]),
@@ -185,11 +189,6 @@ export const superAction = createServerFn({ method: "POST" })
       case "hide_listing":
         await admin.from("listings").update({ status: "hidden" }).eq("id", id);
         break;
-      case "delete": {
-        if (!data.entity) throw new Error("entity required");
-        await admin.from(data.entity).delete().eq("id", id);
-        break;
-      }
       case "ban_user":
         await admin.auth.admin.updateUserById(id, { ban_duration: "8760h" });
         break;

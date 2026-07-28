@@ -1,1 +1,1 @@
-export const BUILD_VERSION = "souqly-investor-demo-20260726";
+export const BUILD_VERSION = "souqly-runtime-validated-20260728";

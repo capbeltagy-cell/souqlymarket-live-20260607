@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Phone, Star, Trophy, MessageCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { MapPin, Star } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrustBadge } from "@/components/TrustBadges";
 import { useI18n } from "@/i18n/I18nProvider";
-import { supabase } from "@/integrations/supabase/client";
+import { getPublicAgentProfile } from "@/lib/public-agent.functions";
 import { initialOf } from "@/lib/marketplace";
-import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/agents/$id")({
   loader: async ({ params }) => {
@@ -76,7 +76,6 @@ type Profile = {
   full_name: string | null;
   display_name: string | null;
   avatar_url: string | null;
-  phone: string | null;
   phone_verified: boolean | null;
 };
 
@@ -85,47 +84,30 @@ function AgentProfile() {
   const { locale, t } = useI18n();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [deals, setDeals] = useState(0);
-  const [earnings, setEarnings] = useState(0);
-  const [referralEarnings, setReferralEarnings] = useState(0);
   const [loading, setLoading] = useState(true);
+  const loadPublicAgent = useServerFn(getPublicAgentProfile);
 
   useEffect(() => {
-    (async () => {
-      const { data: a } = await supabase.from("agents").select("*").eq("id", id).maybeSingle();
-      setAgent(a as Agent | null);
-      if (a) {
-        const [{ data: profArr }, { count }, { data: paid }] = await Promise.all([
-          supabase.rpc("get_public_profiles", { _ids: [a.user_id] }),
-          supabase
-            .from("commissions")
-            .select("id", { count: "exact", head: true })
-            .eq("agent_id", a.id)
-            .eq("status", "paid"),
-          supabase
-            .from("commissions")
-            .select("amount, notes")
-            .eq("agent_id", a.id)
-            .eq("status", "paid"),
-        ]);
-        const p = Array.isArray(profArr) ? profArr[0] : null;
-        setProfile(p as Profile | null);
-        setDeals(count ?? 0);
-        const total = (paid ?? []).reduce(
-          (s, r: { amount: number | null }) => s + Number(r.amount ?? 0),
-          0,
-        );
-        const refTotal = (paid ?? [])
-          .filter((r: { notes: string | null }) =>
-            (r.notes ?? "").toLowerCase().includes("referral"),
-          )
-          .reduce((s, r: { amount: number | null }) => s + Number(r.amount ?? 0), 0);
-        setEarnings(total);
-        setReferralEarnings(refTotal);
-      }
-      setLoading(false);
-    })();
-  }, [id]);
+    let active = true;
+    setLoading(true);
+    loadPublicAgent({ data: { id } })
+      .then((result) => {
+        if (!active) return;
+        setAgent(result.agent as Agent | null);
+        setProfile(result.profile as Profile | null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setAgent(null);
+        setProfile(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id, loadPublicAgent]);
 
   if (loading)
     return (
@@ -144,7 +126,6 @@ function AgentProfile() {
   const headline = (locale === "ar" ? agent.headline_ar : agent.headline_en) ?? "";
   const bio = (locale === "ar" ? agent.bio_ar : agent.bio_en) ?? "";
   const country = [agent.city, agent.country].filter(Boolean).join(", ");
-  const wa = profile?.phone?.replace(/[^0-9]/g, "");
 
   return (
     <Shell>
@@ -173,41 +154,12 @@ function AgentProfile() {
                   {country}
                 </span>
               )}
-              <span className="flex items-center gap-1">
-                <Trophy className="h-4 w-4" />
-                {deals} {t("deals_closed")}
-              </span>
             </div>
           </div>
-          {wa && (
-            <div className="flex flex-col gap-2">
-              <Button asChild className="gap-2 bg-success hover:bg-success/90">
-                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
-                  <MessageCircle className="h-4 w-4" />
-                  {t("contact_whatsapp")}
-                </a>
-              </Button>
-              <Button asChild variant="secondary" className="gap-2">
-                <a href={`tel:+${wa}`}>
-                  <Phone className="h-4 w-4" />
-                  {t("call_now")}
-                </a>
-              </Button>
-            </div>
-          )}
         </div>
       </section>
       <section className="container-souqly py-8 flex-1 grid lg:grid-cols-3 gap-6">
         <aside className="lg:col-span-1 space-y-4">
-          <div className="rounded-lg border border-border bg-card p-5 shadow-card">
-            <h2 className="font-semibold mb-3">{t("agent_stats")}</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <Stat label={t("deals_closed")} value={String(deals)} />
-              <Stat label={t("total_earnings")} value={formatPrice(earnings, locale)} />
-              <Stat label={t("referral_earnings")} value={formatPrice(referralEarnings, locale)} />
-              <Stat label="★" value="—" />
-            </div>
-          </div>
           <div className="rounded-lg border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-2">{t("about")}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -247,15 +199,6 @@ function AgentProfile() {
         </div>
       </section>
     </Shell>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md bg-surface-2 p-3">
-      <div className="text-base font-bold">{value}</div>
-      <div className="text-xs text-muted-foreground truncate">{label}</div>
-    </div>
   );
 }
 

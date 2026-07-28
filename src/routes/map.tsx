@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { MapView } from "@/components/MapView";
+import { ClientMapView } from "@/components/ClientMapView";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
 import {
@@ -175,7 +175,7 @@ function MapPage() {
               ) : filtered.length === 0 ? (
                 <div className="py-20 text-center text-muted-foreground">{t("no_results")}</div>
               ) : (
-                <MapView markers={markers} />
+                <ClientMapView markers={markers} />
               )}
             </div>
           </div>
