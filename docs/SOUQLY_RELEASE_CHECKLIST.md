@@ -1,25 +1,27 @@
 # Souqly Release Checklist
 
-| Gate | Status |
-|---|---|
-| Clean install | PASS |
-| Typecheck | PASS |
-| Lint errors | PASS — 0 errors |
-| Lint warnings | 343 remaining |
-| Unit tests | PASS — 22/22 |
-| Production build | PASS |
-| Node production start | PASS |
-| Static route runtime crawl | PASS — 95 tested, 0 failures |
-| Production dependency audit | PASS — 0 vulnerabilities |
-| Browser visual matrix | BLOCKED |
-| Auth journey | BLOCKED — no test environment/accounts |
-| Company journey | BLOCKED — no test environment/accounts |
-| Marketer journey | BLOCKED — no test environment/accounts |
-| Admin mutation journey | BLOCKED — no test environment/accounts |
-| RLS matrix | BLOCKED — no disposable Supabase |
-| Paymob Sandbox | NOT READY |
-| GitHub Actions final run | PENDING PUSH |
-| Supabase Production migrations | NOT APPLIED |
-| Production deployment | NOT PERFORMED |
+Date: 2026-07-28
 
-Release decision: **NO GO** until authenticated/RLS/browser/Paymob gates pass.
+- [x] Clean install succeeds.
+- [x] TypeScript succeeds.
+- [x] Unit/static security tests succeed.
+- [x] Client and Node production builds succeed locally.
+- [x] Static route crawl succeeds.
+- [x] Paymob secrets stay outside the client contract.
+- [x] Client-side subscription activation removed.
+- [x] Webhook verification, idempotency, auditing, and amount/currency guards implemented.
+- [x] Manual monthly renewal and manual payout settlement stated truthfully.
+- [x] Migration destructive-operation audit succeeds.
+- [x] `.env.test.local` exists locally and is ignored.
+- [x] `.env.example` contains variable names only.
+- [ ] Isolated Supabase Test project provisioned.
+- [ ] Migrations executed on clean Test database.
+- [ ] Live RLS role matrix passed.
+- [ ] Complete Paymob Sandbox matrix passed.
+- [ ] Test URL screenshots and responsive matrix passed.
+- [ ] Remaining legacy lint warnings reduced in scoped batches.
+- [ ] GitHub Actions passed for final pushed SHA.
+- [ ] Production migration preflight performed.
+- [ ] Explicit commercial release approval granted.
+
+Production deployment and merge to `main` are prohibited at this stage.

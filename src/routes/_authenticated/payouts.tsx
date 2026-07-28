@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { type ComponentType, useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Banknote, PlusCircle, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
@@ -73,10 +73,14 @@ function PayoutsPage() {
   const fCancel = useServerFn(cancelWithdrawal);
   const fSettings = useServerFn(getPlatformSettings);
 
-  const [wallet, setWallet] = useState<any>(null);
-  const [methods, setMethods] = useState<any[]>([]);
-  const [payouts, setPayouts] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  type WalletRow = Awaited<ReturnType<typeof getMyWallets>>["wallets"][number];
+  type PayoutMethodRow = Awaited<ReturnType<typeof listMyPayoutMethods>>["methods"][number];
+  type PayoutRow = Awaited<ReturnType<typeof listMyPayouts>>["payouts"][number];
+  type PayoutSettings = { min_withdrawal_amount?: number | string | null };
+  const [wallet, setWallet] = useState<WalletRow | null>(null);
+  const [methods, setMethods] = useState<PayoutMethodRow[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRow[]>([]);
+  const [settings, setSettings] = useState<PayoutSettings | null>(null);
   const [amount, setAmount] = useState("");
   const [methodId, setMethodId] = useState("");
   const [notes, setNotes] = useState("");
@@ -85,19 +89,19 @@ function PayoutsPage() {
   const [mDetails, setMDetails] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     fWallets().then((r) =>
-      setWallet(r.wallets.find((w: any) => w.kind === "agent") ?? r.wallets[0] ?? null),
+      setWallet(r.wallets.find((walletRow) => walletRow.kind === "agent") ?? r.wallets[0] ?? null),
     );
     fMethods().then((r) => setMethods(r.methods));
     fPayouts().then((r) => setPayouts(r.payouts));
     fSettings()
-      .then((r) => setSettings(r.settings))
+      .then((r) => setSettings(r.settings as unknown as PayoutSettings | null))
       .catch(() => {});
-  };
+  }, [fMethods, fPayouts, fSettings, fWallets]);
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const minWithdrawal = Number(settings?.min_withdrawal_amount ?? 100);
   const totalPending = useMemo(
@@ -120,10 +124,9 @@ function PayoutsPage() {
     try {
       const missing = currentFields.filter((f) => !mDetails[f.key]?.trim());
       if (missing.length) throw new Error(ar ? "أكمل كل الحقول" : "Fill all fields");
-      // marketing.functions.ts createPayoutMethod validates kind — extend by casting; new kinds get stored as text.
       await fCreateMethod({
         data: {
-          kind: mKind as any,
+          kind: mKind,
           label: mLabel || KIND_LABELS[mKind][ar ? "ar" : "en"],
           details: mDetails,
           isDefault: methods.length === 0,
@@ -172,6 +175,11 @@ function PayoutsPage() {
           <h1 className="text-2xl font-bold">
             {ar ? "المحفظة والسحوبات" : "Wallet & Withdrawals"}
           </h1>
+        </div>
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+          {ar
+            ? "طلبات السحب تُراجع وتُحوّل يدويًا. لا يظهر الطلب كمدفوع إلا بعد تسجيل مرجع وإثبات التحويل من الإدارة."
+            : "Withdrawals are reviewed and settled manually. A request is marked paid only after the admin records a transfer reference and proof."}
         </div>
 
         {/* Wallet stats */}
@@ -392,7 +400,15 @@ function PayoutsPage() {
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon?: any; label: string; value: string }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon?: ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-4 shadow-card">
       {Icon ? <Icon className="h-4 w-4 text-primary mb-2" /> : null}

@@ -14,6 +14,8 @@
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:migrations": "node scripts/audit-migrations.mjs",
+    "test:routes": "node scripts/crawl-routes.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

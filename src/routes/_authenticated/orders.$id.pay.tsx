@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Upload, CheckCircle2, Clock, XCircle } from "lucide-react";
@@ -17,6 +17,7 @@ import {
   submitPaymentProof,
   listOrderProofs,
 } from "@/lib/payments.functions";
+import { createOnlinePayment, getOnlinePaymentStatus } from "@/lib/paymob.functions";
 
 export const Route = createFileRoute("/_authenticated/orders/$id/pay")({
   head: ({ params }) => ({ meta: [{ title: `دفع الطلب #${params.id.slice(0, 8)} — Souqly` }] }),
@@ -38,30 +39,86 @@ function PayOrderPage() {
   const loadMethods = useServerFn(listActivePaymentMethods);
   const loadProofs = useServerFn(listOrderProofs);
   const submit = useServerFn(submitPaymentProof);
-  const [order, setOrder] = useState<any>(null);
-  const [methods, setMethods] = useState<any[]>([]);
-  const [proofs, setProofs] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any>(null);
+  const createPayment = useServerFn(createOnlinePayment);
+  const loadOnlineStatus = useServerFn(getOnlinePaymentStatus);
+  type OrderView = {
+    currency: string;
+    payment_status: string;
+    total_amount: number | string;
+  };
+  type PaymentMethodView = {
+    account_details: Record<string, unknown> | null;
+    icon: string | null;
+    id: string;
+    instructions_ar: string | null;
+    name_ar: string;
+    name_en: string | null;
+  };
+  type PaymentProofView = {
+    amount: number | string;
+    created_at: string;
+    currency: string;
+    id: string;
+    payment_method_code: string | null;
+    proof_url: string | null;
+    reference: string | null;
+    review_note: string | null;
+    status: string;
+  };
+  const [order, setOrder] = useState<OrderView | null>(null);
+  const [methods, setMethods] = useState<PaymentMethodView[]>([]);
+  const [proofs, setProofs] = useState<PaymentProofView[]>([]);
+  const [selected, setSelected] = useState<PaymentMethodView | null>(null);
   const [amount, setAmount] = useState(0);
   const [ref, setRef] = useState("");
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [onlineConfigured, setOnlineConfigured] = useState(false);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const [o, m, p] = await Promise.all([
       loadOrder({ data: { id } }),
       loadMethods(),
       loadProofs({ data: { order_id: id } }),
     ]);
-    setOrder((o as any).order);
-    setMethods((m as any).items);
-    setProofs((p as any).items);
-    if (!amount) setAmount(Number((o as any).order?.total_amount ?? 0));
-  };
+    const nextOrder = o.order as unknown as OrderView;
+    setOrder(nextOrder);
+    setMethods(m.items as unknown as PaymentMethodView[]);
+    setProofs(p.items as unknown as PaymentProofView[]);
+    setAmount((current) => current || Number(nextOrder?.total_amount ?? 0));
+  }, [id, loadMethods, loadOrder, loadProofs]);
   useEffect(() => {
-    refresh().catch((e) => toast.error(e.message)); /* eslint-disable-next-line */
-  }, [id]);
+    refresh().catch((error: unknown) =>
+      toast.error(error instanceof Error ? error.message : "تعذر تحميل بيانات الدفع"),
+    );
+    loadOnlineStatus()
+      .then((result) => setOnlineConfigured(result.configured))
+      .catch(() => setOnlineConfigured(false));
+  }, [loadOnlineStatus, refresh]);
+
+  const handleOnlinePayment = async () => {
+    setBusy(true);
+    try {
+      const result = await createPayment({
+        data: {
+          idempotencyKey: crypto.randomUUID(),
+          orderId: id,
+          purpose: "marketplace_order",
+        },
+      });
+      if (result.alreadyPaid) {
+        toast.success("تم دفع الطلب بالفعل");
+        await refresh();
+      } else if (result.checkoutUrl) {
+        window.location.assign(result.checkoutUrl);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "تعذر بدء الدفع الإلكتروني");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const uploadProof = async (): Promise<string | null> => {
     if (!file || !user) return null;
@@ -164,6 +221,27 @@ function PayOrderPage() {
             </div>
           ) : (
             <>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+                <div className="font-semibold">الدفع الإلكتروني الآمن</div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  يتم تحديد المبلغ من الخادم، ولا يعتبر الطلب مدفوعًا إلا بعد وصول تأكيد Paymob
+                  الموقّع.
+                </p>
+                <Button
+                  className="mt-3 w-full"
+                  onClick={handleOnlinePayment}
+                  disabled={busy || !onlineConfigured}
+                >
+                  {onlineConfigured
+                    ? "الدفع بالبطاقة أو المحفظة عبر Paymob"
+                    : "الدفع الإلكتروني غير مفعّل حتى إضافة مفاتيح الخادم"}
+                </Button>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                <span>أو وسائل الدفع اليدوية المعتمدة</span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
               <div>
                 <div className="text-sm font-semibold mb-2">اختر طريقة الدفع</div>
                 {methods.length === 0 ? (

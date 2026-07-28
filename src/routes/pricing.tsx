@@ -14,6 +14,7 @@ import {
   getMyCompanySubscription,
   requestCompanyUpgrade,
 } from "@/lib/subscription.functions";
+import { createOnlinePayment, getOnlinePaymentStatus } from "@/lib/paymob.functions";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -49,26 +50,36 @@ function Pricing() {
   const fetchCfg = useServerFn(getPricingConfig);
   const fetchSub = useServerFn(getMyCompanySubscription);
   const requestUpgrade = useServerFn(requestCompanyUpgrade);
+  const createPayment = useServerFn(createOnlinePayment);
+  const fetchPaymentStatus = useServerFn(getOnlinePaymentStatus);
 
   const [cfg, setCfg] = useState<{
     companyPremiumPriceEgp: number;
     marketerCommissionPct: number;
     freeListingLimit: number;
   } | null>(null);
-  const [sub, setSub] = useState<{ hasCompany: boolean; isPaid: boolean; plan: string } | null>(
-    null,
-  );
+  const [sub, setSub] = useState<{
+    companyId: string | null;
+    expiresAt: string | null;
+    hasCompany: boolean;
+    isPaid: boolean;
+    plan: string;
+  } | null>(null);
+  const [onlineConfigured, setOnlineConfigured] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     fetchCfg()
       .then(setCfg)
       .catch(() => {});
+    fetchPaymentStatus()
+      .then((result) => setOnlineConfigured(result.configured))
+      .catch(() => setOnlineConfigured(false));
     if (user)
       fetchSub()
         .then(setSub)
         .catch(() => setSub(null));
-  }, [user]);
+  }, [fetchCfg, fetchPaymentStatus, fetchSub, user]);
 
   const isPureAgent =
     roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
@@ -134,6 +145,31 @@ function Pricing() {
     }
   };
 
+  const onOnlinePayment = async () => {
+    if (!sub?.companyId) return;
+    setBusy(true);
+    try {
+      const result = await createPayment({
+        data: {
+          companyId: sub.companyId,
+          idempotencyKey: crypto.randomUUID(),
+          purpose: "company_subscription",
+        },
+      });
+      if (result.alreadyPaid) {
+        toast.success(ar ? "الاشتراك مدفوع بالفعل" : "Subscription is already paid");
+      } else if (result.checkoutUrl) {
+        window.location.assign(result.checkoutUrl);
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : ar ? "تعذر بدء الدفع" : "Could not start payment",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -144,8 +180,8 @@ function Pricing() {
           </h1>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
             {ar
-              ? "أسعار واضحة وشفافة. التفعيل يتم يدوياً من فريق سوقلي بعد تأكيد الدفع لضمان أمان معاملتك."
-              : "Clear, transparent pricing. Activation is handled manually by the Souqly team after payment confirmation for your safety."}
+              ? "أسعار واضحة وتجديد يدوي شهري. التفعيل يتم تلقائيًا فقط بعد تأكيد الدفع من بوابة الدفع."
+              : "Clear pricing with manual monthly renewal. Activation happens only after the payment gateway verifies payment."}
           </p>
         </div>
       </section>
@@ -155,9 +191,13 @@ function Pricing() {
         <div className="max-w-5xl mx-auto mb-8 rounded-lg border border-primary/20 bg-primary/5 p-4 flex gap-3 text-sm">
           <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-foreground">
-            {ar
-              ? "الدفع الإلكتروني قيد الإطلاق. حالياً بعد اختيار الباقة، يتواصل معك فريقنا خلال 24 ساعة لإتمام الدفع وتفعيل حسابك."
-              : "Online payment is launching soon. For now, after selecting a plan our team contacts you within 24 hours to complete payment and activate your account."}
+            {onlineConfigured
+              ? ar
+                ? "الدفع يتم على صفحة Paymob الآمنة، ويُفعّل الاشتراك بعد وصول إشعار دفع صحيح وموقّع. لا نخزن بيانات بطاقتك."
+                : "Payment is completed on Paymob's secure page. Activation requires a valid signed webhook. Souqly never stores card details."
+              : ar
+                ? "واجهة الدفع جاهزة، لكنها غير مفعّلة حتى تُضاف مفاتيح Paymob إلى الخادم. لن يتم تحصيل أي مبلغ الآن."
+                : "The payment flow is ready but disabled until Paymob server keys are configured. No money will be collected now."}
           </p>
         </div>
 
@@ -279,20 +319,42 @@ function Pricing() {
                   {ar ? "مفعّلة" : "Active"}
                 </Button>
               ) : (
-                <Button
-                  className="w-full gap-2 bg-primary hover:bg-primary-hover"
-                  onClick={onRequestUpgrade}
-                  disabled={busy}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  {ar ? "اطلب التفعيل" : "Request activation"}
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    className="w-full gap-2 bg-primary hover:bg-primary-hover"
+                    onClick={onOnlinePayment}
+                    disabled={busy || !onlineConfigured}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {onlineConfigured
+                      ? ar
+                        ? "ادفع وجدّد شهرًا واحدًا"
+                        : "Pay and renew for one month"
+                      : ar
+                        ? "الدفع الإلكتروني غير مفعّل"
+                        : "Online payment is not configured"}
+                  </Button>
+                  {!onlineConfigured && (
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      onClick={onRequestUpgrade}
+                      disabled={busy}
+                    >
+                      {ar ? "سجّل طلب تجديد يدوي" : "Request manual renewal"}
+                    </Button>
+                  )}
+                </div>
               )}
               <p className="text-xs text-muted-foreground mt-3 flex items-start gap-1.5">
                 <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                 {ar
-                  ? "التفعيل خلال 24 ساعة من تأكيد الدفع."
-                  : "Activated within 24 hours of payment confirmation."}
+                  ? sub?.expiresAt
+                    ? `تاريخ الانتهاء الحالي: ${new Date(sub.expiresAt).toLocaleDateString("ar-EG")}. لا يوجد تجديد تلقائي.`
+                    : "الاشتراك لمدة شهر واحد ولا يتجدد تلقائيًا."
+                  : sub?.expiresAt
+                    ? `Current expiry: ${new Date(sub.expiresAt).toLocaleDateString("en-GB")}. No automatic renewal.`
+                    : "The subscription lasts one month and does not renew automatically."}
               </p>
             </div>
           </div>

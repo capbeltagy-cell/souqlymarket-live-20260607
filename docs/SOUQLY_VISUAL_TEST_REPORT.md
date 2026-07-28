@@ -1,9 +1,21 @@
 # Souqly Visual Test Report
 
-Status: **BLOCKED**
+Date: 2026-07-28
 
-The cloud browser refused access to the local Development server due to its localhost isolation policy. No workaround or alternate browser surface was used.
+The production-style Node server started and 97 static routes were crawled: 92 returned HTTP 200,
+5 returned expected HTTP 307 redirects, and none failed.
 
-The requested viewport matrix (320, 360, 390, 414, 768, 1024, 1280, 1440 and 1920 pixels), screenshots, browser console, keyboard navigation and automated accessibility scan are therefore not verified in this run.
+Cloud-browser visual testing was attempted against local preview, but the available browser has an
+explicit saved permission blocking localhost and instructed that no alternate bypass be used. No
+Production or public preview was deployed, as required. Screenshots and visual PASS claims are
+therefore intentionally absent.
 
-Server-rendered HTML and HTTP status were validated for 95 static routes, but that is not a substitute for visual or interactive browser validation.
+| Coverage | Result |
+| --- | --- |
+| Public and authenticated routes | Route crawl PASS; visual NOT RUN |
+| Checkout/payment/subscription/payout | Route crawl PASS; visual NOT RUN |
+| 320/360/390/414/768/1024/1440/1920 px | NOT RUN |
+| RTL/LTR/dark/loading/empty/error | NOT RUN |
+| Keyboard/menu/tables/dialogs/payment screens | NOT RUN |
+
+Visual QA remains a launch blocker until an approved browser-accessible Test URL is available.

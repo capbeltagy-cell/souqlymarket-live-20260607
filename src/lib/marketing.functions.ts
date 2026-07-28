@@ -310,7 +310,7 @@ export const adminListWithdrawals = createServerFn({ method: "POST" })
     z
       .object({
         status: z
-          .enum(["pending", "approved", "paid", "rejected", "cancelled", "all"])
+          .enum(["pending", "approved", "processing", "paid", "rejected", "cancelled", "all"])
           .default("pending"),
       })
       .parse(d),
@@ -351,8 +351,10 @@ export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
     z
       .object({
         id: z.string().uuid(),
-        action: z.enum(["approve", "reject", "paid"]),
+        action: z.enum(["approve", "start_processing", "reject", "paid"]),
         admin_notes: z.string().max(500).optional().nullable(),
+        paid_reference: z.string().min(3).max(200).optional().nullable(),
+        paid_proof_url: z.string().url().max(2000).optional().nullable(),
       })
       .parse(d),
   )
@@ -362,12 +364,19 @@ export const adminUpdateWithdrawal = createServerFn({ method: "POST" })
       _role: "admin",
     });
     if (!isAdmin) throw new Error("Forbidden");
-    const status =
-      data.action === "approve" ? "approved" : data.action === "reject" ? "rejected" : "paid";
-    const { error } = await context.supabase
-      .from("payout_requests")
-      .update({ status, admin_notes: data.admin_notes ?? null })
-      .eq("id", data.id);
+    if (data.action === "paid" && (!data.paid_reference || !data.paid_proof_url)) {
+      throw new Error("مرجع التحويل ورابط إثبات الدفع مطلوبان قبل تأكيد الصرف");
+    }
+    const { error } = await context.supabase.rpc(
+      "admin_transition_payout" as never,
+      {
+        _action: data.action,
+        _admin_notes: data.admin_notes ?? null,
+        _paid_proof_url: data.paid_proof_url ?? null,
+        _paid_reference: data.paid_reference ?? null,
+        _payout_id: data.id,
+      } as never,
+    );
     if (error) throw new Error(error.message);
     return { ok: true };
   });

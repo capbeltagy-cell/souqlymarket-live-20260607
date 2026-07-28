@@ -1,5 +1,32 @@
 # Souqly Real Build, Runtime & E2E Validation
 
+## Payment and test-environment addendum — 2026-07-28
+
+Starting SHA: `aadbf268307d0590df24676f154ed27e433e5681`.
+
+This phase removed direct client subscription activation and introduced server-resolved payment
+attempts, verified Paymob webhook processing, idempotent event storage, transaction auditing, manual
+monthly renewal, and a controlled manual payout state machine. Two unapplied migrations contain the
+database work; no Production database or data was touched.
+
+Static migration audit covered 78 ordered migration files and found no `DROP TABLE/SCHEMA/DATABASE`,
+`TRUNCATE`, or `DELETE FROM`. It does not replace execution on a clean isolated Test database.
+
+Because isolated Supabase and Paymob Sandbox access were unavailable, the release decision is NO GO
+for commercial money movement. Detailed evidence is in the payment, RLS, visual, and decision reports.
+
+Validation after the changes:
+
+- Clean install: PASS (482 packages).
+- TypeScript: PASS.
+- Unit/static tests: PASS (34/34 across 8 files).
+- Lint: 343 warnings before, 325 after, 0 errors after.
+- Dependency production audit: PASS (0 vulnerabilities).
+- Client production build: PASS.
+- Node production build: PASS.
+- Route crawl: PASS (97 routes; 92 HTTP 200 and 5 expected HTTP 307).
+- GitHub Actions: pending final branch push.
+
 Audit date: 2026-07-28  
 Repository: `capbeltagy-cell/souqlymarket-live-20260607`  
 Branch: `feat/multi-vendor-stores`  

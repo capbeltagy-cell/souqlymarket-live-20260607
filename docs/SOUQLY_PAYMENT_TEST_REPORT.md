@@ -1,29 +1,46 @@
 # Souqly Payment Test Report
 
-Status: **NOT READY FOR PAYMOB PRODUCTION**
+Date: 2026-07-28
+Starting SHA: `aadbf268307d0590df24676f154ed27e433e5681`
+Environment: local test build only; Production was not changed.
 
-## Current implementation
+## Implemented boundary
 
-- Orders, payment methods, payment proofs and admin review interfaces exist.
-- The current buyer flow submits payment proof for manual review.
-- Subscription copy and activation remain manual in the current repository.
-- No complete Paymob intent, redirect, HMAC callback and reconciliation implementation was found.
+- Payment amount and `EGP` currency are resolved server-side from the selected plan or order.
+- Browser code cannot activate subscriptions.
+- Paymob secrets remain server-only and payment is disabled unless explicitly enabled.
+- Callbacks require SHA-512 HMAC verification.
+- Verified events use a service-role-only atomic database RPC.
+- Events and attempts have unique idempotency keys.
+- Amount, currency, order/user binding, and replay are checked before settlement.
+- Rejected events retain sanitized audit records without credentials or card data.
 
-## Paymob sandbox cases
+## Results
 
-| Scenario | Result |
-|---|---|
-| Create intent/order | NOT TESTED — credentials/integration absent |
-| Success callback | NOT TESTED |
-| Failure/cancel callback | NOT TESTED |
-| Invalid HMAC | NOT TESTED |
-| Duplicate/replay callback | NOT TESTED |
-| Wrong amount/currency | NOT TESTED |
-| Automatic activation | NOT IMPLEMENTED/VERIFIED |
-| Automatic renewal/cancellation | NOT IMPLEMENTED/VERIFIED |
+| Scenario | Result | Evidence |
+| --- | --- | --- |
+| Valid signed payload | PASS (unit) | HMAC/parser test |
+| Altered signed payload | PASS (unit) | signature rejected |
+| Missing/invalid fields | PASS (unit) | strict parser rejects |
+| Invalid HMAC HTTP request | PASS (local runtime) | HTTP 401 |
+| Invalid JSON HTTP request | PASS (local runtime) | HTTP 400 |
+| Duplicate event key | PASS (unit/static) | deterministic key + unique DB constraint |
+| Wrong amount/currency | PASS (static) | settlement RPC rejects mismatch |
+| Client-side activation attempt | PASS (static) | subscription writes revoked |
+| Full Sandbox payment | NOT RUN | Paymob Sandbox credentials unavailable |
+| Live DB settlement/retry | NOT RUN | isolated Supabase Test project unavailable |
+| Login → payment → webhook → persisted subscription | NOT RUN | both test services required |
 
-No real money was used and no Production payment state was changed.
+## Actual models
 
-## Release decision
+Subscriptions use **one-month manual renewal**. Automatic recurring/tokenized billing is not claimed
+or implemented. No card details are stored. Activation occurs only after a verified webhook.
 
-Payments must remain classified as manual proof review until Paymob Sandbox passes all callback, idempotency, amount, currency and authorization cases.
+Seller payouts use **manual approval and documented settlement** with `pending`, `approved`,
+`processing`, `paid`, and `rejected` states. Overdraw, duplicate open requests, owner-side status
+changes, and changing an in-use payout method are blocked. `paid` requires a reference and proof URL.
+
+## Decision
+
+Commercial payments remain **NO GO** until migrations pass on a clean isolated Supabase Test project
+and the complete Paymob Sandbox matrix passes.
