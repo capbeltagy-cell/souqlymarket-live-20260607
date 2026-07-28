@@ -6,15 +6,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  getPricingConfig,
-  getMyCompanySubscription,
-  requestCompanyUpgrade,
-} from "@/lib/subscription.functions";
-import { createOnlinePayment, getOnlinePaymentStatus } from "@/lib/paymob.functions";
+import { getPricingConfig, getMyCompanySubscription } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -49,9 +43,6 @@ function Pricing() {
   const { user, roles } = useAuth();
   const fetchCfg = useServerFn(getPricingConfig);
   const fetchSub = useServerFn(getMyCompanySubscription);
-  const requestUpgrade = useServerFn(requestCompanyUpgrade);
-  const createPayment = useServerFn(createOnlinePayment);
-  const fetchPaymentStatus = useServerFn(getOnlinePaymentStatus);
 
   const [cfg, setCfg] = useState<{
     companyPremiumPriceEgp: number;
@@ -65,21 +56,15 @@ function Pricing() {
     isPaid: boolean;
     plan: string;
   } | null>(null);
-  const [onlineConfigured, setOnlineConfigured] = useState(false);
-  const [busy, setBusy] = useState(false);
-
   useEffect(() => {
     fetchCfg()
       .then(setCfg)
       .catch(() => {});
-    fetchPaymentStatus()
-      .then((result) => setOnlineConfigured(result.configured))
-      .catch(() => setOnlineConfigured(false));
     if (user)
       fetchSub()
         .then(setSub)
         .catch(() => setSub(null));
-  }, [fetchCfg, fetchPaymentStatus, fetchSub, user]);
+  }, [fetchCfg, fetchSub, user]);
 
   const isPureAgent =
     roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
@@ -126,50 +111,6 @@ function Pricing() {
         `${pct}% subscription referral commission`,
       ];
 
-  const onRequestUpgrade = async () => {
-    setBusy(true);
-    try {
-      const r = await requestUpgrade({ data: {} });
-      if (r.alreadyPremium)
-        toast.success(ar ? "أنت بالفعل مشترك في الباقة المميزة" : "You are already on premium");
-      else
-        toast.success(
-          ar
-            ? "تم إرسال طلب التفعيل — سيتواصل معك فريقنا لإتمام الدفع"
-            : "Upgrade request sent — our team will contact you to complete payment",
-        );
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const onOnlinePayment = async () => {
-    if (!sub?.companyId) return;
-    setBusy(true);
-    try {
-      const result = await createPayment({
-        data: {
-          companyId: sub.companyId,
-          idempotencyKey: crypto.randomUUID(),
-          purpose: "company_subscription",
-        },
-      });
-      if (result.alreadyPaid) {
-        toast.success(ar ? "الاشتراك مدفوع بالفعل" : "Subscription is already paid");
-      } else if (result.checkoutUrl) {
-        window.location.assign(result.checkoutUrl);
-      }
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : ar ? "تعذر بدء الدفع" : "Could not start payment",
-      );
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -180,8 +121,8 @@ function Pricing() {
           </h1>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
             {ar
-              ? "أسعار واضحة وتجديد يدوي شهري. التفعيل يتم تلقائيًا فقط بعد تأكيد الدفع من بوابة الدفع."
-              : "Clear pricing with manual monthly renewal. Activation happens only after the payment gateway verifies payment."}
+              ? "أسعار واضحة وتجديد يدوي شهري. التفعيل يتم بعد مراجعة إثبات التحويل من الإدارة."
+              : "Clear pricing with manual monthly renewal. Activation follows admin verification of the transfer proof."}
           </p>
         </div>
       </section>
@@ -191,13 +132,9 @@ function Pricing() {
         <div className="max-w-5xl mx-auto mb-8 rounded-lg border border-primary/20 bg-primary/5 p-4 flex gap-3 text-sm">
           <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-foreground">
-            {onlineConfigured
-              ? ar
-                ? "الدفع يتم على صفحة Paymob الآمنة، ويُفعّل الاشتراك بعد وصول إشعار دفع صحيح وموقّع. لا نخزن بيانات بطاقتك."
-                : "Payment is completed on Paymob's secure page. Activation requires a valid signed webhook. Souqly never stores card details."
-              : ar
-                ? "واجهة الدفع جاهزة، لكنها غير مفعّلة حتى تُضاف مفاتيح Paymob إلى الخادم. لن يتم تحصيل أي مبلغ الآن."
-                : "The payment flow is ready but disabled until Paymob server keys are configured. No money will be collected now."}
+            {ar
+              ? "الدفع متاح مؤقتًا عبر إنستا باي أو فودافون كاش. لا يتم تفعيل الباقة قبل مراجعة صورة التحويل."
+              : "Payment is temporarily available through InstaPay or Vodafone Cash. The plan is not activated before receipt review."}
           </p>
         </div>
 
@@ -320,30 +257,12 @@ function Pricing() {
                 </Button>
               ) : (
                 <div className="space-y-2">
-                  <Button
-                    className="w-full gap-2 bg-primary hover:bg-primary-hover"
-                    onClick={onOnlinePayment}
-                    disabled={busy || !onlineConfigured}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    {onlineConfigured
-                      ? ar
-                        ? "ادفع وجدّد شهرًا واحدًا"
-                        : "Pay and renew for one month"
-                      : ar
-                        ? "الدفع الإلكتروني غير مفعّل"
-                        : "Online payment is not configured"}
+                  <Button asChild className="w-full gap-2 bg-primary hover:bg-primary-hover">
+                    <Link to="/manual-payment" search={{ companyId: sub.companyId || undefined }}>
+                      <Sparkles className="h-4 w-4" />
+                      {ar ? "ادفع وجدّد شهرًا واحدًا" : "Pay and renew for one month"}
+                    </Link>
                   </Button>
-                  {!onlineConfigured && (
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={onRequestUpgrade}
-                      disabled={busy}
-                    >
-                      {ar ? "سجّل طلب تجديد يدوي" : "Request manual renewal"}
-                    </Button>
-                  )}
                 </div>
               )}
               <p className="text-xs text-muted-foreground mt-3 flex items-start gap-1.5">

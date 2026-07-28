@@ -6,11 +6,15 @@ Final SHA: recorded by the final Git commit and GitHub Actions run.
 
 ## Decision: NO GO
 
-Production readiness score: **72/100**.
+Production readiness score: **82/100**.
 
 The code has materially stronger payment boundaries, but commercial launch cannot be approved
 without live evidence from an isolated Supabase Test database and Paymob Sandbox. Production was not
 changed, deployed, or merged.
+
+The manual-payment implementation can support a controlled Beta once migration
+`20260728000300_manual_subscription_payments.sql` passes on an isolated Test project. Until that
+database step is completed, the deployed environment must not be described as payment-ready.
 
 ## Confirmed locally
 

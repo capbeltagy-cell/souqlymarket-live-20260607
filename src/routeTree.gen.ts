@@ -53,6 +53,7 @@ import { Route as AuthenticatedAdminDisputesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin-executive'
 import { Route as AuthenticatedAdminLaunchContentRouteImport } from './routes/_authenticated/admin-launch-content'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin-listings'
+import { Route as AuthenticatedAdminManualPaymentsRouteImport } from './routes/_authenticated/admin-manual-payments'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin-moderation'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin-notifications'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin-orders'
@@ -82,6 +83,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedManualPaymentRouteImport } from './routes/_authenticated/manual-payment'
 import { Route as AuthenticatedMarketingCenterRouteImport } from './routes/_authenticated/marketing-center'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
@@ -351,6 +353,12 @@ const AuthenticatedAdminListingsRoute =
     path: '/admin-listings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminManualPaymentsRoute =
+  AuthenticatedAdminManualPaymentsRouteImport.update({
+    id: '/admin-manual-payments',
+    path: '/admin-manual-payments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminModerationRoute =
   AuthenticatedAdminModerationRouteImport.update({
     id: '/admin-moderation',
@@ -513,6 +521,12 @@ const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedManualPaymentRoute =
+  AuthenticatedManualPaymentRouteImport.update({
+    id: '/manual-payment',
+    path: '/manual-payment',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMarketingCenterRoute =
   AuthenticatedMarketingCenterRouteImport.update({
     id: '/marketing-center',
@@ -777,6 +791,7 @@ export interface FileRoutesByFullPath {
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-manual-payments': typeof AuthenticatedAdminManualPaymentsRoute
   '/admin-moderation': typeof AuthenticatedAdminModerationRoute
   '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin-orders': typeof AuthenticatedAdminOrdersRoute
@@ -806,6 +821,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/manual-payment': typeof AuthenticatedManualPaymentRoute
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
@@ -892,6 +908,7 @@ export interface FileRoutesByTo {
   '/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/admin-manual-payments': typeof AuthenticatedAdminManualPaymentsRoute
   '/admin-moderation': typeof AuthenticatedAdminModerationRoute
   '/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin-orders': typeof AuthenticatedAdminOrdersRoute
@@ -921,6 +938,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/manual-payment': typeof AuthenticatedManualPaymentRoute
   '/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
@@ -1009,6 +1027,7 @@ export interface FileRoutesById {
   '/_authenticated/admin-executive': typeof AuthenticatedAdminExecutiveRoute
   '/_authenticated/admin-launch-content': typeof AuthenticatedAdminLaunchContentRoute
   '/_authenticated/admin-listings': typeof AuthenticatedAdminListingsRoute
+  '/_authenticated/admin-manual-payments': typeof AuthenticatedAdminManualPaymentsRoute
   '/_authenticated/admin-moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/admin-notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin-orders': typeof AuthenticatedAdminOrdersRoute
@@ -1038,6 +1057,7 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
+  '/_authenticated/manual-payment': typeof AuthenticatedManualPaymentRoute
   '/_authenticated/marketing-center': typeof AuthenticatedMarketingCenterRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
@@ -1126,6 +1146,7 @@ export interface FileRouteTypes {
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-listings'
+    | '/admin-manual-payments'
     | '/admin-moderation'
     | '/admin-notifications'
     | '/admin-orders'
@@ -1155,6 +1176,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/manual-payment'
     | '/marketing-center'
     | '/messages'
     | '/moderation'
@@ -1241,6 +1263,7 @@ export interface FileRouteTypes {
     | '/admin-executive'
     | '/admin-launch-content'
     | '/admin-listings'
+    | '/admin-manual-payments'
     | '/admin-moderation'
     | '/admin-notifications'
     | '/admin-orders'
@@ -1270,6 +1293,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/invoices'
     | '/leads'
+    | '/manual-payment'
     | '/marketing-center'
     | '/messages'
     | '/moderation'
@@ -1357,6 +1381,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin-executive'
     | '/_authenticated/admin-launch-content'
     | '/_authenticated/admin-listings'
+    | '/_authenticated/admin-manual-payments'
     | '/_authenticated/admin-moderation'
     | '/_authenticated/admin-notifications'
     | '/_authenticated/admin-orders'
@@ -1386,6 +1411,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
     | '/_authenticated/leads'
+    | '/_authenticated/manual-payment'
     | '/_authenticated/marketing-center'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
@@ -1784,6 +1810,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminListingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-manual-payments': {
+      id: '/_authenticated/admin-manual-payments'
+      path: '/admin-manual-payments'
+      fullPath: '/admin-manual-payments'
+      preLoaderRoute: typeof AuthenticatedAdminManualPaymentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin-moderation': {
       id: '/_authenticated/admin-moderation'
       path: '/admin-moderation'
@@ -1985,6 +2018,13 @@ declare module '@tanstack/react-router' {
       path: '/leads'
       fullPath: '/leads'
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manual-payment': {
+      id: '/_authenticated/manual-payment'
+      path: '/manual-payment'
+      fullPath: '/manual-payment'
+      preLoaderRoute: typeof AuthenticatedManualPaymentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/marketing-center': {
@@ -2343,6 +2383,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
   AuthenticatedAdminLaunchContentRoute: typeof AuthenticatedAdminLaunchContentRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
+  AuthenticatedAdminManualPaymentsRoute: typeof AuthenticatedAdminManualPaymentsRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -2372,6 +2413,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
+  AuthenticatedManualPaymentRoute: typeof AuthenticatedManualPaymentRoute
   AuthenticatedMarketingCenterRoute: typeof AuthenticatedMarketingCenterRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
@@ -2406,6 +2448,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
   AuthenticatedAdminLaunchContentRoute: AuthenticatedAdminLaunchContentRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
+  AuthenticatedAdminManualPaymentsRoute: AuthenticatedAdminManualPaymentsRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
@@ -2436,6 +2479,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
+  AuthenticatedManualPaymentRoute: AuthenticatedManualPaymentRoute,
   AuthenticatedMarketingCenterRoute: AuthenticatedMarketingCenterRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,

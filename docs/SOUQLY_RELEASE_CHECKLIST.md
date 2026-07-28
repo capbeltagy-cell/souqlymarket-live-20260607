@@ -14,6 +14,10 @@ Date: 2026-07-28
 - [x] Migration destructive-operation audit succeeds.
 - [x] `.env.test.local` exists locally and is ignored.
 - [x] `.env.example` contains variable names only.
+- [x] Manual subscription payment UI and admin review queue implemented.
+- [x] Manual approval is an atomic database RPC with transaction, notification and audit records.
+- [x] Manual payment proofs are private and owner/admin scoped.
+- [x] Paymob hidden from user-facing screens without deleting its code.
 - [ ] Isolated Supabase Test project provisioned.
 - [ ] Migrations executed on clean Test database.
 - [ ] Live RLS role matrix passed.

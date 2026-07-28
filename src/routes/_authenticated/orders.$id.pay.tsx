@@ -17,7 +17,6 @@ import {
   submitPaymentProof,
   listOrderProofs,
 } from "@/lib/payments.functions";
-import { createOnlinePayment, getOnlinePaymentStatus } from "@/lib/paymob.functions";
 
 export const Route = createFileRoute("/_authenticated/orders/$id/pay")({
   head: ({ params }) => ({ meta: [{ title: `دفع الطلب #${params.id.slice(0, 8)} — Souqly` }] }),
@@ -39,8 +38,6 @@ function PayOrderPage() {
   const loadMethods = useServerFn(listActivePaymentMethods);
   const loadProofs = useServerFn(listOrderProofs);
   const submit = useServerFn(submitPaymentProof);
-  const createPayment = useServerFn(createOnlinePayment);
-  const loadOnlineStatus = useServerFn(getOnlinePaymentStatus);
   type OrderView = {
     currency: string;
     payment_status: string;
@@ -74,7 +71,6 @@ function PayOrderPage() {
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
-  const [onlineConfigured, setOnlineConfigured] = useState(false);
 
   const refresh = useCallback(async () => {
     const [o, m, p] = await Promise.all([
@@ -92,33 +88,7 @@ function PayOrderPage() {
     refresh().catch((error: unknown) =>
       toast.error(error instanceof Error ? error.message : "تعذر تحميل بيانات الدفع"),
     );
-    loadOnlineStatus()
-      .then((result) => setOnlineConfigured(result.configured))
-      .catch(() => setOnlineConfigured(false));
-  }, [loadOnlineStatus, refresh]);
-
-  const handleOnlinePayment = async () => {
-    setBusy(true);
-    try {
-      const result = await createPayment({
-        data: {
-          idempotencyKey: crypto.randomUUID(),
-          orderId: id,
-          purpose: "marketplace_order",
-        },
-      });
-      if (result.alreadyPaid) {
-        toast.success("تم دفع الطلب بالفعل");
-        await refresh();
-      } else if (result.checkoutUrl) {
-        window.location.assign(result.checkoutUrl);
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "تعذر بدء الدفع الإلكتروني");
-    } finally {
-      setBusy(false);
-    }
-  };
+  }, [refresh]);
 
   const uploadProof = async (): Promise<string | null> => {
     if (!file || !user) return null;
@@ -221,26 +191,9 @@ function PayOrderPage() {
             </div>
           ) : (
             <>
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
-                <div className="font-semibold">الدفع الإلكتروني الآمن</div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  يتم تحديد المبلغ من الخادم، ولا يعتبر الطلب مدفوعًا إلا بعد وصول تأكيد Paymob
-                  الموقّع.
-                </p>
-                <Button
-                  className="mt-3 w-full"
-                  onClick={handleOnlinePayment}
-                  disabled={busy || !onlineConfigured}
-                >
-                  {onlineConfigured
-                    ? "الدفع بالبطاقة أو المحفظة عبر Paymob"
-                    : "الدفع الإلكتروني غير مفعّل حتى إضافة مفاتيح الخادم"}
-                </Button>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
-                <span>أو وسائل الدفع اليدوية المعتمدة</span>
-                <span className="h-px flex-1 bg-border" />
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+                الدفع متاح حاليًا عبر وسائل التحويل اليدوية المعتمدة. لا يعتبر الطلب مدفوعًا قبل
+                مراجعة الإدارة لإثبات التحويل.
               </div>
               <div>
                 <div className="text-sm font-semibold mb-2">اختر طريقة الدفع</div>

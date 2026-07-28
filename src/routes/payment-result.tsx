@@ -93,8 +93,8 @@ function PaymentResultPage() {
           <p className="mt-3 text-sm text-muted-foreground">
             {paid
               ? ar
-                ? "تم التفعيل من الخادم بعد وصول تأكيد Paymob الموقّع."
-                : "Activation was completed server-side after Paymob's signed confirmation."
+                ? "تم التفعيل من الخادم بعد وصول تأكيد الدفع الموقّع."
+                : "Activation was completed server-side after the signed payment confirmation."
               : ar
                 ? "هذه الصفحة لا تفعّل الاشتراك. يمكنك التحديث بعد لحظات حتى يصل تأكيد بوابة الدفع."
                 : "This page never activates a subscription. Refresh shortly while the gateway confirmation arrives."}
