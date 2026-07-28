@@ -47,6 +47,10 @@ export function SiteHeader() {
   const isCompany = roles.includes("company");
   const isAgent = roles.includes("agent");
   const isPureAgent = isAgent && !isCompany && !isAdmin;
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.assign("/");
+  };
 
   return (
     <header
@@ -195,7 +199,14 @@ export function SiteHeader() {
                   </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuContent
+                align="end"
+                className="max-h-[min(80vh,36rem)] w-64 overflow-y-auto"
+              >
+                <DropdownMenuLabel className="truncate text-xs font-normal text-muted-foreground">
+                  {user.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 {/* Essentials — always visible */}
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="gap-2">
@@ -426,8 +437,8 @@ export function SiteHeader() {
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={signOut}
-                  className="gap-2 text-destructive focus:text-destructive"
+                  onClick={() => void handleSignOut()}
+                  className="sticky bottom-0 gap-2 border-t border-border bg-popover font-semibold text-destructive focus:bg-destructive/10 focus:text-destructive"
                 >
                   <LogOut className="h-4 w-4" />
                   {t("nav_signout")}
