@@ -82,21 +82,32 @@ model Session {
 }
 
 model Company {
-  id            String               @id @default(cuid())
-  ownerId       String
-  name          String
-  slug          String               @unique
-  description   String?
-  logoUrl       String?
-  isVerified    Boolean              @default(false)
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  owner         User                 @relation("CompanyOwner", fields: [ownerId], references: [id])
-  members       CompanyMember[]
-  applications  CompanyApplication[]
-  opportunities Opportunity[]
+  id              String               @id @default(cuid())
+  ownerId         String
+  name            String
+  slug            String               @unique
+  description     String?
+  logoUrl         String?
+  coverUrl        String?
+  catalogUrl      String?
+  sector          String?
+  city            String?
+  website         String?
+  contactEmail    String?
+  contactPhone    String?
+  establishedYear Int?
+  employeeCount   Int?
+  isVerified      Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  owner           User                 @relation("CompanyOwner", fields: [ownerId], references: [id])
+  members         CompanyMember[]
+  applications    CompanyApplication[]
+  opportunities   Opportunity[]
 
   @@index([ownerId])
+  @@index([sector])
+  @@index([city])
 }
 
 model CompanyApplication {
