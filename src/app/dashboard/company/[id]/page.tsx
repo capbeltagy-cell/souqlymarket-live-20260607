@@ -51,17 +51,19 @@ export default async function CompanyWorkspacePage({ params }: Props) {
           <div>
             <span className="eyebrow">مساحة عمل الشركة</span>
             <h1>{membership.company.name}</h1>
-            <p>
-              دورك داخل الشركة: {membership.role}
-            </p>
+            <p>دورك داخل الشركة: {membership.role}</p>
           </div>
 
-          <Link
-            className="button secondary"
-            href={`/companies/${membership.company.slug}`}
-          >
-            عرض الصفحة العامة
-          </Link>
+          <div className="dashboard-quick-actions">
+            {["OWNER", "ADMIN", "MANAGER"].includes(membership.role) && (
+              <Link className="button" href={`/dashboard/company/${id}/settings`}>
+                تعديل ملف الشركة
+              </Link>
+            )}
+            <Link className="button secondary" href={`/companies/${membership.company.slug}`}>
+              عرض الصفحة العامة
+            </Link>
+          </div>
         </div>
 
         <section className="grid">
