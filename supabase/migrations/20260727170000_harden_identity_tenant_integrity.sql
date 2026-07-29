@@ -123,10 +123,16 @@ BEGIN
   END IF;
 
   IF NEW.store_category_id IS NOT NULL THEN
-    SELECT category.store_id
+    IF to_regclass('public.store_categories') IS NULL THEN
+      RAISE EXCEPTION 'store_categories_unavailable' USING ERRCODE = '55000';
+    END IF;
+
+    EXECUTE
+      'SELECT category.store_id
+         FROM public.store_categories AS category
+        WHERE category.id = $1'
       INTO canonical_category_store
-      FROM public.store_categories AS category
-     WHERE category.id = NEW.store_category_id;
+      USING NEW.store_category_id;
 
     IF NOT FOUND OR NEW.store_id IS NULL
        OR canonical_category_store IS DISTINCT FROM NEW.store_id THEN

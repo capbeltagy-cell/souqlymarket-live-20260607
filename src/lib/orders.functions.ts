@@ -127,7 +127,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
 
     // Notify seller
     if (sellerCompany?.owner_id) {
-      await (supabase.from("notifications" as never) as any).insert({
+      await (supabaseAdmin.from("notifications" as never) as any).insert({
         user_id: sellerCompany.owner_id,
         type: "order",
         title: "طلب جديد",

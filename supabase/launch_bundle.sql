@@ -18,8 +18,12 @@ DECLARE
   relation_name text;
 BEGIN
   FOREACH relation_name IN ARRAY ARRAY[
-    'public.stores', 'public.listings', 'public.wholesale_orders',
-    'public.store_coupons', 'public.store_coupon_usage', 'public.store_reviews'
+    'public.profiles', 'public.user_roles', 'public.companies', 'public.stores',
+    'public.listings', 'public.leads', 'public.crm_activities',
+    'public.inventory_movements', 'public.wholesale_orders',
+    'public.store_coupons', 'public.store_coupon_usage', 'public.store_reviews',
+    'public.payment_methods', 'public.payment_proofs', 'public.subscriptions',
+    'public.notifications', 'public.audit_logs'
   ] LOOP
     IF to_regclass(relation_name) IS NULL THEN
       missing := array_append(missing, relation_name);
@@ -37,6 +41,9 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='store_reviews' AND column_name='order_id') THEN
     missing := array_append(missing, 'public.store_reviews.order_id');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='store_category_id') THEN
+    missing := array_append(missing, 'public.listings.store_category_id');
   END IF;
 
   IF cardinality(missing) > 0 THEN
@@ -615,7 +622,7 @@ CREATE OR REPLACE FUNCTION public.enforce_listing_owner()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   canonical_owner uuid;
@@ -843,10 +850,16 @@ BEGIN
   END IF;
 
   IF NEW.store_category_id IS NOT NULL THEN
-    SELECT category.store_id
+    IF to_regclass('public.store_categories') IS NULL THEN
+      RAISE EXCEPTION 'store_categories_unavailable' USING ERRCODE = '55000';
+    END IF;
+
+    EXECUTE
+      'SELECT category.store_id
+         FROM public.store_categories AS category
+        WHERE category.id = $1'
       INTO canonical_category_store
-      FROM public.store_categories AS category
-     WHERE category.id = NEW.store_category_id;
+      USING NEW.store_category_id;
 
     IF NOT FOUND OR NEW.store_id IS NULL
        OR canonical_category_store IS DISTINCT FROM NEW.store_id THEN
@@ -2399,7 +2412,7 @@ CREATE OR REPLACE FUNCTION public.validate_order_payment_proof()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   target_order public.wholesale_orders%ROWTYPE;
@@ -2447,7 +2460,7 @@ CREATE OR REPLACE FUNCTION public.mark_order_payment_pending_review()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 BEGIN
   UPDATE public.wholesale_orders
@@ -2463,5 +2476,43 @@ DROP TRIGGER IF EXISTS trg_mark_order_payment_pending_review ON public.payment_p
 CREATE TRIGGER trg_mark_order_payment_pending_review
 AFTER INSERT ON public.payment_proofs
 FOR EACH ROW EXECUTE FUNCTION public.mark_order_payment_pending_review();
+
+-- Source: supabase/migrations/20260729105700_final_release_security_hardening.sql
+-- Final release hardening. Additive/convergent and safe for existing data.
+
+-- Notifications are produced by trusted server functions only. Authenticated
+-- users retain access to their own inbox through the existing SELECT/UPDATE RLS.
+REVOKE INSERT ON public.notifications FROM anon, authenticated;
+GRANT SELECT, UPDATE ON public.notifications TO authenticated;
+GRANT ALL ON public.notifications TO service_role;
+
+DROP POLICY IF EXISTS "Authenticated creates notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Service inserts notifications" ON public.notifications;
+DROP POLICY IF EXISTS "notif_insert_any" ON public.notifications;
+
+-- Views exposed by the Data API must evaluate the caller's RLS, when present.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_class AS relation
+    JOIN pg_namespace AS namespace ON namespace.oid = relation.relnamespace
+    WHERE namespace.nspname = 'public'
+      AND relation.relname = 'marketplace_stats'
+      AND relation.relkind = 'v'
+  ) THEN
+    EXECUTE 'ALTER VIEW public.marketplace_stats SET (security_invoker = true)';
+  END IF;
+END
+$$;
+
+-- The common timestamp trigger must not inherit a mutable caller search_path.
+DO $$
+BEGIN
+  IF to_regprocedure('public.set_updated_at()') IS NOT NULL THEN
+    ALTER FUNCTION public.set_updated_at() SET search_path = '';
+  END IF;
+END
+$$;
 
 COMMIT;

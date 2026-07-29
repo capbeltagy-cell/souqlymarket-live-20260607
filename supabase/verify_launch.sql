@@ -7,7 +7,7 @@ DECLARE
   item text;
 BEGIN
   FOREACH item IN ARRAY ARRAY[
-    'profiles','user_roles','companies','agents','listings','stores','store_categories',
+    'profiles','user_roles','companies','agents','listings','stores',
     'store_coupons','store_coupon_usage','store_followers','store_reviews','store_staff',
     'wholesale_orders','notifications','audit_logs','auth_rate_limits','user_addresses',
     'payment_methods','payment_proofs','payment_transactions','payment_events',
@@ -46,6 +46,7 @@ DECLARE
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='store_id') THEN missing := array_append(missing, 'listings.store_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='stock_quantity') THEN missing := array_append(missing, 'listings.stock_quantity'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='listings' AND column_name='store_category_id') THEN missing := array_append(missing, 'listings.store_category_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='store_id') THEN missing := array_append(missing, 'wholesale_orders.store_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='checkout_session_id') THEN missing := array_append(missing, 'wholesale_orders.checkout_session_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='store_reviews' AND column_name='order_id') THEN missing := array_append(missing, 'store_reviews.order_id'); END IF;
@@ -68,7 +69,8 @@ BEGIN
   END LOOP;
   FOREACH item IN ARRAY ARRAY[
     'trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders',
-    'trg_protect_store_review_fields'
+    'trg_protect_store_review_fields','trg_enforce_listing_owner',
+    'trg_validate_order_payment_proof','trg_mark_order_payment_pending_review'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname=item AND NOT tgisinternal) THEN missing := array_append(missing, 'trigger ' || item); END IF;
   END LOOP;
@@ -83,7 +85,8 @@ BEGIN
     SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='public' AND c.relname IN (
       'stores','store_coupons','store_reviews','auth_rate_limits',
-      'company_members','company_invitations','inventory_locations','inventory_movements'
+      'company_members','company_invitations','inventory_locations','inventory_movements',
+      'payment_proofs','payment_transactions','payment_events','subscriptions'
     )
       AND NOT c.relrowsecurity
   ) THEN missing := array_append(missing, 'RLS on one or more launch tables'); END IF;
@@ -95,6 +98,15 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%avatars%') THEN missing := array_append(missing, 'avatars storage policy'); END IF;
   IF NOT EXISTS (SELECT 1 FROM storage.buckets WHERE id='payment-proofs' AND public=false) THEN missing := array_append(missing, 'private payment-proofs bucket'); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='Payment proof owner uploads') THEN missing := array_append(missing, 'payment proof upload policy'); END IF;
+  IF has_table_privilege('anon', 'public.payment_proofs', 'SELECT')
+     OR has_table_privilege('anon', 'public.payment_proofs', 'INSERT')
+     OR has_table_privilege('anon', 'public.payment_proofs', 'UPDATE') THEN
+    missing := array_append(missing, 'anonymous payment proof grants');
+  END IF;
+  IF has_function_privilege('anon', 'public.handle_new_user()', 'EXECUTE')
+     OR has_function_privilege('authenticated', 'public.handle_new_user()', 'EXECUTE') THEN
+    missing := array_append(missing, 'signup role function execute grants');
+  END IF;
 
   IF cardinality(missing) > 0 THEN RAISE EXCEPTION 'Security verification failed: %', array_to_string(missing, ', '); END IF;
 END $$;
@@ -103,5 +115,6 @@ END $$;
 SELECT 'tables' AS category, count(*)::text AS result FROM information_schema.tables WHERE table_schema='public'
 UNION ALL SELECT 'public policies', count(*)::text FROM pg_policies WHERE schemaname='public'
 UNION ALL SELECT 'storage policies', count(*)::text FROM pg_policies WHERE schemaname='storage'
+UNION ALL SELECT 'store categories', CASE WHEN to_regclass('public.store_categories') IS NULL THEN 'OPTIONAL: absent' ELSE 'PASS: present' END
 UNION ALL SELECT 'launch triggers', count(*)::text FROM pg_trigger WHERE tgname IN ('trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders','trg_protect_store_review_fields') AND NOT tgisinternal
 UNION ALL SELECT 'verification', 'PASS';

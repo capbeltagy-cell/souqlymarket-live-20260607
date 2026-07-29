@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION public.validate_order_payment_proof()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   target_order public.wholesale_orders%ROWTYPE;
@@ -104,7 +104,7 @@ CREATE OR REPLACE FUNCTION public.mark_order_payment_pending_review()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 BEGIN
   UPDATE public.wholesale_orders

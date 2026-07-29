@@ -13,6 +13,7 @@ const migrationNames = [
   "20260728000100_paymob_financial_boundaries.sql",
   "20260728000300_manual_subscription_payments.sql",
   "20260729090000_private_order_payment_proofs.sql",
+  "20260729105700_final_release_security_hardening.sql",
 ];
 
 let bundle = await readFile(bundleUrl, "utf8");

@@ -30,7 +30,7 @@ CREATE OR REPLACE FUNCTION public.enforce_listing_owner()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   canonical_owner uuid;

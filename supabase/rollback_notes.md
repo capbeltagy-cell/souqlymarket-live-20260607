@@ -40,6 +40,11 @@ links are deliberately short lived. The order-payment validation triggers and th
 partial unique index prevent amount tampering and duplicate pending proofs and
 should remain enabled unless a reviewed replacement enforces the same invariants.
 
+The final hardening revokes direct notification inserts from browser roles.
+Application rollback must not restore those grants: trusted server functions own
+notification creation. The optional `marketplace_stats` view is set to
+`security_invoker`; do not revert it to a security-definer view.
+
 ## Safe recovery order
 
 1. Put the application in Coolify maintenance mode or roll back to the previous image.

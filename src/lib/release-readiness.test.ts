@@ -73,4 +73,30 @@ describe("release readiness contracts", () => {
     expect(permissions).toContain('"finance_admin"');
     expect(permissions).toContain('"support_admin"');
   });
+
+  it("keeps optional store categories from breaking the release migration", () => {
+    const tenantMigration = read(
+      "supabase/migrations/20260727170000_harden_identity_tenant_integrity.sql",
+    );
+
+    expect(tenantMigration).toContain("to_regclass('public.store_categories')");
+    expect(tenantMigration).toContain("EXECUTE");
+    expect(tenantMigration).toContain("store_categories_unavailable");
+  });
+
+  it("keeps financial evidence and notifications behind trusted boundaries", () => {
+    const proofMigration = read(
+      "supabase/migrations/20260729090000_private_order_payment_proofs.sql",
+    );
+    const hardening = read(
+      "supabase/migrations/20260729105700_final_release_security_hardening.sql",
+    );
+    const orders = read("src/lib/orders.functions.ts");
+
+    expect(proofMigration).toContain("SET search_path = ''");
+    expect(hardening).toContain(
+      "REVOKE INSERT ON public.notifications FROM anon, authenticated",
+    );
+    expect(orders).toContain('supabaseAdmin.from("notifications"');
+  });
 });
