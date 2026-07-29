@@ -34,20 +34,40 @@ enum CompanyMemberRole {
   EMPLOYEE
 }
 
+enum OpportunityType {
+  PURCHASE_REQUEST
+  TENDER
+  DISTRIBUTOR
+  SUPPLIER
+  PARTNERSHIP
+  IMPORT
+  EXPORT
+  INVESTMENT
+  SERVICE
+}
+
+enum OpportunityStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  CANCELLED
+}
+
 model User {
-  id             String               @id @default(cuid())
-  email          String               @unique
-  phone          String?              @unique
-  passwordHash   String
-  fullName       String
-  status         UserStatus           @default(ACTIVE)
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  sessions       Session[]
-  companiesOwned Company[]            @relation("CompanyOwner")
-  companyMembers CompanyMember[]
-  applications   CompanyApplication[]
-  role           UserRole             @default(USER)
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  phone                String?              @unique
+  passwordHash         String
+  fullName             String
+  status               UserStatus           @default(ACTIVE)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  sessions             Session[]
+  companiesOwned       Company[]            @relation("CompanyOwner")
+  companyMembers       CompanyMember[]
+  applications         CompanyApplication[]
+  role                 UserRole             @default(USER)
+  opportunitiesCreated Opportunity[]        @relation("OpportunityCreator")
 }
 
 model Session {
@@ -62,18 +82,19 @@ model Session {
 }
 
 model Company {
-  id           String               @id @default(cuid())
-  ownerId      String
-  name         String
-  slug         String               @unique
-  description  String?
-  logoUrl      String?
-  isVerified   Boolean              @default(false)
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  owner        User                 @relation("CompanyOwner", fields: [ownerId], references: [id])
-  members      CompanyMember[]
-  applications CompanyApplication[]
+  id            String               @id @default(cuid())
+  ownerId       String
+  name          String
+  slug          String               @unique
+  description   String?
+  logoUrl       String?
+  isVerified    Boolean              @default(false)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  owner         User                 @relation("CompanyOwner", fields: [ownerId], references: [id])
+  members       CompanyMember[]
+  applications  CompanyApplication[]
+  opportunities Opportunity[]
 
   @@index([ownerId])
 }
@@ -110,4 +131,29 @@ model CompanyMember {
 
   @@unique([companyId, userId])
   @@index([userId])
+}
+
+model Opportunity {
+  id          String            @id @default(cuid())
+  creatorId   String
+  companyId   String?
+  title       String
+  description String
+  type        OpportunityType
+  status      OpportunityStatus @default(PUBLISHED)
+  sector      String?
+  city        String?
+  budgetMin   Decimal?          @db.Decimal(14, 2)
+  budgetMax   Decimal?          @db.Decimal(14, 2)
+  currency    String            @default("EGP")
+  deadline    DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  creator     User              @relation("OpportunityCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  company     Company?          @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([creatorId])
+  @@index([companyId])
+  @@index([type, status])
+  @@index([createdAt])
 }
