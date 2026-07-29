@@ -34,3 +34,4 @@ dist-ssr
 src/generated/prisma/
 .next
 src/generated/prisma
+backups/
