@@ -13,7 +13,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: production-check-${{ github.workflow }}-${{ github.ref }}
@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -40,6 +42,19 @@ jobs:
 
       - name: Generate production launch bundle
         run: node scripts/build-launch-bundle.mjs
+
+      - name: Commit regenerated launch bundle
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if git diff --quiet -- supabase/launch_bundle.sql; then
+            echo "Launch bundle already synchronized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add supabase/launch_bundle.sql
+          git commit -m "build(db): regenerate production launch bundle"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
 
       - name: Audit ordered migrations
         run: npm run test:migrations
