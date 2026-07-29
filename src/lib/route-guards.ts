@@ -1,7 +1,7 @@
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import type { AppRole } from "@/hooks/useAuth";
-import { ADMIN_ROLES, BUSINESS_ROLES } from "@/hooks/useAuth";
+import { BUSINESS_ROLES } from "@/hooks/useAuth";
+import { PLATFORM_ADMIN_ROLES } from "@/lib/admin-permissions";
 
 /**
  * Client-side navigation guard for administrator screens.
@@ -11,7 +11,7 @@ import { ADMIN_ROLES, BUSINESS_ROLES } from "@/hooks/useAuth";
  * server authorization and Supabase RLS/RPC policies.
  */
 export async function requireAdminRoute() {
-  return requireRoleRoute(ADMIN_ROLES, "/admin-overview");
+  return requireRoleRoute(PLATFORM_ADMIN_ROLES, "/admin-overview");
 }
 
 export async function requireBusinessRoute() {
@@ -22,7 +22,7 @@ export async function requireAgentRoute() {
   return requireRoleRoute(["agent", "admin", "super_admin"], "/agent");
 }
 
-async function requireRoleRoute(allowedRoles: readonly AppRole[], returnTo: string) {
+async function requireRoleRoute(allowedRoles: readonly string[], returnTo: string) {
   const {
     data: { user },
     error: userError,

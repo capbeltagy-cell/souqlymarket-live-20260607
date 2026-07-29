@@ -203,12 +203,15 @@ export const createStoreProduct = createServerFn({ method: "POST" })
 
     const { data: store, error: storeError } = await supabase
       .from("stores")
-      .select("id, owner_id, company_id, city, governorate")
+      .select("id, owner_id, company_id, city, governorate, status")
       .eq("owner_id", userId)
       .maybeSingle();
     if (storeError) throw new Error(storeError.message);
     if (!store) throw new Error("STORE_REQUIRED");
     if (store.owner_id !== userId) throw new Error("غير مسموح بإضافة منتجات إلى هذا المتجر");
+    if (data.status === "active" && store.status !== "published") {
+      throw new Error("لا يمكن نشر المنتج قبل اعتماد المتجر من الإدارة");
+    }
 
     let companyId = store.company_id;
     if (companyId) {
@@ -283,7 +286,10 @@ export const createStoreProduct = createServerFn({ method: "POST" })
         weight_grams: data.weight_grams ?? null,
         variants: data.variants,
         dimensions: { shipping_required: data.shipping_required },
-        visible_in_marketplace: data.visible_in_marketplace,
+        visible_in_marketplace:
+          listingStatus === "approved" && store.status === "published"
+            ? data.visible_in_marketplace
+            : false,
         visible_in_store: true,
         city: store.city,
         governorate: store.governorate,

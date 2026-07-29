@@ -47,4 +47,30 @@ describe("release readiness contracts", () => {
     expect(styles).toContain('[aria-label="Edit with Lovable"]');
     expect(styles).toContain("display: none !important");
   });
+
+  it("routes listing checkout through the atomic database boundary", () => {
+    const orders = read("src/lib/orders.functions.ts");
+
+    expect(orders).toContain('"create_order_atomic"');
+    expect(orders).not.toMatch(
+      /from\("wholesale_orders" as never\)[\s\S]{0,120}\.insert\(insertPayload\)/,
+    );
+  });
+
+  it("prevents products from bypassing store approval", () => {
+    const listings = read("src/lib/listings.functions.ts");
+
+    expect(listings).toContain('data.status === "active" && store.status !== "published"');
+    expect(listings).toContain('listingStatus === "approved" && store.status === "published"');
+  });
+
+  it("preserves scoped platform-admin roles in route guards", () => {
+    const guards = read("src/lib/route-guards.ts");
+    const permissions = read("src/lib/admin-permissions.ts");
+
+    expect(guards).toContain("PLATFORM_ADMIN_ROLES");
+    expect(permissions).toContain('"moderator"');
+    expect(permissions).toContain('"finance_admin"');
+    expect(permissions).toContain('"support_admin"');
+  });
 });
