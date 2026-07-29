@@ -4,6 +4,8 @@ const root = new URL("../", import.meta.url);
 const bundleUrl = new URL("supabase/launch_bundle.sql", root);
 const marker = "-- BEGIN GENERATED RELEASE DELTAS";
 const migrationNames = [
+  "20260720002236_b70480b9-bd56-446e-8cac-31197089dd5d.sql",
+  "20260721000141_f440ecb6-af7d-4785-9e45-009de93bba45.sql",
   "20260723105000_company_workspace_dependencies.sql",
   "20260725210000_listing_owner_integrity.sql",
   "20260725220000_storage_update_ownership.sql",
