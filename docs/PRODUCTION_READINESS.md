@@ -15,12 +15,12 @@ a staging clone or a confirmed backup-protected copy of the real Supabase projec
 | Clean install | PASS |
 | TypeScript | PASS |
 | ESLint | PASS with 0 errors and 326 non-blocking warnings |
-| Unit/security tests | 47/47 PASS |
+| Unit/security tests | 49/49 PASS |
 | Migration safety audit | PASS, 86 ordered files, no destructive data DDL |
 | Node production build | PASS |
 | Health endpoint | PASS, `/health` HTTP 200 |
 | Route crawl | PASS, 101/101 |
-| GitHub Actions | Pending for the final commit |
+| GitHub Actions | PASS on the final release code |
 | Actual Supabase launch SQL | BLOCKED: connected Supabase ref is not the app ref |
 | `verify_launch.sql` on actual DB | BLOCKED by the same access mismatch |
 

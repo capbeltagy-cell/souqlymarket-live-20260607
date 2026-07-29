@@ -27,7 +27,7 @@ Updated: 2026-07-29
 - Clean install: PASS
 - TypeScript: PASS
 - ESLint: 0 errors; 326 documented warnings
-- Unit/security tests: 47/47 PASS
+- Unit/security tests: 49/49 PASS
 - Node production build: PASS
 - Production server `/health`: HTTP 200
 - Static route crawl: 101/101 routes PASS
