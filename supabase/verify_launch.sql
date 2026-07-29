@@ -11,7 +11,9 @@ BEGIN
     'store_coupons','store_coupon_usage','store_followers','store_reviews','store_staff',
     'wholesale_orders','notifications','audit_logs','auth_rate_limits','user_addresses',
     'payment_methods','payment_proofs','payment_transactions','payment_events',
-    'subscriptions','subscription_events','manual_subscription_payments'
+    'subscriptions','subscription_events','manual_subscription_payments',
+    'company_members','company_invitations','crm_activities',
+    'inventory_locations','inventory_movements'
   ] LOOP
     IF to_regclass('public.' || item) IS NULL THEN missing := array_append(missing, 'table public.' || item); END IF;
   END LOOP;
@@ -24,6 +26,10 @@ BEGIN
     'public.create_order_atomic(uuid,uuid,integer,text,text,jsonb,numeric,integer,integer,uuid,text,text,uuid)',
     'public.validate_order_payment_proof()',
     'public.mark_order_payment_pending_review()'
+    ,'public.is_company_member(uuid,uuid)'
+    ,'public.has_company_permission(uuid,text,uuid)'
+    ,'public.accept_company_invitation(text)'
+    ,'public.adjust_company_inventory(uuid,integer,text,uuid)'
   ] LOOP
     IF to_regprocedure(item) IS NULL THEN missing := array_append(missing, 'function ' || item); END IF;
   END LOOP;
@@ -43,6 +49,9 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='store_id') THEN missing := array_append(missing, 'wholesale_orders.store_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='wholesale_orders' AND column_name='checkout_session_id') THEN missing := array_append(missing, 'wholesale_orders.checkout_session_id'); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='store_reviews' AND column_name='order_id') THEN missing := array_append(missing, 'store_reviews.order_id'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='crm_activities' AND column_name='lead_id') THEN missing := array_append(missing, 'crm_activities.lead_id'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='inventory_movements' AND column_name='listing_id') THEN missing := array_append(missing, 'inventory_movements.listing_id'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='inventory_movements' AND column_name='balance_after') THEN missing := array_append(missing, 'inventory_movements.balance_after'); END IF;
   IF cardinality(missing) > 0 THEN RAISE EXCEPTION 'Missing launch columns: %', array_to_string(missing, ', '); END IF;
 END $$;
 
@@ -72,7 +81,10 @@ DECLARE missing text[] := ARRAY[]::text[];
 BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-    WHERE n.nspname='public' AND c.relname IN ('stores','store_coupons','store_reviews','auth_rate_limits')
+    WHERE n.nspname='public' AND c.relname IN (
+      'stores','store_coupons','store_reviews','auth_rate_limits',
+      'company_members','company_invitations','inventory_locations','inventory_movements'
+    )
       AND NOT c.relrowsecurity
   ) THEN missing := array_append(missing, 'RLS on one or more launch tables'); END IF;
 
