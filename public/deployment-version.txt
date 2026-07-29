@@ -1,4 +1,0 @@
-Souqly Production Release Candidate 1
-source_branch=feat/multi-vendor-stores
-release=rc1
-release_trigger=2026-07-22

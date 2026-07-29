@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum CompanyApplicationStatus {
+  DRAFT
+  PENDING
+  CHANGES_REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum CompanyMemberRole {
+  OWNER
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+model User {
+  id             String               @id @default(cuid())
+  email          String               @unique
+  phone          String?              @unique
+  passwordHash   String
+  fullName       String
+  status         UserStatus           @default(ACTIVE)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  sessions       Session[]
+  companiesOwned Company[]            @relation("CompanyOwner")
+  companyMembers CompanyMember[]
+  applications   CompanyApplication[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Company {
+  id           String               @id @default(cuid())
+  ownerId      String
+  name         String
+  slug         String               @unique
+  description  String?
+  logoUrl      String?
+  isVerified   Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  owner        User                 @relation("CompanyOwner", fields: [ownerId], references: [id])
+  members      CompanyMember[]
+  applications CompanyApplication[]
+
+  @@index([ownerId])
+}
+
+model CompanyApplication {
+  id            String                   @id @default(cuid())
+  userId        String
+  companyId     String?
+  companyName   String
+  legalName     String?
+  taxNumber     String?
+  commercialReg String?
+  status        CompanyApplicationStatus @default(DRAFT)
+  adminNotes    String?
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  user          User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company       Company?                 @relation(fields: [companyId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model CompanyMember {
+  id        String            @id @default(cuid())
+  companyId String
+  userId    String
+  role      CompanyMemberRole @default(EMPLOYEE)
+  createdAt DateTime          @default(now())
+  company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([userId])
+}

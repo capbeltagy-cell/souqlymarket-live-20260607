@@ -1,0 +1,160 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  background: #f6f7f9;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Tahoma, sans-serif;
+  color: #17202a;
+  background: #f6f7f9;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0b7a46;
+}
+
+.links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hero {
+  padding: 96px 0;
+  background:
+    radial-gradient(circle at top right, #daf7e7, transparent 45%),
+    #ffffff;
+}
+
+.hero h1 {
+  max-width: 760px;
+  margin: 0 0 20px;
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 1.1;
+}
+
+.hero p {
+  max-width: 700px;
+  font-size: 20px;
+  line-height: 1.8;
+  color: #52606d;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #0b7a46;
+  color: white;
+  font-weight: 700;
+}
+
+.button.secondary {
+  background: white;
+  color: #0b7a46;
+  border: 1px solid #0b7a46;
+}
+
+.section {
+  padding: 72px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  padding: 28px;
+  border-radius: 18px;
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.page {
+  min-height: calc(100vh - 72px);
+  padding: 56px 0;
+}
+
+.form {
+  max-width: 540px;
+  margin: 0 auto;
+  background: white;
+  padding: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d5d9df;
+  border-radius: 10px;
+  font: inherit;
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .links {
+    display: none;
+  }
+}

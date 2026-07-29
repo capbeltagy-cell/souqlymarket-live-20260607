@@ -1,1 +1,0 @@
-ALTER VIEW public.listings_public_contacts SET (security_invoker = true);

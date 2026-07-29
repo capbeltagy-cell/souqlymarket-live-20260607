@@ -1,0 +1,21 @@
+services:
+  souqly-postgres:
+    image: postgres:16-alpine
+    container_name: souqly-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: souqly_core
+      POSTGRES_USER: souqly
+      POSTGRES_PASSWORD: fb222535e6beaed65b99ec57c9b44556b2dc949a4c835dfe
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - souqly_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U souqly -d souqly_core"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  souqly_postgres_data:

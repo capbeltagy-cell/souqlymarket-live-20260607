@@ -1,1 +1,0 @@
-ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS is_verified boolean NOT NULL DEFAULT false;

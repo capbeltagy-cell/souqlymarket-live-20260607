@@ -1,1 +1,0 @@
-ALTER VIEW public.companies_trust SET (security_invoker = true);
