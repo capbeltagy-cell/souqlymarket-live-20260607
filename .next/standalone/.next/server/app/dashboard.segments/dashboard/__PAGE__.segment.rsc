@@ -1,5 +1,0 @@
-1:"$Sreact.fragment"
-2:I[97367,["/_next/static/chunks/3rdqn8rx95pw7.js","/_next/static/chunks/14mrh2-p_w84d.js"],"OutletBoundary"]
-3:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","main",null,{"className":"page","children":["$","div",null,{"className":"container","children":[["$","h1",null,{"children":"مساحة العمل"}],["$","div",null,{"className":"grid","children":[["$","article",null,{"className":"card","children":[["$","h3",null,{"children":"ملف الشركة"}],["$","p",null,{"children":"أنشئ ملف شركتك وأرسله للمراجعة."}]]}],["$","article",null,{"className":"card","children":[["$","h3",null,{"children":"الفرص المناسبة"}],["$","p",null,{"children":"ستظهر هنا الفرص المطابقة لنشاطك."}]]}],["$","article",null,{"className":"card","children":[["$","h3",null,{"children":"مهام اليوم"}],["$","p",null,{"children":"تابع العملاء وعروض الأسعار والمهام اليومية."}]]}]]}]]}]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yTuywW5Q1Pdf5zoEqsflo"}
-4:null

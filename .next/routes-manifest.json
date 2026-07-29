@@ -37,6 +37,22 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/admin/company\\-applications/(?<nxtPid>[^/]+?)/reject(?:/)?$"
+    },
+    {
+      "page": "/companies/[slug]",
+      "regex": "^/companies/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/companies/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/dashboard/company/[id]",
+      "regex": "^/dashboard/company/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/company/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
