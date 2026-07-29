@@ -37,8 +37,7 @@ DECLARE
   shipping_eta_min integer;
   shipping_eta_max integer;
   governorate_key text;
-  inventory_balance integer;
-  inventory_location_id uuid;
+  shipping_required boolean;
 BEGIN
   IF auth.uid() IS NULL OR p_buyer_id IS DISTINCT FROM auth.uid() THEN
     RAISE EXCEPTION 'checkout_buyer_mismatch' USING ERRCODE = '42501';
@@ -66,8 +65,8 @@ BEGIN
     FROM public.listings
    WHERE id = p_listing_id
    FOR UPDATE;
-  IF NOT FOUND OR listing_row.type <> 'product' OR listing_row.status <> 'approved' THEN
-    RAISE EXCEPTION 'product_unavailable' USING ERRCODE = 'P0001';
+  IF NOT FOUND OR listing_row.status <> 'approved' THEN
+    RAISE EXCEPTION 'listing_unavailable' USING ERRCODE = 'P0001';
   END IF;
   IF p_quantity < coalesce(listing_row.min_order_quantity, 1) THEN
     RAISE EXCEPTION 'minimum_order_quantity_not_met' USING ERRCODE = '22023';
@@ -99,9 +98,18 @@ BEGIN
   END IF;
   subtotal_amount := round(unit_price * p_quantity, 2);
 
+  shipping_required := coalesce(
+    lower(listing_row.dimensions ->> 'shipping_required') <> 'false',
+    listing_row.type IN ('product', 'market')
+  );
+  IF shipping_required AND p_shipping_address IS NULL THEN
+    RAISE EXCEPTION 'shipping_address_required' USING ERRCODE = '22023';
+  END IF;
+
   -- Shipping values sent by the browser are compatibility-only. The database
-  -- derives the canonical quote from the address governorate.
-  IF p_shipping_address IS NOT NULL THEN
+  -- derives the canonical quote from the address governorate only when the
+  -- locked listing itself requires shipping.
+  IF shipping_required THEN
     governorate_key := lower(btrim(coalesce(p_shipping_address ->> 'governorate', '')));
     IF governorate_key IN ('القاهرة', 'القاهره', 'cairo', 'الجيزة', 'الجيزه', 'giza') THEN
       shipping_amount := 70; shipping_eta_min := 1; shipping_eta_max := 2;
@@ -203,7 +211,6 @@ BEGIN
     IF listing_row.stock_quantity IS NULL OR listing_row.stock_quantity < p_quantity THEN
       RAISE EXCEPTION 'insufficient_inventory' USING ERRCODE = 'P0001';
     END IF;
-    inventory_balance := listing_row.stock_quantity - p_quantity;
   END IF;
 
   INSERT INTO public.wholesale_orders (
@@ -216,14 +223,13 @@ BEGIN
   )
   VALUES (
     auth.uid(), NULL, listing_row.id, listing_row.store_id, p_quantity, p_notes,
-    p_contact_phone, 'awaiting_seller', p_shipping_address, unit_price,
+    p_contact_phone, 'awaiting_seller',
+    CASE WHEN shipping_required THEN p_shipping_address ELSE NULL END, unit_price,
     subtotal_amount, discount_amount, shipping_amount, shipping_eta_min,
     shipping_eta_max, greatest(subtotal_amount - discount_amount, 0) + shipping_amount,
     coalesce(listing_row.currency, 'EGP'), 'unpaid', p_conversation_id,
     canonical_referral_code, CASE WHEN coupon_row.id IS NULL THEN NULL ELSE coupon_row.code END,
-    p_checkout_session_id, p_checkout_session_id::text,
-    CASE WHEN coalesce(listing_row.track_inventory, false) THEN now() ELSE NULL END,
-    NULL
+    p_checkout_session_id, p_checkout_session_id::text, NULL, NULL
   )
   ON CONFLICT (buyer_id, checkout_session_id, product_listing_id)
     WHERE checkout_session_id IS NOT NULL AND product_listing_id IS NOT NULL
@@ -238,31 +244,6 @@ BEGIN
        AND order_row.checkout_session_id = p_checkout_session_id
        AND order_row.product_listing_id = listing_row.id;
     RETURN jsonb_build_object('order_id', new_order_id, 'idempotent', true);
-  END IF;
-
-  IF coalesce(listing_row.track_inventory, false) THEN
-    UPDATE public.listings
-       SET stock_quantity = inventory_balance,
-           updated_at = now()
-     WHERE id = listing_row.id;
-
-    SELECT location.id
-      INTO inventory_location_id
-      FROM public.inventory_locations AS location
-     WHERE location.company_id = listing_row.company_id
-       AND location.active
-     ORDER BY location.is_default DESC, location.created_at
-     LIMIT 1;
-
-    INSERT INTO public.inventory_movements (
-      company_id, listing_id, location_id, movement_type, quantity_delta,
-      balance_after, reference_type, reference_id, note, created_by
-    )
-    VALUES (
-      listing_row.company_id, listing_row.id, inventory_location_id, 'sale',
-      -p_quantity, inventory_balance, 'order', new_order_id,
-      'حجز مخزون عند إنشاء الطلب', auth.uid()
-    );
   END IF;
 
   IF coupon_row.id IS NOT NULL THEN

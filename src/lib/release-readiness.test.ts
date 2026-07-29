@@ -50,11 +50,16 @@ describe("release readiness contracts", () => {
 
   it("routes listing checkout through the atomic database boundary", () => {
     const orders = read("src/lib/orders.functions.ts");
+    const checkout = read("supabase/migrations/20260727173000_atomic_checkout_orders.sql");
 
     expect(orders).toContain('"create_order_atomic"');
     expect(orders).not.toMatch(
       /from\("wholesale_orders" as never\)[\s\S]{0,120}\.insert\(insertPayload\)/,
     );
+    expect(checkout).toContain("shipping_address_required");
+    expect(checkout).toContain("listing_row.dimensions ->> 'shipping_required'");
+    expect(checkout).toContain("p_checkout_session_id::text, NULL, NULL");
+    expect(checkout).not.toContain("SET stock_quantity = inventory_balance");
   });
 
   it("prevents products from bypassing store approval", () => {
@@ -94,9 +99,9 @@ describe("release readiness contracts", () => {
     const orders = read("src/lib/orders.functions.ts");
 
     expect(proofMigration).toContain("SET search_path = ''");
-    expect(hardening).toContain(
-      "REVOKE INSERT ON public.notifications FROM anon, authenticated",
-    );
+    expect(hardening).toContain("REVOKE INSERT ON public.notifications FROM anon, authenticated");
     expect(orders).toContain('supabaseAdmin.from("notifications"');
+    expect(hardening).toContain("trg_hide_unpublished_store_listings");
+    expect(proofMigration).toContain("ranked_pending");
   });
 });

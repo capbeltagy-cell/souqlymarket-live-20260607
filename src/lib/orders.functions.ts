@@ -62,7 +62,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const { data: listing, error } = await supabase
       .from("listings")
       .select(
-        "id, company_id, store_id, price, sale_price, currency, title_ar, title_en, status, type, track_inventory, stock_quantity, min_order_quantity",
+        "id, company_id, store_id, price, sale_price, currency, title_ar, title_en, status, type, dimensions, track_inventory, stock_quantity, min_order_quantity",
       )
       .eq("id", data.listing_id)
       .maybeSingle();
@@ -73,7 +73,16 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const salePrice = Number(listing.sale_price ?? 0);
     const price = salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
     if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
-    if (["product", "market"].includes(listing.type) && !data.shipping_address) {
+    const dimensions =
+      listing.dimensions &&
+      typeof listing.dimensions === "object" &&
+      !Array.isArray(listing.dimensions)
+        ? (listing.dimensions as Record<string, unknown>)
+        : {};
+    const shippingRequired =
+      dimensions.shipping_required === true ||
+      (dimensions.shipping_required !== false && ["product", "market"].includes(listing.type));
+    if (shippingRequired && !data.shipping_address) {
       throw new Error("عنوان الشحن مطلوب لإتمام شراء هذا المنتج");
     }
     if (data.quantity < (listing.min_order_quantity ?? 1)) {

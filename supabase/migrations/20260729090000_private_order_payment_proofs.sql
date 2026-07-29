@@ -48,6 +48,26 @@ USING (
 COMMENT ON COLUMN public.payment_proofs.proof_url IS
   'Private payment-proofs object path for new records; legacy rows may contain a signed URL.';
 
+-- Preserve every historical row while deterministically superseding duplicate
+-- pending submissions that the legacy select-then-insert flow could create.
+WITH ranked_pending AS (
+  SELECT id,
+         row_number() OVER (
+           PARTITION BY order_id
+           ORDER BY created_at DESC, id DESC
+         ) AS position
+  FROM public.payment_proofs
+  WHERE status = 'pending'
+)
+UPDATE public.payment_proofs AS proof
+SET status = 'rejected',
+    review_note = coalesce(proof.review_note, 'Superseded by a newer pending proof'),
+    reviewed_at = coalesce(proof.reviewed_at, now()),
+    updated_at = now()
+FROM ranked_pending
+WHERE proof.id = ranked_pending.id
+  AND ranked_pending.position > 1;
+
 CREATE UNIQUE INDEX IF NOT EXISTS payment_proofs_one_pending_per_order_idx
 ON public.payment_proofs (order_id)
 WHERE status = 'pending';

@@ -70,7 +70,8 @@ BEGIN
   FOREACH item IN ARRAY ARRAY[
     'trg_recompute_store_coupon_used_count','audit_stores','audit_wholesale_orders',
     'trg_protect_store_review_fields','trg_enforce_listing_owner',
-    'trg_validate_order_payment_proof','trg_mark_order_payment_pending_review'
+    'trg_validate_order_payment_proof','trg_mark_order_payment_pending_review',
+    'trg_hide_unpublished_store_listings'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname=item AND NOT tgisinternal) THEN missing := array_append(missing, 'trigger ' || item); END IF;
   END LOOP;
