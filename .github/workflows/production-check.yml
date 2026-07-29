@@ -38,6 +38,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate production launch bundle
+        run: node scripts/build-launch-bundle.mjs
+
+      - name: Audit ordered migrations
+        run: npm run test:migrations
+
+      - name: Upload generated launch bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-launch-bundle
+          path: supabase/launch_bundle.sql
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Typecheck
         run: npm run typecheck
 
