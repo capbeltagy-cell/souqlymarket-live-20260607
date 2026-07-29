@@ -6,8 +6,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getMyAchievements } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Achievements — Marketing Center" }] }),
   component: AchievementsPage,
 });

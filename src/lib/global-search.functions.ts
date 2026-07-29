@@ -38,6 +38,7 @@ export const globalSearch = createServerFn({ method: "POST" })
             "id, type, title_ar, title_en, price, currency, city, governorate, images, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, status, companies(is_premium, is_verified)",
           )
           .eq("status", "approved")
+          .eq("visible_in_marketplace", true)
           .or(
             `title_ar.ilike.${like},title_en.ilike.${like},description_ar.ilike.${like},description_en.ilike.${like}`,
           )
@@ -62,11 +63,13 @@ export const globalSearch = createServerFn({ method: "POST" })
           .select(
             "id, title, description, governorate, quantity, unit, budget_min, budget_max, currency, status",
           )
+          .eq("status", "open")
           .or(`title.ilike.${like},description.ilike.${like}`)
           .limit(lim),
         supabaseAdmin
           .from("tenders")
           .select("id, title, description, governorate, budget, currency, deadline, status")
+          .eq("status", "open")
           .or(`title.ilike.${like},description.ilike.${like}`)
           .limit(lim),
         supabaseAdmin

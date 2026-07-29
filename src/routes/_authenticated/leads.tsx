@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/leads")({
+  beforeLoad: requireBusinessRoute,
   head: () => ({ meta: [{ title: "إدارة العملاء — سوقلي" }] }),
   component: LegacyLeadsRedirect,
 });

@@ -1126,6 +1126,7 @@ export type Database = {
           marketer_promotion_enabled: boolean;
           min_order_quantity: number;
           ownership_type: string | null;
+          owner_id: string;
           pdf_url: string | null;
           phone: string | null;
           price: number | null;
@@ -1192,6 +1193,7 @@ export type Database = {
           marketer_promotion_enabled?: boolean;
           min_order_quantity?: number;
           ownership_type?: string | null;
+          owner_id: string;
           pdf_url?: string | null;
           phone?: string | null;
           price?: number | null;
@@ -1258,6 +1260,7 @@ export type Database = {
           marketer_promotion_enabled?: boolean;
           min_order_quantity?: number;
           ownership_type?: string | null;
+          owner_id?: string;
           pdf_url?: string | null;
           phone?: string | null;
           price?: number | null;

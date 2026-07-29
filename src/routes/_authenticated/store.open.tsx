@@ -17,6 +17,60 @@ export const Route = createFileRoute("/_authenticated/store/open")({
   component: OpenStoreWizard,
 });
 
+const ARABIC_SLUG_MAP: Record<string, string> = {
+  ا: "a",
+  أ: "a",
+  إ: "e",
+  آ: "a",
+  ب: "b",
+  ت: "t",
+  ث: "th",
+  ج: "g",
+  ح: "h",
+  خ: "kh",
+  د: "d",
+  ذ: "z",
+  ر: "r",
+  ز: "z",
+  س: "s",
+  ش: "sh",
+  ص: "s",
+  ض: "d",
+  ط: "t",
+  ظ: "z",
+  ع: "a",
+  غ: "gh",
+  ف: "f",
+  ق: "q",
+  ك: "k",
+  ل: "l",
+  م: "m",
+  ن: "n",
+  ه: "h",
+  و: "w",
+  ي: "y",
+  ى: "a",
+  ة: "a",
+  ئ: "y",
+  ؤ: "w",
+};
+
+function toStoreSlug(value: string) {
+  const transliterated = Array.from(value.normalize("NFKD"))
+    .map((char) => ARABIC_SLUG_MAP[char] ?? char)
+    .join("")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+  if (transliterated.length >= 4) return transliterated;
+  const hash = Array.from(value).reduce(
+    (total, char) => (total * 31 + char.charCodeAt(0)) >>> 0,
+    7,
+  );
+  return `store-${hash.toString(36)}`;
+}
+
 function OpenStoreWizard() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -36,11 +90,13 @@ function OpenStoreWizard() {
   const [logo, setLogo] = useState<UploadedImage[]>([]);
   const [banner, setBanner] = useState<UploadedImage[]>([]);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(false);
 
   useEffect(() => {
     getMyStore().then((r) => {
       if (r.store) {
         setExisting(r.store);
+        setSlugTouched(true);
         setForm((f) => ({ ...f, ...r.store, colors: { ...f.colors, ...(r.store.colors ?? {}) } }));
         if (r.store.logo_url) setLogo([{ url: r.store.logo_url, source: "uploaded" }]);
         if (r.store.banner_url) setBanner([{ url: r.store.banner_url, source: "uploaded" }]);
@@ -83,7 +139,7 @@ function OpenStoreWizard() {
     <div className="min-h-screen bg-surface-2">
       <SiteHeader />
       <div className="container-souqly py-8 max-w-2xl">
-        <h1 className="text-2xl font-bold mb-1">افتح متجرك</h1>
+        <h1 className="text-2xl font-bold mb-1">{existing ? "إعدادات المتجر" : "افتح متجرك"}</h1>
         <p className="text-muted-foreground mb-6">الخطوة {step} من 3</p>
 
         {step === 1 && (
@@ -92,7 +148,14 @@ function OpenStoreWizard() {
               <Label>اسم المتجر بالعربية *</Label>
               <Input
                 value={form.name_ar}
-                onChange={(e) => setForm({ ...form, name_ar: e.target.value })}
+                onChange={(e) => {
+                  const name = e.target.value;
+                  setForm({
+                    ...form,
+                    name_ar: name,
+                    slug: slugTouched ? form.slug : toStoreSlug(name),
+                  });
+                }}
               />
             </div>
             <div>
@@ -106,12 +169,13 @@ function OpenStoreWizard() {
               <Label>رابط المتجر (slug) *</Label>
               <Input
                 value={form.slug}
-                onChange={(e) =>
+                onChange={(e) => {
+                  setSlugTouched(true);
                   setForm({
                     ...form,
                     slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-                  })
-                }
+                  });
+                }}
                 placeholder="my-store"
               />
               {form.slug && (

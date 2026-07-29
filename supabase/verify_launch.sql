@@ -9,7 +9,9 @@ BEGIN
   FOREACH item IN ARRAY ARRAY[
     'profiles','user_roles','companies','agents','listings','stores','store_categories',
     'store_coupons','store_coupon_usage','store_followers','store_reviews','store_staff',
-    'wholesale_orders','notifications','audit_logs','auth_rate_limits','user_addresses'
+    'wholesale_orders','notifications','audit_logs','auth_rate_limits','user_addresses',
+    'payment_methods','payment_proofs','payment_transactions','payment_events',
+    'subscriptions','subscription_events','manual_subscription_payments'
   ] LOOP
     IF to_regclass('public.' || item) IS NULL THEN missing := array_append(missing, 'table public.' || item); END IF;
   END LOOP;
@@ -18,7 +20,10 @@ BEGIN
     'public.consume_auth_rate_limit(text,integer,integer)',
     'public.recompute_store_coupon_used_count()',
     'public.protect_store_review_fields()',
-    'public.log_audit_event()'
+    'public.log_audit_event()',
+    'public.create_order_atomic(uuid,uuid,integer,text,text,jsonb,numeric,integer,integer,uuid,text,text,uuid)',
+    'public.validate_order_payment_proof()',
+    'public.mark_order_payment_pending_review()'
   ] LOOP
     IF to_regprocedure(item) IS NULL THEN missing := array_append(missing, 'function ' || item); END IF;
   END LOOP;
@@ -48,6 +53,7 @@ BEGIN
   FOREACH item IN ARRAY ARRAY[
     'wholesale_orders_store_created_idx','listings_store_status_idx',
     'store_coupon_usage_order_uidx','auth_rate_limits_window_idx'
+    ,'payment_proofs_one_pending_per_order_idx'
   ] LOOP
     IF to_regclass('public.' || item) IS NULL THEN missing := array_append(missing, 'index ' || item); END IF;
   END LOOP;
@@ -75,6 +81,8 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%listing%') THEN missing := array_append(missing, 'listing media storage policy'); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%company-assets%') THEN missing := array_append(missing, 'company assets storage policy'); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname ILIKE '%avatars%') THEN missing := array_append(missing, 'avatars storage policy'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM storage.buckets WHERE id='payment-proofs' AND public=false) THEN missing := array_append(missing, 'private payment-proofs bucket'); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='Payment proof owner uploads') THEN missing := array_append(missing, 'payment proof upload policy'); END IF;
 
   IF cardinality(missing) > 0 THEN RAISE EXCEPTION 'Security verification failed: %', array_to_string(missing, ', '); END IF;
 END $$;

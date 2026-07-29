@@ -16,6 +16,30 @@ Do not remove tables or columns. Restore the pre-launch backup if service is aff
 
 The new indexes can remain in place during rollback. They do not change data semantics. Avoid dropping `auth_rate_limits` because it may contain useful incident evidence.
 
+Direct authenticated INSERT/UPDATE on `wholesale_orders` and direct INSERT on
+`store_coupon_usage` are also intentionally revoked. Orders must be created through
+`create_order_atomic` or `accept_quotation_atomic`, and status/payment updates run
+through validated server functions. During an application rollback, roll back the
+application and database backup together; do not restore the permissive direct
+write policies independently.
+
+`trg_record_released_order_inventory` records the compensating inventory movement
+after the existing inventory trigger restores stock. If this logging trigger
+fails, disable only that trigger after preserving the incident details; never
+manually edit stock balances or delete inventory movement rows.
+
+The Storage hardening migration only replaces UPDATE policies so that both the old
+and new object paths must remain owner-scoped. Do not restore the previous
+USING-only policies during an application rollback; they permit namespace changes
+that the launch verification intentionally rejects.
+
+The `payment-proofs` bucket is private and contains financial evidence. Do not make
+it public during rollback. If the new upload UI must be rolled back, retain the
+bucket, its objects, and all payment rows; restore application code only. Signed
+links are deliberately short lived. The order-payment validation triggers and the
+partial unique index prevent amount tampering and duplicate pending proofs and
+should remain enabled unless a reviewed replacement enforces the same invariants.
+
 ## Safe recovery order
 
 1. Put the application in Coolify maintenance mode or roll back to the previous image.
