@@ -6,14 +6,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  getPricingConfig,
-  getMyCompanySubscription,
-  requestCompanyUpgrade,
-} from "@/lib/subscription.functions";
+import { getPricingConfig, getMyCompanySubscription } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -48,18 +43,19 @@ function Pricing() {
   const { user, roles } = useAuth();
   const fetchCfg = useServerFn(getPricingConfig);
   const fetchSub = useServerFn(getMyCompanySubscription);
-  const requestUpgrade = useServerFn(requestCompanyUpgrade);
 
   const [cfg, setCfg] = useState<{
     companyPremiumPriceEgp: number;
     marketerCommissionPct: number;
     freeListingLimit: number;
   } | null>(null);
-  const [sub, setSub] = useState<{ hasCompany: boolean; isPaid: boolean; plan: string } | null>(
-    null,
-  );
-  const [busy, setBusy] = useState(false);
-
+  const [sub, setSub] = useState<{
+    companyId: string | null;
+    expiresAt: string | null;
+    hasCompany: boolean;
+    isPaid: boolean;
+    plan: string;
+  } | null>(null);
   useEffect(() => {
     fetchCfg()
       .then(setCfg)
@@ -68,7 +64,7 @@ function Pricing() {
       fetchSub()
         .then(setSub)
         .catch(() => setSub(null));
-  }, [user]);
+  }, [fetchCfg, fetchSub, user]);
 
   const isPureAgent =
     roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
@@ -115,25 +111,6 @@ function Pricing() {
         `${pct}% subscription referral commission`,
       ];
 
-  const onRequestUpgrade = async () => {
-    setBusy(true);
-    try {
-      const r = await requestUpgrade({ data: {} });
-      if (r.alreadyPremium)
-        toast.success(ar ? "أنت بالفعل مشترك في الباقة المميزة" : "You are already on premium");
-      else
-        toast.success(
-          ar
-            ? "تم إرسال طلب التفعيل — سيتواصل معك فريقنا لإتمام الدفع"
-            : "Upgrade request sent — our team will contact you to complete payment",
-        );
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -144,8 +121,8 @@ function Pricing() {
           </h1>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
             {ar
-              ? "أسعار واضحة وشفافة. التفعيل يتم يدوياً من فريق سوقلي بعد تأكيد الدفع لضمان أمان معاملتك."
-              : "Clear, transparent pricing. Activation is handled manually by the Souqly team after payment confirmation for your safety."}
+              ? "أسعار واضحة وتجديد يدوي شهري. التفعيل يتم بعد مراجعة إثبات التحويل من الإدارة."
+              : "Clear pricing with manual monthly renewal. Activation follows admin verification of the transfer proof."}
           </p>
         </div>
       </section>
@@ -156,8 +133,8 @@ function Pricing() {
           <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-foreground">
             {ar
-              ? "الدفع الإلكتروني قيد الإطلاق. حالياً بعد اختيار الباقة، يتواصل معك فريقنا خلال 24 ساعة لإتمام الدفع وتفعيل حسابك."
-              : "Online payment is launching soon. For now, after selecting a plan our team contacts you within 24 hours to complete payment and activate your account."}
+              ? "الدفع متاح مؤقتًا عبر إنستا باي أو فودافون كاش. لا يتم تفعيل الباقة قبل مراجعة صورة التحويل."
+              : "Payment is temporarily available through InstaPay or Vodafone Cash. The plan is not activated before receipt review."}
           </p>
         </div>
 
@@ -279,20 +256,24 @@ function Pricing() {
                   {ar ? "مفعّلة" : "Active"}
                 </Button>
               ) : (
-                <Button
-                  className="w-full gap-2 bg-primary hover:bg-primary-hover"
-                  onClick={onRequestUpgrade}
-                  disabled={busy}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  {ar ? "اطلب التفعيل" : "Request activation"}
-                </Button>
+                <div className="space-y-2">
+                  <Button asChild className="w-full gap-2 bg-primary hover:bg-primary-hover">
+                    <Link to="/manual-payment" search={{ companyId: sub.companyId || undefined }}>
+                      <Sparkles className="h-4 w-4" />
+                      {ar ? "ادفع وجدّد شهرًا واحدًا" : "Pay and renew for one month"}
+                    </Link>
+                  </Button>
+                </div>
               )}
               <p className="text-xs text-muted-foreground mt-3 flex items-start gap-1.5">
                 <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                 {ar
-                  ? "التفعيل خلال 24 ساعة من تأكيد الدفع."
-                  : "Activated within 24 hours of payment confirmation."}
+                  ? sub?.expiresAt
+                    ? `تاريخ الانتهاء الحالي: ${new Date(sub.expiresAt).toLocaleDateString("ar-EG")}. لا يوجد تجديد تلقائي.`
+                    : "الاشتراك لمدة شهر واحد ولا يتجدد تلقائيًا."
+                  : sub?.expiresAt
+                    ? `Current expiry: ${new Date(sub.expiresAt).toLocaleDateString("en-GB")}. No automatic renewal.`
+                    : "The subscription lasts one month and does not renew automatically."}
               </p>
             </div>
           </div>

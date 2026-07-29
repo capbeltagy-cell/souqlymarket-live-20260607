@@ -27,7 +27,7 @@ import { EGYPT_GOVERNORATES, getCitiesForGovernorate } from "@/lib/egypt.locatio
 import { LocationPicker } from "@/components/LocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { MapView } from "@/components/MapView";
+import { ClientMapView } from "@/components/ClientMapView";
 import { ImageUploader, type UploadedImage, toLegacyShape } from "@/components/ImageUploader";
 
 export const Route = createFileRoute("/_authenticated/listings/new")({
@@ -712,7 +712,7 @@ function NewListing() {
                       تم تحديد الموقع ✓ {latitude}, {longitude}
                     </div>
                   )}
-                  <MapView
+                  <ClientMapView
                     markers={
                       latitude && longitude
                         ? [

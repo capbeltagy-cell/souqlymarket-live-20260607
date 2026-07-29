@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type PlanKey = "free" | "premium_company" | "premium_agent";
@@ -79,39 +78,4 @@ export const getMyPlan = createServerFn({ method: "GET" })
       hasCompany: !!company,
       hasAgent: !!agent,
     };
-  });
-
-export const upgradePlan = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z.object({ plan: z.enum(["free", "premium_company", "premium_agent"]) }).parse(d),
-  )
-  .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    // deactivate existing
-    await supabase
-      .from("subscriptions")
-      .update({ is_active: false })
-      .eq("user_id", userId)
-      .eq("is_active", true);
-    const expires = new Date();
-    expires.setMonth(expires.getMonth() + 1);
-    const { error } = await supabase.from("subscriptions").insert({
-      user_id: userId,
-      plan: data.plan,
-      is_active: true,
-      expires_at: expires.toISOString(),
-    });
-    if (error) throw new Error(error.message);
-    // mirror plan onto company/agent record if present
-    if (data.plan === "premium_company") {
-      await supabase
-        .from("companies")
-        .update({ subscription_plan: data.plan })
-        .eq("owner_id", userId);
-    }
-    if (data.plan === "premium_agent") {
-      await supabase.from("agents").update({ subscription_plan: data.plan }).eq("user_id", userId);
-    }
-    return { ok: true, plan: data.plan };
   });

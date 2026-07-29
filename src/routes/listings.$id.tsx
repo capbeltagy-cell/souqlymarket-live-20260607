@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
-import { MapView } from "@/components/MapView";
+import { ClientMapView } from "@/components/ClientMapView";
 import { TrustBadge } from "@/components/TrustBadges";
 import { ListingImageGallery } from "@/components/ListingImageGallery";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
@@ -482,7 +482,7 @@ function ListingDetail() {
             </div>
             {l.latitude !== null && l.longitude !== null && (
               <div className="rounded-xl overflow-hidden border border-border bg-card mb-4">
-                <MapView
+                <ClientMapView
                   markers={[
                     {
                       id: l.id,

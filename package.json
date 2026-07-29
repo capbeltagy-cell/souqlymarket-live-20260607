@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:node": "NITRO_PRESET=node-server vite build",
     "build:dev": "vite build --mode development",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run build",
-    "preview": "vite preview",
+    "preview": "npm run build:node && node .output/server/index.mjs",
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:migrations": "node scripts/audit-migrations.mjs",
+    "test:routes": "node scripts/crawl-routes.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

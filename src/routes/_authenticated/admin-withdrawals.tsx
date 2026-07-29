@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Banknote, Check, X, DollarSign, Settings2, Award } from "lucide-react";
@@ -17,13 +17,22 @@ export const Route = createFileRoute("/_authenticated/admin-withdrawals")({
   component: AdminWithdrawals,
 });
 
-const STATUSES = ["pending", "approved", "paid", "rejected", "cancelled", "all"] as const;
+const STATUSES = [
+  "pending",
+  "approved",
+  "processing",
+  "paid",
+  "rejected",
+  "cancelled",
+  "all",
+] as const;
 type WithdrawalStatus = (typeof STATUSES)[number];
 type WithdrawalRow = Awaited<ReturnType<typeof adminListWithdrawals>>["payouts"][number];
 
 const STATUS_LABELS: Record<WithdrawalStatus, { ar: string; en: string }> = {
   pending: { ar: "معلقة", en: "Pending" },
   approved: { ar: "معتمدة", en: "Approved" },
+  processing: { ar: "قيد التحويل", en: "Processing" },
   paid: { ar: "مدفوعة", en: "Paid" },
   rejected: { ar: "مرفوضة", en: "Rejected" },
   cancelled: { ar: "ملغاة", en: "Cancelled" },
@@ -38,11 +47,13 @@ function AdminWithdrawals() {
   const [status, setStatus] = useState<WithdrawalStatus>("pending");
   const [rows, setRows] = useState<WithdrawalRow[]>([]);
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
+  const [referenceMap, setReferenceMap] = useState<Record<string, string>>({});
+  const [proofMap, setProofMap] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -60,16 +71,24 @@ function AdminWithdrawals() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [ar, fList, status]);
 
   useEffect(() => {
     void load();
-  }, [status]);
+  }, [load]);
 
-  const act = async (id: string, action: "approve" | "reject" | "paid") => {
+  const act = async (id: string, action: "approve" | "start_processing" | "reject" | "paid") => {
     setBusy(`${id}:${action}`);
     try {
-      await fUpdate({ data: { id, action, admin_notes: notesMap[id] || null } });
+      await fUpdate({
+        data: {
+          id,
+          action,
+          admin_notes: notesMap[id] || null,
+          paid_reference: action === "paid" ? referenceMap[id] || null : null,
+          paid_proof_url: action === "paid" ? proofMap[id] || null : null,
+        },
+      });
       toast.success(ar ? "تم تحديث طلب السحب بنجاح" : "Withdrawal updated");
       await load();
     } catch (e) {
@@ -92,8 +111,8 @@ function AdminWithdrawals() {
             <Banknote className="h-5 w-5 text-primary" />
             <span>
               {ar
-                ? "مراجعة واعتماد طلبات سحب عمولات المسوقين فقط."
-                : "Review marketer commission withdrawals."}
+                ? "السحب تسوية يدوية: اعتماد، بدء التحويل، ثم تأكيد الدفع بمرجع وإثبات."
+                : "Payouts are manual settlements: approve, process, then mark paid with proof."}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -169,7 +188,9 @@ function AdminWithdrawals() {
                       )}
                     </div>
 
-                    {(row.status === "pending" || row.status === "approved") && (
+                    {(row.status === "pending" ||
+                      row.status === "approved" ||
+                      row.status === "processing") && (
                       <div className="flex flex-wrap items-center gap-2 pt-1">
                         <Input
                           placeholder={ar ? "ملاحظة الإدارة (اختياري)" : "Admin note (optional)"}
@@ -202,16 +223,57 @@ function AdminWithdrawals() {
                             </Button>
                           </>
                         )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => void act(row.id, "paid")}
-                          disabled={busy === `${row.id}:paid`}
-                          className="gap-1"
-                        >
-                          <DollarSign className="h-4 w-4" />
-                          {ar ? "تأكيد الدفع" : "Mark paid"}
-                        </Button>
+                        {row.status === "approved" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void act(row.id, "start_processing")}
+                            disabled={busy === `${row.id}:start_processing`}
+                          >
+                            {ar ? "بدء التحويل" : "Start processing"}
+                          </Button>
+                        )}
+                        {row.status === "processing" && (
+                          <div className="w-full space-y-2 rounded-lg border border-border p-3">
+                            <div className="grid gap-2 md:grid-cols-2">
+                              <Input
+                                placeholder={ar ? "مرجع التحويل" : "Transfer reference"}
+                                value={referenceMap[row.id] ?? ""}
+                                onChange={(event) =>
+                                  setReferenceMap((current) => ({
+                                    ...current,
+                                    [row.id]: event.target.value,
+                                  }))
+                                }
+                              />
+                              <Input
+                                type="url"
+                                placeholder={ar ? "رابط إثبات التحويل" : "Transfer proof URL"}
+                                value={proofMap[row.id] ?? ""}
+                                onChange={(event) =>
+                                  setProofMap((current) => ({
+                                    ...current,
+                                    [row.id]: event.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => void act(row.id, "paid")}
+                              disabled={
+                                busy === `${row.id}:paid` ||
+                                !referenceMap[row.id]?.trim() ||
+                                !proofMap[row.id]?.trim()
+                              }
+                              className="gap-1"
+                            >
+                              <DollarSign className="h-4 w-4" />
+                              {ar ? "تأكيد الدفع الموثّق" : "Confirm documented payment"}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

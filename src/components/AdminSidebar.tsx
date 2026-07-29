@@ -72,6 +72,7 @@ const MENU_ITEMS: MenuSection[] = [
     section: "المالية",
     items: [
       { icon: CreditCard, label: "المدفوعات", href: "/admin-payments" },
+      { icon: CreditCard, label: "طلبات الدفع اليدوي", href: "/admin-manual-payments" },
       { icon: DollarSign, label: "الإيداعات", href: "/admin-deposits" },
       { icon: ArrowDownUp, label: "السحوبات", href: "/admin-withdrawals" },
       { icon: TrendingUp, label: "الإيرادات", href: "/admin-revenue" },

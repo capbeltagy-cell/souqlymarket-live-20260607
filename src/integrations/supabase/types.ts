@@ -1638,6 +1638,9 @@ export type Database = {
           currency: string;
           id: string;
           notes: string | null;
+          paid_by: string | null;
+          paid_proof_url: string | null;
+          paid_reference: string | null;
           payout_method_id: string | null;
           processed_at: string | null;
           requested_at: string;
@@ -1653,6 +1656,9 @@ export type Database = {
           currency?: string;
           id?: string;
           notes?: string | null;
+          paid_by?: string | null;
+          paid_proof_url?: string | null;
+          paid_reference?: string | null;
           payout_method_id?: string | null;
           processed_at?: string | null;
           requested_at?: string;
@@ -1668,6 +1674,9 @@ export type Database = {
           currency?: string;
           id?: string;
           notes?: string | null;
+          paid_by?: string | null;
+          paid_proof_url?: string | null;
+          paid_reference?: string | null;
           payout_method_id?: string | null;
           processed_at?: string | null;
           requested_at?: string;
@@ -3344,7 +3353,7 @@ export type Database = {
         | "market"
         | "fish_shed";
       payment_proof_status: "pending" | "approved" | "rejected";
-      payout_status: "pending" | "approved" | "rejected" | "paid" | "cancelled";
+      payout_status: "pending" | "approved" | "processing" | "rejected" | "paid" | "cancelled";
       quotation_status:
         | "draft"
         | "sent"
@@ -3527,7 +3536,7 @@ export const Constants = {
         "fish_shed",
       ],
       payment_proof_status: ["pending", "approved", "rejected"],
-      payout_status: ["pending", "approved", "rejected", "paid", "cancelled"],
+      payout_status: ["pending", "approved", "processing", "rejected", "paid", "cancelled"],
       quotation_status: [
         "draft",
         "sent",

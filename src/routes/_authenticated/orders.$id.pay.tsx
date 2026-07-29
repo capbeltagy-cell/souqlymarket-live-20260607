@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Upload, CheckCircle2, Clock, XCircle } from "lucide-react";
@@ -38,30 +38,57 @@ function PayOrderPage() {
   const loadMethods = useServerFn(listActivePaymentMethods);
   const loadProofs = useServerFn(listOrderProofs);
   const submit = useServerFn(submitPaymentProof);
-  const [order, setOrder] = useState<any>(null);
-  const [methods, setMethods] = useState<any[]>([]);
-  const [proofs, setProofs] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any>(null);
+  type OrderView = {
+    currency: string;
+    payment_status: string;
+    total_amount: number | string;
+  };
+  type PaymentMethodView = {
+    account_details: Record<string, unknown> | null;
+    icon: string | null;
+    id: string;
+    instructions_ar: string | null;
+    name_ar: string;
+    name_en: string | null;
+  };
+  type PaymentProofView = {
+    amount: number | string;
+    created_at: string;
+    currency: string;
+    id: string;
+    payment_method_code: string | null;
+    proof_url: string | null;
+    reference: string | null;
+    review_note: string | null;
+    status: string;
+  };
+  const [order, setOrder] = useState<OrderView | null>(null);
+  const [methods, setMethods] = useState<PaymentMethodView[]>([]);
+  const [proofs, setProofs] = useState<PaymentProofView[]>([]);
+  const [selected, setSelected] = useState<PaymentMethodView | null>(null);
   const [amount, setAmount] = useState(0);
   const [ref, setRef] = useState("");
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const [o, m, p] = await Promise.all([
       loadOrder({ data: { id } }),
       loadMethods(),
       loadProofs({ data: { order_id: id } }),
     ]);
-    setOrder((o as any).order);
-    setMethods((m as any).items);
-    setProofs((p as any).items);
-    if (!amount) setAmount(Number((o as any).order?.total_amount ?? 0));
-  };
+    const nextOrder = o.order as unknown as OrderView;
+    setOrder(nextOrder);
+    setMethods(m.items as unknown as PaymentMethodView[]);
+    setProofs(p.items as unknown as PaymentProofView[]);
+    setAmount((current) => current || Number(nextOrder?.total_amount ?? 0));
+  }, [id, loadMethods, loadOrder, loadProofs]);
   useEffect(() => {
-    refresh().catch((e) => toast.error(e.message)); /* eslint-disable-next-line */
-  }, [id]);
+    refresh().catch((error: unknown) =>
+      toast.error(error instanceof Error ? error.message : "تعذر تحميل بيانات الدفع"),
+    );
+  }, [refresh]);
 
   const uploadProof = async (): Promise<string | null> => {
     if (!file || !user) return null;
@@ -164,6 +191,10 @@ function PayOrderPage() {
             </div>
           ) : (
             <>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+                الدفع متاح حاليًا عبر وسائل التحويل اليدوية المعتمدة. لا يعتبر الطلب مدفوعًا قبل
+                مراجعة الإدارة لإثبات التحويل.
+              </div>
               <div>
                 <div className="text-sm font-semibold mb-2">اختر طريقة الدفع</div>
                 {methods.length === 0 ? (
