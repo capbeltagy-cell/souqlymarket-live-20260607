@@ -21,7 +21,24 @@
     "afterFiles": [],
     "fallback": []
   },
-  "dynamicRoutes": [],
+  "dynamicRoutes": [
+    {
+      "page": "/api/admin/company-applications/[id]/approve",
+      "regex": "^/api/admin/company\\-applications/([^/]+?)/approve(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/company\\-applications/(?<nxtPid>[^/]+?)/approve(?:/)?$"
+    },
+    {
+      "page": "/api/admin/company-applications/[id]/reject",
+      "regex": "^/api/admin/company\\-applications/([^/]+?)/reject(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/company\\-applications/(?<nxtPid>[^/]+?)/reject(?:/)?$"
+    }
+  ],
   "staticRoutes": [
     {
       "page": "/",
@@ -48,6 +65,12 @@
       "namedRegex": "^/admin(?:/)?$"
     },
     {
+      "page": "/api/admin/company-applications",
+      "regex": "^/api/admin/company\\-applications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/company\\-applications(?:/)?$"
+    },
+    {
       "page": "/api/auth/login",
       "regex": "^/api/auth/login(?:/)?$",
       "routeKeys": {},
@@ -72,6 +95,12 @@
       "namedRegex": "^/api/auth/register(?:/)?$"
     },
     {
+      "page": "/api/company-applications",
+      "regex": "^/api/company\\-applications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/company\\-applications(?:/)?$"
+    },
+    {
       "page": "/companies",
       "regex": "^/companies(?:/)?$",
       "routeKeys": {},
@@ -82,6 +111,12 @@
       "regex": "^/dashboard(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/company-application",
+      "regex": "^/dashboard/company\\-application(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/company\\-application(?:/)?$"
     },
     {
       "page": "/login",

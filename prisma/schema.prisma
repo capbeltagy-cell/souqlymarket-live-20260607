@@ -1,3 +1,9 @@
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -41,6 +47,7 @@ model User {
   companiesOwned Company[]            @relation("CompanyOwner")
   companyMembers CompanyMember[]
   applications   CompanyApplication[]
+  role           UserRole             @default(USER)
 }
 
 model Session {
