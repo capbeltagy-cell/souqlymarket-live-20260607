@@ -1,3 +1,0 @@
-module.exports=[89880,a=>{"use strict";var b=a.i(87924),c=a.i(50944),d=a.i(72131);a.s(["default",0,function(){let a=(0,c.useRouter)(),[e,f]=(0,d.useState)(!1);async function g(){f(!0);try{await fetch("/api/auth/logout",{method:"POST"}),a.replace("/"),a.refresh()}finally{f(!1)}}return(0,b.jsx)("button",{type:"button",className:"button secondary",onClick:g,disabled:e,children:e?"جارٍ تسجيل الخروج...":"تسجيل الخروج"})}])}];
-
-//# sourceMappingURL=src_components_dashboard_LogoutButton_tsx_0fps4qz._.js.map
