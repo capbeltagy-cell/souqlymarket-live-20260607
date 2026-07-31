@@ -17,6 +17,21 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTabBar } from "@/components/MobileTabBar";
 import { BUILD_VERSION } from "@/lib/build-info";
+import { MARKETER_ENABLED } from "@/lib/feature-flags";
+
+const MARKETER_PATHS = [
+  "/agent",
+  "/agents",
+  "/earn",
+  "/campaigns",
+  "/referrals",
+  "/referral-program",
+  "/agent-performance",
+  "/leaderboard",
+  "/marketing-center",
+  "/commissions",
+  "/payouts",
+];
 
 function NotFoundComponent() {
   return (
@@ -74,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "سوقلي | منصة الأعمال والتجارة في مصر" },
       {
         name: "description",
-        content: "سوقلي منصة أعمال احترافية تربط الشركات والمتاجر والمسوقين والعملاء في مصر.",
+        content: "سوقلي منصة احترافية لإدارة الشركات والمتاجر والطلبات والعملاء في مصر.",
       },
       { property: "og:site_name", content: "Souqly — سوقلي" },
       { property: "og:type", content: "website" },
@@ -114,7 +129,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               url: "https://souqlymarket.com",
               name: "Souqly — سوقلي",
               description:
-                "The professional B2B marketplace connecting companies and sales agents across the Arab world.",
+                "A professional platform for company operations, stores, orders, customers and business growth.",
               publisher: { "@id": "https://souqlymarket.com/#organization" },
               potentialAction: {
                 "@type": "SearchAction",
@@ -149,9 +164,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function AppChrome() {
   const location = useLocation();
+  const router = useRouter();
+  const marketerRoute =
+    !MARKETER_ENABLED &&
+    MARKETER_PATHS.some(
+      (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+    );
+  useEffect(() => {
+    if (marketerRoute) void router.navigate({ to: "/business-solutions", replace: true });
+  }, [marketerRoute, router]);
   const isAdminRoute =
     location.pathname.startsWith("/admin-") || location.pathname === "/control-center-x7";
 
+  if (marketerRoute) return null;
   return (
     <>
       <Outlet />

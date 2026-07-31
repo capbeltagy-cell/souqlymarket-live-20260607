@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, PlusCircle, MessageSquare, User as UserIcon, Building2 } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
-import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
+import { MARKETPLACE_ENABLED, MARKETER_ENABLED } from "@/lib/feature-flags";
 import { isCompanyRole } from "@/lib/roles";
 
 type Tab = { to: string; icon: typeof Home; ar: string; en: string; match: (p: string) => boolean };
@@ -13,8 +13,12 @@ export function MobileTabBar() {
   const { user, roles } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPureAgent =
-    roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+    MARKETER_ENABLED &&
+    roles.includes("agent") &&
+    !roles.includes("company") &&
+    !roles.includes("admin");
   const isCompany = isCompanyRole(roles);
+  const accountPath = isCompany ? "/company-workspace" : isPureAgent ? "/agent" : "/dashboard";
 
   const centerTab: Tab = isPureAgent
     ? {
@@ -66,7 +70,7 @@ export function MobileTabBar() {
       match: (p) => p.startsWith("/messages"),
     },
     {
-      to: user ? "/dashboard" : "/auth",
+      to: user ? accountPath : "/auth",
       icon: UserIcon,
       ar: "حسابي",
       en: "Me",

@@ -66,7 +66,7 @@ function CompanyInventoryPage() {
           <div className="rounded-2xl border border-dashed bg-card p-12 text-center">
             <p className="text-muted-foreground">لا توجد منتجات مرتبطة بالشركة بعد.</p>
             <Button asChild className="mt-4">
-              <Link to="/listings/new">إضافة منتج</Link>
+              <Link to="/store/products/new">إضافة منتج إلى المتجر</Link>
             </Button>
           </div>
         ) : (

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { getPricingConfig, getMyCompanySubscription } from "@/lib/subscription.functions";
+import { MARKETER_ENABLED } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -16,14 +17,12 @@ export const Route = createFileRoute("/pricing")({
       { title: "الأسعار — سوقلي | Souqly Pricing" },
       {
         name: "description",
-        content:
-          "باقات سوقلي للشركات والمسوقين — أسعار واضحة، تفعيل يدوي بعد الدفع، بدون رسوم مخفية.",
+        content: "باقات سوقلي للشركات — أسعار واضحة، تفعيل يدوي بعد الدفع، بدون رسوم مخفية.",
       },
       { property: "og:title", content: "Souqly Pricing" },
       {
         property: "og:description",
-        content:
-          "Company & Marketer plans on Souqly — transparent pricing, admin-verified activation.",
+        content: "Company plans on Souqly — transparent pricing and admin-verified activation.",
       },
     ],
   }),
@@ -67,7 +66,10 @@ function Pricing() {
   }, [fetchCfg, fetchSub, user]);
 
   const isPureAgent =
-    roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+    MARKETER_ENABLED &&
+    roles.includes("agent") &&
+    !roles.includes("company") &&
+    !roles.includes("admin");
   const price = cfg?.companyPremiumPriceEgp ?? 499;
   const pct = cfg?.marketerCommissionPct ?? 15;
 
@@ -76,8 +78,8 @@ function Pricing() {
         "ملف شركة موثّق",
         "منتجات وخدمات غير محدودة",
         "استقبال العملاء المحتملين (Leads)",
-        "إنشاء حملات للمسوقين",
-        "أداء الحملات والتحليلات",
+        "إدارة فريق العمل والصلاحيات",
+        "تقارير التشغيل والمبيعات",
         "ظهور مميّز في نتائج البحث",
         "دعم أولوية",
       ]
@@ -85,8 +87,8 @@ function Pricing() {
         "Verified company profile",
         "Unlimited products & services",
         "Receive customer leads",
-        "Create marketer campaigns",
-        "Campaign analytics & performance",
+        "Team and permissions management",
+        "Operations and sales analytics",
         "Featured placement in search",
         "Priority support",
       ];

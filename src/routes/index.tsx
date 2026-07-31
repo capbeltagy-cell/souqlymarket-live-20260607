@@ -39,8 +39,7 @@ export const Route = createFileRoute("/")({
       { title: "Souqly — سوقلي | منصة الأعمال الفاخرة في مصر" },
       {
         name: "description",
-        content:
-          "سوقلي — منصة B2B فاخرة تربط الشركات والمصانع والموردين والمسوقين المحترفين في مصر. اكتشف الفرص، قدّم عروضك، ونمِّ أعمالك.",
+        content: "سوقلي — منصة احترافية لإدارة الشركات والمتاجر والعملاء والمخزون والطلبات في مصر.",
       },
       { property: "og:title", content: "Souqly — سوقلي | Egypt's Premier B2B Marketplace" },
       {

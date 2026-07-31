@@ -57,9 +57,8 @@ function Dashboard() {
   const { t, locale } = useI18n();
   const ar = locale === "ar";
   const navigate = useNavigate();
-  const hasAppRole =
-    roles.includes("admin") || roles.includes("company") || roles.includes("agent");
-  const role = roles.includes("admin") ? "admin" : roles.includes("company") ? "company" : "agent";
+  const hasAppRole = roles.includes("admin") || roles.includes("company");
+  const role = roles.includes("admin") ? "admin" : "company";
   const [counts, setCounts] = useState<Counts | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [sub, setSub] = useState<CompanySubscriptionInfo | null>(null);
@@ -69,17 +68,12 @@ function Dashboard() {
   useEffect(() => {
     if (loading || !user) return;
     if (hasAppRole) return;
-    let choice: string | null = null;
     try {
-      choice = localStorage.getItem("souqly:role_choice");
+      localStorage.setItem("souqly:role_choice", "customer");
     } catch {
-      // Storage is optional; fall back to the server-backed role flow.
+      // Storage is optional.
     }
-    if (choice === "customer") {
-      navigate({ to: "/marketplace", replace: true });
-    } else {
-      navigate({ to: "/choose-role", replace: true });
-    }
+    navigate({ to: "/business-solutions", replace: true });
   }, [loading, user, hasAppRole, navigate]);
 
   useEffect(() => {
@@ -96,10 +90,9 @@ function Dashboard() {
     (async () => {
       try {
         if (role === "admin") {
-          const [l, c, a, p] = await Promise.all([
+          const [l, c, p] = await Promise.all([
             supabase.from("listings").select("id", { count: "exact", head: true }),
             supabase.from("companies").select("id", { count: "exact", head: true }),
-            supabase.from("agents").select("id", { count: "exact", head: true }),
             supabase
               .from("listings")
               .select("id", { count: "exact", head: true })
@@ -108,12 +101,12 @@ function Dashboard() {
           setCounts({
             listings: l.count ?? 0,
             companies: c.count ?? 0,
-            agents: a.count ?? 0,
+            agents: 0,
             referrals: 0,
             pendingCommissions: 0,
             pendingListings: p.count ?? 0,
           });
-        } else if (role === "company") {
+        } else {
           let subInfo: CompanySubscriptionInfo | null = null;
           try {
             subInfo = await fetchSub();
@@ -147,34 +140,6 @@ function Dashboard() {
           } else {
             setCounts(zero);
           }
-        } else {
-          const { data: ag } = await supabase
-            .from("agents")
-            .select("id")
-            .eq("user_id", user.id)
-            .maybeSingle();
-          setHasProfile(!!ag);
-          if (ag) {
-            const [r, pc] = await Promise.all([
-              supabase
-                .from("referrals")
-                .select("id", { count: "exact", head: true })
-                .eq("agent_id", ag.id),
-              supabase
-                .from("commissions")
-                .select("id", { count: "exact", head: true })
-                .eq("agent_id", ag.id)
-                .eq("status", "pending"),
-            ]);
-            setCounts({
-              ...zero,
-              agents: 1,
-              referrals: r.count ?? 0,
-              pendingCommissions: pc.count ?? 0,
-            });
-          } else {
-            setCounts(zero);
-          }
         }
       } catch (e) {
         console.error("Dashboard load failed", e);
@@ -191,11 +156,7 @@ function Dashboard() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <LayoutDashboard className="h-6 w-6 text-primary" />
-              {role === "admin"
-                ? t("dashboard_admin_title")
-                : role === "company"
-                  ? t("dashboard_company_title")
-                  : t("dashboard_agent_title")}
+              {role === "admin" ? t("dashboard_admin_title") : t("dashboard_company_title")}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {t("dashboard_welcome")}, {user?.email}
@@ -213,22 +174,12 @@ function Dashboard() {
             cta={{ label: t("create_company"), to: "/company" }}
           />
         )}
-        {role === "agent" && hasProfile === false && (
-          <Onboard
-            title={t("create_agent")}
-            body={t("create_agent")}
-            cta={{ label: t("create_agent"), to: "/agent" }}
-          />
-        )}
-
         {!counts ? (
           <div className="py-20 text-center text-muted-foreground">{t("loading")}</div>
         ) : role === "admin" ? (
           <AdminDash counts={counts} />
-        ) : role === "company" ? (
-          <CompanyDash counts={counts} sub={sub} ar={ar} />
         ) : (
-          <AgentDash counts={counts} />
+          <CompanyDash counts={counts} sub={sub} ar={ar} />
         )}
       </div>
       <SiteFooter />

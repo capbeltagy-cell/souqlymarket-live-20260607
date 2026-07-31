@@ -54,7 +54,6 @@ function AuthPage() {
   const ar = dir === "rtl";
 
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
-  const [signupRole, setSignupRole] = useState<"company" | "agent">("company");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -93,11 +92,11 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { display_name: email.split("@")[0], role: signupRole } },
+          options: { data: { display_name: email.split("@")[0] } },
         });
         if (error) throw error;
         try {
-          localStorage.setItem("souqly:role_choice", signupRole);
+          localStorage.setItem("souqly:role_choice", "customer");
         } catch {
           // Storage is optional; the authenticated session remains authoritative.
         }
@@ -114,7 +113,7 @@ function AuthPage() {
         }
         toast.success(ar ? "تم إنشاء الحساب" : "Account created");
         if (returnTo) window.location.assign(returnTo);
-        else navigate({ to: signupRole === "company" ? "/company" : "/agent" });
+        else navigate({ to: "/business-solutions" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -184,38 +183,6 @@ function AuthPage() {
                   ? "مرحباً بعودتك"
                   : "Welcome back"}
             </p>
-
-            {mode === "signup" && (
-              <div className="mb-5">
-                <Label className="text-sm">{ar ? "نوع الحساب" : "Account type"}</Label>
-                <div className="grid grid-cols-2 gap-2 mt-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setSignupRole("company")}
-                    className={`rounded-lg border p-3 text-start transition ${signupRole === "company" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
-                  >
-                    <div className="font-semibold text-sm">
-                      {ar ? "سجل كشركة" : "Register as company"}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      {ar ? "انشر منتجاتك واستقبل الطلبات" : "Publish products, receive leads"}
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignupRole("agent")}
-                    className={`rounded-lg border p-3 text-start transition ${signupRole === "agent" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
-                  >
-                    <div className="font-semibold text-sm">
-                      {ar ? "سجل كمسوق" : "Register as marketer"}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      {ar ? "اربح عمولات من الإحالات" : "Earn commissions from referrals"}
-                    </div>
-                  </button>
-                </div>
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

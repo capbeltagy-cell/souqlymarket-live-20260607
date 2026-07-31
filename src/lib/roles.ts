@@ -86,7 +86,6 @@ export function canCompany(roles: readonly string[], capability: CompanyCapabili
 
 export function resolveHomePathForRoles(roles: readonly string[]): string {
   if (isAdminRole(roles)) return "/admin";
-  if (isCompanyRole(roles)) return "/company/dashboard";
-  if (roles.includes("agent")) return "/agent";
+  if (isCompanyRole(roles)) return "/company-workspace";
   return "/dashboard";
 }

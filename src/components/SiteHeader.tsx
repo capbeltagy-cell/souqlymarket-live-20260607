@@ -28,7 +28,7 @@ import { GlobalSearch } from "./GlobalSearch";
 import { NotificationBell } from "./NotificationBell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
-import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
+import { MARKETPLACE_ENABLED, MARKETER_ENABLED } from "@/lib/feature-flags";
 import { isAdminRole, isCompanyRole } from "@/lib/roles";
 import {
   DropdownMenu,
@@ -47,8 +47,15 @@ export function SiteHeader() {
   const { user, roles, signOut } = useAuth();
   const isAdmin = isAdminRole(roles);
   const isCompany = isCompanyRole(roles);
-  const isAgent = roles.includes("agent");
+  const isAgent = MARKETER_ENABLED && roles.includes("agent");
   const isPureAgent = isAgent && !isCompany && !isAdmin;
+  const dashboardPath = isAdmin
+    ? "/admin-overview"
+    : isCompany
+      ? "/company-workspace"
+      : isPureAgent
+        ? "/agent"
+        : "/dashboard";
   const handleSignOut = async () => {
     await signOut();
     window.location.assign("/");
@@ -215,7 +222,7 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 {/* Essentials — always visible */}
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="gap-2">
+                  <Link to={dashboardPath} className="gap-2">
                     <LayoutDashboard className="h-4 w-4" />
                     {t("nav_dashboard")}
                   </Link>
@@ -375,38 +382,9 @@ export function SiteHeader() {
                               </DropdownMenuItem>
                             </>
                           )}
-                          <DropdownMenuItem asChild>
-                            <Link to="/commissions" className="gap-2">
-                              <DollarSign className="h-4 w-4" />
-                              {t("nav_commissions")}
-                            </Link>
-                          </DropdownMenuItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
                     )}
-
-                    {/* Marketing submenu */}
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="gap-2">
-                        <Link2 className="h-4 w-4" />
-                        التسويق
-                        <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent className="w-56">
-                        <DropdownMenuItem asChild>
-                          <Link to="/marketing-center" className="gap-2">
-                            <Link2 className="h-4 w-4" />
-                            مركز التسويق
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/referral-program" className="gap-2">
-                            <Link2 className="h-4 w-4" />
-                            برنامج الإحالات
-                          </Link>
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
                   </>
                 )}
 
