@@ -247,7 +247,7 @@ function StoreDashboard() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <NavCard to="/listings/new" icon={<Package />} label="إضافة منتج" />
+          <NavCard to="/store/products/new" icon={<Package />} label="إضافة منتج" />
           <NavCard to="/store/coupons" icon={<Ticket />} label="الكوبونات" />
           <NavCard to="/orders" icon={<ShoppingBag />} label="الطلبات" />
           <NavCard to="/store/open" icon={<Settings />} label="إعدادات المتجر" />
@@ -289,7 +289,7 @@ function StoreDashboard() {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">المخزون والمنتجات</h2>
-            <Link to="/listings/new" className="text-sm text-primary">
+            <Link to="/store/products/new" className="text-sm text-primary">
               إضافة منتج
             </Link>
           </div>

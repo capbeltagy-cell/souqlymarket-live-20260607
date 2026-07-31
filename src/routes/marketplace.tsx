@@ -62,6 +62,7 @@ function Marketplace() {
         "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)",
       )
       .eq("status", "approved")
+      .eq("visible_in_marketplace", true)
       .order("created_at", { ascending: false })
       .limit(120);
     if (type !== "all") query = query.eq("type", type);
