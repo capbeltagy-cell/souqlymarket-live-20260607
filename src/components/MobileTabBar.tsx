@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, PlusCircle, MessageSquare, User as UserIcon } from "lucide-react";
+import { Home, Search, PlusCircle, MessageSquare, User as UserIcon, Building2 } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
+import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
+import { isCompanyRole } from "@/lib/roles";
 
 type Tab = { to: string; icon: typeof Home; ar: string; en: string; match: (p: string) => boolean };
 
@@ -12,6 +14,7 @@ export function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPureAgent =
     roles.includes("agent") && !roles.includes("company") && !roles.includes("admin");
+  const isCompany = isCompanyRole(roles);
 
   const centerTab: Tab = isPureAgent
     ? {
@@ -21,7 +24,7 @@ export function MobileTabBar() {
         en: "Opportunities",
         match: (p) => p.startsWith("/campaigns"),
       }
-    : user
+    : user && MARKETPLACE_ENABLED
       ? {
           to: "/listings/new",
           icon: PlusCircle,
@@ -29,13 +32,21 @@ export function MobileTabBar() {
           en: "Post",
           match: (p) => p.startsWith("/listings/new"),
         }
-      : {
-          to: "/auth",
-          icon: PlusCircle,
-          ar: "ابدأ",
-          en: "Start",
-          match: (p) => p.startsWith("/auth"),
-        };
+      : user && isCompany
+        ? {
+            to: "/company-workspace",
+            icon: Building2,
+            ar: "شركتي",
+            en: "Workspace",
+            match: (p) => p.startsWith("/company-workspace"),
+          }
+        : {
+            to: "/auth",
+            icon: PlusCircle,
+            ar: "ابدأ",
+            en: "Start",
+            match: (p) => p.startsWith("/auth") || p.startsWith("/business-solutions"),
+          };
 
   const tabs: Tab[] = [
     { to: "/", icon: Home, ar: "الرئيسية", en: "Home", match: (p) => p === "/" },

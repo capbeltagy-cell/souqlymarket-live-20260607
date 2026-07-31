@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useDeferredValue } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,12 @@ import {
 } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { rankListings } from "@/lib/ranking";
+import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/marketplace")({
+  beforeLoad: () => {
+    if (!MARKETPLACE_ENABLED) throw redirect({ to: "/business-solutions" });
+  },
   head: () => ({
     meta: [
       { title: "Marketplace — Souqly" },
