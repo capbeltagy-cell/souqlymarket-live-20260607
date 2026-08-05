@@ -750,6 +750,7 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
       .select(
         "id, name_ar, name_en, logo_url, cover_url, industry, city, governorate, country, company_type, category_slug, is_verified, is_premium, subscription_plan, subscription_expires_at, export_available, production_capacity, description_ar, description_en, created_at",
       )
+      .eq("is_verified", true)
       .limit(200);
     if (data.q) q = q.or(`name_ar.ilike.%${data.q}%,name_en.ilike.%${data.q}%`);
     if (data.city) {
@@ -764,7 +765,7 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
     }
     if (data.category_slug) q = q.eq("category_slug", data.category_slug);
     if (data.company_type) q = q.eq("company_type", data.company_type);
-    if (typeof data.verified === "boolean") q = q.eq("is_verified", data.verified);
+    if (data.verified === false) return { companies: [] };
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     let list = (rows ?? []) as any[];

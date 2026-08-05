@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertNotPureMarketer } from "@/lib/marketer-guard";
 
 const schema = z.object({
   name_ar: z.string().min(2).max(200),
@@ -56,7 +55,6 @@ export const upsertMyCompany = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    await assertNotPureMarketer(supabase as never, userId);
     const { referral_code, ...companyData } = data;
     const payload = {
       ...companyData,
@@ -109,6 +107,7 @@ export const getCompanyContact = createServerFn({ method: "GET" })
       .from("companies")
       .select("email, phone, website")
       .eq("id", data.id)
+      .eq("is_verified", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
     return {

@@ -19,7 +19,6 @@ import {
   ChevronRight,
   ShoppingCart,
   Boxes,
-  FileDown,
 } from "lucide-react";
 import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,8 @@ import { GlobalSearch } from "./GlobalSearch";
 import { NotificationBell } from "./NotificationBell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuth } from "@/hooks/useAuth";
+import { MARKETPLACE_ENABLED, MARKETER_ENABLED } from "@/lib/feature-flags";
+import { isAdminRole, isCompanyRole } from "@/lib/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,10 +44,17 @@ import {
 export function SiteHeader() {
   const { t } = useI18n();
   const { user, roles, signOut } = useAuth();
-  const isAdmin = roles.includes("admin");
-  const isCompany = roles.includes("company");
-  const isAgent = roles.includes("agent");
+  const isAdmin = isAdminRole(roles);
+  const isCompany = isCompanyRole(roles);
+  const isAgent = MARKETER_ENABLED && roles.includes("agent");
   const isPureAgent = isAgent && !isCompany && !isAdmin;
+  const dashboardPath = isAdmin
+    ? "/admin-overview"
+    : isCompany
+      ? "/company-workspace"
+      : isPureAgent
+        ? "/agent"
+        : "/dashboard";
   const handleSignOut = async () => {
     await signOut();
     window.location.assign("/");
@@ -79,33 +87,35 @@ export function SiteHeader() {
 
         {/* Primary nav — only the essentials */}
         <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                {t("nav_marketplace")}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/marketplace">كل السوق</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/real-estate">عقارات</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/lands">أراضي</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/factories">المصانع</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/wholesale">سوق الجملة</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/agents">المسوقين</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {MARKETPLACE_ENABLED && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
+                  {t("nav_marketplace")}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/marketplace">كل السوق</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/real-estate">عقارات</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/lands">أراضي</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/factories">المصانع</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wholesale">سوق الجملة</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/agents">المسوقين</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
@@ -140,20 +150,16 @@ export function SiteHeader() {
                   كل الحلول
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/digital-products" className="gap-2">
-                  <FileDown className="h-4 w-4" />
-                  المنتجات الرقمية
-                </Link>
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link
-            to="/earn"
-            className="px-3 py-2 rounded-full text-accent hover:text-foreground hover:bg-accent/10 transition font-semibold"
-          >
-            اربح معنا
-          </Link>
+          {MARKETPLACE_ENABLED && (
+            <Link
+              to="/earn"
+              className="px-3 py-2 rounded-full text-accent hover:text-foreground hover:bg-accent/10 transition font-semibold"
+            >
+              اربح معنا
+            </Link>
+          )}
 
           {/* Secondary nav collapsed into "More" */}
           <DropdownMenu>
@@ -188,7 +194,7 @@ export function SiteHeader() {
           </div>
 
           <LanguageToggle />
-          <CartButton />
+          {MARKETPLACE_ENABLED && <CartButton />}
           <NotificationBell />
           {user ? (
             <DropdownMenu>
@@ -209,12 +215,12 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 {/* Essentials — always visible */}
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="gap-2">
+                  <Link to={dashboardPath} className="gap-2">
                     <LayoutDashboard className="h-4 w-4" />
                     {t("nav_dashboard")}
                   </Link>
                 </DropdownMenuItem>
-                {!isPureAgent && (
+                {MARKETPLACE_ENABLED && !isPureAgent && (
                   <DropdownMenuItem asChild>
                     <Link to="/listings/new" className="gap-2">
                       <PlusCircle className="h-4 w-4" />
@@ -228,7 +234,7 @@ export function SiteHeader() {
                     الرسائل
                   </Link>
                 </DropdownMenuItem>
-                {!isPureAgent && (
+                {MARKETPLACE_ENABLED && !isPureAgent && (
                   <DropdownMenuItem asChild>
                     <Link to="/orders" className="gap-2">
                       <ShoppingBag className="h-4 w-4" />
@@ -236,12 +242,14 @@ export function SiteHeader() {
                     </Link>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem asChild>
-                  <Link to="/favorites" className="gap-2">
-                    <Heart className="h-4 w-4" />
-                    {t("nav_favorites")}
-                  </Link>
-                </DropdownMenuItem>
+                {MARKETPLACE_ENABLED && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/favorites" className="gap-2">
+                      <Heart className="h-4 w-4" />
+                      {t("nav_favorites")}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
 
                 {isPureAgent && (
                   <>
@@ -291,6 +299,15 @@ export function SiteHeader() {
                 {!isPureAgent && (
                   <>
                     <DropdownMenuSeparator />
+
+                    {isCompany && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/company-workspace" className="gap-2">
+                          <BriefcaseBusiness className="h-4 w-4" />
+                          مساحة عمل الشركة
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
 
                     {/* Account submenu */}
                     <DropdownMenuSub>
@@ -358,38 +375,9 @@ export function SiteHeader() {
                               </DropdownMenuItem>
                             </>
                           )}
-                          <DropdownMenuItem asChild>
-                            <Link to="/commissions" className="gap-2">
-                              <DollarSign className="h-4 w-4" />
-                              {t("nav_commissions")}
-                            </Link>
-                          </DropdownMenuItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
                     )}
-
-                    {/* Marketing submenu */}
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="gap-2">
-                        <Link2 className="h-4 w-4" />
-                        التسويق
-                        <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent className="w-56">
-                        <DropdownMenuItem asChild>
-                          <Link to="/marketing-center" className="gap-2">
-                            <Link2 className="h-4 w-4" />
-                            مركز التسويق
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/referral-program" className="gap-2">
-                            <Link2 className="h-4 w-4" />
-                            برنامج الإحالات
-                          </Link>
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
                   </>
                 )}
 

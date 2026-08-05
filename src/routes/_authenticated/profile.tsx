@@ -6,7 +6,6 @@ import {
   Loader2,
   Camera,
   Building2,
-  UserCircle2,
   Mail,
   Phone,
   Languages,
@@ -280,7 +279,6 @@ function ProfilePage() {
 
   const initial = (form.display_name || form.full_name || user?.email || "?")[0]?.toUpperCase();
   const isCompany = roles.includes("company");
-  const isAgent = roles.includes("agent");
   const completedFields = [
     form.full_name,
     form.display_name,
@@ -411,34 +409,19 @@ function ProfilePage() {
                   ? msg("إغلاق الإعدادات", "Close settings")
                   : msg("إعدادات الحساب", "Account settings")}
               </Button>
-              {(isCompany || isAgent) && (
+              {isCompany && (
                 <div className="mt-4 space-y-2">
-                  {isCompany && (
-                    <Button
-                      asChild
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start gap-2"
-                    >
-                      <Link to="/company">
-                        <Building2 className="h-4 w-4" />
-                        {msg("ملف الشركة", "Company profile")}
-                      </Link>
-                    </Button>
-                  )}
-                  {isAgent && (
-                    <Button
-                      asChild
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start gap-2"
-                    >
-                      <Link to="/agent">
-                        <UserCircle2 className="h-4 w-4" />
-                        {msg("ملف المسوق", "Marketer profile")}
-                      </Link>
-                    </Button>
-                  )}
+                  <Button
+                    asChild
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Link to="/company">
+                      <Building2 className="h-4 w-4" />
+                      {msg("ملف الشركة", "Company profile")}
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>

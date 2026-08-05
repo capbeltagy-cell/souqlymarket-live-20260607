@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useDeferredValue } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,12 @@ import {
 } from "@/lib/egypt.locations";
 import { supabase } from "@/integrations/supabase/client";
 import { rankListings } from "@/lib/ranking";
+import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
 
 export const Route = createFileRoute("/marketplace")({
+  beforeLoad: () => {
+    if (!MARKETPLACE_ENABLED) throw redirect({ to: "/business-solutions" });
+  },
   head: () => ({
     meta: [
       { title: "Marketplace — Souqly" },
@@ -58,6 +62,7 @@ function Marketplace() {
         "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)",
       )
       .eq("status", "approved")
+      .eq("visible_in_marketplace", true)
       .order("created_at", { ascending: false })
       .limit(120);
     if (type !== "all") query = query.eq("type", type);

@@ -249,10 +249,38 @@ export const adminSetCompanyVerified = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
-    const { error } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: company, error: companyError } = await supabaseAdmin
+      .from("companies")
+      .select("id, owner_id, subscription_plan, subscription_expires_at")
+      .eq("id", data.companyId)
+      .maybeSingle();
+    if (companyError) throw new Error(companyError.message);
+    if (!company) throw new Error("الشركة غير موجودة");
+    if (data.verified) {
+      const paid =
+        company.subscription_plan === "premium_company" &&
+        (!company.subscription_expires_at ||
+          new Date(company.subscription_expires_at).getTime() > Date.now());
+      if (!paid) throw new Error("لا يمكن اعتماد الشركة قبل مراجعة الدفع وتفعيل الاشتراك");
+    }
+    const { error } = await supabaseAdmin
       .from("companies")
       .update({ is_verified: data.verified })
       .eq("id", data.companyId);
     if (error) throw new Error(error.message);
+    if (data.verified) {
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: company.owner_id, role: "company" }, { onConflict: "user_id,role" });
+      if (roleError) throw new Error(roleError.message);
+    } else {
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .delete()
+        .eq("user_id", company.owner_id)
+        .eq("role", "company");
+      if (roleError) throw new Error(roleError.message);
+    }
     return { ok: true };
   });

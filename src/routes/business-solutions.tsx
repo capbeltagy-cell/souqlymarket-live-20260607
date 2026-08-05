@@ -57,12 +57,14 @@ function BusinessSolutionsPage() {
                     {module.description}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    فتح الوحدة{" "}
-                    <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" />
+                    {module.href ? "فتح الوحدة" : "قريبًا"}
+                    {module.href && (
+                      <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" />
+                    )}
                   </span>
                 </div>
               );
-              return (
+              return module.href ? (
                 <Link
                   key={module.key}
                   to={module.href}
@@ -70,6 +72,10 @@ function BusinessSolutionsPage() {
                 >
                   {card}
                 </Link>
+              ) : (
+                <div key={module.key} className="opacity-75" aria-disabled="true">
+                  {card}
+                </div>
               );
             })}
           </div>
