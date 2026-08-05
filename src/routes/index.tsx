@@ -102,11 +102,35 @@ function CompanyPlatformLanding() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link to="/company-workspace">فتح مساحة العمل</Link>
+                <Link to="/company">سجّل شركتك الآن</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link to="/business-solutions">استكشف حلول الشركات</Link>
               </Button>
+            </div>
+          </div>
+        </section>
+        <section className="border-y bg-card">
+          <div className="container-souqly py-12 sm:py-16">
+            <div className="mb-8 max-w-2xl">
+              <p className="font-semibold text-primary">ابدأ بخطوات واضحة</p>
+              <h2 className="mt-2 text-3xl font-bold">من التسجيل إلى تشغيل شركتك</h2>
+            </div>
+            <div className="grid gap-4 md:grid-cols-4">
+              {[
+                ["١", "أنشئ حسابك", "حساب شخصي واحد وآمن لكل مستخدم."],
+                ["٢", "سجّل شركتك", "أدخل بيانات الشركة مرة واحدة ويمكنك تعديلها لاحقًا."],
+                ["٣", "فعّل الاشتراك", "أكمل طلب الدفع ثم انتظر مراجعة الإدارة."],
+                ["٤", "ابدأ العمل", "بعد الاعتماد تُفتح مساحة الشركة والصلاحيات والمتجر."],
+              ].map(([number, title, text]) => (
+                <div key={number} className="rounded-2xl border bg-surface-2 p-5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                    {number}
+                  </span>
+                  <h3 className="mt-4 font-semibold">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

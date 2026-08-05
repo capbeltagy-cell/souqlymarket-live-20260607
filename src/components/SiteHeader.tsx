@@ -19,7 +19,6 @@ import {
   ChevronRight,
   ShoppingCart,
   Boxes,
-  FileDown,
 } from "lucide-react";
 import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -149,12 +148,6 @@ export function SiteHeader() {
                 <Link to="/business-solutions" className="gap-2">
                   <Boxes className="h-4 w-4" />
                   كل الحلول
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/digital-products" className="gap-2">
-                  <FileDown className="h-4 w-4" />
-                  المنتجات الرقمية
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>

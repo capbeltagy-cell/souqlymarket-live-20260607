@@ -75,7 +75,10 @@ export function MobileTabBar() {
       ar: "حسابي",
       en: "Me",
       match: (p) =>
-        p.startsWith("/dashboard") || p.startsWith("/profile") || p.startsWith("/agent"),
+        p.startsWith("/dashboard") ||
+        p.startsWith("/profile") ||
+        p.startsWith("/company-workspace") ||
+        p.startsWith("/agent"),
     },
   ];
 

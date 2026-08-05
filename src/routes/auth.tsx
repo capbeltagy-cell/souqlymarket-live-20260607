@@ -139,7 +139,9 @@ function AuthPage() {
         </Link>
         <div>
           <h2 className="text-4xl font-bold leading-tight mb-4">
-            {ar ? "انضم إلى أكبر سوق B2B في مصر" : "Join Egypt's leading B2B marketplace"}
+            {ar
+              ? "ابدأ إدارة شركتك وعملياتك من مكان واحد"
+              : "Run your company and operations from one place"}
           </h2>
           <p className="text-primary-foreground/80">
             {ar ? "تسجيل سريع. بدون نماذج طويلة." : "Fast signup. No long forms."}

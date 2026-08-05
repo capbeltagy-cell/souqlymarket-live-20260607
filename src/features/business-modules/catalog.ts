@@ -1,12 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
-  Bot,
   Boxes,
   Calculator,
   ContactRound,
   FileText,
-  Megaphone,
   MonitorSmartphone,
   PackageCheck,
   ReceiptText,
@@ -51,22 +49,6 @@ export const BUSINESS_MODULES: BusinessModuleDefinition[] = [
     icon: ReceiptText,
     status: "available",
     href: "/invoices",
-  },
-  {
-    key: "marketing",
-    name: "التسويق",
-    description: "إدارة الحملات وفرص المسوقين.",
-    icon: Megaphone,
-    status: "available",
-    href: "/marketing-center",
-  },
-  {
-    key: "ai",
-    name: "أدوات الذكاء الاصطناعي",
-    description: "أدوات مساعدة لإعداد المحتوى التسويقي.",
-    icon: Bot,
-    status: "available",
-    href: "/ai-tools",
   },
   {
     key: "reports",
