@@ -16,6 +16,7 @@ import { I18nProvider } from "@/i18n/I18nProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { MobileTabBar } from "@/components/MobileTabBar";
+import { SouqlyAssistant } from "@/components/SouqlyAssistant";
 import { BUILD_VERSION } from "@/lib/build-info";
 import { MARKETER_ENABLED } from "@/lib/feature-flags";
 
@@ -180,6 +181,7 @@ function AppChrome() {
   return (
     <>
       <Outlet />
+      {!isAdminRoute && <SouqlyAssistant />}
       {!isAdminRoute && <MobileTabBar />}
       <Toaster />
     </>
