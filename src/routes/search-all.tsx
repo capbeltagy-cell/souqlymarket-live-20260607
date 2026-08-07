@@ -21,7 +21,7 @@ export const Route = createFileRoute("/search-all")({
       { title: "بحث شامل — Souqly" },
       {
         name: "description",
-        content: "ابحث عبر الشركات والمنتجات والمصانع والعقارات والأراضي.",
+        content: "ابحث عبر الشركات والمنتجات والمصانع والعقارات والأراضي والمسوقين.",
       },
     ],
   }),
@@ -257,6 +257,29 @@ function SearchAllPage() {
                 ]
                   .filter(Boolean)
                   .join(" · "),
+              }))}
+              q={initialQ}
+            />
+            <Section
+              title={ar ? "المسوقون" : "Agents"}
+              count={res.agents.length}
+              items={res.agents.map((a: any) => ({
+                key: a.id,
+                to: "/agents/$id",
+                params: { id: a.id },
+                title:
+                  a.profile?.display_name ||
+                  a.profile?.full_name ||
+                  (ar ? a.headline_ar : a.headline_en) ||
+                  "Agent",
+                sub: [ar ? a.headline_ar : a.headline_en, a.city, a.country]
+                  .filter(Boolean)
+                  .join(" · "),
+                tags: [
+                  a.is_verified && (ar ? "موثق" : "Verified"),
+                  a.is_trusted && (ar ? "موثوق" : "Trusted"),
+                  a.is_premium && (ar ? "بريميوم" : "Premium"),
+                ].filter(Boolean) as string[],
               }))}
               q={initialQ}
             />

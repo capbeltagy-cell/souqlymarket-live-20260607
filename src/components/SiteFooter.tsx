@@ -16,6 +16,7 @@ const MARKETING_FOOTER_ROUTES = new Set<string>([
   "/terms",
   "/privacy",
   "/refund-policy",
+  "/earn",
 ]);
 
 export function SiteFooter() {
@@ -73,9 +74,9 @@ export function SiteFooter() {
           <FooterCol
             title="المنصة"
             links={[
-              { to: "/business-solutions", label: "حلول الشركات" },
-              { to: "/companies", label: "دليل الشركات" },
-              { to: "/stores", label: "متاجر الشركات" },
+              { to: "/marketplace", label: "السوق" },
+              { to: "/wholesale", label: "سوق الجملة" },
+              { to: "/factories", label: "المصانع" },
               { to: "/rfq", label: "طلبات الأسعار" },
               { to: "/tenders", label: "المناقصات" },
             ]}

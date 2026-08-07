@@ -221,12 +221,6 @@ function CommandCenter() {
           </Link>
         </Button>
         <Button asChild size="sm" variant="outline" className="gap-1">
-          <Link to="/company-workspace">
-            <Building2 className="h-4 w-4" />
-            {ar ? "مساحة العمل" : "Workspace"}
-          </Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="gap-1">
           <Link to="/company-campaigns">
             <Megaphone className="h-4 w-4" />
             {ar ? "الحملات" : "Campaigns"}

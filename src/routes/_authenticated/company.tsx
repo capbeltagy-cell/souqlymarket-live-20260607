@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMarketerGuard } from "@/hooks/useMarketerGuard";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
@@ -102,6 +103,7 @@ const STEPS: { id: StepId; ar: string; en: string; icon: typeof Building2 }[] = 
 ];
 
 function CompanyEdit() {
+  useMarketerGuard();
   const { t, locale } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -300,20 +302,9 @@ function CompanyEdit() {
         data: { ...payload, website, email: email || null, referral_code } as never,
       });
 
-      toast.success(
-        res.created
-          ? msg(
-              "تم حفظ بيانات الشركة. أكمل الدفع لإرسال طلبك إلى مراجعة الإدارة.",
-              "Company details saved. Complete payment to submit your application for admin review.",
-            )
-          : t("company_updated"),
-      );
+      toast.success(res.created ? t("company_created") : t("company_updated"));
       clearDraft();
-      if (res.created) {
-        navigate({ to: "/manual-payment", search: { companyId: res.id } });
-      } else {
-        navigate({ to: "/companies/$id", params: { id: res.id } });
-      }
+      navigate({ to: "/companies/$id", params: { id: res.id } });
     } catch (e) {
       toast.error(getArabicErrorMessage(e, "تعذر حفظ بيانات الشركة."));
     } finally {
@@ -343,28 +334,6 @@ function CompanyEdit() {
             {hasExisting ? t("company_profile") : msg("إنشاء شركتك", "Create your company")}
           </h1>
         </div>
-
-        {!hasExisting && (
-          <div className="mb-5 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
-            <p className="font-semibold text-foreground">
-              {msg("ماذا ستحصل عليه شركتك؟", "What does your company get?")}
-            </p>
-            <ul className="mt-2 grid gap-2 text-muted-foreground sm:grid-cols-2">
-              <li>
-                • {msg("مساحة عمل لإدارة الفريق والعملاء", "Workspace for teams and customers")}
-              </li>
-              <li>• {msg("إدارة المنتجات والمخزون والطلبات", "Products, inventory and orders")}</li>
-              <li>• {msg("نظام CRM ومتابعة فرص البيع", "CRM and sales pipeline")}</li>
-              <li>• {msg("متجر احترافي وتقارير تشغيلية", "Professional store and reports")}</li>
-            </ul>
-            <p className="mt-3 text-xs text-muted-foreground">
-              {msg(
-                "بعد حفظ البيانات ستكمل الدفع، ثم تراجع الإدارة الطلب قبل تفعيل حساب الشركة.",
-                "After saving, complete payment. Admin review is required before company activation.",
-              )}
-            </p>
-          </div>
-        )}
 
         {draftRestored && !hasExisting && (
           <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm flex items-center justify-between gap-3">

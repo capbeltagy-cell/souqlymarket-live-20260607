@@ -16,10 +16,6 @@ import {
   TrendingUp,
   Users,
   Wrench,
-  Boxes,
-  ContactRound,
-  BarChart3,
-  UsersRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -29,7 +25,6 @@ import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
 import { FeaturedAdBar } from "@/components/FeaturedAdBar";
 import { useI18n } from "@/i18n/I18nProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { MARKETPLACE_ENABLED } from "@/lib/feature-flags";
 
 const HOME_OG_IMAGE = "/icon.svg";
 
@@ -39,7 +34,8 @@ export const Route = createFileRoute("/")({
       { title: "Souqly — سوقلي | منصة الأعمال الفاخرة في مصر" },
       {
         name: "description",
-        content: "سوقلي — منصة احترافية لإدارة الشركات والمتاجر والعملاء والمخزون والطلبات في مصر.",
+        content:
+          "سوقلي — منصة B2B فاخرة تربط الشركات والمصانع والموردين والمسوقين المحترفين في مصر. اكتشف الفرص، قدّم عروضك، ونمِّ أعمالك.",
       },
       { property: "og:title", content: "Souqly — سوقلي | Egypt's Premier B2B Marketplace" },
       {
@@ -52,117 +48,8 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://souqlymarket.com/" }],
   }),
-  component: MARKETPLACE_ENABLED ? Landing : CompanyPlatformLanding,
+  component: Landing,
 });
-
-const companyModules = [
-  {
-    icon: ContactRound,
-    title: "إدارة العملاء",
-    text: "نظّم العملاء والفرص ومتابعات فريق المبيعات.",
-    to: "/company-workspace/crm",
-  },
-  {
-    icon: Boxes,
-    title: "المخزون والمنتجات",
-    text: "تابع المنتجات والكميات والتنبيهات من مساحة واحدة.",
-    to: "/company-workspace/inventory",
-  },
-  {
-    icon: UsersRound,
-    title: "الفريق والصلاحيات",
-    text: "أضف أعضاء شركتك وحدد صلاحيات كل موظف بأمان.",
-    to: "/company-workspace/members",
-  },
-  {
-    icon: BarChart3,
-    title: "التقارير التشغيلية",
-    text: "راقب مؤشرات النشاط واتخذ قرارات مبنية على بياناتك.",
-    to: "/analytics",
-  },
-] as const;
-
-function CompanyPlatformLanding() {
-  return (
-    <div className="flex min-h-screen flex-col bg-surface-2">
-      <SiteHeader />
-      <main className="flex-1">
-        <section className="relative overflow-hidden border-b bg-card">
-          <div className="hero-grid absolute inset-0 opacity-40" aria-hidden="true" />
-          <div className="container-souqly relative py-16 sm:py-24">
-            <span className="status-pill mb-5">
-              <Sparkles className="h-3.5 w-3.5" /> منصة إدارة الشركات
-            </span>
-            <h1 className="max-w-4xl text-serif text-4xl font-bold leading-tight sm:text-6xl">
-              شغّل شركتك بوضوح، من مكان واحد.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-              سوقلي يجمع العملاء والمخزون والفريق والعمليات والتقارير في مساحة عمل عربية آمنة وقابلة
-              للتوسع.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link to="/company">سجّل شركتك الآن</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/business-solutions">استكشف حلول الشركات</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-        <section className="border-y bg-card">
-          <div className="container-souqly py-12 sm:py-16">
-            <div className="mb-8 max-w-2xl">
-              <p className="font-semibold text-primary">ابدأ بخطوات واضحة</p>
-              <h2 className="mt-2 text-3xl font-bold">من التسجيل إلى تشغيل شركتك</h2>
-            </div>
-            <div className="grid gap-4 md:grid-cols-4">
-              {[
-                ["١", "أنشئ حسابك", "حساب شخصي واحد وآمن لكل مستخدم."],
-                ["٢", "سجّل شركتك", "أدخل بيانات الشركة مرة واحدة ويمكنك تعديلها لاحقًا."],
-                ["٣", "فعّل الاشتراك", "أكمل طلب الدفع ثم انتظر مراجعة الإدارة."],
-                ["٤", "ابدأ العمل", "بعد الاعتماد تُفتح مساحة الشركة والصلاحيات والمتجر."],
-              ].map(([number, title, text]) => (
-                <div key={number} className="rounded-2xl border bg-surface-2 p-5">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                    {number}
-                  </span>
-                  <h3 className="mt-4 font-semibold">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <section className="container-souqly py-12 sm:py-16">
-          <div className="mb-8 max-w-2xl">
-            <p className="font-semibold text-primary">أدوات العمل الأساسية</p>
-            <h2 className="mt-2 text-3xl font-bold">كل فريقك يعمل على نفس الصورة</h2>
-            <p className="mt-3 leading-7 text-muted-foreground">
-              ابدأ بالوحدات الجاهزة الآن، وأضف الوحدات التالية بدون تغيير بنية شركتك.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {companyModules.map(({ icon: Icon, title, text, to }) => (
-              <Link
-                key={to}
-                to={to}
-                className="rounded-2xl border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:border-primary/40"
-              >
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-5 text-lg font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
-  );
-}
 
 const categories = [
   { key: "cat_product", icon: Package, to: "/marketplace" },

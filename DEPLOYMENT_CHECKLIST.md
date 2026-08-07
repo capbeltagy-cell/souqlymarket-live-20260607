@@ -19,11 +19,16 @@ Set these in Coolify. Never commit real values.
 
 ## 2. Supabase setup
 
+- Confirm the project ref is `nszbhxekvzqkhbnpyebr`. Do not apply this release
+  to a different project with the same display name.
+- Take a restorable backup or use a staging clone before the first application.
 - Site URL: `https://souqlymarket.com`
 - Redirect URLs: `https://souqlymarket.com/auth/callback` and the exact `www` variant if used.
 - Add the Coolify preview domain only while testing, then remove it.
 - Apply `supabase/launch_bundle.sql` in the SQL editor.
 - Run `supabase/verify_launch.sql` and require the final `verification = PASS` row.
+- Use the bundle as the single release path. Do not also apply its individual
+  release migrations to the same environment.
 - Confirm Storage buckets and policies for `listing-media`, `company-assets`, `avatars`, `company-catalogs`, and `rfq-attachments`.
 
 ## 3. Coolify application settings

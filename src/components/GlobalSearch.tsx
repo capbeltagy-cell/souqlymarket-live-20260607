@@ -10,6 +10,7 @@ import {
   MapPin,
   FileText,
   ClipboardList,
+  UserCircle2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -72,7 +73,8 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
       res.factories.length +
       res.wholesale.length +
       res.rfqs.length +
-      res.tenders.length
+      res.tenders.length +
+      res.agents.length
     : 0;
 
   return (
@@ -213,6 +215,23 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
                   params: { id: t.id },
                   title: t.title,
                   sub: t.governorate ?? "",
+                }))}
+                q={q}
+                onPick={() => setOpen(false)}
+              />
+              <Group
+                icon={UserCircle2}
+                title={ar ? "المسوقون" : "Agents"}
+                items={res.agents.map((a: any) => ({
+                  key: a.id,
+                  to: "/agents/$id",
+                  params: { id: a.id },
+                  title:
+                    a.profile?.display_name ||
+                    a.profile?.full_name ||
+                    (ar ? a.headline_ar : a.headline_en) ||
+                    "Agent",
+                  sub: [a.city, a.country].filter(Boolean).join(" · "),
                 }))}
                 q={q}
                 onPick={() => setOpen(false)}
