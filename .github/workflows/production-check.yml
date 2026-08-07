@@ -3,13 +3,12 @@ name: production-check
 on:
   push:
     branches:
+      - integration/final-consolidation-20260807
       - feature/store-production-readiness-sprint-1
       - feat/multi-vendor-stores
       - main
   pull_request:
     branches:
-      - feature/store-production-readiness-sprint-1
-      - feat/multi-vendor-stores
       - main
 
 permissions:
