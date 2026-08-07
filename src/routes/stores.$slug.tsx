@@ -342,7 +342,7 @@ function StorePage() {
                       reviewCount: store.review_count,
                     }
                   : undefined,
-            }),
+            }).replace(/</g, "\\u003c"),
           }}
         />
       </section>

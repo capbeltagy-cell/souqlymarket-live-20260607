@@ -79,7 +79,6 @@ import { Route as AuthenticatedCompanyCampaignsRouteImport } from './routes/_aut
 import { Route as AuthenticatedCompanyCenterRouteImport } from './routes/_authenticated/company-center'
 import { Route as AuthenticatedCompanyProfileExtraRouteImport } from './routes/_authenticated/company-profile-extra'
 import { Route as AuthenticatedCompanyWalletRouteImport } from './routes/_authenticated/company-wallet'
-import { Route as AuthenticatedCompanyWorkspaceRouteImport } from './routes/_authenticated/company-workspace'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
@@ -109,11 +108,7 @@ import { Route as StoresSlugRouteImport } from './routes/stores.$slug'
 import { Route as TendersIdRouteImport } from './routes/tenders.$id'
 import { Route as WholesaleIdRouteImport } from './routes/wholesale.$id'
 import { Route as AuthenticatedCampaignsIdRouteImport } from './routes/_authenticated/campaigns.$id'
-import { Route as AuthenticatedCompanyInvitationsTokenRouteImport } from './routes/_authenticated/company-invitations.$token'
 import { Route as AuthenticatedCompanyWalletDepositRouteImport } from './routes/_authenticated/company-wallet.deposit'
-import { Route as AuthenticatedCompanyWorkspaceCrmRouteImport } from './routes/_authenticated/company-workspace.crm'
-import { Route as AuthenticatedCompanyWorkspaceInventoryRouteImport } from './routes/_authenticated/company-workspace.inventory'
-import { Route as AuthenticatedCompanyWorkspaceMembersRouteImport } from './routes/_authenticated/company-workspace.members'
 import { Route as AuthenticatedListingsNewRouteImport } from './routes/_authenticated/listings.new'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedQuotationsIdRouteImport } from './routes/_authenticated/quotations.$id'
@@ -121,6 +116,7 @@ import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authen
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
+import { Route as AuthenticatedStoreCategoriesRouteImport } from './routes/_authenticated/store.categories'
 import { Route as AuthenticatedStoreCouponsRouteImport } from './routes/_authenticated/store.coupons'
 import { Route as AuthenticatedStoreOpenRouteImport } from './routes/_authenticated/store.open'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
@@ -507,12 +503,6 @@ const AuthenticatedCompanyWalletRoute =
     path: '/company-wallet',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCompanyWorkspaceRoute =
-  AuthenticatedCompanyWorkspaceRouteImport.update({
-    id: '/company-workspace',
-    path: '/company-workspace',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -663,35 +653,11 @@ const AuthenticatedCampaignsIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedCampaignsRoute,
   } as any)
-const AuthenticatedCompanyInvitationsTokenRoute =
-  AuthenticatedCompanyInvitationsTokenRouteImport.update({
-    id: '/company-invitations/$token',
-    path: '/company-invitations/$token',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedCompanyWalletDepositRoute =
   AuthenticatedCompanyWalletDepositRouteImport.update({
     id: '/deposit',
     path: '/deposit',
     getParentRoute: () => AuthenticatedCompanyWalletRoute,
-  } as any)
-const AuthenticatedCompanyWorkspaceCrmRoute =
-  AuthenticatedCompanyWorkspaceCrmRouteImport.update({
-    id: '/crm',
-    path: '/crm',
-    getParentRoute: () => AuthenticatedCompanyWorkspaceRoute,
-  } as any)
-const AuthenticatedCompanyWorkspaceInventoryRoute =
-  AuthenticatedCompanyWorkspaceInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => AuthenticatedCompanyWorkspaceRoute,
-  } as any)
-const AuthenticatedCompanyWorkspaceMembersRoute =
-  AuthenticatedCompanyWorkspaceMembersRouteImport.update({
-    id: '/members',
-    path: '/members',
-    getParentRoute: () => AuthenticatedCompanyWorkspaceRoute,
   } as any)
 const AuthenticatedListingsNewRoute =
   AuthenticatedListingsNewRouteImport.update({
@@ -731,6 +697,12 @@ const AuthenticatedStoreIndexRoute = AuthenticatedStoreIndexRouteImport.update({
   path: '/store/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoreCategoriesRoute =
+  AuthenticatedStoreCategoriesRouteImport.update({
+    id: '/store/categories',
+    path: '/store/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStoreCouponsRoute =
   AuthenticatedStoreCouponsRouteImport.update({
     id: '/store/coupons',
@@ -859,7 +831,6 @@ export interface FileRoutesByFullPath {
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
-  '/company-workspace': typeof AuthenticatedCompanyWorkspaceRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -889,17 +860,14 @@ export interface FileRoutesByFullPath {
   '/companies/': typeof CompaniesIndexRoute
   '/stores/': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
-  '/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
-  '/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
-  '/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
-  '/company-workspace/members': typeof AuthenticatedCompanyWorkspaceMembersRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -982,7 +950,6 @@ export interface FileRoutesByTo {
   '/company-center': typeof AuthenticatedCompanyCenterRoute
   '/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
-  '/company-workspace': typeof AuthenticatedCompanyWorkspaceRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -1012,17 +979,14 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesIndexRoute
   '/stores': typeof StoresIndexRoute
   '/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
-  '/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
-  '/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
-  '/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
-  '/company-workspace/members': typeof AuthenticatedCompanyWorkspaceMembersRoute
   '/listings/new': typeof AuthenticatedListingsNewRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/quotations/$id': typeof AuthenticatedQuotationsIdRoute
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -1107,7 +1071,6 @@ export interface FileRoutesById {
   '/_authenticated/company-center': typeof AuthenticatedCompanyCenterRoute
   '/_authenticated/company-profile-extra': typeof AuthenticatedCompanyProfileExtraRoute
   '/_authenticated/company-wallet': typeof AuthenticatedCompanyWalletRouteWithChildren
-  '/_authenticated/company-workspace': typeof AuthenticatedCompanyWorkspaceRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
@@ -1137,17 +1100,14 @@ export interface FileRoutesById {
   '/companies/': typeof CompaniesIndexRoute
   '/stores/': typeof StoresIndexRoute
   '/_authenticated/campaigns/$id': typeof AuthenticatedCampaignsIdRoute
-  '/_authenticated/company-invitations/$token': typeof AuthenticatedCompanyInvitationsTokenRoute
   '/_authenticated/company-wallet/deposit': typeof AuthenticatedCompanyWalletDepositRoute
-  '/_authenticated/company-workspace/crm': typeof AuthenticatedCompanyWorkspaceCrmRoute
-  '/_authenticated/company-workspace/inventory': typeof AuthenticatedCompanyWorkspaceInventoryRoute
-  '/_authenticated/company-workspace/members': typeof AuthenticatedCompanyWorkspaceMembersRoute
   '/_authenticated/listings/new': typeof AuthenticatedListingsNewRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRouteWithChildren
   '/_authenticated/quotations/$id': typeof AuthenticatedQuotationsIdRoute
   '/_authenticated/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/_authenticated/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/_authenticated/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/_authenticated/store/open': typeof AuthenticatedStoreOpenRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -1232,7 +1192,6 @@ export interface FileRouteTypes {
     | '/company-center'
     | '/company-profile-extra'
     | '/company-wallet'
-    | '/company-workspace'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -1262,17 +1221,14 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/stores/'
     | '/campaigns/$id'
-    | '/company-invitations/$token'
     | '/company-wallet/deposit'
-    | '/company-workspace/crm'
-    | '/company-workspace/inventory'
-    | '/company-workspace/members'
     | '/listings/new'
     | '/orders/$id'
     | '/quotations/$id'
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/categories'
     | '/store/coupons'
     | '/store/open'
     | '/tenders/mine'
@@ -1355,7 +1311,6 @@ export interface FileRouteTypes {
     | '/company-center'
     | '/company-profile-extra'
     | '/company-wallet'
-    | '/company-workspace'
     | '/dashboard'
     | '/favorites'
     | '/invoices'
@@ -1385,17 +1340,14 @@ export interface FileRouteTypes {
     | '/companies'
     | '/stores'
     | '/campaigns/$id'
-    | '/company-invitations/$token'
     | '/company-wallet/deposit'
-    | '/company-workspace/crm'
-    | '/company-workspace/inventory'
-    | '/company-workspace/members'
     | '/listings/new'
     | '/orders/$id'
     | '/quotations/$id'
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/categories'
     | '/store/coupons'
     | '/store/open'
     | '/tenders/mine'
@@ -1479,7 +1431,6 @@ export interface FileRouteTypes {
     | '/_authenticated/company-center'
     | '/_authenticated/company-profile-extra'
     | '/_authenticated/company-wallet'
-    | '/_authenticated/company-workspace'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/invoices'
@@ -1509,17 +1460,14 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/stores/'
     | '/_authenticated/campaigns/$id'
-    | '/_authenticated/company-invitations/$token'
     | '/_authenticated/company-wallet/deposit'
-    | '/_authenticated/company-workspace/crm'
-    | '/_authenticated/company-workspace/inventory'
-    | '/_authenticated/company-workspace/members'
     | '/_authenticated/listings/new'
     | '/_authenticated/orders/$id'
     | '/_authenticated/quotations/$id'
     | '/_authenticated/quotations/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
+    | '/_authenticated/store/categories'
     | '/_authenticated/store/coupons'
     | '/_authenticated/store/open'
     | '/_authenticated/tenders/mine'
@@ -2070,13 +2018,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompanyWalletRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/company-workspace': {
-      id: '/_authenticated/company-workspace'
-      path: '/company-workspace'
-      fullPath: '/company-workspace'
-      preLoaderRoute: typeof AuthenticatedCompanyWorkspaceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -2280,40 +2221,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsIdRouteImport
       parentRoute: typeof AuthenticatedCampaignsRoute
     }
-    '/_authenticated/company-invitations/$token': {
-      id: '/_authenticated/company-invitations/$token'
-      path: '/company-invitations/$token'
-      fullPath: '/company-invitations/$token'
-      preLoaderRoute: typeof AuthenticatedCompanyInvitationsTokenRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/company-wallet/deposit': {
       id: '/_authenticated/company-wallet/deposit'
       path: '/deposit'
       fullPath: '/company-wallet/deposit'
       preLoaderRoute: typeof AuthenticatedCompanyWalletDepositRouteImport
       parentRoute: typeof AuthenticatedCompanyWalletRoute
-    }
-    '/_authenticated/company-workspace/crm': {
-      id: '/_authenticated/company-workspace/crm'
-      path: '/crm'
-      fullPath: '/company-workspace/crm'
-      preLoaderRoute: typeof AuthenticatedCompanyWorkspaceCrmRouteImport
-      parentRoute: typeof AuthenticatedCompanyWorkspaceRoute
-    }
-    '/_authenticated/company-workspace/inventory': {
-      id: '/_authenticated/company-workspace/inventory'
-      path: '/inventory'
-      fullPath: '/company-workspace/inventory'
-      preLoaderRoute: typeof AuthenticatedCompanyWorkspaceInventoryRouteImport
-      parentRoute: typeof AuthenticatedCompanyWorkspaceRoute
-    }
-    '/_authenticated/company-workspace/members': {
-      id: '/_authenticated/company-workspace/members'
-      path: '/members'
-      fullPath: '/company-workspace/members'
-      preLoaderRoute: typeof AuthenticatedCompanyWorkspaceMembersRouteImport
-      parentRoute: typeof AuthenticatedCompanyWorkspaceRoute
     }
     '/_authenticated/listings/new': {
       id: '/_authenticated/listings/new'
@@ -2362,6 +2275,13 @@ declare module '@tanstack/react-router' {
       path: '/store'
       fullPath: '/store/'
       preLoaderRoute: typeof AuthenticatedStoreIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/store/categories': {
+      id: '/_authenticated/store/categories'
+      path: '/store/categories'
+      fullPath: '/store/categories'
+      preLoaderRoute: typeof AuthenticatedStoreCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/store/coupons': {
@@ -2466,27 +2386,6 @@ const AuthenticatedCompanyWalletRouteWithChildren =
     AuthenticatedCompanyWalletRouteChildren,
   )
 
-interface AuthenticatedCompanyWorkspaceRouteChildren {
-  AuthenticatedCompanyWorkspaceCrmRoute: typeof AuthenticatedCompanyWorkspaceCrmRoute
-  AuthenticatedCompanyWorkspaceInventoryRoute: typeof AuthenticatedCompanyWorkspaceInventoryRoute
-  AuthenticatedCompanyWorkspaceMembersRoute: typeof AuthenticatedCompanyWorkspaceMembersRoute
-}
-
-const AuthenticatedCompanyWorkspaceRouteChildren: AuthenticatedCompanyWorkspaceRouteChildren =
-  {
-    AuthenticatedCompanyWorkspaceCrmRoute:
-      AuthenticatedCompanyWorkspaceCrmRoute,
-    AuthenticatedCompanyWorkspaceInventoryRoute:
-      AuthenticatedCompanyWorkspaceInventoryRoute,
-    AuthenticatedCompanyWorkspaceMembersRoute:
-      AuthenticatedCompanyWorkspaceMembersRoute,
-  }
-
-const AuthenticatedCompanyWorkspaceRouteWithChildren =
-  AuthenticatedCompanyWorkspaceRoute._addFileChildren(
-    AuthenticatedCompanyWorkspaceRouteChildren,
-  )
-
 interface AuthenticatedOrdersIdRouteChildren {
   AuthenticatedOrdersIdConfirmationRoute: typeof AuthenticatedOrdersIdConfirmationRoute
   AuthenticatedOrdersIdPayRoute: typeof AuthenticatedOrdersIdPayRoute
@@ -2550,7 +2449,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyCenterRoute: typeof AuthenticatedCompanyCenterRoute
   AuthenticatedCompanyProfileExtraRoute: typeof AuthenticatedCompanyProfileExtraRoute
   AuthenticatedCompanyWalletRoute: typeof AuthenticatedCompanyWalletRouteWithChildren
-  AuthenticatedCompanyWorkspaceRoute: typeof AuthenticatedCompanyWorkspaceRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
@@ -2566,12 +2464,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
-  AuthenticatedCompanyInvitationsTokenRoute: typeof AuthenticatedCompanyInvitationsTokenRoute
   AuthenticatedListingsNewRoute: typeof AuthenticatedListingsNewRoute
   AuthenticatedQuotationsIdRoute: typeof AuthenticatedQuotationsIdRoute
   AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
+  AuthenticatedStoreCategoriesRoute: typeof AuthenticatedStoreCategoriesRoute
   AuthenticatedStoreCouponsRoute: typeof AuthenticatedStoreCouponsRoute
   AuthenticatedStoreOpenRoute: typeof AuthenticatedStoreOpenRoute
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
@@ -2619,8 +2517,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyCenterRoute: AuthenticatedCompanyCenterRoute,
   AuthenticatedCompanyProfileExtraRoute: AuthenticatedCompanyProfileExtraRoute,
   AuthenticatedCompanyWalletRoute: AuthenticatedCompanyWalletRouteWithChildren,
-  AuthenticatedCompanyWorkspaceRoute:
-    AuthenticatedCompanyWorkspaceRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
@@ -2636,13 +2532,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
-  AuthenticatedCompanyInvitationsTokenRoute:
-    AuthenticatedCompanyInvitationsTokenRoute,
   AuthenticatedListingsNewRoute: AuthenticatedListingsNewRoute,
   AuthenticatedQuotationsIdRoute: AuthenticatedQuotationsIdRoute,
   AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
+  AuthenticatedStoreCategoriesRoute: AuthenticatedStoreCategoriesRoute,
   AuthenticatedStoreCouponsRoute: AuthenticatedStoreCouponsRoute,
   AuthenticatedStoreOpenRoute: AuthenticatedStoreOpenRoute,
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,

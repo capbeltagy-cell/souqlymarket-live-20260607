@@ -27,7 +27,6 @@ export const getCompanyMeta = createServerFn({ method: "GET" })
         "id, name_ar, name_en, description_ar, description_en, logo_url, cover_url, country, city, industry, is_verified",
       )
       .eq("id", data.id)
-      .eq("is_verified", true)
       .maybeSingle();
     return row;
   });

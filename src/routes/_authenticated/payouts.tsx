@@ -20,8 +20,10 @@ import {
   cancelWithdrawal,
   getPlatformSettings,
 } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/payouts")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Withdrawals — Marketing Center" }] }),
   component: PayoutsPage,
 });

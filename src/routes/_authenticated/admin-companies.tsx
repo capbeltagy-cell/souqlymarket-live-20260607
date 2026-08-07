@@ -198,7 +198,7 @@ function AdminCompanies() {
                         <Button
                           size="sm"
                           variant="outline"
-                          disabled={busy === row.id || (!row.isPaid && !row.is_verified)}
+                          disabled={busy === row.id}
                           onClick={() => void toggleVerify(row)}
                           className="gap-1"
                         >
@@ -212,9 +212,7 @@ function AdminCompanies() {
                               ? "إلغاء التوثيق"
                               : "Unverify"
                             : ar
-                              ? row.isPaid
-                                ? "اعتماد الشركة"
-                                : "بانتظار الدفع"
+                              ? "توثيق"
                               : "Verify"}
                         </Button>
                       </div>

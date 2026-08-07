@@ -1,1 +1,1 @@
-export const BUILD_VERSION = "souqly-manual-payment-beta-20260728";
+export const BUILD_VERSION = "souqly-production-store-payments-rc-20260729";

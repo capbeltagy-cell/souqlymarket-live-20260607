@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createStoreProduct } from "@/lib/listings.functions";
-import { getMyStore } from "@/lib/stores.functions";
+import { getMyStore, listMyStoreCategories } from "@/lib/stores.functions";
 
 export const Route = createFileRoute("/_authenticated/store/products/new")({
   head: () => ({ meta: [{ title: "إضافة منتج إلى متجرك — Souqly" }] }),
@@ -75,6 +75,10 @@ function NewStoreProduct() {
   const [price, setPrice] = useState("");
   const [compareAtPrice, setCompareAtPrice] = useState("");
   const [category, setCategory] = useState("");
+  const [storeCategoryId, setStoreCategoryId] = useState("none");
+  const [storeCategories, setStoreCategories] = useState<Array<{ id: string; name_ar: string }>>(
+    [],
+  );
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [sku, setSku] = useState("");
   const [trackInventory, setTrackInventory] = useState(true);
@@ -88,14 +92,15 @@ function NewStoreProduct() {
 
   useEffect(() => {
     let active = true;
-    void fetchStore()
-      .then((result) => {
+    void Promise.all([fetchStore(), listMyStoreCategories()])
+      .then(([result, categories]) => {
         if (!active) return;
         if (!result.store) {
           toast.error("يجب إنشاء متجر أولًا قبل إضافة المنتجات");
           void navigate({ to: "/store/open", replace: true });
           return;
         }
+        setStoreCategories(categories.items);
         setCheckingStore(false);
       })
       .catch(() => {
@@ -129,6 +134,7 @@ function NewStoreProduct() {
           price: Number(price),
           compare_at_price: compareAtPrice ? Number(compareAtPrice) : null,
           category: category.trim() || null,
+          store_category_id: storeCategoryId === "none" ? null : storeCategoryId,
           images: legacyImages.images,
           image_sources: legacyImages.image_sources,
           sku: sku.trim() || null,
@@ -220,7 +226,7 @@ function NewStoreProduct() {
                 maxLength={4000}
               />
             </Field>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Field label="سعر البيع (جنيه)" required>
                 <Input
                   type="number"
@@ -245,6 +251,27 @@ function NewStoreProduct() {
                   onChange={(e) => setCategory(e.target.value)}
                   maxLength={80}
                 />
+              </Field>
+              <Field label="قسم المتجر">
+                <Select value={storeCategoryId} onValueChange={setStoreCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="بدون قسم" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">بدون قسم</SelectItem>
+                    {storeCategories.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name_ar}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Link
+                  to="/store/categories"
+                  className="mt-1 block text-xs text-primary hover:underline"
+                >
+                  إدارة الأقسام
+                </Link>
               </Field>
             </div>
           </section>

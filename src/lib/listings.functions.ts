@@ -25,6 +25,7 @@ const storeProductSchema = z.object({
   price: z.number().positive(),
   compare_at_price: z.number().positive().optional().nullable(),
   category: z.string().trim().max(80).optional().nullable(),
+  store_category_id: z.string().uuid().optional().nullable(),
   images: z.array(z.string().url()).min(1).max(10),
   image_sources: z.array(IMAGE_SOURCE).max(10).default([]),
   sku: z.string().trim().max(80).optional().nullable(),
@@ -141,6 +142,7 @@ export const createListing = createServerFn({ method: "POST" })
       .from("listings")
       .insert({
         company_id: company.id,
+        owner_id: userId,
         type: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
@@ -201,12 +203,15 @@ export const createStoreProduct = createServerFn({ method: "POST" })
 
     const { data: store, error: storeError } = await supabase
       .from("stores")
-      .select("id, owner_id, company_id, city, governorate")
+      .select("id, owner_id, company_id, city, governorate, status")
       .eq("owner_id", userId)
       .maybeSingle();
     if (storeError) throw new Error(storeError.message);
     if (!store) throw new Error("STORE_REQUIRED");
     if (store.owner_id !== userId) throw new Error("غير مسموح بإضافة منتجات إلى هذا المتجر");
+    if (data.status === "active" && store.status !== "published") {
+      throw new Error("لا يمكن نشر المنتج قبل اعتماد المتجر من الإدارة");
+    }
 
     let companyId = store.company_id;
     if (companyId) {
@@ -229,6 +234,18 @@ export const createStoreProduct = createServerFn({ method: "POST" })
     }
     if (!companyId) throw new Error("أنشئ ملف شركتك واربطه بالمتجر قبل إضافة المنتجات");
 
+    if (data.store_category_id) {
+      const { data: category, error: categoryError } = await (
+        supabase.from("store_categories" as never) as any
+      )
+        .select("id")
+        .eq("id", data.store_category_id)
+        .eq("store_id", store.id)
+        .maybeSingle();
+      if (categoryError) throw new Error(categoryError.message);
+      if (!category) throw new Error("القسم المختار لا يتبع متجرك");
+    }
+
     if (data.compare_at_price && data.compare_at_price <= data.price) {
       throw new Error("السعر قبل الخصم يجب أن يكون أكبر من سعر البيع");
     }
@@ -248,7 +265,9 @@ export const createStoreProduct = createServerFn({ method: "POST" })
       .from("listings")
       .insert({
         company_id: companyId,
+        owner_id: userId,
         store_id: store.id,
+        store_category_id: data.store_category_id || null,
         type: "product",
         title_ar: data.title_ar,
         title_en: data.title_en || data.title_ar,
@@ -267,7 +286,10 @@ export const createStoreProduct = createServerFn({ method: "POST" })
         weight_grams: data.weight_grams ?? null,
         variants: data.variants,
         dimensions: { shipping_required: data.shipping_required },
-        visible_in_marketplace: data.visible_in_marketplace,
+        visible_in_marketplace:
+          listingStatus === "approved" && store.status === "published"
+            ? data.visible_in_marketplace
+            : false,
         visible_in_store: true,
         city: store.city,
         governorate: store.governorate,

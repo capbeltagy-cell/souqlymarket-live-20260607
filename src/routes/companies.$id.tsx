@@ -98,7 +98,6 @@ function CompanyProfile() {
         .from("companies")
         .select(COMPANY_PUBLIC_COLS)
         .eq("id", id)
-        .eq("is_verified", true)
         .maybeSingle();
       setCompany(data as Company | null);
       if (data) {

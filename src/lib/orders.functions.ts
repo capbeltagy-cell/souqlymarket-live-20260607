@@ -62,7 +62,7 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const { data: listing, error } = await supabase
       .from("listings")
       .select(
-        "id, company_id, store_id, price, sale_price, currency, title_ar, title_en, status, type, track_inventory, stock_quantity, min_order_quantity",
+        "id, company_id, store_id, price, sale_price, currency, title_ar, title_en, status, type, dimensions, track_inventory, stock_quantity, min_order_quantity",
       )
       .eq("id", data.listing_id)
       .maybeSingle();
@@ -73,7 +73,16 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
     const salePrice = Number(listing.sale_price ?? 0);
     const price = salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
     if (!Number.isFinite(price) || price <= 0) throw new Error("لا يمكن شراء عرض بدون سعر صالح");
-    if (["product", "market"].includes(listing.type) && !data.shipping_address) {
+    const dimensions =
+      listing.dimensions &&
+      typeof listing.dimensions === "object" &&
+      !Array.isArray(listing.dimensions)
+        ? (listing.dimensions as Record<string, unknown>)
+        : {};
+    const shippingRequired =
+      dimensions.shipping_required === true ||
+      (dimensions.shipping_required !== false && ["product", "market"].includes(listing.type));
+    if (shippingRequired && !data.shipping_address) {
       throw new Error("عنوان الشحن مطلوب لإتمام شراء هذا المنتج");
     }
     if (data.quantity < (listing.min_order_quantity ?? 1)) {
@@ -89,118 +98,53 @@ export const createOrderFromListing = createServerFn({ method: "POST" })
       .eq("id", listing.company_id as string)
       .maybeSingle();
     if (sellerCompany?.owner_id === userId) throw new Error("لا يمكنك شراء عرض تابع لشركتك");
-    const subtotal = price * data.quantity;
-    let discount = 0;
-    let couponId: string | null = null;
-    let couponCode: string | null = null;
-    if (data.coupon_code) {
-      if (!listing.store_id) throw new Error("هذا المنتج غير تابع لمتجر يقبل الكوبونات");
-      const normalizedCode = data.coupon_code.toUpperCase();
-      const { data: coupon } = await (supabaseAdmin.from("store_coupons" as never) as any)
-        .select(
-          "id, code, type, value, min_order, max_discount, starts_at, ends_at, usage_limit_total, usage_limit_per_user, used_count, active",
-        )
-        .eq("store_id", listing.store_id)
-        .eq("code", normalizedCode)
-        .eq("active", true)
-        .maybeSingle();
-      if (!coupon) throw new Error("الكوبون غير صالح لهذا المتجر");
-      const now = Date.now();
-      if (coupon.starts_at && new Date(coupon.starts_at).getTime() > now)
-        throw new Error("الكوبون لم يبدأ بعد");
-      if (coupon.ends_at && new Date(coupon.ends_at).getTime() < now)
-        throw new Error("انتهت صلاحية الكوبون");
-      if (subtotal < Number(coupon.min_order || 0))
-        throw new Error(`الحد الأدنى للكوبون ${coupon.min_order} ج.م`);
-      if (coupon.usage_limit_total && coupon.used_count >= coupon.usage_limit_total)
-        throw new Error("انتهى استخدام الكوبون");
-      const { count: userUsed } = await (supabaseAdmin.from("store_coupon_usage" as never) as any)
-        .select("id", { count: "exact", head: true })
-        .eq("coupon_id", coupon.id)
-        .eq("user_id", userId);
-      if ((userUsed ?? 0) >= Number(coupon.usage_limit_per_user || 1))
-        throw new Error("لقد استنفدت استخدام هذا الكوبون");
-      discount =
-        coupon.type === "percent" ? (subtotal * Number(coupon.value)) / 100 : Number(coupon.value);
-      if (coupon.max_discount) discount = Math.min(discount, Number(coupon.max_discount));
-      discount = Math.round(Math.min(discount, subtotal) * 100) / 100;
-      couponId = coupon.id;
-      couponCode = coupon.code;
-    }
     const shippingQuote = data.shipping_address
       ? getShippingQuote(data.shipping_address.governorate)
       : { amount: 0, etaMinDays: 0, etaMaxDays: 0 };
-    const total = subtotal - discount + shippingQuote.amount;
 
-    const insertPayload = {
-      buyer_id: userId,
-      product_listing_id: listing.id,
-      quantity: data.quantity,
-      notes: data.notes ?? null,
-      contact_phone: data.contact_phone ?? null,
-      status: "awaiting_seller",
-      unit_price: price,
-      subtotal,
-      discount_amount: discount,
-      total_amount: total,
-      shipping_amount: shippingQuote.amount,
-      shipping_eta_min_days: shippingQuote.etaMinDays || null,
-      shipping_eta_max_days: shippingQuote.etaMaxDays || null,
-      currency: listing.currency ?? "EGP",
-      shipping_address: data.shipping_address ?? null,
-      conversation_id: data.conversation_id ?? null,
-      payment_status: "unpaid",
-      referral_code: data.referral_code ?? null,
-      store_id: listing.store_id ?? null,
-      coupon_code: couponCode,
-      checkout_session_id: data.checkout_session_id ?? null,
-    } as Record<string, unknown>;
-
-    const { data: created, error: iErr } = await (supabase.from("wholesale_orders" as never) as any)
-      .insert(insertPayload)
-      .select("id")
-      .single();
-    if (iErr) {
-      if (iErr.code === "23505" && data.checkout_session_id) {
-        const { data: existing } = await (supabase.from("wholesale_orders" as never) as any)
-          .select("id")
-          .eq("buyer_id", userId)
-          .eq("checkout_session_id", data.checkout_session_id)
-          .eq("product_listing_id", listing.id)
-          .maybeSingle();
-        if (existing?.id) return { id: existing.id as string };
-      }
-      throw new Error(iErr.message);
+    if (!data.checkout_session_id) {
+      throw new Error("تعذر إنشاء جلسة شراء آمنة؛ حدّث الصفحة وحاول مرة أخرى");
     }
 
-    if (couponId) {
-      const { error: usageError } = await (
-        supabaseAdmin.from("store_coupon_usage" as never) as any
-      ).insert({
-        coupon_id: couponId,
-        user_id: userId,
-        order_id: created.id,
-        discount_amount: discount,
-      });
-      if (usageError) {
-        await (supabaseAdmin.from("wholesale_orders" as never) as any)
-          .delete()
-          .eq("id", created.id);
-        throw new Error("تعذر حجز الكوبون؛ حاول مرة أخرى");
-      }
-    }
+    // The database owns price, coupon, shipping and inventory calculations.
+    // Client/server previews above are UX validation only; the atomic RPC is the
+    // sole order writer and provides idempotency under concurrent retries.
+    const { data: atomicResult, error: atomicError } = await (supabase.rpc as any)(
+      "create_order_atomic",
+      {
+        p_buyer_id: userId,
+        p_listing_id: listing.id,
+        p_quantity: data.quantity,
+        p_notes: data.notes ?? null,
+        p_contact_phone: data.contact_phone ?? null,
+        p_shipping_address: data.shipping_address ?? null,
+        p_shipping_amount: shippingQuote.amount,
+        p_shipping_eta_min_days: shippingQuote.etaMinDays || null,
+        p_shipping_eta_max_days: shippingQuote.etaMaxDays || null,
+        p_checkout_session_id: data.checkout_session_id,
+        p_referral_code: data.referral_code ?? null,
+        p_coupon_code: data.coupon_code?.toUpperCase() ?? null,
+        p_conversation_id: data.conversation_id ?? null,
+      },
+    );
+    if (atomicError) throw new Error(atomicError.message);
+    const createdId =
+      atomicResult && typeof atomicResult === "object" && "order_id" in atomicResult
+        ? String(atomicResult.order_id)
+        : "";
+    if (!createdId) throw new Error("تعذر تأكيد إنشاء الطلب");
 
     // Notify seller
     if (sellerCompany?.owner_id) {
-      await (supabase.from("notifications" as never) as any).insert({
+      await (supabaseAdmin.from("notifications" as never) as any).insert({
         user_id: sellerCompany.owner_id,
         type: "order",
         title: "طلب جديد",
         body: `طلب جديد على ${listing.title_ar ?? listing.title_en ?? "منتج"}`,
-        link: `/orders/${created.id}`,
+        link: `/orders/${createdId}`,
       });
     }
-    return { id: created.id as string };
+    return { id: createdId };
   });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
