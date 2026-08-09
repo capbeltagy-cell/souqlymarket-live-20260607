@@ -51,7 +51,7 @@ const PHONE_RE = /^[+0-9()\-\s]{6,20}$/;
 
 export const createListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         type: LISTING_TYPE,
@@ -196,7 +196,7 @@ export const createListing = createServerFn({ method: "POST" })
  */
 export const createStoreProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => storeProductSchema.parse(input))
+  .validator((input: unknown) => storeProductSchema.parse(input))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await assertNotPureMarketer(supabase as never, userId);
@@ -304,7 +304,7 @@ export const createStoreProduct = createServerFn({ method: "POST" })
 
 export const deleteListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: listing, error: listingError } = await supabase
@@ -360,7 +360,7 @@ export const listMyListings = createServerFn({ method: "GET" })
 // Ownership is enforced server-side (RLS + explicit company_id check).
 export const updateListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -439,7 +439,7 @@ export const updateListing = createServerFn({ method: "POST" })
 
 // Contact reveal — buyers/anonymous NEVER get direct contact. Only the listing's company owner does.
 export const getListingContact = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     // Try to identify caller via bearer token; if none or not the owner, mask.
     const { getRequestHeader } = await import("@tanstack/react-start/server");
@@ -482,7 +482,7 @@ export const getListingContact = createServerFn({ method: "POST" })
 
 export const checkListingDuplicate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         title_ar: z.string().min(1).max(200),

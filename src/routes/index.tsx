@@ -12,14 +12,14 @@ import {
   Search,
   ShieldCheck,
   Store,
+  Star,
   Sparkles,
   TrendingUp,
   Users,
   Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
 import { FeaturedAdBar } from "@/components/FeaturedAdBar";
@@ -60,20 +60,20 @@ const categories = [
   { key: "cat_opportunity", icon: TrendingUp, to: "/marketplace" },
 ] as const;
 
-type FactoryRow = {
-  company_id: string;
-  production_capacity: string | null;
-  employees_range: string | null;
-  verified: boolean;
-  companies: {
-    id: string;
-    name_ar: string | null;
-    name_en: string | null;
-    industry: string | null;
-    governorate: string | null;
-    logo_url: string | null;
-    is_verified: boolean | null;
-  } | null;
+type RfqPreview = {
+  id: string;
+  title: string;
+  quantity: number | null;
+  unit: string | null;
+  governorate: string | null;
+  created_at: string;
+};
+
+type ReviewPreview = {
+  id: string;
+  comment: string | null;
+  rating: number;
+  companies: { name_ar: string | null; name_en: string | null } | null;
 };
 
 function CardSkeleton({ count = 4, aspect = "aspect-[4/3]" }: { count?: number; aspect?: string }) {
@@ -130,10 +130,13 @@ function Landing() {
   const [query, setQuery] = useState("");
   const [listings, setListings] = useState<ListingCardData[] | null>(null);
   const [companies, setCompanies] = useState<CompanyCardData[] | null>(null);
-  const [factories, setFactories] = useState<FactoryRow[] | null>(null);
-  const [opportunities, setOpportunities] = useState<ListingCardData[] | null>(null);
-  const [wholesale, setWholesale] = useState<any[] | null>(null);
-  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0 });
+  const [rfqs, setRfqs] = useState<RfqPreview[] | null>(null);
+  const [reviews, setReviews] = useState<ReviewPreview[] | null>(null);
+  const [counts, setCounts] = useState<{
+    companies: number;
+    listings: number;
+    agents: number;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -146,17 +149,19 @@ function Landing() {
           .eq("visible_in_marketplace", true),
         supabase.from("agents").select("id", { count: "exact", head: true }),
       ]);
-      setCounts({
-        companies: cCount.count ?? 0,
-        listings: lCount.count ?? 0,
-        agents: aCount.count ?? 0,
-      });
+      if (!cCount.error && !lCount.error && !aCount.error) {
+        setCounts({
+          companies: cCount.count ?? 0,
+          listings: lCount.count ?? 0,
+          agents: aCount.count ?? 0,
+        });
+      }
     })();
 
     (async () => {
       const listingSelect =
         "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)";
-      const [lRes, oRes, cRes, fRes, wRes] = await Promise.all([
+      const [lRes, cRes, rRes, reviewRes] = await Promise.all([
         supabase
           .from("listings")
           .select(listingSelect)
@@ -166,13 +171,6 @@ function Landing() {
           .order("created_at", { ascending: false })
           .limit(40),
         supabase
-          .from("listings")
-          .select(listingSelect)
-          .eq("status", "approved")
-          .eq("type", "opportunity")
-          .order("created_at", { ascending: false })
-          .limit(4),
-        supabase
           .from("companies")
           .select("id, name_ar, name_en, industry, country, is_verified, is_premium, logo_url")
           .order("is_premium", { ascending: false })
@@ -180,27 +178,23 @@ function Landing() {
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
-          .from("factories")
-          .select(
-            "company_id, production_capacity, employees_range, verified, companies(id, name_ar, name_en, industry, governorate, logo_url, is_verified)",
-          )
-          .order("verified", { ascending: false })
-          .limit(6),
-        supabase
-          .from("wholesale_listings")
-          .select(
-            "id, title, images, price_per_unit, currency, moq, governorate, companies(name_ar, name_en, is_verified)",
-          )
-          .eq("active", true)
+          .from("rfqs")
+          .select("id, title, quantity, unit, governorate, created_at")
+          .eq("status", "open")
           .order("created_at", { ascending: false })
           .limit(4),
+        supabase
+          .from("reviews")
+          .select("id, comment, rating, companies(name_ar, name_en)")
+          .not("comment", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(3),
       ]);
       const { rankListings } = await import("@/lib/ranking");
       setListings(rankListings((lRes.data ?? []) as unknown as ListingCardData[]).slice(0, 8));
-      setOpportunities((oRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
-      setFactories((fRes.data ?? []) as unknown as FactoryRow[]);
-      setWholesale((wRes.data ?? []) as any[]);
+      setRfqs((rRes.data ?? []) as unknown as RfqPreview[]);
+      setReviews((reviewRes.data ?? []) as unknown as ReviewPreview[]);
     })();
   }, []);
 
@@ -215,9 +209,7 @@ function Landing() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-
+    <PublicLayout>
       {/* 1. HERO + SEARCH — compact */}
       <section className="relative overflow-hidden hero-gradient">
         <div className="hero-grid" aria-hidden="true" />
@@ -306,23 +298,24 @@ function Landing() {
           </div>
 
           {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
-          <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
-            {[
-              { label: ar ? "شركة" : "Companies", value: counts.companies },
-              { label: ar ? "إعلان" : "Listings", value: counts.listings },
-              { label: ar ? "مسوّق" : "Agents", value: counts.agents },
-            ].map((item) => (
-              <div key={item.label} className="premium-panel rounded-xl p-6">
-                <div className="text-serif text-4xl text-gold tabular-nums leading-none">
-                  {item.value.toLocaleString(ar ? "ar-EG" : "en-US")}
-                  <span className="text-gold-soft">+</span>
+          {counts && (
+            <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
+              {[
+                { label: ar ? "شركة" : "Companies", value: counts.companies },
+                { label: ar ? "إعلان" : "Listings", value: counts.listings },
+                { label: ar ? "مسوّق" : "Agents", value: counts.agents },
+              ].map((item) => (
+                <div key={item.label} className="premium-panel rounded-xl p-6">
+                  <div className="text-serif text-4xl text-gold tabular-nums leading-none">
+                    {item.value.toLocaleString(ar ? "ar-EG" : "en-US")}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">
+                    {item.label}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -454,6 +447,76 @@ function Landing() {
         )}
       </section>
 
+      {/* 6. LATEST RFQS — production records only */}
+      <section className="container-souqly py-6 md:py-8">
+        <SectionHead
+          title={ar ? "أحدث طلبات الأسعار" : "Latest RFQs"}
+          href="/rfq"
+          cta={ar ? "عرض الكل" : "View all"}
+        />
+        {rfqs === null ? (
+          <CardSkeleton count={4} aspect="aspect-[2/1]" />
+        ) : rfqs.length > 0 ? (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            {rfqs.map((rfq) => (
+              <Link
+                key={rfq.id}
+                to="/rfq/$id"
+                params={{ id: rfq.id }}
+                className="rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary/50"
+              >
+                <span className="text-xs font-semibold text-primary">
+                  {rfq.governorate || (ar ? "كل مصر" : "Egypt")}
+                </span>
+                <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-snug">{rfq.title}</h3>
+                {(rfq.quantity || rfq.unit) && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    {rfq.quantity ?? "—"} {rfq.unit ?? ""}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Empty label={ar ? "أنشئ طلب سعر" : "Create an RFQ"} href="/rfq/new" />
+        )}
+      </section>
+
+      {/* 7. VERIFIED CUSTOMER REVIEWS — no fabricated testimonials */}
+      {reviews && reviews.length > 0 && (
+        <section className="border-y border-border bg-surface-2/50">
+          <div className="container-souqly py-10 md:py-14">
+            <h2 className="text-serif text-2xl md:text-4xl">
+              {ar ? "تقييمات حقيقية من المنصة" : "Real platform reviews"}
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {reviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="rounded-2xl border border-border bg-card p-5 shadow-card"
+                >
+                  <div className="flex gap-1 text-gold" aria-label={`${review.rating} / 5`}>
+                    {Array.from({ length: Math.max(0, Math.min(5, review.rating)) }).map(
+                      (_, index) => (
+                        <Star key={index} className="h-4 w-4 fill-current" />
+                      ),
+                    )}
+                  </div>
+                  <p className="mt-4 line-clamp-4 text-sm leading-7 text-foreground">
+                    “{review.comment}”
+                  </p>
+                  <p className="mt-4 text-xs font-semibold text-muted-foreground">
+                    {review.companies?.name_ar ||
+                      review.companies?.name_en ||
+                      (ar ? "شركة على سوقلي" : "A Souqly company")}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 8. HOW SOUQLY WORKS */}
       <section className="container-souqly py-10 md:py-16">
         <div className="text-center max-w-2xl mx-auto mb-6 md:mb-10">
@@ -497,6 +560,45 @@ function Landing() {
       </section>
 
       {/* 9. CTA FOR COMPANIES */}
+      <section className="container-souqly py-10 md:py-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="status-pill">{ar ? "أسئلة شائعة" : "FAQ"}</span>
+          <h2 className="mt-4 text-serif text-3xl md:text-5xl">
+            {ar ? "قبل أن تبدأ" : "Before you start"}
+          </h2>
+        </div>
+        <div className="mx-auto mt-7 grid max-w-4xl gap-3">
+          {[
+            [
+              ar ? "هل التسجيل مجاني؟" : "Is registration free?",
+              ar
+                ? "يمكن إنشاء الحساب وملف الشركة مجانًا، وتظهر أي خطط مدفوعة وأسعارها بوضوح قبل الاشتراك."
+                : "You can create an account and company profile for free. Any paid plan is shown clearly before subscribing.",
+            ],
+            [
+              ar ? "كيف أطلب أسعارًا من الموردين؟" : "How do I request supplier quotes?",
+              ar
+                ? "أنشئ RFQ وحدد الكمية والموقع والموعد، ثم استقبل عروض الموردين وقارنها."
+                : "Create an RFQ with quantity, location and deadline, then receive and compare supplier offers.",
+            ],
+            [
+              ar ? "هل الشركات والمنتجات شيء واحد؟" : "Are companies and products the same?",
+              ar
+                ? "لا. لكل شركة ملف مستقل، ويمكن أن يتبعه متجر ومنتجات وخدمات ومصانع وفروع."
+                : "No. Every company has its own profile and may have a store, products, services, factories and branches.",
+            ],
+          ].map(([question, answer]) => (
+            <details
+              key={question}
+              className="group rounded-2xl border border-border bg-card p-5 shadow-card"
+            >
+              <summary className="cursor-pointer list-none font-semibold">{question}</summary>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       <section className="container-souqly py-10 md:py-16">
         <div className="premium-panel rounded-2xl md:rounded-[2rem] p-6 md:p-14 text-center overflow-hidden relative">
           <div
@@ -546,8 +648,6 @@ function Landing() {
           </div>
         </div>
       </section>
-
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }

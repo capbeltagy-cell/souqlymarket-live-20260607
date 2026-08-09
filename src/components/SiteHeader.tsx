@@ -85,9 +85,11 @@ export function SiteHeader() {
         >
           <PrimaryLink to="/" label="الرئيسية" />
           <PrimaryLink to="/marketplace" label={t("nav_marketplace")} />
-          <PrimaryLink to="/stores" label="المتاجر" />
           <PrimaryLink to="/companies" label={t("nav_companies")} />
+          <PrimaryLink to="/factories" label="المصانع" />
+          <PrimaryLink to="/services" label="الخدمات" />
           <PrimaryLink to="/rfq" label="طلبات الأسعار" />
+          <PrimaryLink to="/business-solutions" label="حلول الأعمال" />
           <PrimaryLink to="/store/open" label="افتح متجرك" emphasis />
         </nav>
 
@@ -101,8 +103,9 @@ export function SiteHeader() {
             <DropdownMenuContent align="start" className="w-56">
               <MobilePrimaryLink to="/" icon={<Home />} label="الرئيسية" />
               <MobilePrimaryLink to="/marketplace" icon={<ShoppingBag />} label="السوق" />
-              <MobilePrimaryLink to="/stores" icon={<Store />} label="المتاجر" />
               <MobilePrimaryLink to="/companies" icon={<Building2 />} label="الشركات" />
+              <MobilePrimaryLink to="/factories" icon={<Store />} label="المصانع" />
+              <MobilePrimaryLink to="/services" icon={<Briefcase />} label="الخدمات" />
               <MobilePrimaryLink to="/rfq" icon={<ListChecks />} label="طلبات الأسعار" />
               <DropdownMenuSeparator />
               <MobilePrimaryLink to="/store/open" icon={<PlusCircle />} label="افتح متجرك" />
@@ -398,7 +401,16 @@ function PrimaryLink({
   label,
   emphasis = false,
 }: {
-  to: "/" | "/marketplace" | "/stores" | "/companies" | "/rfq" | "/store/open";
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/store/open";
   label: string;
   emphasis?: boolean;
 }) {
@@ -421,7 +433,16 @@ function MobilePrimaryLink({
   icon,
   label,
 }: {
-  to: "/" | "/marketplace" | "/stores" | "/companies" | "/rfq" | "/store/open";
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/store/open";
   icon: ReactNode;
   label: string;
 }) {

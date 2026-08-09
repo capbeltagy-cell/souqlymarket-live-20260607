@@ -162,7 +162,7 @@ function SearchPage() {
                       {ar ? "موثقة" : "Verified"}
                     </span>
                   )}
-                  {c.subscription_plan === "paid" && (
+                  {c.subscription_plan === "premium_company" && (
                     <span className="text-xs rounded px-2 py-0.5 bg-success/10 text-success">
                       {ar ? "مدفوع" : "Paid"}
                     </span>

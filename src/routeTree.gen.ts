@@ -39,6 +39,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SearchAllRouteImport } from './routes/search-all'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as TendersRouteImport } from './routes/tenders'
@@ -275,6 +276,11 @@ const SearchRoute = SearchRouteImport.update({
 const SearchAllRoute = SearchAllRouteImport.update({
   id: '/search-all',
   path: '/search-all',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -791,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -910,6 +917,7 @@ export interface FileRoutesByTo {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -1031,6 +1039,7 @@ export interface FileRoutesById {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -1152,6 +1161,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1271,6 +1281,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1391,6 +1402,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1512,6 +1524,7 @@ export interface RootRouteChildren {
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
   SearchAllRoute: typeof SearchAllRoute
+  ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscribeRoute: typeof SubscribeRoute
   TendersRoute: typeof TendersRouteWithChildren
@@ -1736,6 +1749,13 @@ declare module '@tanstack/react-router' {
       path: '/search-all'
       fullPath: '/search-all'
       preLoaderRoute: typeof SearchAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2660,6 +2680,7 @@ const rootRouteChildren: RootRouteChildren = {
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
   SearchAllRoute: SearchAllRoute,
+  ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscribeRoute: SubscribeRoute,
   TendersRoute: TendersRouteWithChildren,

@@ -49,7 +49,7 @@ export function rankCompanies<T extends RankableCompany>(
     const premium = c.is_premium ? 1 : 0;
     const verified = c.is_verified ? 1 : 0;
     const paid =
-      c.subscription_plan === "paid" &&
+      c.subscription_plan === "premium_company" &&
       (!c.subscription_expires_at || c.subscription_expires_at > nowIso)
         ? 1
         : 0;
