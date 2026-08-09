@@ -26,7 +26,7 @@ export const listAllPaymentMethods = createServerFn({ method: "GET" })
 
 export const upsertPaymentMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid().optional(),
@@ -59,7 +59,7 @@ export const upsertPaymentMethod = createServerFn({ method: "POST" })
 
 export const submitPaymentProof = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         order_id: z.string().uuid(),
@@ -146,7 +146,7 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
 
 export const listOrderProofs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: visibleOrder } = await (context.supabase.from("wholesale_orders" as never) as any)
       .select("id")
@@ -196,7 +196,7 @@ export const listPendingProofs = createServerFn({ method: "GET" })
 
 export const reviewPaymentProof = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),

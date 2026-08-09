@@ -44,7 +44,7 @@ function isMissingMigration(message: string) {
 
 export const getManualPaymentCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => z.object({ companyId: z.string().uuid() }).parse(value))
+  .validator((value: unknown) => z.object({ companyId: z.string().uuid() }).parse(value))
   .handler(async ({ context, data }) => {
     const { data: company, error } = await context.supabase
       .from("companies")
@@ -82,7 +82,7 @@ export const getManualPaymentCheckout = createServerFn({ method: "POST" })
 
 export const submitManualPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => submitSchema.parse(value))
+  .validator((value: unknown) => submitSchema.parse(value))
   .handler(async ({ context, data }) => {
     if (!data.proofPath.startsWith(`${context.userId}/`)) {
       throw new Error("مسار إثبات الدفع غير صالح");
@@ -136,7 +136,7 @@ export const listMyManualPayments = createServerFn({ method: "GET" })
 
 export const adminListManualPayments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) =>
+  .validator((value: unknown) =>
     z
       .object({
         status: z.enum(["all", "pending", "approved", "rejected"]).default("pending"),
@@ -207,7 +207,7 @@ export const adminListManualPayments = createServerFn({ method: "POST" })
 
 export const reviewManualPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) =>
+  .validator((value: unknown) =>
     z
       .object({
         requestId: z.string().uuid(),

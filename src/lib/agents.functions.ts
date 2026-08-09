@@ -28,7 +28,7 @@ export const getMyAgent = createServerFn({ method: "GET" })
 
 export const upsertMyAgent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => schema.parse(d))
+  .validator((d: unknown) => schema.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const payload = { ...data, user_id: userId };
