@@ -39,6 +39,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SearchAllRouteImport } from './routes/search-all'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as TendersRouteImport } from './routes/tenders'
@@ -116,6 +117,7 @@ import { Route as AuthenticatedQuotationsNewRouteImport } from './routes/_authen
 import { Route as AuthenticatedRfqMineRouteImport } from './routes/_authenticated/rfq.mine'
 import { Route as AuthenticatedRfqNewRouteImport } from './routes/_authenticated/rfq.new'
 import { Route as AuthenticatedStoreIndexRouteImport } from './routes/_authenticated/store.index'
+import { Route as AuthenticatedStoreCategoriesRouteImport } from './routes/_authenticated/store.categories'
 import { Route as AuthenticatedStoreCouponsRouteImport } from './routes/_authenticated/store.coupons'
 import { Route as AuthenticatedStoreOpenRouteImport } from './routes/_authenticated/store.open'
 import { Route as AuthenticatedTendersMineRouteImport } from './routes/_authenticated/tenders.mine'
@@ -125,6 +127,7 @@ import { Route as ApiPaymobWebhookRouteImport } from './routes/api.paymob.webhoo
 import { Route as AuthenticatedListingsIdEditRouteImport } from './routes/_authenticated/listings.$id.edit'
 import { Route as AuthenticatedOrdersIdConfirmationRouteImport } from './routes/_authenticated/orders.$id.confirmation'
 import { Route as AuthenticatedOrdersIdPayRouteImport } from './routes/_authenticated/orders.$id.pay'
+import { Route as AuthenticatedStoreProductsNewRouteImport } from './routes/_authenticated/store.products.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -273,6 +276,11 @@ const SearchRoute = SearchRouteImport.update({
 const SearchAllRoute = SearchAllRouteImport.update({
   id: '/search-all',
   path: '/search-all',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -695,6 +703,12 @@ const AuthenticatedStoreIndexRoute = AuthenticatedStoreIndexRouteImport.update({
   path: '/store/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoreCategoriesRoute =
+  AuthenticatedStoreCategoriesRouteImport.update({
+    id: '/store/categories',
+    path: '/store/categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStoreCouponsRoute =
   AuthenticatedStoreCouponsRouteImport.update({
     id: '/store/coupons',
@@ -746,6 +760,12 @@ const AuthenticatedOrdersIdPayRoute =
     path: '/pay',
     getParentRoute: () => AuthenticatedOrdersIdRoute,
   } as any)
+const AuthenticatedStoreProductsNewRoute =
+  AuthenticatedStoreProductsNewRouteImport.update({
+    id: '/store/products/new',
+    path: '/store/products/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -777,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -853,6 +874,7 @@ export interface FileRoutesByFullPath {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -863,6 +885,7 @@ export interface FileRoutesByFullPath {
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
+  '/store/products/new': typeof AuthenticatedStoreProductsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -894,6 +917,7 @@ export interface FileRoutesByTo {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -970,6 +994,7 @@ export interface FileRoutesByTo {
   '/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/store/open': typeof AuthenticatedStoreOpenRoute
   '/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -980,6 +1005,7 @@ export interface FileRoutesByTo {
   '/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
+  '/store/products/new': typeof AuthenticatedStoreProductsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1013,6 +1039,7 @@ export interface FileRoutesById {
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/tenders': typeof TendersRouteWithChildren
@@ -1089,6 +1116,7 @@ export interface FileRoutesById {
   '/_authenticated/quotations/new': typeof AuthenticatedQuotationsNewRoute
   '/_authenticated/rfq/mine': typeof AuthenticatedRfqMineRoute
   '/_authenticated/rfq/new': typeof AuthenticatedRfqNewRoute
+  '/_authenticated/store/categories': typeof AuthenticatedStoreCategoriesRoute
   '/_authenticated/store/coupons': typeof AuthenticatedStoreCouponsRoute
   '/_authenticated/store/open': typeof AuthenticatedStoreOpenRoute
   '/_authenticated/tenders/mine': typeof AuthenticatedTendersMineRoute
@@ -1099,6 +1127,7 @@ export interface FileRoutesById {
   '/_authenticated/listings/$id/edit': typeof AuthenticatedListingsIdEditRoute
   '/_authenticated/orders/$id/confirmation': typeof AuthenticatedOrdersIdConfirmationRoute
   '/_authenticated/orders/$id/pay': typeof AuthenticatedOrdersIdPayRoute
+  '/_authenticated/store/products/new': typeof AuthenticatedStoreProductsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1132,6 +1161,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1208,6 +1238,7 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/categories'
     | '/store/coupons'
     | '/store/open'
     | '/tenders/mine'
@@ -1218,6 +1249,7 @@ export interface FileRouteTypes {
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
+    | '/store/products/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1249,6 +1281,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1325,6 +1358,7 @@ export interface FileRouteTypes {
     | '/quotations/new'
     | '/rfq/mine'
     | '/rfq/new'
+    | '/store/categories'
     | '/store/coupons'
     | '/store/open'
     | '/tenders/mine'
@@ -1335,6 +1369,7 @@ export interface FileRouteTypes {
     | '/listings/$id/edit'
     | '/orders/$id/confirmation'
     | '/orders/$id/pay'
+    | '/store/products/new'
   id:
     | '__root__'
     | '/'
@@ -1367,6 +1402,7 @@ export interface FileRouteTypes {
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
     | '/tenders'
@@ -1443,6 +1479,7 @@ export interface FileRouteTypes {
     | '/_authenticated/quotations/new'
     | '/_authenticated/rfq/mine'
     | '/_authenticated/rfq/new'
+    | '/_authenticated/store/categories'
     | '/_authenticated/store/coupons'
     | '/_authenticated/store/open'
     | '/_authenticated/tenders/mine'
@@ -1453,6 +1490,7 @@ export interface FileRouteTypes {
     | '/_authenticated/listings/$id/edit'
     | '/_authenticated/orders/$id/confirmation'
     | '/_authenticated/orders/$id/pay'
+    | '/_authenticated/store/products/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1486,6 +1524,7 @@ export interface RootRouteChildren {
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
   SearchAllRoute: typeof SearchAllRoute
+  ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscribeRoute: typeof SubscribeRoute
   TendersRoute: typeof TendersRouteWithChildren
@@ -1710,6 +1749,13 @@ declare module '@tanstack/react-router' {
       path: '/search-all'
       fullPath: '/search-all'
       preLoaderRoute: typeof SearchAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2251,6 +2297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoreIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/store/categories': {
+      id: '/_authenticated/store/categories'
+      path: '/store/categories'
+      fullPath: '/store/categories'
+      preLoaderRoute: typeof AuthenticatedStoreCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/store/coupons': {
       id: '/_authenticated/store/coupons'
       path: '/store/coupons'
@@ -2313,6 +2366,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/orders/$id/pay'
       preLoaderRoute: typeof AuthenticatedOrdersIdPayRouteImport
       parentRoute: typeof AuthenticatedOrdersIdRoute
+    }
+    '/_authenticated/store/products/new': {
+      id: '/_authenticated/store/products/new'
+      path: '/store/products/new'
+      fullPath: '/store/products/new'
+      preLoaderRoute: typeof AuthenticatedStoreProductsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
@@ -2429,6 +2489,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedQuotationsNewRoute: typeof AuthenticatedQuotationsNewRoute
   AuthenticatedRfqMineRoute: typeof AuthenticatedRfqMineRoute
   AuthenticatedRfqNewRoute: typeof AuthenticatedRfqNewRoute
+  AuthenticatedStoreCategoriesRoute: typeof AuthenticatedStoreCategoriesRoute
   AuthenticatedStoreCouponsRoute: typeof AuthenticatedStoreCouponsRoute
   AuthenticatedStoreOpenRoute: typeof AuthenticatedStoreOpenRoute
   AuthenticatedTendersMineRoute: typeof AuthenticatedTendersMineRoute
@@ -2436,6 +2497,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWholesaleNewRoute: typeof AuthenticatedWholesaleNewRoute
   AuthenticatedStoreIndexRoute: typeof AuthenticatedStoreIndexRoute
   AuthenticatedListingsIdEditRoute: typeof AuthenticatedListingsIdEditRoute
+  AuthenticatedStoreProductsNewRoute: typeof AuthenticatedStoreProductsNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -2495,6 +2557,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedQuotationsNewRoute: AuthenticatedQuotationsNewRoute,
   AuthenticatedRfqMineRoute: AuthenticatedRfqMineRoute,
   AuthenticatedRfqNewRoute: AuthenticatedRfqNewRoute,
+  AuthenticatedStoreCategoriesRoute: AuthenticatedStoreCategoriesRoute,
   AuthenticatedStoreCouponsRoute: AuthenticatedStoreCouponsRoute,
   AuthenticatedStoreOpenRoute: AuthenticatedStoreOpenRoute,
   AuthenticatedTendersMineRoute: AuthenticatedTendersMineRoute,
@@ -2502,6 +2565,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWholesaleNewRoute: AuthenticatedWholesaleNewRoute,
   AuthenticatedStoreIndexRoute: AuthenticatedStoreIndexRoute,
   AuthenticatedListingsIdEditRoute: AuthenticatedListingsIdEditRoute,
+  AuthenticatedStoreProductsNewRoute: AuthenticatedStoreProductsNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -2616,6 +2680,7 @@ const rootRouteChildren: RootRouteChildren = {
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
   SearchAllRoute: SearchAllRoute,
+  ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscribeRoute: SubscribeRoute,
   TendersRoute: TendersRouteWithChildren,

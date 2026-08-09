@@ -38,7 +38,7 @@ async function assertOwnedCompany(supabase: any, userId: string, companyId?: str
 
 export const createStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => storeSchema.parse(d))
+  .validator((d: unknown) => storeSchema.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     await assertOwnedCompany(supabase, userId, data.company_id);
@@ -62,7 +62,7 @@ export const createStore = createServerFn({ method: "POST" })
 
 export const updateStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => storeSchema.partial().extend({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => storeSchema.partial().extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { id, ...rest } = data;
@@ -79,7 +79,7 @@ export const updateStore = createServerFn({ method: "POST" })
 
 export const submitStoreForReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -104,6 +104,111 @@ export const getMyStore = createServerFn({ method: "GET" })
       .eq("owner_id", userId)
       .maybeSingle();
     return { store: data ?? null };
+  });
+
+const storeCategorySchema = z.object({
+  name_ar: z.string().trim().min(2).max(80),
+  name_en: z.string().trim().max(80).optional().nullable(),
+  sort_order: z.number().int().min(0).max(10_000).default(0),
+});
+
+function categorySlug(value: string) {
+  return value
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+export const listMyStoreCategories = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: store } = await supabase
+      .from("stores")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!store) return { storeId: null, items: [] };
+    const { data, error } = await (supabase.from("store_categories" as never) as any)
+      .select("id, store_id, name_ar, name_en, slug, sort_order, created_at")
+      .eq("store_id", store.id)
+      .order("sort_order")
+      .order("created_at");
+    if (error) throw new Error(error.message);
+    return { storeId: store.id, items: data ?? [] };
+  });
+
+export const createStoreCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => storeCategorySchema.parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: store } = await supabase
+      .from("stores")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!store) throw new Error("أنشئ متجرك أولًا");
+    const slug = categorySlug(data.name_en || data.name_ar);
+    if (!slug) throw new Error("اسم القسم غير صالح");
+    const { error } = await (supabase.from("store_categories" as never) as any).insert({
+      store_id: store.id,
+      name_ar: data.name_ar,
+      name_en: data.name_en || null,
+      slug,
+      sort_order: data.sort_order,
+    });
+    if (error?.code === "23505") throw new Error("يوجد قسم بهذا الاسم بالفعل");
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateStoreCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => storeCategorySchema.extend({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const slug = categorySlug(data.name_en || data.name_ar);
+    const { data: store } = await supabase
+      .from("stores")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!store) throw new Error("غير مسموح");
+    const { data: updated, error } = await (supabase.from("store_categories" as never) as any)
+      .update({
+        name_ar: data.name_ar,
+        name_en: data.name_en || null,
+        slug,
+        sort_order: data.sort_order,
+      })
+      .eq("id", data.id)
+      .eq("store_id", store.id)
+      .select("id")
+      .maybeSingle();
+    if (error?.code === "23505") throw new Error("يوجد قسم بهذا الاسم بالفعل");
+    if (error) throw new Error(error.message);
+    if (!updated) throw new Error("غير مسموح بتعديل هذا القسم");
+    return { ok: true };
+  });
+
+export const deleteStoreCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: stores } = await supabase.from("stores").select("id").eq("owner_id", userId);
+    const storeIds = (stores ?? []).map((store) => store.id);
+    if (!storeIds.length) throw new Error("غير مسموح");
+    const { error } = await (supabase.from("store_categories" as never) as any)
+      .delete()
+      .eq("id", data.id)
+      .in("store_id", storeIds);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const listPublicStores = createServerFn({ method: "GET" }).handler(async () => {
@@ -132,7 +237,7 @@ export const listPublicStores = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const getStoreBySlug = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ slug: z.string() }).parse(d))
+  .validator((d: unknown) => z.object({ slug: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
     const s = createClient<Database>(process.env.SUPABASE_URL!, key, {
@@ -184,7 +289,7 @@ export const getStoreBySlug = createServerFn({ method: "POST" })
 
 export const followStore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ store_id: z.string().uuid(), follow: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -212,7 +317,7 @@ export const followStore = createServerFn({ method: "POST" })
 
 export const listStoreOrders = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -230,7 +335,7 @@ export const listStoreOrders = createServerFn({ method: "POST" })
 
 export const getStoreAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)
@@ -267,7 +372,7 @@ export const getStoreAnalytics = createServerFn({ method: "POST" })
 
 export const getStoreOperations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: store } = await (supabase.from("stores" as never) as any)

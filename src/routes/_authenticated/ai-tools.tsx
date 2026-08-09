@@ -15,8 +15,10 @@ import {
   generateSocialPost,
   generateProductPromotion,
 } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/ai-tools")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "AI Marketing Tools — Souqly" }] }),
   component: AIToolsPage,
 });

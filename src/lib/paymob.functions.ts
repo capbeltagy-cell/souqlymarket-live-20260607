@@ -51,7 +51,7 @@ export const getOnlinePaymentStatus = createServerFn({ method: "GET" }).handler(
 
 export const createOnlinePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => createPaymentSchema.parse(input))
+  .validator((input: unknown) => createPaymentSchema.parse(input))
   .handler(async ({ context, data }) => {
     const config = getPaymobConfigurationStatus();
     if (!config.configured) throw new Error("ONLINE_PAYMENT_NOT_CONFIGURED");
@@ -118,7 +118,7 @@ export const createOnlinePayment = createServerFn({ method: "POST" })
 
 export const getMyOnlinePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ reference: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ reference: z.string().uuid() }).parse(input))
   .handler(async ({ context, data }) => {
     const { data: rows, error } = await context.supabase.rpc(
       "get_my_payment_attempt" as never,

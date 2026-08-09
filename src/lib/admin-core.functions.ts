@@ -52,7 +52,7 @@ async function writeAudit(
 
 export const adminListUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         page: z.number().int().min(1).default(1),
@@ -140,7 +140,7 @@ export const adminListUsers = createServerFn({ method: "POST" })
 
 export const adminSetUserSuspended = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ userId: z.string().uuid(), suspended: z.boolean() }).parse(input),
   )
   .handler(async ({ context, data }) => {
@@ -165,7 +165,7 @@ export const adminSetUserSuspended = createServerFn({ method: "POST" })
 
 export const adminSetUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({ userId: z.string().uuid(), role: z.enum(assignableRoles), enabled: z.boolean() })
       .parse(input),
@@ -211,7 +211,7 @@ export const adminSetUserRole = createServerFn({ method: "POST" })
 
 export const adminListAuditLogs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         page: z.number().int().min(1).default(1),

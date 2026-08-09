@@ -33,7 +33,7 @@ async function assertStoreOwner(supabase: any, userId: string, store_id: string)
 
 export const listCoupons = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ store_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     await assertStoreOwner(context.supabase, context.userId, data.store_id);
     const { data: items } = await (context.supabase.from("store_coupons" as never) as any)
@@ -45,7 +45,7 @@ export const listCoupons = createServerFn({ method: "POST" })
 
 export const upsertCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => couponSchema.parse(d))
+  .validator((d: unknown) => couponSchema.parse(d))
   .handler(async ({ context, data }) => {
     await assertStoreOwner(context.supabase, context.userId, data.store_id);
     const payload = { ...data, code: data.code.toUpperCase() };
@@ -66,7 +66,7 @@ export const upsertCoupon = createServerFn({ method: "POST" })
 
 export const deleteCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ id: z.string().uuid(), store_id: z.string().uuid() }).parse(d),
   )
   .handler(async ({ context, data }) => {
@@ -77,7 +77,7 @@ export const deleteCoupon = createServerFn({ method: "POST" })
 
 export const validateCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         store_id: z.string().uuid(),

@@ -293,6 +293,7 @@ function ManualPaymentPage() {
                         <li>
                           2. {ar ? "حوّل المبلغ كاملًا إلى الرقم:" : "Transfer the full amount to:"}
                         </li>
+                        <li>3. {ar ? method.instructionsAr : method.instructionsEn}</li>
                       </ol>
                       <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border bg-background p-3">
                         <span className="font-mono font-bold" dir="ltr">

@@ -4,7 +4,7 @@ import { z } from "zod";
 const input = z.object({ id: z.string().uuid() });
 
 export const getPublicAgentProfile = createServerFn({ method: "POST" })
-  .inputValidator((value: unknown) => input.parse(value))
+  .validator((value: unknown) => input.parse(value))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: agent, error } = await supabaseAdmin

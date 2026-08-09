@@ -6,8 +6,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getCampaignAnalytics } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/campaigns/$id")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Campaign analytics — Marketing Center" }] }),
   component: CampaignAnalytics,
 });

@@ -17,8 +17,10 @@ import {
   updateCampaign,
   deleteCampaign,
 } from "@/lib/marketing.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/campaigns")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Campaigns — Marketing Center" }] }),
   component: CampaignsPage,
 });

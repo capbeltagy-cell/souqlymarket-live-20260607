@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getMyReferral } from "@/lib/phase3.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/referral-program")({
+  beforeLoad: requireAgentRoute,
   component: ReferralProgram,
 });
 

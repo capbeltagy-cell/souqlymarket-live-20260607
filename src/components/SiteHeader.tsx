@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import {
   Briefcase,
   BriefcaseBusiness,
@@ -18,8 +19,9 @@ import {
   ShoppingBag,
   ChevronRight,
   ShoppingCart,
-  Boxes,
-  FileDown,
+  Menu,
+  Store,
+  Home,
 } from "lucide-react";
 import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -54,7 +56,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70"
+      className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 shadow-[0_1px_0_hsl(var(--border)/0.4)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="container-souqly flex h-14 lg:h-16 items-center gap-2 lg:gap-4">
@@ -77,112 +79,43 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* Primary nav — only the essentials */}
-        <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                {t("nav_marketplace")}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/marketplace">كل السوق</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/real-estate">عقارات</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/lands">أراضي</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/factories">المصانع</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/wholesale">سوق الجملة</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/agents">المسوقين</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                فرص أعمال
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/rfq">طلبات الأسعار</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/tenders">المناقصات</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link
-            to="/companies"
-            className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition"
-          >
-            {t("nav_companies")}
-          </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                حلول الشركات
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/business-solutions" className="gap-2">
-                  <Boxes className="h-4 w-4" />
-                  كل الحلول
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/digital-products" className="gap-2">
-                  <FileDown className="h-4 w-4" />
-                  المنتجات الرقمية
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link
-            to="/earn"
-            className="px-3 py-2 rounded-full text-accent hover:text-foreground hover:bg-accent/10 transition font-semibold"
-          >
-            اربح معنا
-          </Link>
-
-          {/* Secondary nav collapsed into "More" */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                المزيد
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link to="/pricing">{t("nav_pricing")}</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/how-it-works">كيف يعمل</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/about">من نحن</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/contact">اتصل بنا</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/faq">الأسئلة الشائعة</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <nav
+          className="hidden lg:flex min-w-0 items-center gap-0.5 text-sm font-medium"
+          aria-label="التنقل الرئيسي"
+        >
+          <PrimaryLink to="/" label="الرئيسية" />
+          <PrimaryLink to="/marketplace" label={t("nav_marketplace")} />
+          <PrimaryLink to="/companies" label={t("nav_companies")} />
+          <PrimaryLink to="/factories" label="المصانع" />
+          <PrimaryLink to="/services" label="الخدمات" />
+          <PrimaryLink to="/rfq" label="طلبات الأسعار" />
+          <PrimaryLink to="/business-solutions" label="حلول الأعمال" />
+          <PrimaryLink to="/store/open" label="افتح متجرك" emphasis />
         </nav>
 
         <div className="ms-auto flex items-center gap-1.5 lg:gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                aria-label="فتح قائمة التنقل"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64" aria-label="روابط التنقل">
+              <MobilePrimaryLink to="/" icon={<Home />} label="الرئيسية" />
+              <MobilePrimaryLink to="/marketplace" icon={<ShoppingBag />} label="السوق" />
+              <MobilePrimaryLink to="/companies" icon={<Building2 />} label="الشركات" />
+              <MobilePrimaryLink to="/factories" icon={<Store />} label="المصانع" />
+              <MobilePrimaryLink to="/services" icon={<Briefcase />} label="الخدمات" />
+              <MobilePrimaryLink to="/rfq" icon={<ListChecks />} label="طلبات الأسعار" />
+              <DropdownMenuSeparator />
+              <MobilePrimaryLink to="/store/open" icon={<PlusCircle />} label="افتح متجرك" />
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className="hidden xl:block w-[260px]">
             <GlobalSearch compact />
           </div>
@@ -468,6 +401,81 @@ export function SiteHeader() {
   );
 }
 
+function PrimaryLink({
+  to,
+  label,
+  emphasis = false,
+}: {
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/store/open";
+  label: string;
+  emphasis?: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      activeOptions={{ exact: to === "/" }}
+      activeProps={{
+        className: emphasis
+          ? "rounded-full bg-primary-hover px-3 py-2 font-semibold text-primary-foreground"
+          : "rounded-full bg-muted px-3 py-2 text-foreground",
+        "aria-current": "page",
+      }}
+      className={
+        emphasis
+          ? "rounded-full bg-primary px-3 py-2 font-semibold text-primary-foreground transition hover:bg-primary-hover"
+          : "rounded-full px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+      }
+    >
+      {label}
+    </Link>
+  );
+}
+
+function MobilePrimaryLink({
+  to,
+  icon,
+  label,
+}: {
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/store/open";
+  icon: ReactNode;
+  label: string;
+}) {
+  return (
+    <DropdownMenuItem asChild>
+      <Link
+        to={to}
+        activeOptions={{ exact: to === "/" }}
+        activeProps={{
+          className: "gap-2 bg-muted font-semibold text-foreground",
+          "aria-current": "page",
+        }}
+        className="gap-2"
+      >
+        <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+        {label}
+      </Link>
+    </DropdownMenuItem>
+  );
+}
+
 function CartButton() {
   const [n, setN] = useState(0);
   useEffect(() => {
@@ -477,7 +485,7 @@ function CartButton() {
   return (
     <Link
       to="/cart"
-      aria-label="Cart"
+      aria-label="سلة المشتريات"
       className="relative inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-muted transition"
     >
       <ShoppingCart className="h-5 w-5" />

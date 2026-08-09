@@ -55,7 +55,7 @@ export const superOverview = createServerFn({ method: "POST" })
     const { count: paid } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
-      .eq("subscription_plan", "paid");
+      .eq("subscription_plan", "premium_company");
     const { count: verified } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
@@ -74,7 +74,7 @@ export const superOverview = createServerFn({ method: "POST" })
 
 export const superList = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { entity: string; limit?: number }) =>
+  .validator((d: { entity: string; limit?: number }) =>
     z
       .object({
         entity: z.enum([
@@ -118,28 +118,27 @@ export const superList = createServerFn({ method: "POST" })
 
 export const superAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { action: string; entity?: string; id?: string; payload?: Record<string, any> }) =>
-      z
-        .object({
-          action: z.enum([
-            "verify_company",
-            "unverify_company",
-            "mark_paid",
-            "mark_unpaid",
-            "feature_listing",
-            "unfeature_listing",
-            "approve_listing",
-            "reject_listing",
-            "hide_listing",
-            "ban_user",
-            "unban_user",
-          ]),
-          entity: z.string().optional(),
-          id: z.string().uuid().optional(),
-          payload: z.record(z.string(), z.any()).optional(),
-        })
-        .parse(d),
+  .validator((d: { action: string; entity?: string; id?: string; payload?: Record<string, any> }) =>
+    z
+      .object({
+        action: z.enum([
+          "verify_company",
+          "unverify_company",
+          "mark_paid",
+          "mark_unpaid",
+          "feature_listing",
+          "unfeature_listing",
+          "approve_listing",
+          "reject_listing",
+          "hide_listing",
+          "ban_user",
+          "unban_user",
+        ]),
+        entity: z.string().optional(),
+        id: z.string().uuid().optional(),
+        payload: z.record(z.string(), z.any()).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const admin = await assertSuper(context);
@@ -155,7 +154,7 @@ export const superAction = createServerFn({ method: "POST" })
         await admin
           .from("companies")
           .update({
-            subscription_plan: "paid",
+            subscription_plan: "premium_company",
             subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
           })
           .eq("id", id);

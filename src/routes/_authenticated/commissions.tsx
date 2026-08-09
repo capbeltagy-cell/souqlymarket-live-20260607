@@ -14,8 +14,10 @@ import {
   updateCommissionStatus,
   requestPayout,
 } from "@/lib/commissions.functions";
+import { requireAgentRoute } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/_authenticated/commissions")({
+  beforeLoad: requireAgentRoute,
   head: () => ({ meta: [{ title: "Commissions — Souqly" }] }),
   component: CommissionsPage,
 });

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listWholesale, listCategories } from "@/lib/phase3.functions";
+import { CollectionState } from "@/components/CollectionState";
 
 export const Route = createFileRoute("/wholesale")({
   head: () => ({
@@ -26,15 +27,25 @@ function WholesalePage() {
   const [cat, setCat] = useState("");
   const [gov, setGov] = useState("");
   const [cats, setCats] = useState<{ slug: string; name_ar: string; name_en: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
-    listCategories().then((r) => setCats(r.categories));
-  }, []);
+    listCategories()
+      .then((r) => setCats(r.categories))
+      .catch(() => setError(ar ? "تعذر تحميل أقسام سوق الجملة." : "Unable to load categories."));
+  }, [ar]);
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     listWholesale({
       data: { q: q || undefined, category_slug: cat || undefined, governorate: gov || undefined },
-    }).then((r) => setItems(r.items));
-  }, [q, cat, gov]);
+    })
+      .then((r) => setItems(r.items))
+      .catch(() => setError(ar ? "تعذر تحميل منتجات الجملة." : "Unable to load products."))
+      .finally(() => setLoading(false));
+  }, [ar, q, cat, gov, retryToken]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -111,11 +122,20 @@ function WholesalePage() {
             <Link to="/wholesale/new">{ar ? "+ أضف منتج جملة" : "+ Add wholesale product"}</Link>
           </Button>
         </div>
-        {items.length === 0 ? (
-          <div className="text-center text-muted-foreground py-12">
-            {ar ? "لا توجد منتجات بعد" : "No products yet"}
-          </div>
-        ) : (
+        <CollectionState
+          loading={loading}
+          error={error}
+          empty={items.length === 0}
+          emptyTitle={ar ? "لا توجد منتجات جملة مطابقة" : "No matching wholesale products"}
+          emptyDescription={
+            ar
+              ? "غيّر كلمات البحث أو عوامل التصفية لعرض نتائج أخرى."
+              : "Change your search or filters to see more results."
+          }
+          retryLabel={ar ? "إعادة المحاولة" : "Try again"}
+          onRetry={() => setRetryToken((value) => value + 1)}
+        />
+        {!loading && !error && items.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {items.map((it) => (
               <Link

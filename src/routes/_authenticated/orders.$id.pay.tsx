@@ -99,22 +99,15 @@ function PayOrderPage() {
       throw new Error("حجم إثبات الدفع يجب ألا يتجاوز 10 ميجابايت");
     }
     const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `${user.id}/proofs/${Date.now()}.${ext}`;
+    const path = `${user.id}/${id}/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage
-      .from("listing-media")
+      .from("payment-proofs")
       .upload(path, file, { contentType: file.type });
     if (error) {
       toast.error(error.message);
       return null;
     }
-    const { data, error: sErr } = await supabase.storage
-      .from("listing-media")
-      .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
-    if (sErr) {
-      toast.error(sErr.message);
-      return null;
-    }
-    return data?.signedUrl ?? null;
+    return path;
   };
 
   const handleSubmit = async () => {

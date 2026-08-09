@@ -57,7 +57,7 @@ async function audit(
 
 export const adminPhase2List = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         module: z.enum(modules),
@@ -95,7 +95,7 @@ export const adminPhase2List = createServerFn({ method: "POST" })
 
 export const adminPhase2Detail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ module: z.enum(modules), id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ context, data }) => {
@@ -140,7 +140,7 @@ export const adminPhase2Detail = createServerFn({ method: "POST" })
 
 export const adminPhase2Action = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         module: z.enum(modules),
@@ -266,7 +266,7 @@ export const adminPhase2Action = createServerFn({ method: "POST" })
 
 export const adminCreateNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         title: z.string().trim().min(2).max(160),

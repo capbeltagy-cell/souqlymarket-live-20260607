@@ -9,8 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n/I18nProvider";
 import { createTender, listCategories } from "@/lib/phase3.functions";
+import { requireBusinessRoute } from "@/lib/route-guards";
 
-export const Route = createFileRoute("/_authenticated/tenders/new")({ component: NewTender });
+export const Route = createFileRoute("/_authenticated/tenders/new")({
+  beforeLoad: requireBusinessRoute,
+  component: NewTender,
+});
 
 function NewTender() {
   useMarketerGuard();

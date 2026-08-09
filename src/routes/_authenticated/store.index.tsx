@@ -22,6 +22,7 @@ import {
   Palette,
   AlertTriangle,
   RefreshCw,
+  FolderTree,
 } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
@@ -146,6 +147,61 @@ function StoreDashboard() {
     );
   }
 
+  if (store.status !== "published") {
+    return (
+      <div className="min-h-screen bg-surface-2">
+        <SiteHeader />
+        <main className="container-souqly max-w-3xl py-10" dir="rtl">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div className="flex flex-wrap items-start gap-4">
+              <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl bg-primary/10 text-primary">
+                {store.logo_url ? (
+                  <img src={store.logo_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <StoreIcon className="h-7 w-7" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-bold">{store.name_ar}</h1>
+                  {statusBadge(store.status)}
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  لوحة المبيعات والطلبات ستُفتح تلقائيًا بعد اعتماد المتجر من الإدارة.
+                </p>
+                {store.rejection_reason ? (
+                  <p className="mt-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                    سبب الرفض: {store.rejection_reason}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Button asChild variant="outline">
+                <Link to="/store/open">تعديل بيانات المتجر</Link>
+              </Button>
+              {(store.status === "draft" || store.status === "rejected") && (
+                <Button
+                  onClick={async () => {
+                    try {
+                      await submitStoreForReview({ data: { id: store.id } });
+                      toast.success("تم إرسال المتجر للمراجعة");
+                      location.reload();
+                    } catch (error) {
+                      toast.error(getArabicErrorMessage(error, "تعذر إرسال المتجر للمراجعة."));
+                    }
+                  }}
+                >
+                  إرسال للمراجعة
+                </Button>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-surface-2">
       <SiteHeader />
@@ -246,8 +302,9 @@ function StoreDashboard() {
           </Link>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <NavCard to="/listings/new" icon={<Package />} label="إضافة منتج" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <NavCard to="/store/products/new" icon={<Package />} label="إضافة منتج" />
+          <NavCard to="/store/categories" icon={<FolderTree />} label="أقسام المتجر" />
           <NavCard to="/store/coupons" icon={<Ticket />} label="الكوبونات" />
           <NavCard to="/orders" icon={<ShoppingBag />} label="الطلبات" />
           <NavCard to="/store/open" icon={<Settings />} label="إعدادات المتجر" />
@@ -289,7 +346,7 @@ function StoreDashboard() {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">المخزون والمنتجات</h2>
-            <Link to="/listings/new" className="text-sm text-primary">
+            <Link to="/store/products/new" className="text-sm text-primary">
               إضافة منتج
             </Link>
           </div>

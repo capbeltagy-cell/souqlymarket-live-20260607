@@ -1,75 +1,57 @@
-# Souqly deployment checklist — Coolify
+# Souqly deployment checklist — Cloudflare
 
-## 1. Required environment variables
+## Source of truth
 
-Set these in Coolify. Never commit real values.
+- Repository: `capbeltagy-cell/souqlymarket-live-20260607`.
+- Review branch: `souqly-v2-rebuild`.
+- Do not publish from `main` until PR #18 is reviewed and merged deliberately.
+- Existing Lovable project: `690a1256-6676-460f-acc1-0cfe17aec9a4`; do not create or remix another project.
+- Production Supabase ref: `qujssmtdzmzsfrgtaitj`.
 
-| Variable                        | Scope          | Required                  |
-| ------------------------------- | -------------- | ------------------------- |
-| `VITE_SUPABASE_URL`             | Build          | Yes                       |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Build          | Yes; publishable key only |
-| `SUPABASE_URL`                  | Runtime        | Yes                       |
-| `SUPABASE_PUBLISHABLE_KEY`      | Runtime        | Yes                       |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Runtime secret | Yes; server only          |
-| `SUPER_ADMIN_EMAILS`            | Runtime secret | Yes                       |
-| `NODE_ENV=production`           | Runtime        | Yes                       |
-| `HOST=0.0.0.0`                  | Runtime        | Yes                       |
-| `PORT=3000`                     | Runtime        | Yes                       |
-| `NITRO_PRESET=node-server`      | Build          | Recommended               |
+## Required environment variables
 
-## 2. Supabase setup
+Configure these in the existing Lovable/Cloudflare environment. Never commit real values.
 
-- Site URL: `https://souqlymarket.com`
-- Redirect URLs: `https://souqlymarket.com/auth/callback` and the exact `www` variant if used.
-- Add the Coolify preview domain only while testing, then remove it.
-- Apply `supabase/launch_bundle.sql` in the SQL editor.
-- Run `supabase/verify_launch.sql` and require the final `verification = PASS` row.
-- Confirm Storage buckets and policies for `listing-media`, `company-assets`, `avatars`, `company-catalogs`, and `rfq-attachments`.
+| Variable | Scope | Required |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Build | Yes |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Build | Yes; publishable key only |
+| `SUPABASE_URL` | Runtime | Yes |
+| `SUPABASE_PUBLISHABLE_KEY` | Runtime | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Runtime secret | Only for server-only privileged operations |
+| `SUPER_ADMIN_EMAILS` | Runtime secret | If email allowlisting is used |
 
-## 3. Coolify application settings
+All Supabase URL variables must target `https://qujssmtdzmzsfrgtaitj.supabase.co`. A service-role key must never be stored in a `VITE_` variable.
 
-- Deployment type: Dockerfile.
-- Dockerfile: `Dockerfile` at repository root.
-- Build command when using Nixpacks instead: `npm ci && NITRO_PRESET=node-server npm run build`.
-- Start command when using Nixpacks instead: `npm run start`.
-- Container port: `3000`.
-- Health path: `/health`.
-- Health expected status: `200` for GET or `204` for HEAD.
-- Persist no application directory; the app is stateless.
-- Keep one previous successful image available for rollback.
+## Cloudflare build
 
-## 4. Domain, proxy, and HTTPS
+- Build command: `npm ci && npm run build`.
+- The default Nitro preset is `cloudflare-module`.
+- Generated artifacts: `.output/server/wrangler.json`, `.wrangler/deploy/config.json`, `.output/public/_headers`, and `.output/nitro.json`.
+- Optional prebuilt deployment command after review: `npx nitro deploy --prebuilt`.
+- Do not run the deployment command as part of validation.
 
-- Point the domain to the Coolify server before issuing the certificate.
-- Attach `souqlymarket.com`; choose one canonical host and redirect the other.
-- Enable automatic HTTPS and HTTP-to-HTTPS redirect.
-- Reverse proxy target must be container port `3000`, not a public host port.
-- Preserve `Host`, `X-Forwarded-Proto`, and `X-Forwarded-For` headers (Coolify defaults do this).
+## Pre-publish gate
 
-## 5. Pre-deployment gate
-
-- `npm ci`
 - `npm run typecheck`
-- `npm run lint`
-- `NITRO_PRESET=node-server npm run build`
-- Build the Dockerfile and confirm `/health` from inside the deployment network.
-- Confirm `.env` is ignored and no service-role key appears in Git history.
-- On a workstation with Docker available: `supabase start`, `supabase db reset`,
-  `supabase migration list --local`, then `supabase db push --local --dry-run`.
+- `npm run lint` with zero errors
+- `npm test -- --run`
+- `npm run test:migrations`
+- `npm run build`
+- Node preview route crawl: 102/102 routes
+- Verify Supabase RLS, policy count and security advisors
+- Confirm Lovable's environment variable names and project ref in its publish settings
 
-## 6. Post-deployment tests
+## Supabase and authentication
 
-- Open home, marketplace, companies, stores, and a public store page.
-- Sign in and verify `/auth/callback` returns to the intended page.
-- Test profile save, saved address, cart, checkout preview, and order history.
-- Test company, marketer, store, and admin guards with separate accounts.
-- Upload one permitted image and reject an invalid type/oversized image.
-- Verify store approval publishes it publicly.
-- Check `/health`, browser console, server logs, and Supabase logs.
-- Run `supabase/verify_launch.sql` once more after smoke testing.
+- Production database migrations are tracked and reconciled separately from application publish.
+- Do not replay the repository migration history blindly.
+- Site URL: `https://souqlymarket.com`.
+- Redirect URL: `https://souqlymarket.com/auth/callback` plus the canonical `www` variant only if used.
+- Enable leaked-password protection in Supabase Auth before public launch.
 
-## 7. Rollback
+## Rollback
 
-1. Roll back Coolify to the previous healthy image.
-2. If database behavior is involved, enable maintenance mode and follow `supabase/rollback_notes.md`.
-3. Restore the pre-launch Supabase backup when partial manual changes or data integrity are uncertain.
+1. Roll Cloudflare back to the prior healthy Worker deployment.
+2. If the approved security reconciliation must be reversed, use `artifacts/production-snapshot-2026-08-09/rollback.sql` after incident review.
+3. Never reset the database or remove users, buckets, policies or production records.

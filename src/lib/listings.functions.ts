@@ -16,11 +16,42 @@ const LISTING_TYPE = z.enum([
 ]);
 const IMAGE_SOURCE = z.enum(["live_capture", "uploaded"]);
 
+const STORE_PRODUCT_STATUS = z.enum(["draft", "active", "out_of_stock", "archived"]);
+
+const storeProductSchema = z.object({
+  title_ar: z.string().trim().min(2).max(200),
+  title_en: z.string().trim().max(200).optional().nullable(),
+  description_ar: z.string().trim().max(4000).optional().nullable(),
+  price: z.number().positive(),
+  compare_at_price: z.number().positive().optional().nullable(),
+  category: z.string().trim().max(80).optional().nullable(),
+  store_category_id: z.string().uuid().optional().nullable(),
+  images: z.array(z.string().url()).min(1).max(10),
+  image_sources: z.array(IMAGE_SOURCE).max(10).default([]),
+  sku: z.string().trim().max(80).optional().nullable(),
+  track_inventory: z.boolean().default(true),
+  stock_quantity: z.number().int().nonnegative().default(0),
+  min_order_quantity: z.number().int().positive().default(1),
+  weight_grams: z.number().int().positive().optional().nullable(),
+  status: STORE_PRODUCT_STATUS.default("active"),
+  variants: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(80),
+        values: z.array(z.string().trim().min(1).max(80)).min(1).max(30),
+      }),
+    )
+    .max(20)
+    .default([]),
+  shipping_required: z.boolean().default(true),
+  visible_in_marketplace: z.boolean().default(true),
+});
+
 const PHONE_RE = /^[+0-9()\-\s]{6,20}$/;
 
 export const createListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         type: LISTING_TYPE,
@@ -111,6 +142,7 @@ export const createListing = createServerFn({ method: "POST" })
       .from("listings")
       .insert({
         company_id: company.id,
+        owner_id: userId,
         type: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
@@ -158,9 +190,121 @@ export const createListing = createServerFn({ method: "POST" })
     return { ok: true, id: row.id, status: row.status as string };
   });
 
+/**
+ * Creates a product for the authenticated owner's store. Store, company and
+ * listing type are resolved on the server and are never accepted from the UI.
+ */
+export const createStoreProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => storeProductSchema.parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await assertNotPureMarketer(supabase as never, userId);
+
+    const { data: store, error: storeError } = await supabase
+      .from("stores")
+      .select("id, owner_id, company_id, city, governorate, status")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (storeError) throw new Error(storeError.message);
+    if (!store) throw new Error("STORE_REQUIRED");
+    if (store.owner_id !== userId) throw new Error("غير مسموح بإضافة منتجات إلى هذا المتجر");
+    if (data.status === "active" && store.status !== "published") {
+      throw new Error("لا يمكن نشر المنتج قبل اعتماد المتجر من الإدارة");
+    }
+
+    let companyId = store.company_id;
+    if (companyId) {
+      const { data: ownedCompany, error: companyError } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("id", companyId)
+        .eq("owner_id", userId)
+        .maybeSingle();
+      if (companyError) throw new Error(companyError.message);
+      if (!ownedCompany) throw new Error("المتجر غير مربوط بشركة تملكها");
+    } else {
+      const { data: ownedCompany, error: companyError } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("owner_id", userId)
+        .maybeSingle();
+      if (companyError) throw new Error(companyError.message);
+      companyId = ownedCompany?.id ?? null;
+    }
+    if (!companyId) throw new Error("أنشئ ملف شركتك واربطه بالمتجر قبل إضافة المنتجات");
+
+    if (data.store_category_id) {
+      const { data: category, error: categoryError } = await (
+        supabase.from("store_categories" as never) as any
+      )
+        .select("id")
+        .eq("id", data.store_category_id)
+        .eq("store_id", store.id)
+        .maybeSingle();
+      if (categoryError) throw new Error(categoryError.message);
+      if (!category) throw new Error("القسم المختار لا يتبع متجرك");
+    }
+
+    if (data.compare_at_price && data.compare_at_price <= data.price) {
+      throw new Error("السعر قبل الخصم يجب أن يكون أكبر من سعر البيع");
+    }
+    if (data.track_inventory && data.status === "active" && data.stock_quantity === 0) {
+      throw new Error("أدخل كمية المخزون أو اختر حالة غير متوفر");
+    }
+
+    // The shared listings enum has no separate archived value. Archived store
+    // products remain non-public drafts; the owner can activate them later.
+    const listingStatus =
+      data.status === "draft" || data.status === "archived" ? "draft" : "approved";
+    const stockQuantity = data.status === "out_of_stock" ? 0 : data.stock_quantity;
+    const currentPrice = data.price;
+    const basePrice = data.compare_at_price ?? currentPrice;
+
+    const { data: product, error } = await supabase
+      .from("listings")
+      .insert({
+        company_id: companyId,
+        owner_id: userId,
+        store_id: store.id,
+        store_category_id: data.store_category_id || null,
+        type: "product",
+        title_ar: data.title_ar,
+        title_en: data.title_en || data.title_ar,
+        description_ar: data.description_ar || null,
+        description_en: null,
+        category: data.category || null,
+        price: basePrice,
+        sale_price: data.compare_at_price ? currentPrice : null,
+        currency: "EGP",
+        images: data.images,
+        image_sources: data.image_sources,
+        sku: data.sku || null,
+        track_inventory: data.track_inventory,
+        stock_quantity: data.track_inventory ? stockQuantity : null,
+        min_order_quantity: data.min_order_quantity,
+        weight_grams: data.weight_grams ?? null,
+        variants: data.variants,
+        dimensions: { shipping_required: data.shipping_required },
+        visible_in_marketplace:
+          listingStatus === "approved" && store.status === "published"
+            ? data.visible_in_marketplace
+            : false,
+        visible_in_store: true,
+        city: store.city,
+        governorate: store.governorate,
+        country: "Egypt",
+        status: listingStatus,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, id: product.id };
+  });
+
 export const deleteListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: listing, error: listingError } = await supabase
@@ -216,7 +360,7 @@ export const listMyListings = createServerFn({ method: "GET" })
 // Ownership is enforced server-side (RLS + explicit company_id check).
 export const updateListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -295,7 +439,7 @@ export const updateListing = createServerFn({ method: "POST" })
 
 // Contact reveal — buyers/anonymous NEVER get direct contact. Only the listing's company owner does.
 export const getListingContact = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     // Try to identify caller via bearer token; if none or not the owner, mask.
     const { getRequestHeader } = await import("@tanstack/react-start/server");
@@ -338,7 +482,7 @@ export const getListingContact = createServerFn({ method: "POST" })
 
 export const checkListingDuplicate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         title_ar: z.string().min(1).max(200),

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const listActivePaymentMethods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -25,7 +26,7 @@ export const listAllPaymentMethods = createServerFn({ method: "GET" })
 
 export const upsertPaymentMethod = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid().optional(),
@@ -58,14 +59,18 @@ export const upsertPaymentMethod = createServerFn({ method: "POST" })
 
 export const submitPaymentProof = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         order_id: z.string().uuid(),
         payment_method_id: z.string().uuid(),
         amount: z.number().positive(),
         currency: z.string().default("EGP"),
-        proof_url: z.string().url().optional().nullable(),
+        proof_url: z
+          .string()
+          .regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|jpeg|png|webp|pdf)$/i)
+          .optional()
+          .nullable(),
         reference: z.string().max(200).optional().nullable(),
         note: z.string().max(500).optional().nullable(),
       })
@@ -119,6 +124,9 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
     if (pm.code !== "cash" && !data.proof_url && !data.reference) {
       throw new Error("أرفق إثبات الدفع أو اكتب رقم العملية");
     }
+    if (data.proof_url && !data.proof_url.startsWith(`${userId}/${data.order_id}/`)) {
+      throw new Error("مسار إثبات الدفع غير صالح");
+    }
 
     const { error } = await (supabase.from("payment_proofs" as never) as any).insert({
       order_id: data.order_id,
@@ -133,15 +141,12 @@ export const submitPaymentProof = createServerFn({ method: "POST" })
       note: data.note ?? null,
     });
     if (error) throw new Error(error.message);
-    await (supabase.from("wholesale_orders" as never) as any)
-      .update({ payment_status: "pending_review" })
-      .eq("id", data.order_id);
     return { ok: true };
   });
 
 export const listOrderProofs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ order_id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { data: visibleOrder } = await (context.supabase.from("wholesale_orders" as never) as any)
       .select("id")
@@ -152,7 +157,16 @@ export const listOrderProofs = createServerFn({ method: "POST" })
       .select("*")
       .eq("order_id", data.order_id)
       .order("created_at", { ascending: false });
-    return { items: items ?? [] };
+    const signedItems = await Promise.all(
+      (items ?? []).map(async (item: any) => {
+        if (!item.proof_url || /^https?:\/\//i.test(item.proof_url)) return item;
+        const { data: signed } = await supabaseAdmin.storage
+          .from("payment-proofs")
+          .createSignedUrl(item.proof_url, 300);
+        return { ...item, proof_url: signed?.signedUrl ?? null };
+      }),
+    );
+    return { items: signedItems };
   });
 
 export const listPendingProofs = createServerFn({ method: "GET" })
@@ -168,12 +182,21 @@ export const listPendingProofs = createServerFn({ method: "GET" })
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(200);
-    return { items: data ?? [] };
+    const signedItems = await Promise.all(
+      (data ?? []).map(async (item: any) => {
+        if (!item.proof_url || /^https?:\/\//i.test(item.proof_url)) return item;
+        const { data: signed } = await supabaseAdmin.storage
+          .from("payment-proofs")
+          .createSignedUrl(item.proof_url, 300);
+        return { ...item, proof_url: signed?.signedUrl ?? null };
+      }),
+    );
+    return { items: signedItems };
   });
 
 export const reviewPaymentProof = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
