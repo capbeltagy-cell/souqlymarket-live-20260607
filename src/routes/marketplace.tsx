@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useDeferredValue } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Boxes, Search, SlidersHorizontal, Wrench, Building2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { useI18n } from "@/i18n/I18nProvider";
 import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
@@ -171,11 +170,41 @@ function Marketplace() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
+    <PublicLayout>
       <section className="bg-surface-2 border-b border-border">
         <div className="container-souqly py-6 md:py-10">
           <h1 className="text-2xl md:text-3xl font-bold mb-4">{t("nav_marketplace")}</h1>
+          <p className="mb-5 max-w-2xl text-sm text-muted-foreground">
+            {locale === "ar"
+              ? "استكشف المنتجات والخدمات والأصول التجارية في مسارات واضحة. الشركات والمصانع لها أدلة مستقلة."
+              : "Explore products, services and business assets in clear domains. Companies and factories have separate directories."}
+          </p>
+          <nav className="mb-6 grid max-w-2xl grid-cols-3 gap-2" aria-label="أقسام السوق">
+            {[
+              { icon: Boxes, label: locale === "ar" ? "المنتجات" : "Products", value: "product" },
+              { icon: Wrench, label: locale === "ar" ? "الخدمات" : "Services", value: "service" },
+              {
+                icon: Building2,
+                label: locale === "ar" ? "الأصول" : "Assets",
+                value: "real_estate",
+              },
+            ].map(({ icon: Icon, label, value }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setType(value as ListingType)}
+                aria-pressed={type === value}
+                className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition ${
+                  type === value
+                    ? "border-primary bg-primary text-primary-foreground shadow-gold"
+                    : "border-border bg-card text-foreground hover:border-primary/50"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {label}
+              </button>
+            ))}
+          </nav>
 
           {/* Search + mobile filter trigger */}
           <div className="flex items-center gap-2 max-w-2xl">
@@ -249,8 +278,7 @@ function Marketplace() {
           {filtered.length} {t("listings_count")} • {locale.toUpperCase()}
         </p>
       </section>
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }
 

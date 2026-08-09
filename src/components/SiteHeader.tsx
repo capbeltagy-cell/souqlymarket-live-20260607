@@ -56,7 +56,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70"
+      className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 shadow-[0_1px_0_hsl(var(--border)/0.4)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="container-souqly flex h-14 lg:h-16 items-center gap-2 lg:gap-4">
@@ -80,7 +80,7 @@ export function SiteHeader() {
         </Link>
 
         <nav
-          className="hidden lg:flex items-center gap-1 text-sm font-medium"
+          className="hidden lg:flex min-w-0 items-center gap-0.5 text-sm font-medium"
           aria-label="التنقل الرئيسي"
         >
           <PrimaryLink to="/" label="الرئيسية" />
@@ -96,11 +96,16 @@ export function SiteHeader() {
         <div className="ms-auto flex items-center gap-1.5 lg:gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="فتح القائمة">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                aria-label="فتح قائمة التنقل"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-64" aria-label="روابط التنقل">
               <MobilePrimaryLink to="/" icon={<Home />} label="الرئيسية" />
               <MobilePrimaryLink to="/marketplace" icon={<ShoppingBag />} label="السوق" />
               <MobilePrimaryLink to="/companies" icon={<Building2 />} label="الشركات" />
@@ -417,6 +422,13 @@ function PrimaryLink({
   return (
     <Link
       to={to}
+      activeOptions={{ exact: to === "/" }}
+      activeProps={{
+        className: emphasis
+          ? "rounded-full bg-primary-hover px-3 py-2 font-semibold text-primary-foreground"
+          : "rounded-full bg-muted px-3 py-2 text-foreground",
+        "aria-current": "page",
+      }}
       className={
         emphasis
           ? "rounded-full bg-primary px-3 py-2 font-semibold text-primary-foreground transition hover:bg-primary-hover"
@@ -448,7 +460,15 @@ function MobilePrimaryLink({
 }) {
   return (
     <DropdownMenuItem asChild>
-      <Link to={to} className="gap-2">
+      <Link
+        to={to}
+        activeOptions={{ exact: to === "/" }}
+        activeProps={{
+          className: "gap-2 bg-muted font-semibold text-foreground",
+          "aria-current": "page",
+        }}
+        className="gap-2"
+      >
         <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
         {label}
       </Link>
@@ -465,7 +485,7 @@ function CartButton() {
   return (
     <Link
       to="/cart"
-      aria-label="Cart"
+      aria-label="سلة المشتريات"
       className="relative inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-muted transition"
     >
       <ShoppingCart className="h-5 w-5" />

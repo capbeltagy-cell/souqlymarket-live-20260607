@@ -28,6 +28,7 @@
 | Medium | 326 lint warnings and many unsafe casts | Replace route query casts with typed adapters and Zod validation gradually |
 | Medium | Legacy views must enforce caller permissions | Confirm `security_invoker=true` or revoke Data API access where appropriate |
 | Medium | Storage upsert needs SELECT+INSERT+UPDATE | Verify each writable bucket policy set and ownership path convention |
+| High | Two high-severity transitive dependency advisories | Update `js-yaml` and `nanoid` through the lockfile, then rerun audit and full tests |
 
 ## Non-negotiable rules
 

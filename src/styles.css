@@ -55,6 +55,10 @@ aside:has(a[href*="utm_source=lovable-badge"]) {
 
 :root {
   --radius: 0.875rem;
+  --content-max: 80rem;
+  --content-gutter: clamp(1rem, 3vw, 2rem);
+  --section-space: clamp(3.5rem, 7vw, 7rem);
+  --control-height: 2.75rem;
 
   /* Souqly — clean Egyptian marketplace, turquoise & warm gold */
   --background: #f7faf9;
@@ -139,6 +143,14 @@ aside:has(a[href*="utm_source=lovable-badge"]) {
     color: inherit;
     -webkit-tap-highlight-color: transparent;
   }
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ring) 55%, transparent);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
+    color: var(--foreground);
+  }
   button,
   input,
   textarea,
@@ -174,6 +186,9 @@ aside:has(a[href*="utm_source=lovable-badge"]) {
 }
 
 @layer utilities {
+  .section-souqly {
+    padding-block: var(--section-space);
+  }
   .text-gold {
     color: var(--gold);
   }
@@ -480,8 +495,8 @@ aside:has(a[href*="utm_source=lovable-badge"]) {
 @utility container-souqly {
   width: 100%;
   margin-inline: auto;
-  padding-inline: 1.25rem;
-  max-width: 80rem;
+  padding-inline: var(--content-gutter);
+  max-width: var(--content-max);
 }
 
 @utility hero-gradient {

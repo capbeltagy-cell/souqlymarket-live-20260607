@@ -6,7 +6,6 @@ import {
   BadgeCheck,
   Building2,
   Factory,
-  Landmark,
   Megaphone,
   Package,
   Search,
@@ -17,6 +16,13 @@ import {
   TrendingUp,
   Users,
   Wrench,
+  Boxes,
+  Car,
+  Construction,
+  Cpu,
+  Shirt,
+  Sprout,
+  UtensilsCrossed,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicLayout } from "@/components/layouts/PublicLayout";
@@ -52,12 +58,15 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { key: "cat_product", icon: Package, to: "/marketplace" },
-  { key: "cat_factory", icon: Factory, to: "/factories" },
-  { key: "cat_real_estate", icon: Building2, to: "/real-estate" },
-  { key: "cat_land", icon: Landmark, to: "/lands" },
-  { key: "cat_service", icon: Wrench, to: "/marketplace" },
-  { key: "cat_opportunity", icon: TrendingUp, to: "/marketplace" },
+  { ar: "الأغذية", en: "Food", icon: UtensilsCrossed, to: "/marketplace" },
+  { ar: "الملابس", en: "Clothing", icon: Shirt, to: "/marketplace" },
+  { ar: "التعبئة والتغليف", en: "Packaging", icon: Boxes, to: "/marketplace" },
+  { ar: "الإلكترونيات", en: "Electronics", icon: Cpu, to: "/marketplace" },
+  { ar: "الزراعة", en: "Agriculture", icon: Sprout, to: "/marketplace" },
+  { ar: "الإنشاءات", en: "Construction", icon: Construction, to: "/marketplace" },
+  { ar: "الآلات", en: "Machinery", icon: Factory, to: "/marketplace" },
+  { ar: "السيارات", en: "Automotive", icon: Car, to: "/marketplace" },
+  { ar: "مستلزمات صناعية", en: "Industrial supplies", icon: Wrench, to: "/marketplace" },
 ] as const;
 
 type RfqPreview = {
@@ -225,19 +234,18 @@ function Landing() {
           <h1 className="text-serif text-[2.25rem] leading-[1.08] md:text-6xl lg:text-7xl tracking-tight text-foreground mb-4 fade-up-1 max-w-5xl">
             {ar ? (
               <>
-                حيث تلتقي <span className="gold-shine italic">الصفقات</span> بالشركات الجادة.
+                سوق الأعمال <span className="gold-shine italic">المصري</span>
               </>
             ) : (
               <>
-                Where serious <span className="gold-shine italic">deals</span> meet serious
-                business.
+                Egypt&apos;s <span className="gold-shine italic">Business Marketplace</span>
               </>
             )}
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-5 fade-up-2">
             {ar
-              ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر."
-              : "Souqly connects companies, suppliers, factories and pro agents across Egypt."}
+              ? "اعثر على الموردين، اطلب عروض الأسعار، ونمِّ أعمالك."
+              : "Find suppliers, request quotations and grow your business."}
           </p>
 
           <form
@@ -265,7 +273,7 @@ function Landing() {
             </Button>
           </form>
 
-          <div className="mt-4 flex flex-col gap-2 fade-up-3 sm:flex-row sm:items-center">
+          <div className="mt-5 grid max-w-3xl gap-2 fade-up-3 sm:grid-cols-2 lg:grid-cols-4">
             <Button
               asChild
               size="lg"
@@ -273,15 +281,28 @@ function Landing() {
             >
               <Link to="/store/open">
                 <Store className="me-2 h-5 w-5" />
-                {ar ? "أنشئ متجرك الآن" : "Create your store now"}
+                {ar ? "ابدأ البيع" : "Start selling"}
                 <Arrow className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
               </Link>
             </Button>
             <Link
-              to="/stores"
+              to="/marketplace"
               className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
             >
-              {ar ? "تصفح المتاجر" : "Browse stores"}
+              {ar ? "تصفح السوق" : "Browse marketplace"}
+            </Link>
+            <Link
+              to="/rfq/new"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+            >
+              {ar ? "اطلب عرض سعر" : "Request quotation"}
+            </Link>
+            <Link
+              to="/auth"
+              search={{ mode: "signup" }}
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+            >
+              {ar ? "سجّل شركتك" : "Register company"}
             </Link>
           </div>
 
@@ -343,10 +364,10 @@ function Landing() {
       {/* 3. MAIN CATEGORIES */}
       <section className="container-souqly py-6 md:py-10">
         <h2 className="text-serif text-xl md:text-3xl mb-3 md:mb-5">{t("section_categories")}</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
-          {categories.map(({ key, icon: Icon, to }) => (
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-5 md:gap-3 lg:grid-cols-9">
+          {categories.map(({ ar: arLabel, en, icon: Icon, to }) => (
             <Link
-              key={key}
+              key={en}
               to={to}
               className="group premium-panel category-tile rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/50 hover:shadow-gold transition-all min-h-[88px]"
             >
@@ -354,7 +375,7 @@ function Landing() {
                 <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">
-                {t(key)}
+                {ar ? arLabel : en}
               </div>
             </Link>
           ))}
@@ -480,6 +501,53 @@ function Landing() {
         ) : (
           <Empty label={ar ? "أنشئ طلب سعر" : "Create an RFQ"} href="/rfq/new" />
         )}
+      </section>
+
+      <section className="border-y border-border bg-surface-2/45">
+        <div className="container-souqly py-10 md:py-16">
+          <SectionHead
+            title={ar ? "خدمات تنمّي أعمالك" : "Services that grow your business"}
+            href="/services"
+            cta={ar ? "كل الخدمات" : "All services"}
+          />
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              {
+                icon: Factory,
+                title: ar ? "التصنيع والتوريد" : "Manufacturing & sourcing",
+                body: ar
+                  ? "اعثر على شركاء إنتاج وموردين مناسبين لمواصفاتك."
+                  : "Find production partners and suppliers matched to your requirements.",
+              },
+              {
+                icon: Store,
+                title: ar ? "اللوجستيات والتجارة" : "Logistics & trade",
+                body: ar
+                  ? "خدمات شحن واستيراد وتصدير لدعم الصفقة من البداية للنهاية."
+                  : "Shipping, import and export services that support the full deal.",
+              },
+              {
+                icon: TrendingUp,
+                title: ar ? "التسويق والاستشارات" : "Marketing & consulting",
+                body: ar
+                  ? "خبرات متخصصة تساعد شركتك على الوصول والنمو واتخاذ القرار."
+                  : "Specialist expertise to help your company reach, grow and decide.",
+              },
+            ].map(({ icon: Icon, title, body }) => (
+              <Link
+                key={title}
+                to="/services"
+                className="group rounded-2xl border border-border bg-card p-6 shadow-card transition hover:-translate-y-0.5 hover:border-primary/50"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-xl">{title}</h3>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* 7. VERIFIED CUSTOMER REVIEWS — no fabricated testimonials */}

@@ -2,7 +2,7 @@
 
 ## Evidence boundary
 
-This audit is generated from the 86 versioned SQL migrations and generated TypeScript database types. Supabase MCP returned `You do not have permission to perform this action` for the live project, so live-production drift, row counts and advisor results remain **unverified**. No SQL was executed.
+This audit is generated from the 87 versioned SQL migrations and generated TypeScript database types. Live-production drift, row counts and advisor results remain **unverified** because direct project access is unavailable. No SQL was executed.
 
 ## Versioned schema inventory
 
@@ -14,7 +14,7 @@ This audit is generated from the 86 versioned SQL migrations and generated TypeS
 | Policies | 237 | Parsed from versioned migrations; live enabled/disabled state unverified |
 | Triggers | 83 | Ownership, audit, lifecycle, financial and notification triggers |
 | Enums | 17 | Roles and domain state machines |
-| Migrations | 86 | Migration safety audit reports no destructive data DDL |
+| Migrations | 87 | Migration safety audit passes: ordered files and no destructive data DDL |
 
 ## Tables by domain
 

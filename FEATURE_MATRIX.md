@@ -26,10 +26,10 @@ Rule: preserve every existing capability; refactor only behind compatible routes
 
 ## Code inventory
 
-- 116 pre-existing route files; `/services` added in reconstruction.
-- 77 pre-existing components, 68 library modules, 4 hooks and one i18n context.
+- 117 route files are currently versioned, spanning public, authenticated, workspace, growth and admin surfaces.
+- 82 component files are currently versioned, alongside the shared library, hooks and i18n context.
 - No repository layer existed at baseline; server functions and route-level queries currently act as the data layer.
-- 326 lint warnings at baseline, including widespread explicit `any`; zero lint errors.
+- 477 explicit `any` occurrences remain in TypeScript source and are tracked as a gradual typing backlog.
 
 ## Preservation gates
 
