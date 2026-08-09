@@ -50,3 +50,17 @@
 - Approval locks the request and is idempotent before activating a subscription.
 - Manual-payment `SECURITY DEFINER` functions are migrated to `search_path = ''`.
 - Production advisors were inspected and findings are documented; no zero-finding claim is made.
+
+## Production reconciliation result — 2026-08-09
+
+| Control | Result |
+|---|---|
+| `marketplace_stats` caller security | PASS — `security_invoker=true` |
+| Legacy referral conversion exposure | PASS — service role only |
+| `has_role` anonymous exposure | PASS — revoked |
+| Trigger function client exposure | PASS — revoked |
+| Target function search paths | PASS — pinned to empty path |
+| RLS inventory | PASS — enabled on all 43 inspected public/storage tables |
+| Policy preservation | PASS — 163 policies retained; none deleted |
+
+The targeted Supabase advisor findings for the definer view, mutable `set_updated_at` search path and anonymous legacy referral conversion were reconciled. Remaining advisor output contains existing performance recommendations such as missing foreign-key indexes and RLS init-plan optimizations; these were deliberately not changed because this execution was restricted to the approved additive security reconciliation.

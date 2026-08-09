@@ -35,3 +35,19 @@ Baseline and reconstruction verification date: 2026-08-09.
 ## Existing regression suites retained
 
 Admin permissions, moderation permissions, payment boundaries, Paymob security, order state machine, notification targeting, company-workspace migration, manual-payment boundaries, release readiness and security boundaries.
+
+## Final verification — 2026-08-09
+
+| Check | Result |
+|---|---|
+| Migration safety audit | PASS — 88 ordered files, no destructive data DDL |
+| TypeScript | PASS |
+| ESLint | PASS — 0 errors, 322 legacy warnings |
+| Unit/security tests | PASS — 11 files, 53/53 tests |
+| Cloudflare production build | PASS — worker artifacts and Wrangler config generated |
+| Node production build | PASS |
+| Route crawl | PASS — 102/102; 97 HTTP 200 and 5 expected HTTP 307 |
+| Live RLS verification | PASS — 43/43 inspected tables enabled |
+| Live policy preservation | PASS — 163 policies retained |
+
+The Cloudflare build reports one client chunk above 500 kB. This is a performance warning, not a build failure, and remains an optimization item.

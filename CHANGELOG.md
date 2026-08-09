@@ -39,3 +39,12 @@
 - Replaced legacy `paid` subscription comparisons with the canonical `premium_company` enum value.
 - Expired subscriptions no longer retain paid-plan access through the billing helper.
 - Manual payment approval remains atomic: payment transaction, subscription renewal, company activation, notification and audit event are committed together.
+# 2026-08-09 — Production security reconciliation
+
+- Exported the current production schema, RLS policies and function definitions.
+- Added an exact rollback script and verification logs.
+- Reconciled `marketplace_stats` to invoker security.
+- Restricted the unsafe legacy referral RPC to the service role.
+- Hardened authorization/trigger function grants and function search paths.
+- Preserved all production data, users, buckets and 163 policies.
+- Re-ran TypeScript, lint, 53 tests, migration audit, Cloudflare/Node builds and the 102-route crawl.

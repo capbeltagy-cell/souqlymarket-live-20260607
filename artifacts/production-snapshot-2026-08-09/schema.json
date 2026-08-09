@@ -1,0 +1,6301 @@
+[
+  {
+    "snapshot": {
+      "enums": [
+        {
+          "name": "app_role",
+          "schema": "public",
+          "values": [
+            "admin",
+            "company",
+            "agent"
+          ]
+        },
+        {
+          "name": "application_status",
+          "schema": "public",
+          "values": [
+            "pending",
+            "accepted",
+            "rejected"
+          ]
+        },
+        {
+          "name": "commission_status",
+          "schema": "public",
+          "values": [
+            "pending",
+            "approved",
+            "paid"
+          ]
+        },
+        {
+          "name": "listing_status",
+          "schema": "public",
+          "values": [
+            "draft",
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        {
+          "name": "listing_type",
+          "schema": "public",
+          "values": [
+            "product",
+            "service",
+            "real_estate",
+            "land",
+            "factory",
+            "opportunity"
+          ]
+        },
+        {
+          "name": "subscription_plan",
+          "schema": "public",
+          "values": [
+            "free",
+            "premium_company",
+            "premium_agent"
+          ]
+        }
+      ],
+      "views": [
+        {
+          "name": "marketplace_stats",
+          "schema": "public",
+          "options": null,
+          "definition": " SELECT (( SELECT count(*) AS count\n           FROM commission_campaigns\n          WHERE commission_campaigns.status = 'active'::text))::integer AS active_campaigns,\n    (( SELECT count(DISTINCT agent_campaigns.agent_id) AS count\n           FROM agent_campaigns\n          WHERE agent_campaigns.status = 'active'::text))::integer AS active_agents,\n    ( SELECT COALESCE(sum(agent_commissions.amount), 0::numeric) AS \"coalesce\"\n           FROM agent_commissions\n          WHERE agent_commissions.status = 'paid'::text) AS total_paid_commissions,\n    (( SELECT count(*) AS count\n           FROM campaign_leads))::integer AS total_leads;"
+        }
+      ],
+      "tables": [
+        {
+          "type": "BASE TABLE",
+          "table": "agent_applications",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "agent_campaigns",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "agent_commissions",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "agent_landing_pages",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "agents",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "business_categories",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "campaign_leads",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "commission_campaigns",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "commissions",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "companies",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "company_profiles_extra",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "company_referrals",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "credit_transactions",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "factories",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "favorites",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "lead_unlock_requests",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "leads",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "listings",
+          "schema": "public"
+        },
+        {
+          "type": "VIEW",
+          "table": "marketplace_stats",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "notifications",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "partner_offers",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "payments",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "platform_messages",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "platform_settings",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "platform_threads",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "profiles",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "referrals",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "rfq_offers",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "rfqs",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "subscriptions",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "tender_proposals",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "tenders",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "user_roles",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "violation_reports",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "wholesale_listings",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "wholesale_orders",
+          "schema": "public"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "buckets",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "buckets_analytics",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "buckets_vectors",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "migrations",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "objects",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "s3_multipart_uploads",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "s3_multipart_uploads_parts",
+          "schema": "storage"
+        },
+        {
+          "type": "BASE TABLE",
+          "table": "vector_indexes",
+          "schema": "storage"
+        }
+      ],
+      "columns": [
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_applications",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_applications",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_applications",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "application_status",
+          "type": "USER-DEFINED",
+          "table": "agent_applications",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::application_status",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_applications",
+          "column": "message",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_applications",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_applications",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_campaigns",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_campaigns",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_campaigns",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_campaigns",
+          "column": "referral_code",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "agent_campaigns",
+          "column": "clicks",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "agent_campaigns",
+          "column": "leads_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "agent_campaigns",
+          "column": "conversions_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "agent_campaigns",
+          "column": "total_earned",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_campaigns",
+          "column": "status",
+          "schema": "public",
+          "default": "'active'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_campaigns",
+          "column": "joined_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_commissions",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_commissions",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_commissions",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_commissions",
+          "column": "lead_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_commissions",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "agent_commissions",
+          "column": "amount",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "admin_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_commissions",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_commissions",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "agent_commissions",
+          "column": "deal_value",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "deal_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_commissions",
+          "column": "payout_requested_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_commissions",
+          "column": "payout_paid_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "payout_method",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_commissions",
+          "column": "payout_reference",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_landing_pages",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_landing_pages",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agent_landing_pages",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_landing_pages",
+          "column": "slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_landing_pages",
+          "column": "headline_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_landing_pages",
+          "column": "headline_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_landing_pages",
+          "column": "custom_content_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agent_landing_pages",
+          "column": "custom_content_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agent_landing_pages",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agents",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "agents",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "headline_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "headline_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "bio_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "bio_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "country",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "city",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "_text",
+          "type": "ARRAY",
+          "table": "agents",
+          "column": "specialties",
+          "schema": "public",
+          "default": "'{}'::text[]",
+          "nullable": "YES"
+        },
+        {
+          "udt": "_text",
+          "type": "ARRAY",
+          "table": "agents",
+          "column": "languages",
+          "schema": "public",
+          "default": "'{}'::text[]",
+          "nullable": "YES"
+        },
+        {
+          "udt": "subscription_plan",
+          "type": "USER-DEFINED",
+          "table": "agents",
+          "column": "subscription_plan",
+          "schema": "public",
+          "default": "'free'::subscription_plan",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agents",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agents",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "agents",
+          "column": "is_verified",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agents",
+          "column": "subscription_expires_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "agents",
+          "column": "subscription_updated_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_method",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_account",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_account_name",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_iban",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "agents",
+          "column": "payout_bank_name",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "business_categories",
+          "column": "slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "business_categories",
+          "column": "name_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "business_categories",
+          "column": "name_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "business_categories",
+          "column": "icon",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "business_categories",
+          "column": "sort",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "business_categories",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "campaign_leads",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "campaign_leads",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "campaign_leads",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "campaign_leads",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "campaign_leads",
+          "column": "agent_campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "referral_code",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "visitor_name",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "visitor_phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "visitor_company",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "status",
+          "schema": "public",
+          "default": "'new'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "campaign_leads",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "campaign_leads",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "campaign_leads",
+          "column": "phone_unlocked",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "campaign_leads",
+          "column": "unlock_requested_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "campaign_leads",
+          "column": "deal_value",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "campaign_leads",
+          "column": "deal_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commission_campaigns",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commission_campaigns",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commission_campaigns",
+          "column": "created_by",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "title",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "description",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "product_service",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "commission_type",
+          "schema": "public",
+          "default": "'fixed'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "commission_campaigns",
+          "column": "commission_value",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "target_location",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "requirements",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "date",
+          "type": "date",
+          "table": "commission_campaigns",
+          "column": "expiry_date",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "commission_campaigns",
+          "column": "is_featured",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "commission_campaigns",
+          "column": "total_clicks",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "commission_campaigns",
+          "column": "total_leads",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "commission_campaigns",
+          "column": "total_conversions",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "admin_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "commission_campaigns",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "commission_campaigns",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commission_campaigns",
+          "column": "industry",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commissions",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commissions",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commissions",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "commissions",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "commissions",
+          "column": "amount",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commissions",
+          "column": "currency",
+          "schema": "public",
+          "default": "'USD'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "commission_status",
+          "type": "USER-DEFINED",
+          "table": "commissions",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::commission_status",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "commissions",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "commissions",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "commissions",
+          "column": "payout_requested_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "commissions",
+          "column": "paid_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "companies",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "companies",
+          "column": "owner_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "name_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "name_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "description_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "description_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "logo_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "cover_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "industry",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "country",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "city",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "website",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "email",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "companies",
+          "column": "is_verified",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "subscription_plan",
+          "type": "USER-DEFINED",
+          "table": "companies",
+          "column": "subscription_plan",
+          "schema": "public",
+          "default": "'free'::subscription_plan",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "companies",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "companies",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "companies",
+          "column": "subscription_expires_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "companies",
+          "column": "subscription_updated_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "governorate",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "company_type",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "category_slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "companies",
+          "column": "export_available",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "companies",
+          "column": "production_capacity",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "companies",
+          "column": "credits_balance",
+          "schema": "public",
+          "default": "5",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "company_profiles_extra",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "company_profiles_extra",
+          "column": "cover_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "company_profiles_extra",
+          "column": "whatsapp",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "company_profiles_extra",
+          "column": "website",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "company_profiles_extra",
+          "column": "achievements",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "company_profiles_extra",
+          "column": "catalog_pdfs",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "company_profiles_extra",
+          "column": "gallery",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "company_profiles_extra",
+          "column": "downloads_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "company_profiles_extra",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "company_profiles_extra",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "company_referrals",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "company_referrals",
+          "column": "owner_user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "company_referrals",
+          "column": "code",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "company_referrals",
+          "column": "clicks",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "company_referrals",
+          "column": "signups",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "company_referrals",
+          "column": "conversions",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "company_referrals",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "credit_transactions",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "credit_transactions",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "credit_transactions",
+          "column": "delta",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "credit_transactions",
+          "column": "balance_after",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "credit_transactions",
+          "column": "reason",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "credit_transactions",
+          "column": "ref_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "credit_transactions",
+          "column": "ref_type",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "credit_transactions",
+          "column": "payment_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "credit_transactions",
+          "column": "created_by",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "credit_transactions",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "factories",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "factories",
+          "column": "production_capacity",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "factories",
+          "column": "employees_range",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "factories",
+          "column": "export_available",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "factories",
+          "column": "certifications",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "factories",
+          "column": "verified",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "factories",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "factories",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "favorites",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "favorites",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "favorites",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "favorites",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "lead_unlock_requests",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "lead_unlock_requests",
+          "column": "lead_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "lead_unlock_requests",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "lead_unlock_requests",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "lead_unlock_requests",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "lead_unlock_requests",
+          "column": "requested_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "lead_unlock_requests",
+          "column": "resolved_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "lead_unlock_requests",
+          "column": "admin_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "lead_unlock_requests",
+          "column": "credits_charged",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "buyer_user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "buyer_name",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "buyer_email",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "buyer_phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "message",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "status",
+          "schema": "public",
+          "default": "'new'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "source_type",
+          "schema": "public",
+          "default": "'listing'::text",
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "source_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "contacted_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "negotiating_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "won_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "lost_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "leads",
+          "column": "assigned_agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "leads",
+          "column": "negotiating_since",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "leads",
+          "column": "referral_code",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "listings",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "listings",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "listing_type",
+          "type": "USER-DEFINED",
+          "table": "listings",
+          "column": "type",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "title_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "title_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "description_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "description_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "category",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "listings",
+          "column": "price",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "currency",
+          "schema": "public",
+          "default": "'USD'::text",
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "location",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "country",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "city",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "_text",
+          "type": "ARRAY",
+          "table": "listings",
+          "column": "images",
+          "schema": "public",
+          "default": "'{}'::text[]",
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "video_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "listings",
+          "column": "pdf_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "listings",
+          "column": "commission_percentage",
+          "schema": "public",
+          "default": "0",
+          "nullable": "YES"
+        },
+        {
+          "udt": "listing_status",
+          "type": "USER-DEFINED",
+          "table": "listings",
+          "column": "status",
+          "schema": "public",
+          "default": "'approved'::listing_status",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "listings",
+          "column": "featured",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "listings",
+          "column": "views_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "listings",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "listings",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "listings",
+          "column": "featured_until",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "listings",
+          "column": "clicks_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "listings",
+          "column": "leads_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "listings",
+          "column": "owner_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "marketplace_stats",
+          "column": "active_campaigns",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "marketplace_stats",
+          "column": "active_agents",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "marketplace_stats",
+          "column": "total_paid_commissions",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "marketplace_stats",
+          "column": "total_leads",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "notifications",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "notifications",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "notifications",
+          "column": "type",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "notifications",
+          "column": "title_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "notifications",
+          "column": "title_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "notifications",
+          "column": "body_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "notifications",
+          "column": "body_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "notifications",
+          "column": "data",
+          "schema": "public",
+          "default": "'{}'::jsonb",
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "notifications",
+          "column": "read",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "notifications",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "partner_offers",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "title_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "title_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "description_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "description_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "image_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "affiliate_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "cta_text_ar",
+          "schema": "public",
+          "default": "'اعرف أكثر'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "partner_offers",
+          "column": "cta_text_en",
+          "schema": "public",
+          "default": "'Learn More'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "partner_offers",
+          "column": "is_featured",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "partner_offers",
+          "column": "is_active",
+          "schema": "public",
+          "default": "true",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "partner_offers",
+          "column": "click_count",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "partner_offers",
+          "column": "sort_order",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "partner_offers",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "partner_offers",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "payments",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "payments",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "payments",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "payments",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "purpose",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "payments",
+          "column": "amount",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "provider",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "provider_reference",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "payments",
+          "column": "metadata",
+          "schema": "public",
+          "default": "'{}'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "payments",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "payments",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "proof_image_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "payments",
+          "column": "proof_uploaded_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "payments",
+          "column": "rejection_reason",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "payments",
+          "column": "reviewed_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "payments",
+          "column": "reviewed_by",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_messages",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_messages",
+          "column": "thread_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_messages",
+          "column": "sender_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_messages",
+          "column": "sender_type",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_messages",
+          "column": "body",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "platform_messages",
+          "column": "is_read",
+          "schema": "public",
+          "default": "false",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "platform_messages",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_settings",
+          "column": "key",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_settings",
+          "column": "value",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_settings",
+          "column": "label_ar",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_settings",
+          "column": "label_en",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_settings",
+          "column": "category",
+          "schema": "public",
+          "default": "'general'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "platform_settings",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_settings",
+          "column": "updated_by",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_threads",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_threads",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_threads",
+          "column": "lead_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_threads",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "platform_threads",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_threads",
+          "column": "subject",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "platform_threads",
+          "column": "last_message_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "platform_threads",
+          "column": "unread_company",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "platform_threads",
+          "column": "unread_agent",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "platform_threads",
+          "column": "status",
+          "schema": "public",
+          "default": "'open'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "platform_threads",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "profiles",
+          "column": "id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "profiles",
+          "column": "full_name",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "profiles",
+          "column": "avatar_url",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "profiles",
+          "column": "phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "profiles",
+          "column": "preferred_language",
+          "schema": "public",
+          "default": "'ar'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "profiles",
+          "column": "bio",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "profiles",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "profiles",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "referrals",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "referrals",
+          "column": "agent_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "referrals",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "referrals",
+          "column": "code",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "referrals",
+          "column": "clicks",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "referrals",
+          "column": "conversions",
+          "schema": "public",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "referrals",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfq_offers",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfq_offers",
+          "column": "rfq_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfq_offers",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "rfq_offers",
+          "column": "price",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfq_offers",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "rfq_offers",
+          "column": "lead_time_days",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfq_offers",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfq_offers",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "rfq_offers",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "rfq_offers",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfqs",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfqs",
+          "column": "buyer_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "title",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "description",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "category_slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "rfqs",
+          "column": "quantity",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "unit",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "rfqs",
+          "column": "budget_min",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "rfqs",
+          "column": "budget_max",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "governorate",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "rfqs",
+          "column": "attachments",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "rfqs",
+          "column": "status",
+          "schema": "public",
+          "default": "'open'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "rfqs",
+          "column": "winner_offer_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "rfqs",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "rfqs",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "subscriptions",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "subscriptions",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "subscription_plan",
+          "type": "USER-DEFINED",
+          "table": "subscriptions",
+          "column": "plan",
+          "schema": "public",
+          "default": "'free'::subscription_plan",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "subscriptions",
+          "column": "started_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "subscriptions",
+          "column": "expires_at",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "subscriptions",
+          "column": "is_active",
+          "schema": "public",
+          "default": "true",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "subscriptions",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tender_proposals",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tender_proposals",
+          "column": "tender_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tender_proposals",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "tender_proposals",
+          "column": "price",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tender_proposals",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "tender_proposals",
+          "column": "timeline_days",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tender_proposals",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tender_proposals",
+          "column": "status",
+          "schema": "public",
+          "default": "'pending'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "tender_proposals",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "tender_proposals",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tenders",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tenders",
+          "column": "publisher_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "title",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "description",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "category_slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "governorate",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "tenders",
+          "column": "budget",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "date",
+          "type": "date",
+          "table": "tenders",
+          "column": "deadline",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "tenders",
+          "column": "status",
+          "schema": "public",
+          "default": "'open'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "tenders",
+          "column": "winner_proposal_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "tenders",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "tenders",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "user_roles",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "user_roles",
+          "column": "user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "app_role",
+          "type": "USER-DEFINED",
+          "table": "user_roles",
+          "column": "role",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "user_roles",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "violation_reports",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "violation_reports",
+          "column": "reporter_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "violation_reports",
+          "column": "reported_user_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "violation_reports",
+          "column": "campaign_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "violation_reports",
+          "column": "lead_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "violation_reports",
+          "column": "violation_type",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "violation_reports",
+          "column": "description",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "violation_reports",
+          "column": "status",
+          "schema": "public",
+          "default": "'open'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "violation_reports",
+          "column": "admin_notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "violation_reports",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "wholesale_listings",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "wholesale_listings",
+          "column": "company_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_listings",
+          "column": "title",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_listings",
+          "column": "description",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_listings",
+          "column": "category_slug",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "wholesale_listings",
+          "column": "moq",
+          "schema": "public",
+          "default": "1",
+          "nullable": "NO"
+        },
+        {
+          "udt": "numeric",
+          "type": "numeric",
+          "table": "wholesale_listings",
+          "column": "price_per_unit",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_listings",
+          "column": "currency",
+          "schema": "public",
+          "default": "'EGP'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_listings",
+          "column": "governorate",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "wholesale_listings",
+          "column": "images",
+          "schema": "public",
+          "default": "'[]'::jsonb",
+          "nullable": "NO"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "wholesale_listings",
+          "column": "active",
+          "schema": "public",
+          "default": "true",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "wholesale_listings",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "wholesale_listings",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "wholesale_orders",
+          "column": "id",
+          "schema": "public",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "wholesale_orders",
+          "column": "buyer_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "wholesale_orders",
+          "column": "listing_id",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "wholesale_orders",
+          "column": "quantity",
+          "schema": "public",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_orders",
+          "column": "notes",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_orders",
+          "column": "contact_phone",
+          "schema": "public",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "wholesale_orders",
+          "column": "status",
+          "schema": "public",
+          "default": "'new'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "wholesale_orders",
+          "column": "created_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "wholesale_orders",
+          "column": "updated_at",
+          "schema": "public",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets",
+          "column": "id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets",
+          "column": "name",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "buckets",
+          "column": "owner",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets",
+          "column": "updated_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "buckets",
+          "column": "public",
+          "schema": "storage",
+          "default": "false",
+          "nullable": "YES"
+        },
+        {
+          "udt": "bool",
+          "type": "boolean",
+          "table": "buckets",
+          "column": "avif_autodetection",
+          "schema": "storage",
+          "default": "false",
+          "nullable": "YES"
+        },
+        {
+          "udt": "int8",
+          "type": "bigint",
+          "table": "buckets",
+          "column": "file_size_limit",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "_text",
+          "type": "ARRAY",
+          "table": "buckets",
+          "column": "allowed_mime_types",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets",
+          "column": "owner_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "buckettype",
+          "type": "USER-DEFINED",
+          "table": "buckets",
+          "column": "type",
+          "schema": "storage",
+          "default": "'STANDARD'::storage.buckettype",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets_analytics",
+          "column": "name",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "buckettype",
+          "type": "USER-DEFINED",
+          "table": "buckets_analytics",
+          "column": "type",
+          "schema": "storage",
+          "default": "'ANALYTICS'::storage.buckettype",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets_analytics",
+          "column": "format",
+          "schema": "storage",
+          "default": "'ICEBERG'::text",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets_analytics",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets_analytics",
+          "column": "updated_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "buckets_analytics",
+          "column": "id",
+          "schema": "storage",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets_analytics",
+          "column": "deleted_at",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "buckets_vectors",
+          "column": "id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "buckettype",
+          "type": "USER-DEFINED",
+          "table": "buckets_vectors",
+          "column": "type",
+          "schema": "storage",
+          "default": "'VECTOR'::storage.buckettype",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets_vectors",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "buckets_vectors",
+          "column": "updated_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "migrations",
+          "column": "id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "varchar",
+          "type": "character varying",
+          "table": "migrations",
+          "column": "name",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "varchar",
+          "type": "character varying",
+          "table": "migrations",
+          "column": "hash",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamp",
+          "type": "timestamp without time zone",
+          "table": "migrations",
+          "column": "executed_at",
+          "schema": "storage",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "objects",
+          "column": "id",
+          "schema": "storage",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "objects",
+          "column": "bucket_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "objects",
+          "column": "name",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "objects",
+          "column": "owner",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "objects",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "objects",
+          "column": "updated_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "objects",
+          "column": "last_accessed_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "objects",
+          "column": "metadata",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "_text",
+          "type": "ARRAY",
+          "table": "objects",
+          "column": "path_tokens",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "objects",
+          "column": "version",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "objects",
+          "column": "owner_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "objects",
+          "column": "user_metadata",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int8",
+          "type": "bigint",
+          "table": "s3_multipart_uploads",
+          "column": "in_progress_size",
+          "schema": "storage",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "upload_signature",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "bucket_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "key",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "version",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads",
+          "column": "owner_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "s3_multipart_uploads",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "s3_multipart_uploads",
+          "column": "user_metadata",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "s3_multipart_uploads",
+          "column": "metadata",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "uuid",
+          "type": "uuid",
+          "table": "s3_multipart_uploads_parts",
+          "column": "id",
+          "schema": "storage",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "upload_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int8",
+          "type": "bigint",
+          "table": "s3_multipart_uploads_parts",
+          "column": "size",
+          "schema": "storage",
+          "default": "0",
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "s3_multipart_uploads_parts",
+          "column": "part_number",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "bucket_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "key",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "etag",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "owner_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "s3_multipart_uploads_parts",
+          "column": "version",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "s3_multipart_uploads_parts",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "vector_indexes",
+          "column": "id",
+          "schema": "storage",
+          "default": "gen_random_uuid()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "vector_indexes",
+          "column": "name",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "vector_indexes",
+          "column": "bucket_id",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "vector_indexes",
+          "column": "data_type",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "int4",
+          "type": "integer",
+          "table": "vector_indexes",
+          "column": "dimension",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "text",
+          "type": "text",
+          "table": "vector_indexes",
+          "column": "distance_metric",
+          "schema": "storage",
+          "default": null,
+          "nullable": "NO"
+        },
+        {
+          "udt": "jsonb",
+          "type": "jsonb",
+          "table": "vector_indexes",
+          "column": "metadata_configuration",
+          "schema": "storage",
+          "default": null,
+          "nullable": "YES"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "vector_indexes",
+          "column": "created_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        },
+        {
+          "udt": "timestamptz",
+          "type": "timestamp with time zone",
+          "table": "vector_indexes",
+          "column": "updated_at",
+          "schema": "storage",
+          "default": "now()",
+          "nullable": "NO"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "agent_applications_agent_id_company_id_key",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_applications_agent_id_company_id_key ON public.agent_applications USING btree (agent_id, company_id)"
+        },
+        {
+          "name": "agent_applications_pkey",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_applications_pkey ON public.agent_applications USING btree (id)"
+        },
+        {
+          "name": "agent_campaigns_agent_id_campaign_id_key",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_campaigns_agent_id_campaign_id_key ON public.agent_campaigns USING btree (agent_id, campaign_id)"
+        },
+        {
+          "name": "agent_campaigns_agent_id_idx",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX agent_campaigns_agent_id_idx ON public.agent_campaigns USING btree (agent_id)"
+        },
+        {
+          "name": "agent_campaigns_campaign_id_idx",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX agent_campaigns_campaign_id_idx ON public.agent_campaigns USING btree (campaign_id)"
+        },
+        {
+          "name": "agent_campaigns_pkey",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_campaigns_pkey ON public.agent_campaigns USING btree (id)"
+        },
+        {
+          "name": "agent_campaigns_referral_code_idx",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX agent_campaigns_referral_code_idx ON public.agent_campaigns USING btree (referral_code)"
+        },
+        {
+          "name": "agent_campaigns_referral_code_key",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_campaigns_referral_code_key ON public.agent_campaigns USING btree (referral_code)"
+        },
+        {
+          "name": "agent_commissions_agent_id_idx",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "CREATE INDEX agent_commissions_agent_id_idx ON public.agent_commissions USING btree (agent_id)"
+        },
+        {
+          "name": "agent_commissions_pkey",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_commissions_pkey ON public.agent_commissions USING btree (id)"
+        },
+        {
+          "name": "agent_commissions_status_idx",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "CREATE INDEX agent_commissions_status_idx ON public.agent_commissions USING btree (status)"
+        },
+        {
+          "name": "agent_landing_pages_pkey",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_landing_pages_pkey ON public.agent_landing_pages USING btree (id)"
+        },
+        {
+          "name": "agent_landing_pages_slug_key",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agent_landing_pages_slug_key ON public.agent_landing_pages USING btree (slug)"
+        },
+        {
+          "name": "agents_pkey",
+          "table": "agents",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agents_pkey ON public.agents USING btree (id)"
+        },
+        {
+          "name": "agents_user_id_key",
+          "table": "agents",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX agents_user_id_key ON public.agents USING btree (user_id)"
+        },
+        {
+          "name": "business_categories_pkey",
+          "table": "business_categories",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX business_categories_pkey ON public.business_categories USING btree (slug)"
+        },
+        {
+          "name": "campaign_leads_agent_id_idx",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CREATE INDEX campaign_leads_agent_id_idx ON public.campaign_leads USING btree (agent_id)"
+        },
+        {
+          "name": "campaign_leads_campaign_id_idx",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CREATE INDEX campaign_leads_campaign_id_idx ON public.campaign_leads USING btree (campaign_id)"
+        },
+        {
+          "name": "campaign_leads_pkey",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX campaign_leads_pkey ON public.campaign_leads USING btree (id)"
+        },
+        {
+          "name": "campaign_leads_referral_code_idx",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CREATE INDEX campaign_leads_referral_code_idx ON public.campaign_leads USING btree (referral_code)"
+        },
+        {
+          "name": "campaign_leads_status_idx",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CREATE INDEX campaign_leads_status_idx ON public.campaign_leads USING btree (status, created_at DESC)"
+        },
+        {
+          "name": "commission_campaigns_company_id_idx",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX commission_campaigns_company_id_idx ON public.commission_campaigns USING btree (company_id)"
+        },
+        {
+          "name": "commission_campaigns_created_by_idx",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX commission_campaigns_created_by_idx ON public.commission_campaigns USING btree (created_by)"
+        },
+        {
+          "name": "commission_campaigns_pkey",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX commission_campaigns_pkey ON public.commission_campaigns USING btree (id)"
+        },
+        {
+          "name": "commission_campaigns_status_idx",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CREATE INDEX commission_campaigns_status_idx ON public.commission_campaigns USING btree (status)"
+        },
+        {
+          "name": "commissions_pkey",
+          "table": "commissions",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX commissions_pkey ON public.commissions USING btree (id)"
+        },
+        {
+          "name": "companies_pkey",
+          "table": "companies",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX companies_pkey ON public.companies USING btree (id)"
+        },
+        {
+          "name": "company_profiles_extra_pkey",
+          "table": "company_profiles_extra",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX company_profiles_extra_pkey ON public.company_profiles_extra USING btree (company_id)"
+        },
+        {
+          "name": "company_referrals_code_key",
+          "table": "company_referrals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX company_referrals_code_key ON public.company_referrals USING btree (code)"
+        },
+        {
+          "name": "company_referrals_pkey",
+          "table": "company_referrals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX company_referrals_pkey ON public.company_referrals USING btree (id)"
+        },
+        {
+          "name": "credit_transactions_pkey",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX credit_transactions_pkey ON public.credit_transactions USING btree (id)"
+        },
+        {
+          "name": "credit_tx_company_idx",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "CREATE INDEX credit_tx_company_idx ON public.credit_transactions USING btree (company_id, created_at DESC)"
+        },
+        {
+          "name": "factories_pkey",
+          "table": "factories",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX factories_pkey ON public.factories USING btree (company_id)"
+        },
+        {
+          "name": "favorites_pkey",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX favorites_pkey ON public.favorites USING btree (id)"
+        },
+        {
+          "name": "favorites_user_id_listing_id_key",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX favorites_user_id_listing_id_key ON public.favorites USING btree (user_id, listing_id)"
+        },
+        {
+          "name": "lead_unlock_company_idx",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CREATE INDEX lead_unlock_company_idx ON public.lead_unlock_requests USING btree (company_id)"
+        },
+        {
+          "name": "lead_unlock_lead_idx",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CREATE INDEX lead_unlock_lead_idx ON public.lead_unlock_requests USING btree (lead_id)"
+        },
+        {
+          "name": "lead_unlock_requests_lead_id_company_id_key",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX lead_unlock_requests_lead_id_company_id_key ON public.lead_unlock_requests USING btree (lead_id, company_id)"
+        },
+        {
+          "name": "lead_unlock_requests_pkey",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX lead_unlock_requests_pkey ON public.lead_unlock_requests USING btree (id)"
+        },
+        {
+          "name": "lead_unlock_status_idx",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CREATE INDEX lead_unlock_status_idx ON public.lead_unlock_requests USING btree (status)"
+        },
+        {
+          "name": "leads_agent_id_idx",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CREATE INDEX leads_agent_id_idx ON public.leads USING btree (agent_id) WHERE (agent_id IS NOT NULL)"
+        },
+        {
+          "name": "leads_company_id_idx",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CREATE INDEX leads_company_id_idx ON public.leads USING btree (company_id, created_at DESC)"
+        },
+        {
+          "name": "leads_listing_id_idx",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CREATE INDEX leads_listing_id_idx ON public.leads USING btree (listing_id, created_at DESC)"
+        },
+        {
+          "name": "leads_pkey",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX leads_pkey ON public.leads USING btree (id)"
+        },
+        {
+          "name": "leads_ref_code_idx",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CREATE INDEX leads_ref_code_idx ON public.leads USING btree (referral_code) WHERE (referral_code IS NOT NULL)"
+        },
+        {
+          "name": "listings_featured_until_idx",
+          "table": "listings",
+          "schema": "public",
+          "definition": "CREATE INDEX listings_featured_until_idx ON public.listings USING btree (featured_until DESC NULLS LAST)"
+        },
+        {
+          "name": "listings_owner_created_idx",
+          "table": "listings",
+          "schema": "public",
+          "definition": "CREATE INDEX listings_owner_created_idx ON public.listings USING btree (owner_id, created_at DESC)"
+        },
+        {
+          "name": "listings_pkey",
+          "table": "listings",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX listings_pkey ON public.listings USING btree (id)"
+        },
+        {
+          "name": "idx_notifications_unread",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "CREATE INDEX idx_notifications_unread ON public.notifications USING btree (user_id) WHERE (read = false)"
+        },
+        {
+          "name": "idx_notifications_user_created",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "CREATE INDEX idx_notifications_user_created ON public.notifications USING btree (user_id, created_at DESC)"
+        },
+        {
+          "name": "notifications_pkey",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)"
+        },
+        {
+          "name": "notifications_unread_idx",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "CREATE INDEX notifications_unread_idx ON public.notifications USING btree (user_id) WHERE (read = false)"
+        },
+        {
+          "name": "notifications_user_id_idx",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "CREATE INDEX notifications_user_id_idx ON public.notifications USING btree (user_id, created_at DESC)"
+        },
+        {
+          "name": "partner_offers_pkey",
+          "table": "partner_offers",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX partner_offers_pkey ON public.partner_offers USING btree (id)"
+        },
+        {
+          "name": "payments_pkey",
+          "table": "payments",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (id)"
+        },
+        {
+          "name": "payments_user_idx",
+          "table": "payments",
+          "schema": "public",
+          "definition": "CREATE INDEX payments_user_idx ON public.payments USING btree (user_id, created_at DESC)"
+        },
+        {
+          "name": "platform_messages_pkey",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX platform_messages_pkey ON public.platform_messages USING btree (id)"
+        },
+        {
+          "name": "platform_messages_thread_idx",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "CREATE INDEX platform_messages_thread_idx ON public.platform_messages USING btree (thread_id, created_at)"
+        },
+        {
+          "name": "platform_settings_pkey",
+          "table": "platform_settings",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX platform_settings_pkey ON public.platform_settings USING btree (key)"
+        },
+        {
+          "name": "platform_threads_agent_idx",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "CREATE INDEX platform_threads_agent_idx ON public.platform_threads USING btree (agent_id)"
+        },
+        {
+          "name": "platform_threads_company_idx",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "CREATE INDEX platform_threads_company_idx ON public.platform_threads USING btree (company_id)"
+        },
+        {
+          "name": "platform_threads_pkey",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX platform_threads_pkey ON public.platform_threads USING btree (id)"
+        },
+        {
+          "name": "platform_threads_updated_idx",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "CREATE INDEX platform_threads_updated_idx ON public.platform_threads USING btree (last_message_at DESC)"
+        },
+        {
+          "name": "profiles_pkey",
+          "table": "profiles",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+        },
+        {
+          "name": "referrals_agent_id_listing_id_key",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX referrals_agent_id_listing_id_key ON public.referrals USING btree (agent_id, listing_id)"
+        },
+        {
+          "name": "referrals_code_key",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX referrals_code_key ON public.referrals USING btree (code)"
+        },
+        {
+          "name": "referrals_pkey",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX referrals_pkey ON public.referrals USING btree (id)"
+        },
+        {
+          "name": "rfq_offers_pkey",
+          "table": "rfq_offers",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX rfq_offers_pkey ON public.rfq_offers USING btree (id)"
+        },
+        {
+          "name": "rfqs_pkey",
+          "table": "rfqs",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX rfqs_pkey ON public.rfqs USING btree (id)"
+        },
+        {
+          "name": "subscriptions_pkey",
+          "table": "subscriptions",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX subscriptions_pkey ON public.subscriptions USING btree (id)"
+        },
+        {
+          "name": "tender_proposals_pkey",
+          "table": "tender_proposals",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX tender_proposals_pkey ON public.tender_proposals USING btree (id)"
+        },
+        {
+          "name": "tenders_pkey",
+          "table": "tenders",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX tenders_pkey ON public.tenders USING btree (id)"
+        },
+        {
+          "name": "user_roles_pkey",
+          "table": "user_roles",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX user_roles_pkey ON public.user_roles USING btree (id)"
+        },
+        {
+          "name": "user_roles_user_id_role_key",
+          "table": "user_roles",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX user_roles_user_id_role_key ON public.user_roles USING btree (user_id, role)"
+        },
+        {
+          "name": "violation_reports_pkey",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX violation_reports_pkey ON public.violation_reports USING btree (id)"
+        },
+        {
+          "name": "violation_reports_reporter_idx",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "CREATE INDEX violation_reports_reporter_idx ON public.violation_reports USING btree (reporter_id)"
+        },
+        {
+          "name": "violation_reports_status_idx",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "CREATE INDEX violation_reports_status_idx ON public.violation_reports USING btree (status)"
+        },
+        {
+          "name": "wholesale_listings_pkey",
+          "table": "wholesale_listings",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX wholesale_listings_pkey ON public.wholesale_listings USING btree (id)"
+        },
+        {
+          "name": "wholesale_orders_pkey",
+          "table": "wholesale_orders",
+          "schema": "public",
+          "definition": "CREATE UNIQUE INDEX wholesale_orders_pkey ON public.wholesale_orders USING btree (id)"
+        },
+        {
+          "name": "bname",
+          "table": "buckets",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX bname ON storage.buckets USING btree (name)"
+        },
+        {
+          "name": "buckets_pkey",
+          "table": "buckets",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX buckets_pkey ON storage.buckets USING btree (id)"
+        },
+        {
+          "name": "buckets_analytics_pkey",
+          "table": "buckets_analytics",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX buckets_analytics_pkey ON storage.buckets_analytics USING btree (id)"
+        },
+        {
+          "name": "buckets_analytics_unique_name_idx",
+          "table": "buckets_analytics",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX buckets_analytics_unique_name_idx ON storage.buckets_analytics USING btree (name) WHERE (deleted_at IS NULL)"
+        },
+        {
+          "name": "buckets_vectors_pkey",
+          "table": "buckets_vectors",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX buckets_vectors_pkey ON storage.buckets_vectors USING btree (id)"
+        },
+        {
+          "name": "migrations_name_key",
+          "table": "migrations",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX migrations_name_key ON storage.migrations USING btree (name)"
+        },
+        {
+          "name": "migrations_pkey",
+          "table": "migrations",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX migrations_pkey ON storage.migrations USING btree (id)"
+        },
+        {
+          "name": "bucketid_objname",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name)"
+        },
+        {
+          "name": "idx_objects_bucket_id_name",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE \"C\")"
+        },
+        {
+          "name": "idx_objects_bucket_id_name_lower",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "CREATE INDEX idx_objects_bucket_id_name_lower ON storage.objects USING btree (bucket_id, lower(name) COLLATE \"C\")"
+        },
+        {
+          "name": "name_prefix_search",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "CREATE INDEX name_prefix_search ON storage.objects USING btree (name text_pattern_ops)"
+        },
+        {
+          "name": "objects_pkey",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX objects_pkey ON storage.objects USING btree (id)"
+        },
+        {
+          "name": "idx_multipart_uploads_list",
+          "table": "s3_multipart_uploads",
+          "schema": "storage",
+          "definition": "CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at)"
+        },
+        {
+          "name": "s3_multipart_uploads_pkey",
+          "table": "s3_multipart_uploads",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX s3_multipart_uploads_pkey ON storage.s3_multipart_uploads USING btree (id)"
+        },
+        {
+          "name": "s3_multipart_uploads_parts_pkey",
+          "table": "s3_multipart_uploads_parts",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX s3_multipart_uploads_parts_pkey ON storage.s3_multipart_uploads_parts USING btree (id)"
+        },
+        {
+          "name": "vector_indexes_name_bucket_id_idx",
+          "table": "vector_indexes",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX vector_indexes_name_bucket_id_idx ON storage.vector_indexes USING btree (name, bucket_id)"
+        },
+        {
+          "name": "vector_indexes_pkey",
+          "table": "vector_indexes",
+          "schema": "storage",
+          "definition": "CREATE UNIQUE INDEX vector_indexes_pkey ON storage.vector_indexes USING btree (id)"
+        }
+      ],
+      "captured_at": "2026-08-09T02:38:37.185046+00:00",
+      "constraints": [
+        {
+          "name": "agent_applications_agent_id_company_id_key",
+          "type": "u",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "UNIQUE (agent_id, company_id)"
+        },
+        {
+          "name": "agent_applications_agent_id_fkey",
+          "type": "f",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_applications_company_id_fkey",
+          "type": "f",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_applications_pkey",
+          "type": "p",
+          "table": "agent_applications",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agent_campaigns_agent_id_campaign_id_key",
+          "type": "u",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "UNIQUE (agent_id, campaign_id)"
+        },
+        {
+          "name": "agent_campaigns_agent_id_fkey",
+          "type": "f",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_campaigns_campaign_id_fkey",
+          "type": "f",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_campaigns_pkey",
+          "type": "p",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agent_campaigns_referral_code_key",
+          "type": "u",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "UNIQUE (referral_code)"
+        },
+        {
+          "name": "agent_campaigns_status_check",
+          "type": "c",
+          "table": "agent_campaigns",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['active'::text, 'inactive'::text]))"
+        },
+        {
+          "name": "agent_commissions_agent_id_fkey",
+          "type": "f",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_commissions_campaign_id_fkey",
+          "type": "f",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "agent_commissions_company_id_fkey",
+          "type": "f",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "agent_commissions_lead_id_fkey",
+          "type": "f",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES campaign_leads(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "agent_commissions_pkey",
+          "type": "p",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agent_commissions_status_check",
+          "type": "c",
+          "table": "agent_commissions",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'paid'::text]))"
+        },
+        {
+          "name": "agent_landing_pages_agent_id_fkey",
+          "type": "f",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_landing_pages_listing_id_fkey",
+          "type": "f",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agent_landing_pages_pkey",
+          "type": "p",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agent_landing_pages_slug_key",
+          "type": "u",
+          "table": "agent_landing_pages",
+          "schema": "public",
+          "definition": "UNIQUE (slug)"
+        },
+        {
+          "name": "agents_payout_method_check",
+          "type": "c",
+          "table": "agents",
+          "schema": "public",
+          "definition": "CHECK (payout_method = ANY (ARRAY['vodafone_cash'::text, 'instapay'::text, 'bank_transfer'::text]))"
+        },
+        {
+          "name": "agents_pkey",
+          "type": "p",
+          "table": "agents",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agents_user_id_fkey",
+          "type": "f",
+          "table": "agents",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "agents_user_id_key",
+          "type": "u",
+          "table": "agents",
+          "schema": "public",
+          "definition": "UNIQUE (user_id)"
+        },
+        {
+          "name": "business_categories_pkey",
+          "type": "p",
+          "table": "business_categories",
+          "schema": "public",
+          "definition": "PRIMARY KEY (slug)"
+        },
+        {
+          "name": "campaign_leads_agent_campaign_id_fkey",
+          "type": "f",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_campaign_id) REFERENCES agent_campaigns(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "campaign_leads_agent_id_fkey",
+          "type": "f",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "campaign_leads_campaign_id_fkey",
+          "type": "f",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "campaign_leads_company_id_fkey",
+          "type": "f",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "campaign_leads_pkey",
+          "type": "p",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "campaign_leads_status_check",
+          "type": "c",
+          "table": "campaign_leads",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['new'::text, 'contacted'::text, 'qualified'::text, 'converted'::text, 'rejected'::text]))"
+        },
+        {
+          "name": "commission_campaigns_commission_type_check",
+          "type": "c",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CHECK (commission_type = ANY (ARRAY['fixed'::text, 'percentage'::text]))"
+        },
+        {
+          "name": "commission_campaigns_company_id_fkey",
+          "type": "f",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "commission_campaigns_created_by_fkey",
+          "type": "f",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "commission_campaigns_pkey",
+          "type": "p",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "commission_campaigns_status_check",
+          "type": "c",
+          "table": "commission_campaigns",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'active'::text, 'inactive'::text, 'rejected'::text, 'expired'::text]))"
+        },
+        {
+          "name": "commissions_agent_id_fkey",
+          "type": "f",
+          "table": "commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "commissions_company_id_fkey",
+          "type": "f",
+          "table": "commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "commissions_listing_id_fkey",
+          "type": "f",
+          "table": "commissions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "commissions_pkey",
+          "type": "p",
+          "table": "commissions",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "companies_owner_id_fkey",
+          "type": "f",
+          "table": "companies",
+          "schema": "public",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "companies_pkey",
+          "type": "p",
+          "table": "companies",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "company_profiles_extra_company_id_fkey",
+          "type": "f",
+          "table": "company_profiles_extra",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "company_profiles_extra_pkey",
+          "type": "p",
+          "table": "company_profiles_extra",
+          "schema": "public",
+          "definition": "PRIMARY KEY (company_id)"
+        },
+        {
+          "name": "company_referrals_code_key",
+          "type": "u",
+          "table": "company_referrals",
+          "schema": "public",
+          "definition": "UNIQUE (code)"
+        },
+        {
+          "name": "company_referrals_pkey",
+          "type": "p",
+          "table": "company_referrals",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "credit_transactions_company_id_fkey",
+          "type": "f",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "credit_transactions_created_by_fkey",
+          "type": "f",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "credit_transactions_payment_id_fkey",
+          "type": "f",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "credit_transactions_pkey",
+          "type": "p",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "credit_transactions_ref_type_check",
+          "type": "c",
+          "table": "credit_transactions",
+          "schema": "public",
+          "definition": "CHECK (ref_type = ANY (ARRAY['purchase'::text, 'unlock'::text, 'refund'::text, 'admin_grant'::text, 'admin_deduct'::text]))"
+        },
+        {
+          "name": "factories_company_id_fkey",
+          "type": "f",
+          "table": "factories",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "factories_pkey",
+          "type": "p",
+          "table": "factories",
+          "schema": "public",
+          "definition": "PRIMARY KEY (company_id)"
+        },
+        {
+          "name": "favorites_listing_id_fkey",
+          "type": "f",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "favorites_pkey",
+          "type": "p",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "favorites_user_id_fkey",
+          "type": "f",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "favorites_user_id_listing_id_key",
+          "type": "u",
+          "table": "favorites",
+          "schema": "public",
+          "definition": "UNIQUE (user_id, listing_id)"
+        },
+        {
+          "name": "lead_unlock_requests_campaign_id_fkey",
+          "type": "f",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "lead_unlock_requests_company_id_fkey",
+          "type": "f",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "lead_unlock_requests_lead_id_company_id_key",
+          "type": "u",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "UNIQUE (lead_id, company_id)"
+        },
+        {
+          "name": "lead_unlock_requests_lead_id_fkey",
+          "type": "f",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES campaign_leads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "lead_unlock_requests_pkey",
+          "type": "p",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "lead_unlock_requests_status_check",
+          "type": "c",
+          "table": "lead_unlock_requests",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text]))"
+        },
+        {
+          "name": "leads_agent_id_fkey",
+          "type": "f",
+          "table": "leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "leads_assigned_agent_id_fkey",
+          "type": "f",
+          "table": "leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (assigned_agent_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "leads_buyer_user_id_fkey",
+          "type": "f",
+          "table": "leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (buyer_user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "leads_company_id_fkey",
+          "type": "f",
+          "table": "leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "leads_listing_id_fkey",
+          "type": "f",
+          "table": "leads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "leads_pkey",
+          "type": "p",
+          "table": "leads",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "leads_status_chk",
+          "type": "c",
+          "table": "leads",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['new'::text, 'contacted'::text, 'negotiating'::text, 'won'::text, 'lost'::text]))"
+        },
+        {
+          "name": "listings_company_id_fkey",
+          "type": "f",
+          "table": "listings",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "listings_owner_id_fkey",
+          "type": "f",
+          "table": "listings",
+          "schema": "public",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "listings_pkey",
+          "type": "p",
+          "table": "listings",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "notifications_pkey",
+          "type": "p",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "notifications_user_id_fkey",
+          "type": "f",
+          "table": "notifications",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "partner_offers_pkey",
+          "type": "p",
+          "table": "partner_offers",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "payments_company_id_fkey",
+          "type": "f",
+          "table": "payments",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "payments_listing_id_fkey",
+          "type": "f",
+          "table": "payments",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "payments_pkey",
+          "type": "p",
+          "table": "payments",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "payments_purpose_chk",
+          "type": "c",
+          "table": "payments",
+          "schema": "public",
+          "definition": "CHECK (purpose = ANY (ARRAY['subscription'::text, 'featured_listing'::text, 'verification'::text, 'other'::text]))"
+        },
+        {
+          "name": "payments_status_chk",
+          "type": "c",
+          "table": "payments",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'paid'::text, 'failed'::text, 'refunded'::text, 'pending_payment'::text, 'pending_admin_approval'::text, 'completed'::text, 'rejected'::text]))"
+        },
+        {
+          "name": "payments_user_id_fkey",
+          "type": "f",
+          "table": "payments",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "platform_messages_pkey",
+          "type": "p",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "platform_messages_sender_id_fkey",
+          "type": "f",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "FOREIGN KEY (sender_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "platform_messages_sender_type_check",
+          "type": "c",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "CHECK (sender_type = ANY (ARRAY['admin'::text, 'company'::text, 'agent'::text]))"
+        },
+        {
+          "name": "platform_messages_thread_id_fkey",
+          "type": "f",
+          "table": "platform_messages",
+          "schema": "public",
+          "definition": "FOREIGN KEY (thread_id) REFERENCES platform_threads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "platform_settings_pkey",
+          "type": "p",
+          "table": "platform_settings",
+          "schema": "public",
+          "definition": "PRIMARY KEY (key)"
+        },
+        {
+          "name": "platform_settings_updated_by_fkey",
+          "type": "f",
+          "table": "platform_settings",
+          "schema": "public",
+          "definition": "FOREIGN KEY (updated_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "platform_threads_agent_id_fkey",
+          "type": "f",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "platform_threads_campaign_id_fkey",
+          "type": "f",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "platform_threads_company_id_fkey",
+          "type": "f",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "platform_threads_lead_id_fkey",
+          "type": "f",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES campaign_leads(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "platform_threads_pkey",
+          "type": "p",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "platform_threads_status_check",
+          "type": "c",
+          "table": "platform_threads",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['open'::text, 'closed'::text]))"
+        },
+        {
+          "name": "profiles_id_fkey",
+          "type": "f",
+          "table": "profiles",
+          "schema": "public",
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "profiles_pkey",
+          "type": "p",
+          "table": "profiles",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "referrals_agent_id_fkey",
+          "type": "f",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "referrals_agent_id_listing_id_key",
+          "type": "u",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "UNIQUE (agent_id, listing_id)"
+        },
+        {
+          "name": "referrals_code_key",
+          "type": "u",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "UNIQUE (code)"
+        },
+        {
+          "name": "referrals_listing_id_fkey",
+          "type": "f",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "referrals_pkey",
+          "type": "p",
+          "table": "referrals",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "rfq_offers_company_id_fkey",
+          "type": "f",
+          "table": "rfq_offers",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "rfq_offers_pkey",
+          "type": "p",
+          "table": "rfq_offers",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "rfq_offers_rfq_id_fkey",
+          "type": "f",
+          "table": "rfq_offers",
+          "schema": "public",
+          "definition": "FOREIGN KEY (rfq_id) REFERENCES rfqs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "rfq_offers_status_check",
+          "type": "c",
+          "table": "rfq_offers",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text]))"
+        },
+        {
+          "name": "rfqs_category_slug_fkey",
+          "type": "f",
+          "table": "rfqs",
+          "schema": "public",
+          "definition": "FOREIGN KEY (category_slug) REFERENCES business_categories(slug)"
+        },
+        {
+          "name": "rfqs_pkey",
+          "type": "p",
+          "table": "rfqs",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "rfqs_status_check",
+          "type": "c",
+          "table": "rfqs",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['open'::text, 'closed'::text, 'awarded'::text]))"
+        },
+        {
+          "name": "subscriptions_pkey",
+          "type": "p",
+          "table": "subscriptions",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "subscriptions_user_id_fkey",
+          "type": "f",
+          "table": "subscriptions",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "tender_proposals_company_id_fkey",
+          "type": "f",
+          "table": "tender_proposals",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "tender_proposals_pkey",
+          "type": "p",
+          "table": "tender_proposals",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "tender_proposals_status_check",
+          "type": "c",
+          "table": "tender_proposals",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text]))"
+        },
+        {
+          "name": "tender_proposals_tender_id_fkey",
+          "type": "f",
+          "table": "tender_proposals",
+          "schema": "public",
+          "definition": "FOREIGN KEY (tender_id) REFERENCES tenders(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "tenders_category_slug_fkey",
+          "type": "f",
+          "table": "tenders",
+          "schema": "public",
+          "definition": "FOREIGN KEY (category_slug) REFERENCES business_categories(slug)"
+        },
+        {
+          "name": "tenders_pkey",
+          "type": "p",
+          "table": "tenders",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "tenders_status_check",
+          "type": "c",
+          "table": "tenders",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['open'::text, 'closed'::text, 'awarded'::text]))"
+        },
+        {
+          "name": "user_roles_pkey",
+          "type": "p",
+          "table": "user_roles",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_roles_user_id_fkey",
+          "type": "f",
+          "table": "user_roles",
+          "schema": "public",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_roles_user_id_role_key",
+          "type": "u",
+          "table": "user_roles",
+          "schema": "public",
+          "definition": "UNIQUE (user_id, role)"
+        },
+        {
+          "name": "violation_reports_campaign_id_fkey",
+          "type": "f",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "FOREIGN KEY (campaign_id) REFERENCES commission_campaigns(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "violation_reports_lead_id_fkey",
+          "type": "f",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES campaign_leads(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "violation_reports_pkey",
+          "type": "p",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "violation_reports_reported_user_id_fkey",
+          "type": "f",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "FOREIGN KEY (reported_user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "violation_reports_reporter_id_fkey",
+          "type": "f",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "FOREIGN KEY (reporter_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "violation_reports_status_check",
+          "type": "c",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['open'::text, 'warned'::text, 'suspended'::text, 'dismissed'::text]))"
+        },
+        {
+          "name": "violation_reports_violation_type_check",
+          "type": "c",
+          "table": "violation_reports",
+          "schema": "public",
+          "definition": "CHECK (violation_type = ANY (ARRAY['direct_contact_attempt'::text, 'spam'::text, 'fraud'::text, 'fake_lead'::text, 'other'::text]))"
+        },
+        {
+          "name": "wholesale_listings_category_slug_fkey",
+          "type": "f",
+          "table": "wholesale_listings",
+          "schema": "public",
+          "definition": "FOREIGN KEY (category_slug) REFERENCES business_categories(slug)"
+        },
+        {
+          "name": "wholesale_listings_company_id_fkey",
+          "type": "f",
+          "table": "wholesale_listings",
+          "schema": "public",
+          "definition": "FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "wholesale_listings_pkey",
+          "type": "p",
+          "table": "wholesale_listings",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "wholesale_orders_listing_id_fkey",
+          "type": "f",
+          "table": "wholesale_orders",
+          "schema": "public",
+          "definition": "FOREIGN KEY (listing_id) REFERENCES wholesale_listings(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "wholesale_orders_pkey",
+          "type": "p",
+          "table": "wholesale_orders",
+          "schema": "public",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "wholesale_orders_status_check",
+          "type": "c",
+          "table": "wholesale_orders",
+          "schema": "public",
+          "definition": "CHECK (status = ANY (ARRAY['new'::text, 'accepted'::text, 'rejected'::text, 'fulfilled'::text]))"
+        },
+        {
+          "name": "buckets_pkey",
+          "type": "p",
+          "table": "buckets",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "buckets_analytics_pkey",
+          "type": "p",
+          "table": "buckets_analytics",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "buckets_vectors_pkey",
+          "type": "p",
+          "table": "buckets_vectors",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "migrations_name_key",
+          "type": "u",
+          "table": "migrations",
+          "schema": "storage",
+          "definition": "UNIQUE (name)"
+        },
+        {
+          "name": "migrations_pkey",
+          "type": "p",
+          "table": "migrations",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "objects_bucketId_fkey",
+          "type": "f",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+        },
+        {
+          "name": "objects_pkey",
+          "type": "p",
+          "table": "objects",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "s3_multipart_uploads_bucket_id_fkey",
+          "type": "f",
+          "table": "s3_multipart_uploads",
+          "schema": "storage",
+          "definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+        },
+        {
+          "name": "s3_multipart_uploads_pkey",
+          "type": "p",
+          "table": "s3_multipart_uploads",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "s3_multipart_uploads_parts_bucket_id_fkey",
+          "type": "f",
+          "table": "s3_multipart_uploads_parts",
+          "schema": "storage",
+          "definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+        },
+        {
+          "name": "s3_multipart_uploads_parts_pkey",
+          "type": "p",
+          "table": "s3_multipart_uploads_parts",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "s3_multipart_uploads_parts_upload_id_fkey",
+          "type": "f",
+          "table": "s3_multipart_uploads_parts",
+          "schema": "storage",
+          "definition": "FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "vector_indexes_bucket_id_fkey",
+          "type": "f",
+          "table": "vector_indexes",
+          "schema": "storage",
+          "definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets_vectors(id)"
+        },
+        {
+          "name": "vector_indexes_pkey",
+          "type": "p",
+          "table": "vector_indexes",
+          "schema": "storage",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    }
+  }
+]
+

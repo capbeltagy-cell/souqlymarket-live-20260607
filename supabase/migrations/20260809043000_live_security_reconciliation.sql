@@ -9,15 +9,15 @@ BEGIN
 END
 $$;
 
-ALTER FUNCTION IF EXISTS public.set_updated_at() SET search_path = '';
-ALTER FUNCTION IF EXISTS public.has_role(uuid, public.app_role) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.enforce_listing_owner() SET search_path = '';
-ALTER FUNCTION IF EXISTS public.increment_catalog_downloads(uuid) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.increment_listing_click(uuid) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.increment_listing_view(uuid) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.increment_partner_click(uuid) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.increment_referral_click(text) SET search_path = '';
-ALTER FUNCTION IF EXISTS public.track_company_referral_click(text) SET search_path = '';
+ALTER FUNCTION public.set_updated_at() SET search_path = '';
+ALTER FUNCTION public.has_role(uuid, public.app_role) SET search_path = '';
+ALTER FUNCTION public.enforce_listing_owner() SET search_path = '';
+ALTER FUNCTION public.increment_catalog_downloads(uuid) SET search_path = '';
+ALTER FUNCTION public.increment_listing_click(uuid) SET search_path = '';
+ALTER FUNCTION public.increment_listing_view(uuid) SET search_path = '';
+ALTER FUNCTION public.increment_partner_click(uuid) SET search_path = '';
+ALTER FUNCTION public.increment_referral_click(text) SET search_path = '';
+ALTER FUNCTION public.track_company_referral_click(text) SET search_path = '';
 
 -- Trigger functions are invoked by their triggers and must not be exposed as RPCs.
 REVOKE EXECUTE ON FUNCTION public.enforce_listing_owner() FROM PUBLIC, anon, authenticated;
