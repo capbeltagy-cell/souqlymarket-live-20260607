@@ -6,7 +6,7 @@
 - Payment boundary tests: PASS.
 - Admin/moderation permission tests: PASS.
 - Migration destructive-DDL audit: PASS.
-- Live Supabase advisors/RLS tests: BLOCKED by connector permission; not claimed as passing.
+- Live Supabase advisors: COMPLETED read-only; remediation changes remain gated.
 
 ## Confirmed controls in code/migrations
 
@@ -21,7 +21,9 @@
 
 | Priority | Finding | Required action |
 |---|---|---|
-| Critical gate | Production schema and advisor state unavailable | Reauthorize read-only Supabase connector before any migration |
+| Critical gate | Repository and production migration histories are not reconciled | Rehearse a convergent migration on a development branch before production DDL |
+| High | `marketplace_stats` is reported as a security-definer view | Apply the prepared `security_invoker` migration after explicit approval |
+| High | A legacy `convert_referral` overload accepts a caller-supplied converted user | Keep this overload service-only using the prepared reconciliation migration |
 | High | 83 parsed functions include privileged financial/authorization code | Audit `SECURITY DEFINER`, `search_path`, grants and internal auth checks live |
 | High | 237 policies may contain legacy broad rules | Test anon/authenticated/owner/staff/admin matrices against live schema |
 | High | Signup sends requested role through user metadata | Ensure trigger treats it only as onboarding intent; authorization must come from protected `user_roles`/app metadata |
@@ -47,4 +49,4 @@
 - User-supplied amount, destination and approval state are never accepted by the submission RPC.
 - Approval locks the request and is idempotent before activating a subscription.
 - Manual-payment `SECURITY DEFINER` functions are migrated to `search_path = ''`.
-- Production Security/Performance Advisors remain blocked by Supabase connector authorization, so a zero-finding live claim is intentionally not made.
+- Production advisors were inspected and findings are documented; no zero-finding claim is made.

@@ -2,7 +2,15 @@
 
 ## Evidence boundary
 
-This audit is generated from the 87 versioned SQL migrations and generated TypeScript database types. Live-production drift, row counts and advisor results remain **unverified** because direct project access is unavailable. No SQL was executed.
+This audit combines the versioned migrations, generated types and a read-only inspection of production project `qujssmtdzmzsfrgtaitj` on 2026-08-09. No production data was changed.
+
+## Confirmed production drift
+
+- Production is `ACTIVE_HEALTHY` on PostgreSQL 17 in `eu-central-2`.
+- The Supabase migration history API reports no tracked migrations, while the repository contains 88 ordered files.
+- Production exposes 35 public tables plus `marketplace_stats`; later store, order, messaging, quotation, wallet and admin tables are not all live.
+- Production contains 2 profiles and 2 role rows; inspected marketplace tables currently contain zero rows.
+- Do not replay all repository migrations blindly. Verify a convergent reconciliation on a non-production branch first.
 
 ## Versioned schema inventory
 
@@ -14,7 +22,7 @@ This audit is generated from the 87 versioned SQL migrations and generated TypeS
 | Policies | 237 | Parsed from versioned migrations; live enabled/disabled state unverified |
 | Triggers | 83 | Ownership, audit, lifecycle, financial and notification triggers |
 | Enums | 17 | Roles and domain state machines |
-| Migrations | 87 | Migration safety audit passes: ordered files and no destructive data DDL |
+| Migrations | 88 | Migration safety audit passes: ordered files and no destructive data DDL |
 
 ## Tables by domain
 

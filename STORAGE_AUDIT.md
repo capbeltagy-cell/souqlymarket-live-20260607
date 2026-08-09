@@ -14,7 +14,7 @@
 
 ## Audit boundary
 
-Bucket existence, public flags, file limits, MIME restrictions, object counts and live policies are not verified because the Supabase connector denied access. No bucket or object was changed.
+Live read-only verification confirmed `avatars`, `company-assets`, `company-catalogs`, `listing-media`, `partner-assets`, `payment-proofs` and `rfq-attachments`. `payment-proofs` is private; the other current buckets are public. Existing objects: 6 in `company-assets` and 7 in `listing-media`. No bucket or object was changed.
 
 ## Required live checks
 
