@@ -3,7 +3,21 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const PAYMENT_NUMBER = "+201140949424";
+const paymentMethodSchema = z.object({
+  code: z.enum(["instapay", "vodafone_cash"]),
+  nameAr: z.string().trim().min(2).max(80),
+  nameEn: z.string().trim().min(2).max(80),
+  number: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9]{10,15}$/),
+  instructionsAr: z.string().trim().max(500),
+  instructionsEn: z.string().trim().max(500),
+  isActive: z.boolean(),
+  sortOrder: z.number().int().min(0).max(1000),
+});
+
+export type ManualPaymentMethod = z.infer<typeof paymentMethodSchema>;
 
 const submitSchema = z.object({
   companyId: z.string().uuid(),
@@ -42,6 +56,34 @@ function isMissingMigration(message: string) {
   return /manual_payment_requests|submit_manual_subscription_payment|schema cache/i.test(message);
 }
 
+function toPaymentMethod(row: {
+  account_details: unknown;
+  code: string;
+  instructions_ar: string | null;
+  instructions_en: string | null;
+  is_active: boolean;
+  name_ar: string;
+  name_en: string | null;
+  sort_order: number;
+}): ManualPaymentMethod | null {
+  if (row.code !== "instapay" && row.code !== "vodafone_cash") return null;
+  const details =
+    row.account_details && typeof row.account_details === "object"
+      ? (row.account_details as Record<string, unknown>)
+      : {};
+  const parsed = paymentMethodSchema.safeParse({
+    code: row.code,
+    instructionsAr: row.instructions_ar || "",
+    instructionsEn: row.instructions_en || "",
+    isActive: row.is_active,
+    nameAr: row.name_ar,
+    nameEn: row.name_en || row.name_ar,
+    number: details.phone,
+    sortOrder: row.sort_order,
+  });
+  return parsed.success ? parsed.data : null;
+}
+
 export const getManualPaymentCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((value: unknown) => z.object({ companyId: z.string().uuid() }).parse(value))
@@ -59,25 +101,95 @@ export const getManualPaymentCheckout = createServerFn({ method: "POST" })
     const row = Array.isArray(pricing)
       ? (pricing[0] as { subscription_plan_price_egp?: number } | undefined)
       : undefined;
+    const { data: methodRows, error: methodsError } = await supabaseAdmin
+      .from("payment_methods")
+      .select(
+        "code, name_ar, name_en, instructions_ar, instructions_en, account_details, is_active, sort_order",
+      )
+      .in("code", ["instapay", "vodafone_cash"])
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (methodsError) throw new Error(methodsError.message);
+    const methods = (methodRows ?? [])
+      .map(toPaymentMethod)
+      .filter(Boolean) as ManualPaymentMethod[];
+    if (methods.length === 0) {
+      throw new Error("لا توجد وسيلة دفع يدوية مفعلة حاليًا. تواصل مع الإدارة.");
+    }
+
     return {
       amountEgp: Number(row?.subscription_plan_price_egp ?? 499),
       companyId: company.id,
       companyName: company.name_ar || company.name_en || "الشركة",
-      methods: [
-        {
-          code: "instapay" as const,
-          nameAr: "إنستا باي",
-          nameEn: "InstaPay",
-          number: PAYMENT_NUMBER,
-        },
-        {
-          code: "vodafone_cash" as const,
-          nameAr: "فودافون كاش",
-          nameEn: "Vodafone Cash",
-          number: PAYMENT_NUMBER,
-        },
-      ],
+      methods,
     };
+  });
+
+export const adminGetManualPaymentMethods = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _role: "admin",
+      _user_id: context.userId,
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { data, error } = await supabaseAdmin
+      .from("payment_methods")
+      .select(
+        "code, name_ar, name_en, instructions_ar, instructions_en, account_details, is_active, sort_order",
+      )
+      .in("code", ["instapay", "vodafone_cash"])
+      .order("sort_order", { ascending: true });
+    if (error) throw new Error(error.message);
+    return {
+      methods: (data ?? []).map(toPaymentMethod).filter(Boolean) as ManualPaymentMethod[],
+    };
+  });
+
+export const adminUpdateManualPaymentMethods = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((value: unknown) =>
+    z.object({ methods: z.array(paymentMethodSchema).length(2) }).parse(value),
+  )
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _role: "admin",
+      _user_id: context.userId,
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    if (new Set(data.methods.map((method) => method.code)).size !== 2) {
+      throw new Error("يجب إعداد إنستا باي وفودافون كاش مرة واحدة لكل وسيلة");
+    }
+    for (const method of data.methods) {
+      const { error } = await supabaseAdmin
+        .from("payment_methods")
+        .update({
+          account_details: { phone: method.number },
+          instructions_ar: method.instructionsAr,
+          instructions_en: method.instructionsEn,
+          is_active: method.isActive,
+          name_ar: method.nameAr,
+          name_en: method.nameEn,
+          sort_order: method.sortOrder,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("code", method.code);
+      if (error) throw new Error(error.message);
+    }
+    await supabaseAdmin.from("audit_logs").insert({
+      action: "MANUAL_PAYMENT_METHODS_UPDATED",
+      new_data: {
+        methods: data.methods.map(({ code, isActive, number, sortOrder }) => ({
+          code,
+          isActive,
+          number,
+          sortOrder,
+        })),
+      },
+      table_name: "payment_methods",
+      user_id: context.userId,
+    });
+    return { ok: true };
   });
 
 export const submitManualPayment = createServerFn({ method: "POST" })

@@ -772,7 +772,7 @@ export const advancedSearchCompanies = createServerFn({ method: "POST" })
       const now = Date.now();
       list = list.filter((r) => {
         const isPaid =
-          r.subscription_plan === "paid" &&
+          r.subscription_plan === "premium_company" &&
           (!r.subscription_expires_at || new Date(r.subscription_expires_at).getTime() > now);
         return data.plan === "paid" ? isPaid : !isPaid;
       });
@@ -807,7 +807,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const cs = (companies.data ?? []) as any[];
     const paid = cs.filter(
       (c) =>
-        c.subscription_plan === "paid" &&
+        c.subscription_plan === "premium_company" &&
         (!c.subscription_expires_at || c.subscription_expires_at > now),
     ).length;
     const refRows = (refs.data ?? []) as any[];

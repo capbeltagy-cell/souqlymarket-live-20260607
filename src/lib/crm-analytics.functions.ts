@@ -157,7 +157,7 @@ export const getAdminExecutiveDashboard = createServerFn({ method: "GET" })
     const cs = (companies.data ?? []) as any[];
     const activeCompanies = cs.filter(
       (c) =>
-        c.subscription_plan === "paid" &&
+        c.subscription_plan === "premium_company" &&
         (!c.subscription_expires_at || c.subscription_expires_at > nowIso),
     ).length;
     const activeAgents = (agents.data ?? []).length;

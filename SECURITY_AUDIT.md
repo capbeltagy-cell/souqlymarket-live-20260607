@@ -37,3 +37,13 @@
 - Every exposed table needs explicit grants plus RLS.
 - Every update policy needs appropriate SELECT, `USING` and `WITH CHECK` behavior.
 - Storage metadata is read-only; object mutations go through Storage APIs.
+
+## Billing hardening update
+
+- Manual payment numbers are no longer compiled into application code.
+- Only the server-side service client writes payment-method configuration after an authenticated admin-role check.
+- Checkout reads active payment methods and snapshots the selected destination into each request.
+- User-supplied amount, destination and approval state are never accepted by the submission RPC.
+- Approval locks the request and is idempotent before activating a subscription.
+- Manual-payment `SECURITY DEFINER` functions are migrated to `search_path = ''`.
+- Production Security/Performance Advisors remain blocked by Supabase connector authorization, so a zero-finding live claim is intentionally not made.

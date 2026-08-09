@@ -55,7 +55,7 @@ export const superOverview = createServerFn({ method: "POST" })
     const { count: paid } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
-      .eq("subscription_plan", "paid");
+      .eq("subscription_plan", "premium_company");
     const { count: verified } = await admin
       .from("companies")
       .select("id", { count: "exact", head: true })
@@ -154,7 +154,7 @@ export const superAction = createServerFn({ method: "POST" })
         await admin
           .from("companies")
           .update({
-            subscription_plan: "paid",
+            subscription_plan: "premium_company",
             subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
           })
           .eq("id", id);

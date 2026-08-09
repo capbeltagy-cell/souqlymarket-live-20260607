@@ -8,6 +8,17 @@ const migration = readFileSync(
   ),
   "utf8",
 );
+const adminManagedMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/20260809011544_admin_managed_manual_payments.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const serverFunctions = readFileSync(
+  new URL("./manual-payments.functions.ts", import.meta.url),
+  "utf8",
+);
 
 describe("manual subscription payment security boundaries", () => {
   it("keeps payment proofs private and owner-scoped", () => {
@@ -51,5 +62,23 @@ describe("manual subscription payment security boundaries", () => {
     expect(migration).toContain("REJECTION_REASON_REQUIRED");
     expect(migration).toContain("manual_payment_one_pending_per_company_idx");
     expect(migration).toContain("WHERE status = 'pending'");
+  });
+
+  it("loads customer-facing destinations from admin-managed payment methods", () => {
+    expect(serverFunctions).toContain('.from("payment_methods")');
+    expect(serverFunctions).toContain("adminUpdateManualPaymentMethods");
+    expect(serverFunctions).not.toContain("const PAYMENT_NUMBER =");
+  });
+
+  it("keeps manual payment RPCs on an immutable search path", () => {
+    expect(adminManagedMigration).toContain(
+      "REVOKE ALL ON public.payment_methods FROM PUBLIC, anon",
+    );
+    expect(adminManagedMigration).toMatch(
+      /submit_manual_subscription_payment[\s\S]*SET search_path = ''/,
+    );
+    expect(adminManagedMigration).toMatch(
+      /review_manual_subscription_payment[\s\S]*SET search_path = ''/,
+    );
   });
 });

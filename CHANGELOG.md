@@ -24,3 +24,18 @@
 
 - Authentication, role logic, storage, existing routes, features, migrations and database contracts.
 - No production SQL, deployment, merge, destructive DDL or mock production data.
+
+## Souqly 2.0 billing hardening — 2026-08-09
+
+### Added
+
+- Admin-managed InstaPay and Vodafone Cash destination numbers, instructions, activation state and display order.
+- Database migration hardening manual-payment RPC search paths and payment-method grants.
+- Regression coverage proving checkout destinations come from admin-managed records rather than source constants.
+
+### Fixed
+
+- Removed the hardcoded payment destination from the checkout backend.
+- Replaced legacy `paid` subscription comparisons with the canonical `premium_company` enum value.
+- Expired subscriptions no longer retain paid-plan access through the billing helper.
+- Manual payment approval remains atomic: payment transaction, subscription renewal, company activation, notification and audit event are committed together.
