@@ -277,7 +277,7 @@ function Landing() {
             <Button
               asChild
               size="lg"
-              className="group h-11 justify-center rounded-xl bg-gold px-4 font-bold text-background shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
+              className="group h-11 justify-center rounded-lg bg-accent px-4 font-bold text-accent-foreground shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
             >
               <Link to="/store/open">
                 <Store className="me-2 h-5 w-5" />
@@ -287,20 +287,20 @@ function Landing() {
             </Button>
             <Link
               to="/marketplace"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
             >
               {ar ? "تصفح السوق" : "Browse marketplace"}
             </Link>
             <Link
               to="/rfq/new"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
             >
               {ar ? "اطلب عرض سعر" : "Request quotation"}
             </Link>
             <Link
               to="/auth"
               search={{ mode: "signup" }}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
             >
               {ar ? "سجّل شركتك" : "Register company"}
             </Link>
@@ -369,9 +369,9 @@ function Landing() {
             <Link
               key={en}
               to={to}
-              className="group premium-panel category-tile rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/50 hover:shadow-gold transition-all min-h-[88px]"
+              className="group premium-panel category-tile flex min-h-[88px] flex-col items-center gap-2 rounded-xl p-3 text-center transition-all hover:border-accent/50 hover:shadow-elev md:gap-3 md:p-5"
             >
-              <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-primary/10 text-primary grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition shadow-[0_0_30px_-12px_var(--primary)]">
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent/10 text-accent transition group-hover:bg-accent group-hover:text-accent-foreground md:h-12 md:w-12">
                 <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">
@@ -631,7 +631,7 @@ function Landing() {
       <section className="container-souqly py-10 md:py-14">
         <div className="mx-auto max-w-3xl text-center">
           <span className="status-pill">{ar ? "أسئلة شائعة" : "FAQ"}</span>
-          <h2 className="mt-4 text-serif text-3xl md:text-5xl">
+          <h2 className="mt-4 text-serif text-2xl md:text-4xl">
             {ar ? "قبل أن تبدأ" : "Before you start"}
           </h2>
         </div>
@@ -668,12 +668,12 @@ function Landing() {
       </section>
 
       <section className="container-souqly py-10 md:py-16">
-        <div className="premium-panel rounded-2xl md:rounded-[2rem] p-6 md:p-14 text-center overflow-hidden relative">
+        <div className="premium-panel relative overflow-hidden rounded-xl p-6 text-center md:p-12">
           <div
             className="absolute inset-0 opacity-40 pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle at 50% 0%, rgba(201,168,76,0.15), transparent 60%)",
+                "radial-gradient(circle at 50% 0%, rgba(249,115,22,0.14), transparent 60%)",
             }}
           />
           <div className="relative">

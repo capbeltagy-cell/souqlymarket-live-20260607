@@ -90,10 +90,10 @@ export function FeaturedAdBar() {
   const loop = [...items, ...items];
 
   return (
-    <div className="relative w-full overflow-hidden border-y border-white/10 bg-gradient-to-r from-black via-[#0f0f0f] to-black">
+    <div className="relative w-full overflow-hidden border-y border-slate-700 bg-gradient-to-r from-primary via-secondary to-primary">
       {/* edge fades */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10 bg-gradient-to-r from-black to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10 bg-gradient-to-l from-black to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-primary to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-primary to-transparent" />
 
       <div className="group flex items-center gap-3 py-2.5">
         <span className="shrink-0 hidden sm:inline-flex items-center gap-1.5 pl-4 text-[10px] uppercase tracking-[0.2em] text-gold">

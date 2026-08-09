@@ -44,10 +44,10 @@ function FactoriesList() {
   return (
     <PublicLayout>
       <section className="container-souqly flex-1 py-8 md:py-10">
-        <div className="mb-6 rounded-2xl glass-card p-5 md:p-7">
+        <div className="glass-card mb-6 rounded-xl p-5 md:p-7">
           <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr] items-center">
             <div>
-              <h1 className="text-3xl font-bold md:text-4xl">
+              <h1 className="text-2xl font-bold md:text-3xl">
                 {ar ? "دليل المصانع المصرية" : "Egypt Factory Directory"}
               </h1>
               <p className="text-muted-foreground mt-3 max-w-2xl">
@@ -57,19 +57,19 @@ function FactoriesList() {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="rounded-3xl bg-surface p-4 text-center">
+              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
                 <div className="text-2xl font-semibold">{rows.length}</div>
                 <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                   {ar ? "المصانع" : "Factories"}
                 </div>
               </div>
-              <div className="rounded-3xl bg-surface p-4 text-center">
+              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
                 <div className="text-2xl font-semibold">{verified ? "✓" : "⚡"}</div>
                 <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                   {ar ? "التصفية الذكية" : "Smart filters"}
                 </div>
               </div>
-              <div className="rounded-3xl bg-surface p-4 text-center">
+              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
                 <div className="text-2xl font-semibold">{exportOnly ? "✔" : "🌍"}</div>
                 <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                   {ar ? "فرص التصدير" : "Export-ready"}
@@ -78,15 +78,15 @@ function FactoriesList() {
             </div>
           </div>
         </div>
-        <div className="mb-6 rounded-2xl panel-card p-4 md:p-5">
+        <div className="panel-card mb-6 rounded-xl p-4 md:p-5">
           <div className="flex flex-wrap gap-3 items-center">
             <input
-              className="flex-1 min-w-[220px] h-12 rounded-3xl border border-input bg-background px-4 text-sm text-foreground"
+              className="h-11 min-w-[220px] flex-1 rounded-lg border border-input bg-background px-4 text-sm text-foreground"
               placeholder={ar ? "ابحث عن محافظة أو مدينة" : "Search governorate or city"}
               value={gov}
               onChange={(e) => setGov(e.target.value)}
             />
-            <label className="flex items-center gap-2 rounded-3xl border border-white/10 bg-surface px-4 py-3 text-sm">
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm">
               <input
                 type="checkbox"
                 checked={verified}
@@ -94,7 +94,7 @@ function FactoriesList() {
               />
               {ar ? "موثق فقط" : "Verified only"}
             </label>
-            <label className="flex items-center gap-2 rounded-3xl border border-white/10 bg-surface px-4 py-3 text-sm">
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm">
               <input
                 type="checkbox"
                 checked={exportOnly}
@@ -124,7 +124,7 @@ function FactoriesList() {
                 key={f.company_id}
                 to="/factories/$id"
                 params={{ id: f.company_id }}
-                className="rounded-[1.5rem] border border-border bg-surface-2 p-5 hover:bg-surface shadow-elev transition"
+                className="rounded-xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-elev"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="font-semibold">

@@ -196,8 +196,8 @@ function Marketplace() {
                 aria-pressed={type === value}
                 className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition ${
                   type === value
-                    ? "border-primary bg-primary text-primary-foreground shadow-gold"
-                    : "border-border bg-card text-foreground hover:border-primary/50"
+                    ? "border-primary bg-primary text-primary-foreground shadow-card"
+                    : "border-border bg-card text-foreground hover:border-accent/50 hover:bg-accent/5"
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -228,7 +228,7 @@ function Marketplace() {
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
                 <SheetHeader>
                   <SheetTitle>{t("filter_type")}</SheetTitle>
                 </SheetHeader>
@@ -244,7 +244,7 @@ function Marketplace() {
           </div>
 
           {/* Desktop inline filters */}
-          <div className="hidden lg:block mt-6 rounded-2xl border border-white/10 bg-surface p-5">
+          <div className="mt-6 hidden rounded-xl border border-border bg-card p-5 shadow-card lg:block">
             {filterBody}
           </div>
         </div>
@@ -254,7 +254,10 @@ function Marketplace() {
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-card p-3 space-y-3">
+              <div
+                key={i}
+                className="space-y-3 rounded-xl border border-border bg-card p-3 shadow-card"
+              >
                 <Skeleton className="h-32 md:h-40 w-full rounded-xl" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
@@ -284,7 +287,7 @@ function Marketplace() {
 
 function EmptyState({ title, cta }: { title: string; cta?: { label: string; to: string } }) {
   return (
-    <div className="py-24 text-center">
+    <div className="rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center shadow-card">
       <div className="text-lg font-semibold mb-2">{title}</div>
       {cta && (
         <Button asChild className="mt-4 bg-primary hover:bg-primary-hover">

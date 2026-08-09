@@ -1,5 +1,16 @@
 # Changelog
 
+## Souqly 2.0 RC3 — visual identity and platform polish
+
+- Replaced the legacy palette with the approved deep-navy, slate, white and warm-orange B2B system.
+- Unified buttons, badges, cards, borders, radii, shadows, focus states and hover behavior.
+- Refined the compact header, homepage actions, categories, statistics and final call to action.
+- Improved marketplace filters, cards, skeletons and honest empty states.
+- Refined company profiles, company/factory cards, RFQ offers and dashboard widgets.
+- Reworked messaging responsiveness so the conversation list and active thread remain usable on small screens.
+- Added lazy decoding for chat images and retained off-screen section rendering optimization.
+- Preserved all features and database contracts; no schema, migration or production-data changes were made.
+
 ## Souqly 2.0 reconstruction RC1 — 2026-08-09
 
 ### Added
@@ -39,6 +50,7 @@
 - Replaced legacy `paid` subscription comparisons with the canonical `premium_company` enum value.
 - Expired subscriptions no longer retain paid-plan access through the billing helper.
 - Manual payment approval remains atomic: payment transaction, subscription renewal, company activation, notification and audit event are committed together.
+
 # 2026-08-09 — Production security reconciliation
 
 - Exported the current production schema, RLS policies and function definitions.

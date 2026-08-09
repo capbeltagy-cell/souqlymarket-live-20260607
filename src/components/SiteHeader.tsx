@@ -57,7 +57,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 shadow-[0_1px_0_hsl(var(--border)/0.4)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
+      className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="container-souqly flex h-14 items-center gap-2 lg:gap-3">

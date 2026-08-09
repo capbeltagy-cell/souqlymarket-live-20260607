@@ -102,7 +102,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
   }
 
   return (
-    <div className="group overflow-hidden rounded-3xl premium-panel transition-all duration-300 hover:-translate-y-1 hover:shadow-gold hover:border-primary/40">
+    <div className="group overflow-hidden rounded-xl premium-panel transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-elev">
       <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
         <img
           src={image}
@@ -111,7 +111,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
           decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent" />
         <Badge className="absolute top-3 start-3 bg-background/80 text-foreground border border-primary/20 backdrop-blur-md hover:bg-background/80">
           {t(typeKey[l.type] as never)}
         </Badge>
@@ -126,7 +126,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
           className="absolute bottom-3 end-3 h-10 w-10 rounded-full bg-background/85 grid place-items-center hover:bg-background border border-primary/20 backdrop-blur-md transition disabled:opacity-50"
           aria-label={t("save_favorite")}
         >
-          <Heart className={`h-4 w-4 ${fav ? "fill-primary text-primary" : "text-foreground"}`} />
+          <Heart className={`h-4 w-4 ${fav ? "fill-accent text-accent" : "text-foreground"}`} />
         </button>
       </div>
       <div className="p-4 space-y-3">
@@ -170,7 +170,7 @@ export function ListingCard({ l }: { l: ListingCardData }) {
         <div className="flex items-center justify-between pt-2 border-t border-border gap-2">
           <div className="min-w-0">
             {l.price && l.price > 0 ? (
-              <div className="font-bold text-primary text-lg truncate">
+              <div className="truncate text-lg font-bold text-foreground">
                 {formatPrice(l.price, locale)}
               </div>
             ) : (
