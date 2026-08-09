@@ -186,6 +186,13 @@ aside:has(a[href*="utm_source=lovable-badge"]) {
 }
 
 @layer utilities {
+  @supports (content-visibility: auto) {
+    .public-main > section:not(:first-child) {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 720px;
+    }
+  }
+
   .section-souqly {
     padding-block: var(--section-space);
   }

@@ -23,7 +23,7 @@ export function PublicLayout({ children, announcement, mainClassName = "" }: Pub
       <main
         id="main-content"
         tabIndex={-1}
-        className={`min-w-0 flex-1 outline-none ${mainClassName}`}
+        className={`public-main min-w-0 flex-1 outline-none ${mainClassName}`}
       >
         {children}
       </main>

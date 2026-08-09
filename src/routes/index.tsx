@@ -226,12 +226,12 @@ function Landing() {
         <div className="hero-orb hero-orb-b" aria-hidden="true" />
         <div className="hero-ring hero-ring-a" aria-hidden="true" />
         <div className="hero-ring hero-ring-b" aria-hidden="true" />
-        <div className="container-souqly relative z-10 pt-8 pb-10 md:pt-20 md:pb-16">
+        <div className="container-souqly relative z-10 py-7 md:py-11">
           <span className="status-pill mb-3 fade-up text-[10px] md:text-xs">
             <Sparkles className="h-3 w-3" />
             {ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
           </span>
-          <h1 className="text-serif text-[2.25rem] leading-[1.08] md:text-6xl lg:text-7xl tracking-tight text-foreground mb-4 fade-up-1 max-w-5xl">
+          <h1 className="mb-3 max-w-4xl text-serif text-[2rem] leading-[1.12] tracking-tight text-foreground fade-up-1 sm:text-4xl md:text-5xl lg:text-6xl">
             {ar ? (
               <>
                 سوق الأعمال <span className="gold-shine italic">المصري</span>
@@ -242,7 +242,7 @@ function Landing() {
               </>
             )}
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-5 fade-up-2">
+          <p className="mb-4 max-w-2xl text-sm leading-relaxed text-muted-foreground fade-up-2 md:text-base">
             {ar
               ? "اعثر على الموردين، اطلب عروض الأسعار، ونمِّ أعمالك."
               : "Find suppliers, request quotations and grow your business."}
@@ -273,11 +273,11 @@ function Landing() {
             </Button>
           </form>
 
-          <div className="mt-5 grid max-w-3xl gap-2 fade-up-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid max-w-3xl gap-2 fade-up-3 sm:grid-cols-2 lg:grid-cols-4">
             <Button
               asChild
               size="lg"
-              className="group h-12 justify-center rounded-xl bg-gold px-5 font-bold text-background shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
+              className="group h-11 justify-center rounded-xl bg-gold px-4 font-bold text-background shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
             >
               <Link to="/store/open">
                 <Store className="me-2 h-5 w-5" />
@@ -287,20 +287,20 @@ function Landing() {
             </Button>
             <Link
               to="/marketplace"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
             >
               {ar ? "تصفح السوق" : "Browse marketplace"}
             </Link>
             <Link
               to="/rfq/new"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
             >
               {ar ? "اطلب عرض سعر" : "Request quotation"}
             </Link>
             <Link
               to="/auth"
               search={{ mode: "signup" }}
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
             >
               {ar ? "سجّل شركتك" : "Register company"}
             </Link>
@@ -320,14 +320,14 @@ function Landing() {
 
           {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
           {counts && (
-            <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
+            <div className="mt-5 hidden max-w-2xl grid-cols-3 gap-3 md:grid">
               {[
                 { label: ar ? "شركة" : "Companies", value: counts.companies },
                 { label: ar ? "إعلان" : "Listings", value: counts.listings },
                 { label: ar ? "مسوّق" : "Agents", value: counts.agents },
               ].map((item) => (
-                <div key={item.label} className="premium-panel rounded-xl p-6">
-                  <div className="text-serif text-4xl text-gold tabular-nums leading-none">
+                <div key={item.label} className="premium-panel rounded-xl p-4">
+                  <div className="text-serif text-3xl text-gold tabular-nums leading-none">
                     {item.value.toLocaleString(ar ? "ar-EG" : "en-US")}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">

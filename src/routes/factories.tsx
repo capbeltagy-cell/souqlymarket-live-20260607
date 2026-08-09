@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
 import { listFactories } from "@/lib/phase3.functions";
@@ -43,13 +42,12 @@ function FactoriesList() {
   }, [ar, verified, exportOnly, gov, retryToken]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <section className="container-souqly py-10 flex-1">
-        <div className="rounded-[2rem] glass-card p-8 mb-8">
+    <PublicLayout>
+      <section className="container-souqly flex-1 py-8 md:py-10">
+        <div className="mb-6 rounded-2xl glass-card p-5 md:p-7">
           <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr] items-center">
             <div>
-              <h1 className="text-4xl font-bold">
+              <h1 className="text-3xl font-bold md:text-4xl">
                 {ar ? "دليل المصانع المصرية" : "Egypt Factory Directory"}
               </h1>
               <p className="text-muted-foreground mt-3 max-w-2xl">
@@ -58,7 +56,7 @@ function FactoriesList() {
                   : "Find factories by capacity, governorate, export"}
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div className="rounded-3xl bg-surface p-4 text-center">
                 <div className="text-2xl font-semibold">{rows.length}</div>
                 <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
@@ -80,7 +78,7 @@ function FactoriesList() {
             </div>
           </div>
         </div>
-        <div className="rounded-[2rem] panel-card p-6 mb-8">
+        <div className="mb-6 rounded-2xl panel-card p-4 md:p-5">
           <div className="flex flex-wrap gap-3 items-center">
             <input
               className="flex-1 min-w-[220px] h-12 rounded-3xl border border-input bg-background px-4 text-sm text-foreground"
@@ -153,7 +151,6 @@ function FactoriesList() {
           </div>
         )}
       </section>
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }

@@ -48,3 +48,12 @@
 - Hardened authorization/trigger function grants and function search paths.
 - Preserved all production data, users, buckets and 163 policies.
 - Re-ran TypeScript, lint, 53 tests, migration audit, Cloudflare/Node builds and the 102-route crawl.
+
+## Souqly 2.0 RC2 — interface refinement
+
+- Reduced homepage hero height and responsive heading scale.
+- Simplified primary navigation and moved secondary destinations into a compact menu.
+- Improved RTL submenu direction, spacing and small-screen layouts.
+- Unified companies, factories and RFQ pages under the public layout.
+- Removed fabricated company-directory statistics in favor of live verified counts.
+- Added off-screen section rendering optimization while preserving accessible document flow.

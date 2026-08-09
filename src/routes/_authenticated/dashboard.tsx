@@ -186,8 +186,8 @@ function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
-      <div className="container-souqly py-8 flex-1">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div className="container-souqly flex-1 py-6 md:py-8">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3 md:items-center">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <LayoutDashboard className="h-6 w-6 text-primary" />
