@@ -82,8 +82,10 @@ export function SiteHeader() {
           aria-label="التنقل الرئيسي"
         >
           <PrimaryLink to="/marketplace" label={t("nav_marketplace")} />
-          <PrimaryLink to="/companies" label={t("nav_companies")} />
+          <PrimaryLink to="/companies" label="الشركات والمصانع" />
           <PrimaryLink to="/rfq" label="طلبات الأسعار" />
+          <PrimaryLink to="/services" label="الخدمات" />
+          <PrimaryLink to="/business-solutions" label="الأعمال" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -95,13 +97,10 @@ export function SiteHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-52">
-              <MobilePrimaryLink to="/factories" icon={<Store />} label="المصانع" />
-              <MobilePrimaryLink to="/services" icon={<Briefcase />} label="الخدمات" />
-              <MobilePrimaryLink
-                to="/business-solutions"
-                icon={<BriefcaseBusiness />}
-                label="حلول الأعمال"
-              />
+              <MobilePrimaryLink to="/factories" icon={<Store />} label="دليل المصانع" />
+              <MobilePrimaryLink to="/tenders" icon={<ListChecks />} label="المناقصات" />
+              <MobilePrimaryLink to="/earn" icon={<Link2 />} label="برنامج المسوقين" />
+              <MobilePrimaryLink to="/contact" icon={<MessageSquare />} label="المساعدة" />
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
@@ -125,6 +124,13 @@ export function SiteHeader() {
               <MobilePrimaryLink to="/factories" icon={<Store />} label="المصانع" />
               <MobilePrimaryLink to="/services" icon={<Briefcase />} label="الخدمات" />
               <MobilePrimaryLink to="/rfq" icon={<ListChecks />} label="طلبات الأسعار" />
+              <MobilePrimaryLink
+                to="/business-solutions"
+                icon={<BriefcaseBusiness />}
+                label="حلول الأعمال"
+              />
+              <MobilePrimaryLink to="/tenders" icon={<ListChecks />} label="المناقصات" />
+              <MobilePrimaryLink to="/contact" icon={<MessageSquare />} label="المساعدة" />
               <DropdownMenuSeparator />
               <MobilePrimaryLink to="/store/open" icon={<PlusCircle />} label="افتح متجرك" />
             </DropdownMenuContent>
@@ -432,6 +438,9 @@ function PrimaryLink({
     | "/services"
     | "/rfq"
     | "/business-solutions"
+    | "/tenders"
+    | "/earn"
+    | "/contact"
     | "/store/open";
   label: string;
   emphasis?: boolean;
@@ -471,6 +480,9 @@ function MobilePrimaryLink({
     | "/services"
     | "/rfq"
     | "/business-solutions"
+    | "/tenders"
+    | "/earn"
+    | "/contact"
     | "/store/open";
   icon: ReactNode;
   label: string;

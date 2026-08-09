@@ -51,22 +51,24 @@ function CompaniesPage() {
               </h1>
               <p className="text-muted-foreground mt-4 max-w-2xl">{t("companies_page_subtitle")}</p>
             </div>
-            <div className="grid grid-cols-1 gap-3 text-center sm:grid-cols-2">
-              <div className="rounded-2xl bg-surface p-4">
-                <div className="text-3xl font-bold">{items.length}</div>
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
-                  {t("companies_count")}
+            {items.length > 0 && (
+              <div className="grid grid-cols-1 gap-3 text-center sm:grid-cols-2">
+                <div className="rounded-2xl bg-surface p-4">
+                  <div className="text-3xl font-bold">{items.length}</div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                    {t("companies_count")}
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-surface p-4">
+                  <div className="text-3xl font-bold">
+                    {items.filter((item) => item.is_verified).length}
+                  </div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
+                    {t("trusted_companies")}
+                  </div>
                 </div>
               </div>
-              <div className="rounded-2xl bg-surface p-4">
-                <div className="text-3xl font-bold">
-                  {items.filter((item) => item.is_verified).length}
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-[0.18em]">
-                  {t("trusted_companies")}
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -74,7 +76,7 @@ function CompaniesPage() {
         {loading ? (
           <div className="py-20 text-center text-muted-foreground">{t("loading")}</div>
         ) : items.length === 0 ? (
-          <div className="py-24 text-center">
+          <div className="rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center shadow-card">
             <div className="text-lg font-semibold mb-2">{t("no_companies_yet")}</div>
             <Button asChild className="mt-4 bg-primary hover:bg-primary-hover">
               <Link to="/company">{t("create_company")}</Link>

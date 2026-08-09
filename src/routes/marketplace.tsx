@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { useI18n } from "@/i18n/I18nProvider";
-import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
+import type { ListingType } from "@/lib/marketplace";
 import {
   EGYPT_GOVERNORATES,
   getCitiesForGovernorate,
@@ -32,15 +32,25 @@ export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
 });
 
-const TYPES: { value: ListingType | "all"; key: string }[] = [
-  { value: "all", key: "filter_all" },
-  ...LISTING_TYPES.map((t) => ({ value: t, key: `cat_${t}` })),
+type MarketplaceDomain = "all" | "products" | "services" | "assets";
+
+const DOMAIN_TYPES: Record<Exclude<MarketplaceDomain, "all">, ListingType[]> = {
+  products: ["product", "market", "fish_shed"],
+  services: ["service", "opportunity"],
+  assets: ["real_estate", "land", "factory"],
+};
+
+const DOMAINS: { value: MarketplaceDomain; ar: string; en: string }[] = [
+  { value: "all", ar: "الكل", en: "All" },
+  { value: "products", ar: "المنتجات", en: "Products" },
+  { value: "services", ar: "الخدمات", en: "Services" },
+  { value: "assets", ar: "الأصول", en: "Assets" },
 ];
 
 function Marketplace() {
   const { t, locale } = useI18n();
   const [q, setQ] = useState("");
-  const [type, setType] = useState<ListingType | "all">("all");
+  const [domain, setDomain] = useState<MarketplaceDomain>("all");
   const [governorate, setGovernorate] = useState("all");
   const [city, setCity] = useState("all");
   const [items, setItems] = useState<ListingCardData[]>([]);
@@ -58,9 +68,10 @@ function Marketplace() {
       )
       .eq("status", "approved")
       .eq("visible_in_marketplace", true)
+      .neq("type", "company")
       .order("created_at", { ascending: false })
       .limit(120);
-    if (type !== "all") query = query.eq("type", type);
+    if (domain !== "all") query = query.in("type", DOMAIN_TYPES[domain]);
     query.then(({ data }) => {
       if (cancelled) return;
       const rows = (data ?? []) as unknown as ListingCardData[];
@@ -70,7 +81,7 @@ function Marketplace() {
     return () => {
       cancelled = true;
     };
-  }, [type]);
+  }, [domain]);
 
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
 
@@ -78,7 +89,7 @@ function Marketplace() {
   const filtered = useMemo(() => {
     const needle = deferredQ.trim().toLowerCase();
     return items.filter((l) => {
-      if (type !== "all" && l.type !== type) return false;
+      if (domain !== "all" && !DOMAIN_TYPES[domain].includes(l.type)) return false;
       if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate)
         return false;
       if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
@@ -87,10 +98,10 @@ function Marketplace() {
         `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
       return hay.includes(needle);
     });
-  }, [items, deferredQ, type, governorate, city]);
+  }, [items, deferredQ, domain, governorate, city]);
 
   const activeCount =
-    (type !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
+    (domain !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
 
   const filterBody = (
     <div className="space-y-5">
@@ -99,15 +110,15 @@ function Marketplace() {
           {t("filter_type")}
         </div>
         <div className="flex flex-wrap gap-2">
-          {TYPES.map((tp) => (
+          {DOMAINS.map((item) => (
             <Button
-              key={tp.value}
+              key={item.value}
               size="sm"
-              variant={type === tp.value ? "default" : "outline"}
-              onClick={() => setType(tp.value)}
-              className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}
+              variant={domain === item.value ? "default" : "outline"}
+              onClick={() => setDomain(item.value)}
+              className={domain === item.value ? "bg-primary hover:bg-primary-hover" : ""}
             >
-              {t(tp.key as never)}
+              {locale === "ar" ? item.ar : item.en}
             </Button>
           ))}
         </div>
@@ -158,7 +169,7 @@ function Marketplace() {
           size="sm"
           className="text-muted-foreground"
           onClick={() => {
-            setType("all");
+            setDomain("all");
             setGovernorate("all");
             setCity("all");
           }}
@@ -181,21 +192,29 @@ function Marketplace() {
           </p>
           <nav className="mb-6 grid max-w-2xl grid-cols-3 gap-2" aria-label="أقسام السوق">
             {[
-              { icon: Boxes, label: locale === "ar" ? "المنتجات" : "Products", value: "product" },
-              { icon: Wrench, label: locale === "ar" ? "الخدمات" : "Services", value: "service" },
+              {
+                icon: Boxes,
+                label: locale === "ar" ? "المنتجات" : "Products",
+                value: "products",
+              },
+              {
+                icon: Wrench,
+                label: locale === "ar" ? "الخدمات" : "Services",
+                value: "services",
+              },
               {
                 icon: Building2,
                 label: locale === "ar" ? "الأصول" : "Assets",
-                value: "real_estate",
+                value: "assets",
               },
             ].map(({ icon: Icon, label, value }) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => setType(value as ListingType)}
-                aria-pressed={type === value}
+                onClick={() => setDomain(value as MarketplaceDomain)}
+                aria-pressed={domain === value}
                 className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition ${
-                  type === value
+                  domain === value
                     ? "border-primary bg-primary text-primary-foreground shadow-card"
                     : "border-border bg-card text-foreground hover:border-accent/50 hover:bg-accent/5"
                 }`}

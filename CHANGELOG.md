@@ -1,5 +1,15 @@
 # Changelog
 
+## Souqly 2.0 RC4 — final product QA
+
+- Added backward-compatible routes for `/login`, `/register`, `/account`, `/workspace`, `/admin` and `/support`.
+- Normalized the public marketplace UI to Products, Services and Assets while preserving legacy records.
+- Excluded organization listings from marketplace product results without deleting underlying data.
+- Removed user-visible zero counters from homepage and organization-directory presentation.
+- Expanded the compact navigation with business, tenders, marketer and help destinations.
+- Aligned PWA theme metadata and the application icon with the navy/orange design system.
+- Revalidated authentication guards, RLS visibility, builds, tests, dependencies and all static routes.
+
 ## Souqly 2.0 RC3 — visual identity and platform polish
 
 - Replaced the legacy palette with the approved deep-navy, slate, white and warm-orange B2B system.

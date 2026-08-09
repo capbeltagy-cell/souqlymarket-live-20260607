@@ -244,8 +244,8 @@ function Landing() {
           </h1>
           <p className="mb-4 max-w-2xl text-sm leading-relaxed text-muted-foreground fade-up-2 md:text-base">
             {ar
-              ? "اعثر على الموردين، اطلب عروض الأسعار، ونمِّ أعمالك."
-              : "Find suppliers, request quotations and grow your business."}
+              ? "سوقلي هو سوق الأعمال المصري لاكتشاف الموردين وطلب عروض الأسعار والشراء والبيع وإدارة علاقات الأعمال."
+              : "Souqly is Egypt's business marketplace for discovering suppliers, requesting quotations, buying, selling and managing business relationships."}
           </p>
 
           <form
@@ -319,7 +319,7 @@ function Landing() {
           </div>
 
           {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
-          {counts && (
+          {counts && counts.companies + counts.listings + counts.agents > 0 && (
             <div className="mt-5 hidden max-w-2xl grid-cols-3 gap-3 md:grid">
               {[
                 { label: ar ? "شركة" : "Companies", value: counts.companies },

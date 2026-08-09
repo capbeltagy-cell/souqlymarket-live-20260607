@@ -56,26 +56,28 @@ function FactoriesList() {
                   : "Find factories by capacity, governorate, export"}
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-                <div className="text-2xl font-semibold">{rows.length}</div>
-                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {ar ? "المصانع" : "Factories"}
+            {rows.length > 0 && (
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
+                  <div className="text-2xl font-semibold">{rows.length}</div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "المصانع" : "Factories"}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
+                  <div className="text-2xl font-semibold">{verified ? "✓" : "⚡"}</div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "التصفية الذكية" : "Smart filters"}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
+                  <div className="text-2xl font-semibold">{exportOnly ? "✔" : "🌍"}</div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "فرص التصدير" : "Export-ready"}
+                  </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-                <div className="text-2xl font-semibold">{verified ? "✓" : "⚡"}</div>
-                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {ar ? "التصفية الذكية" : "Smart filters"}
-                </div>
-              </div>
-              <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-                <div className="text-2xl font-semibold">{exportOnly ? "✔" : "🌍"}</div>
-                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {ar ? "فرص التصدير" : "Export-ready"}
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="panel-card mb-6 rounded-xl p-4 md:p-5">

@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Souqly — سوقلي" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#0f766e" },
+      { name: "theme-color", content: "#0f172a" },
       { name: "application-name", content: "Souqly" },
     ],
     links: [
