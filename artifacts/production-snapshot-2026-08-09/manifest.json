@@ -1,0 +1,14 @@
+{
+  "captured_at": "2026-08-09",
+  "project_id": "qujssmtdzmzsfrgtaitj",
+  "scope": [
+    "public schema",
+    "storage schema",
+    "public/storage policies",
+    "public functions"
+  ],
+  "backup_limitation_acknowledged": true,
+  "migration": "live_security_reconciliation",
+  "destructive_operations": false
+}
+

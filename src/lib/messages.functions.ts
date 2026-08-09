@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // Ensures a conversation exists between the caller (buyer) and the listing's company owner (seller).
 export const startConversationForListing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ listing_id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ listing_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: listing, error: le } = await supabase

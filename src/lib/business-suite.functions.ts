@@ -100,7 +100,7 @@ export const listBusinessContacts = createServerFn({ method: "GET" })
 
 export const createBusinessContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         full_name: z.string().trim().min(2).max(160),
@@ -146,7 +146,7 @@ export const listInventoryItems = createServerFn({ method: "GET" })
 
 export const createInventoryItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         name: z.string().trim().min(2).max(200),
@@ -208,7 +208,7 @@ export const listBusinessInvoices = createServerFn({ method: "GET" })
 
 export const createBusinessInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         contact_id: z.string().uuid().optional().or(z.literal("")),
@@ -273,7 +273,7 @@ export const listSuppliers = createServerFn({ method: "GET" })
 
 export const createSupplier = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         name: z.string().trim().min(2).max(180),
@@ -317,7 +317,7 @@ export const listSalesOrders = createServerFn({ method: "GET" })
 
 export const createSalesOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         contact_id: z.string().uuid().optional().or(z.literal("")),
@@ -377,7 +377,7 @@ export const listPurchaseOrders = createServerFn({ method: "GET" })
 
 export const createPurchaseOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         supplier_id: z.string().uuid().optional().or(z.literal("")),

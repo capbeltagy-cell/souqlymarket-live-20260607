@@ -267,7 +267,7 @@ function EntityPanel({ entity }: { entity: string }) {
                         مميّز
                       </Badge>
                     )}
-                    {r.subscription_plan === "paid" && (
+                    {r.subscription_plan === "premium_company" && (
                       <Badge variant="outline" className="text-[10px]">
                         مدفوع
                       </Badge>
@@ -301,15 +301,24 @@ function EntityPanel({ entity }: { entity: string }) {
                         </Button>
                         <Button
                           aria-label={
-                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                            r.subscription_plan === "premium_company"
+                              ? "إلغاء الاشتراك"
+                              : "تفعيل الاشتراك"
                           }
                           title={
-                            r.subscription_plan === "paid" ? "إلغاء الاشتراك" : "تفعيل الاشتراك"
+                            r.subscription_plan === "premium_company"
+                              ? "إلغاء الاشتراك"
+                              : "تفعيل الاشتراك"
                           }
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            run(r.subscription_plan === "paid" ? "mark_unpaid" : "mark_paid", r.id)
+                            run(
+                              r.subscription_plan === "premium_company"
+                                ? "mark_unpaid"
+                                : "mark_paid",
+                              r.id,
+                            )
                           }
                         >
                           <Crown className="h-3 w-3" />

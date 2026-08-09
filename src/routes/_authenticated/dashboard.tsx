@@ -186,8 +186,8 @@ function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-surface-2">
       <SiteHeader />
-      <div className="container-souqly py-8 flex-1">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div className="container-souqly flex-1 py-6 md:py-8">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3 md:items-center">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <LayoutDashboard className="h-6 w-6 text-primary" />
@@ -246,7 +246,7 @@ function Onboard({
   cta: { label: string; to: string };
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-primary/20 bg-primary/5 p-6 mb-6 shadow-card">
+    <div className="mb-6 rounded-xl border border-accent/20 bg-accent/5 p-5 shadow-card md:p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="font-semibold text-lg">{title}</div>
@@ -270,8 +270,8 @@ function Stat({
   value: string;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-surface p-6 shadow-elev">
-      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center">
+    <div className="rounded-xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-elev md:p-6">
+      <div className="grid h-11 w-11 place-items-center rounded-lg bg-accent/10 text-accent">
         <Icon className="h-5 w-5" />
       </div>
       <div className="mt-4 text-3xl font-bold tracking-tight">{value}</div>

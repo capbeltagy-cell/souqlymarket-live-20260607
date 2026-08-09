@@ -1,0 +1,200 @@
+[
+  {
+    "functions": [
+      {
+        "name": "bump_listing_leads_count",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.bump_listing_leads_count()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nBEGIN\r\n  UPDATE public.listings SET leads_count = leads_count + 1 WHERE id = NEW.listing_id;\r\n  RETURN NEW;\r\nEND $function$\n",
+        "anon_execute": false,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "name": "convert_referral",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_referral_code text, _converted_user_id uuid, _listing_id uuid, _amount numeric",
+        "definition": "CREATE OR REPLACE FUNCTION public.convert_referral(_referral_code text, _converted_user_id uuid, _listing_id uuid DEFAULT NULL::uuid, _amount numeric DEFAULT 0)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nDECLARE\r\n  _ref_id uuid;\r\n  _commission_id uuid;\r\nBEGIN\r\n  SELECT id INTO _ref_id FROM public.referrals WHERE code = _referral_code LIMIT 1;\r\n  IF _ref_id IS NULL THEN RETURN NULL; END IF;\r\n\r\n  INSERT INTO public.commissions (referral_id, converted_user_id, listing_id, amount, status)\r\n  VALUES (_ref_id, _converted_user_id, _listing_id, _amount, 'pending')\r\n  RETURNING id INTO _commission_id;\r\n\r\n  UPDATE public.referrals SET conversions = conversions + 1 WHERE id = _ref_id;\r\n  RETURN _commission_id;\r\nEND $function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "convert_referral",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_referral_id uuid, _amount numeric, _currency text, _notes text",
+        "definition": "CREATE OR REPLACE FUNCTION public.convert_referral(_referral_id uuid, _amount numeric, _currency text DEFAULT 'USD'::text, _notes text DEFAULT NULL::text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nDECLARE\r\n  v_referral public.referrals%ROWTYPE;\r\n  v_company_id uuid;\r\n  v_owner uuid;\r\n  v_commission_id uuid;\r\nBEGIN\r\n  SELECT * INTO v_referral FROM public.referrals WHERE id = _referral_id;\r\n  IF NOT FOUND THEN RAISE EXCEPTION 'Referral not found'; END IF;\r\n\r\n  SELECT company_id INTO v_company_id FROM public.listings WHERE id = v_referral.listing_id;\r\n  IF v_company_id IS NULL THEN RAISE EXCEPTION 'Listing not found'; END IF;\r\n\r\n  SELECT owner_id INTO v_owner FROM public.companies WHERE id = v_company_id;\r\n  IF v_owner IS NULL OR v_owner <> auth.uid() THEN\r\n    IF NOT public.has_role(auth.uid(), 'admin') THEN\r\n      RAISE EXCEPTION 'Only the listing company owner can record a conversion';\r\n    END IF;\r\n  END IF;\r\n\r\n  UPDATE public.referrals SET conversions = conversions + 1 WHERE id = _referral_id;\r\n\r\n  INSERT INTO public.commissions (agent_id, company_id, listing_id, amount, currency, status, notes)\r\n  VALUES (v_referral.agent_id, v_company_id, v_referral.listing_id, _amount, COALESCE(_currency,'USD'), 'pending', _notes)\r\n  RETURNING id INTO v_commission_id;\r\n\r\n  RETURN v_commission_id;\r\nEND;\r\n$function$\n",
+        "anon_execute": false,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "enforce_listing_owner",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.enforce_listing_owner()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nDECLARE\r\n  canonical_owner uuid;\r\nBEGIN\r\n  SELECT company.owner_id\r\n  INTO canonical_owner\r\n  FROM public.companies AS company\r\n  WHERE company.id = NEW.company_id;\r\n\r\n  IF canonical_owner IS NULL THEN\r\n    RAISE EXCEPTION 'listing_company_owner_not_found';\r\n  END IF;\r\n\r\n  NEW.owner_id := canonical_owner;\r\n  RETURN NEW;\r\nEND;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "handle_new_user",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nBEGIN\r\n  INSERT INTO public.profiles (id, full_name, avatar_url)\r\n  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email,'@',1)), NEW.raw_user_meta_data->>'avatar_url')\r\n  ON CONFLICT (id) DO NOTHING;\r\n\r\n  -- default role agent; user can change later\r\n  INSERT INTO public.user_roles (user_id, role)\r\n  VALUES (NEW.id, COALESCE((NEW.raw_user_meta_data->>'role')::public.app_role, 'agent'))\r\n  ON CONFLICT DO NOTHING;\r\n  RETURN NEW;\r\nEND; $function$\n",
+        "anon_execute": false,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "name": "has_role",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_user_id uuid, _role app_role",
+        "definition": "CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role app_role)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$ SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = _user_id AND role = _role) $function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "increment_catalog_downloads",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_company_id uuid",
+        "definition": "CREATE OR REPLACE FUNCTION public.increment_catalog_downloads(_company_id uuid)\n RETURNS void\n LANGUAGE sql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  INSERT INTO public.company_profiles_extra (company_id, downloads_count)\r\n  VALUES (_company_id, 1)\r\n  ON CONFLICT (company_id) DO UPDATE\r\n    SET downloads_count = company_profiles_extra.downloads_count + 1;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "increment_listing_click",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_id uuid",
+        "definition": "CREATE OR REPLACE FUNCTION public.increment_listing_click(_id uuid)\n RETURNS void\n LANGUAGE sql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  UPDATE public.listings SET clicks_count = clicks_count + 1 WHERE id = _id;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "increment_listing_view",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_id uuid",
+        "definition": "CREATE OR REPLACE FUNCTION public.increment_listing_view(_id uuid)\n RETURNS void\n LANGUAGE sql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  UPDATE public.listings SET views_count = views_count + 1 WHERE id = _id;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "increment_partner_click",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_offer_id uuid",
+        "definition": "CREATE OR REPLACE FUNCTION public.increment_partner_click(_offer_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nBEGIN\r\n  UPDATE public.partner_offers\r\n  SET click_count = click_count + 1,\r\n      updated_at  = now()\r\n  WHERE id = _offer_id AND is_active = true;\r\nEND;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "increment_referral_click",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_code text",
+        "definition": "CREATE OR REPLACE FUNCTION public.increment_referral_click(_code text)\n RETURNS TABLE(listing_id uuid)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nBEGIN\r\n  RETURN QUERY\r\n  UPDATE public.referrals\r\n  SET clicks = clicks + 1\r\n  WHERE code = _code\r\n  RETURNING referrals.listing_id;\r\nEND;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "set_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.set_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\r\nBEGIN NEW.updated_at = now(); RETURN NEW; END $function$\n",
+        "anon_execute": true,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "stamp_commission_paid",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.stamp_commission_paid()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nBEGIN\r\n  IF NEW.status = 'paid' AND (OLD.status IS DISTINCT FROM 'paid') THEN\r\n    NEW.paid_at = now();\r\n  END IF;\r\n  RETURN NEW;\r\nEND;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "track_company_referral_click",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "_code text",
+        "definition": "CREATE OR REPLACE FUNCTION public.track_company_referral_click(_code text)\n RETURNS void\n LANGUAGE sql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  UPDATE public.company_referrals SET clicks = clicks + 1 WHERE code = _code;\r\n$function$\n",
+        "anon_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "name": "update_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.update_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nBEGIN NEW.updated_at = now(); RETURN NEW; END; $function$\n",
+        "anon_execute": true,
+        "security_definer": false,
+        "authenticated_execute": true
+      }
+    ]
+  }
+]
+

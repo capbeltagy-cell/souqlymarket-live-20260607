@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Save, Settings2 } from "lucide-react";
+import { CreditCard, Loader2, Save, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,11 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getPlatformSettings, updatePlatformSettings } from "@/lib/marketing.functions";
 import { requireAdminRoute } from "@/lib/route-guards";
 import { adminSettingsHistory } from "@/lib/admin-phase2-ui.functions";
+import {
+  adminGetManualPaymentMethods,
+  adminUpdateManualPaymentMethods,
+  type ManualPaymentMethod,
+} from "@/lib/manual-payments.functions";
 
 export const Route = createFileRoute("/_authenticated/admin-platform-settings")({
   beforeLoad: requireAdminRoute,
@@ -25,9 +30,12 @@ function SettingsPage() {
   const ar = locale === "ar";
   const fetchSettings = useServerFn(getPlatformSettings);
   const saveSettings = useServerFn(updatePlatformSettings);
+  const fetchPaymentMethods = useServerFn(adminGetManualPaymentMethods);
+  const savePaymentMethods = useServerFn(adminUpdateManualPaymentMethods);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<ManualPaymentMethod[]>([]);
   const [history, setHistory] = useState<unknown[]>([]);
   const [historyMessage, setHistoryMessage] = useState<string | null>(null);
 
@@ -50,6 +58,21 @@ function SettingsPage() {
         setLoadingError(message);
         toast.error(message);
       });
+    fetchPaymentMethods()
+      .then((result) => {
+        if (active) setPaymentMethods(result.methods);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        const message =
+          error instanceof Error
+            ? error.message
+            : ar
+              ? "تعذر تحميل وسائل الدفع"
+              : "Unable to load payment methods";
+        setLoadingError(message);
+        toast.error(message);
+      });
     adminSettingsHistory()
       .then((result) => {
         setHistory(result.rows);
@@ -60,10 +83,20 @@ function SettingsPage() {
     return () => {
       active = false;
     };
-  }, [ar, fetchSettings]);
+  }, [ar, fetchPaymentMethods, fetchSettings]);
 
   const updateField = <K extends keyof Settings>(key: K, value: Settings[K]) => {
     setSettings((current: Settings | null) => (current ? { ...current, [key]: value } : current));
+  };
+
+  const updatePaymentMethod = <K extends keyof ManualPaymentMethod>(
+    code: ManualPaymentMethod["code"],
+    key: K,
+    value: ManualPaymentMethod[K],
+  ) => {
+    setPaymentMethods((current) =>
+      current.map((method) => (method.code === code ? { ...method, [key]: value } : method)),
+    );
   };
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
@@ -100,17 +133,27 @@ function SettingsPage() {
             : "Platform and marketer percentages must total 100%",
         );
       }
+      if (paymentMethods.length !== 2) {
+        throw new Error(
+          ar
+            ? "يجب إعداد إنستا باي وفودافون كاش قبل الحفظ"
+            : "Configure InstaPay and Vodafone Cash before saving",
+        );
+      }
 
-      await saveSettings({
-        data: {
-          platform_commission_pct: platform,
-          marketer_commission_pct: marketer,
-          min_withdrawal_amount: minimumWithdrawal,
-          withdrawal_review_mode: settings.withdrawal_review_mode,
-          subscription_marketer_commission_pct: subscriptionCommission,
-          subscription_plan_price_egp: subscriptionPrice,
-        },
-      });
+      await Promise.all([
+        saveSettings({
+          data: {
+            platform_commission_pct: platform,
+            marketer_commission_pct: marketer,
+            min_withdrawal_amount: minimumWithdrawal,
+            withdrawal_review_mode: settings.withdrawal_review_mode,
+            subscription_marketer_commission_pct: subscriptionCommission,
+            subscription_plan_price_egp: subscriptionPrice,
+          },
+        }),
+        savePaymentMethods({ data: { methods: paymentMethods } }),
+      ]);
 
       setSettings((current: Settings | null) =>
         current
@@ -238,6 +281,86 @@ function SettingsPage() {
                     <option value="auto">{ar ? "تلقائي" : "Automatic"}</option>
                   </select>
                 </Field>
+              </div>
+            </section>
+
+            <section className="border-t border-border pt-6">
+              <div className="mb-4 flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="font-semibold">
+                    {ar ? "وسائل الدفع اليدوي" : "Manual payment methods"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "الأرقام والتعليمات الظاهرة للعميل تأتي من هذه الإعدادات مباشرة."
+                      : "Customer-facing numbers and instructions come directly from these settings."}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {paymentMethods.map((method) => (
+                  <div key={method.code} className="rounded-xl border bg-muted/20 p-4">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <strong>{ar ? method.nameAr : method.nameEn}</strong>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={method.isActive}
+                          onChange={(event) =>
+                            updatePaymentMethod(method.code, "isActive", event.target.checked)
+                          }
+                        />
+                        {ar ? "مفعلة" : "Active"}
+                      </label>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Field label={ar ? "رقم التحويل" : "Destination number"}>
+                        <Input
+                          dir="ltr"
+                          inputMode="tel"
+                          value={method.number}
+                          onChange={(event) =>
+                            updatePaymentMethod(method.code, "number", event.target.value)
+                          }
+                          placeholder="+201XXXXXXXXX"
+                        />
+                      </Field>
+                      <Field label={ar ? "الترتيب" : "Sort order"}>
+                        <Input
+                          type="number"
+                          min={0}
+                          max={1000}
+                          value={method.sortOrder}
+                          onChange={(event) =>
+                            updatePaymentMethod(
+                              method.code,
+                              "sortOrder",
+                              Number(event.target.value),
+                            )
+                          }
+                        />
+                      </Field>
+                      <Field label={ar ? "التعليمات بالعربية" : "Arabic instructions"}>
+                        <Input
+                          value={method.instructionsAr}
+                          onChange={(event) =>
+                            updatePaymentMethod(method.code, "instructionsAr", event.target.value)
+                          }
+                        />
+                      </Field>
+                      <Field label={ar ? "التعليمات بالإنجليزية" : "English instructions"}>
+                        <Input
+                          dir="ltr"
+                          value={method.instructionsEn}
+                          onChange={(event) =>
+                            updatePaymentMethod(method.code, "instructionsEn", event.target.value)
+                          }
+                        />
+                      </Field>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
 

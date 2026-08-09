@@ -296,10 +296,12 @@ function MessagesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <section className="container-souqly py-6 flex-1">
+      <section className="container-souqly flex-1 py-5 md:py-7">
         <h1 className="text-2xl font-bold mb-4">الرسائل</h1>
-        <div className="grid md:grid-cols-[280px_1fr] gap-4 h-[75vh]">
-          <aside className="border border-border rounded-lg bg-card overflow-y-auto">
+        <div className="grid min-h-[68vh] gap-4 md:h-[75vh] md:grid-cols-[280px_1fr]">
+          <aside
+            className={`${activeId ? "hidden md:block" : "block"} overflow-y-auto rounded-xl border border-border bg-card shadow-card`}
+          >
             {convs.length === 0 ? (
               <p className="p-4 text-sm text-muted-foreground text-center">لا توجد محادثات بعد</p>
             ) : (
@@ -307,7 +309,7 @@ function MessagesPage() {
                 <button
                   key={c.id}
                   onClick={() => setActiveId(c.id)}
-                  className={`w-full text-start p-3 border-b border-border hover:bg-muted transition ${activeId === c.id ? "bg-muted" : ""}`}
+                  className={`w-full border-b border-border p-3 text-start transition hover:bg-accent/5 ${activeId === c.id ? "bg-accent/10" : ""}`}
                 >
                   <div className="text-sm font-medium">محادثة #{c.id.slice(0, 8)}</div>
                   <div className="text-xs text-muted-foreground">
@@ -317,7 +319,9 @@ function MessagesPage() {
               ))
             )}
           </aside>
-          <div className="border border-border rounded-lg bg-card flex flex-col">
+          <div
+            className={`${activeId ? "flex" : "hidden md:flex"} min-h-[68vh] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-card`}
+          >
             {active ? (
               <>
                 <div className="border-b border-border p-3 flex items-center justify-between">
@@ -439,7 +443,13 @@ function MessageBubble({ m, mine }: { m: Msg; mine: boolean }) {
       >
         {m.attachment_type === "image" && m.attachment_url && (
           <a href={m.attachment_url} target="_blank" rel="noreferrer">
-            <img src={m.attachment_url} alt="" className="rounded-lg max-h-64 mb-1" />
+            <img
+              src={m.attachment_url}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="mb-1 max-h-64 rounded-lg"
+            />
           </a>
         )}
         {m.attachment_type === "pdf" && m.attachment_url && (

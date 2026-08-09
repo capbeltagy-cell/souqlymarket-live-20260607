@@ -1,0 +1,1966 @@
+[
+  {
+    "policies": [
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_applications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent creates application",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = agent_applications.agent_id) AND (a.user_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = agent_applications.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_applications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent views own applications",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = agent_applications.company_id) AND (c.owner_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_applications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company updates application",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = agent_applications.company_id) AND (c.owner_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_applications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company views applications",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent inserts own agent_campaigns",
+        "schemaname": "public",
+        "with_check": "(agent_id = auth.uid())"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((agent_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM commission_campaigns cc\n  WHERE ((cc.id = agent_campaigns.campaign_id) AND (cc.created_by = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent reads own agent_campaigns",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((agent_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent updates own agent_campaigns",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin updates commissions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((agent_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent reads own commissions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "agent_commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company inserts commissions",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = agent_landing_pages.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_landing_pages",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent manages own landing pages",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = agent_landing_pages.agent_id) AND (a.user_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agent_landing_pages",
+        "permissive": "PERMISSIVE",
+        "policyname": "Landing pages readable",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agents",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage agents",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agents",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent manages own profile",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = user_id)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "agents",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agents viewable by everyone",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "business_categories",
+        "permissive": "PERMISSIVE",
+        "policyname": "categories admin write",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "business_categories",
+        "permissive": "PERMISSIVE",
+        "policyname": "categories public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "tablename": "campaign_leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Anyone submits campaign lead",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM commission_campaigns cc\n  WHERE ((cc.id = campaign_leads.campaign_id) AND (cc.created_by = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "campaign_leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company updates lead status",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((agent_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM commission_campaigns cc\n  WHERE ((cc.id = campaign_leads.campaign_id) AND (cc.created_by = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "campaign_leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company, agent, admin reads leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((created_by = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "commission_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner deletes campaigns",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "commission_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner inserts campaigns",
+        "schemaname": "public",
+        "with_check": "(created_by = auth.uid())"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((created_by = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "commission_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner updates campaigns",
+        "schemaname": "public",
+        "with_check": "((created_by = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((status = 'active'::text) OR has_role(auth.uid(), 'admin'::app_role) OR ((auth.uid() IS NOT NULL) AND (created_by = auth.uid())))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "commission_campaigns",
+        "permissive": "PERMISSIVE",
+        "policyname": "Public reads active campaigns",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage commissions",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((status = 'approved'::commission_status) AND (EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = commissions.agent_id) AND (a.user_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent requests payout",
+        "schemaname": "public",
+        "with_check": "((status = 'approved'::commission_status) AND (EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = commissions.agent_id) AND (a.user_id = auth.uid())))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = commissions.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent views own commissions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = commissions.company_id) AND (c.owner_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company manages commissions",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = commissions.company_id) AND (c.owner_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = commissions.company_id) AND (c.owner_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "commissions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company views own commissions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "companies",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage companies",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "companies",
+        "permissive": "PERMISSIVE",
+        "policyname": "Companies viewable by everyone",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(auth.uid() = owner_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "companies",
+        "permissive": "PERMISSIVE",
+        "policyname": "Owner manages company",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = owner_id)"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = company_profiles_extra.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "company_profiles_extra",
+        "permissive": "PERMISSIVE",
+        "policyname": "profile extra owner write",
+        "schemaname": "public",
+        "with_check": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = company_profiles_extra.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "company_profiles_extra",
+        "permissive": "PERMISSIVE",
+        "policyname": "profile extra public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "company_referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "company referrals owner insert",
+        "schemaname": "public",
+        "with_check": "(owner_user_id = auth.uid())"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((owner_user_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "company_referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "company referrals owner update",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "company_referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "company referrals public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "credit_transactions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company inserts credit transactions",
+        "schemaname": "public",
+        "with_check": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = credit_transactions.company_id) AND (c.owner_id = auth.uid())))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = credit_transactions.company_id) AND (c.owner_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "credit_transactions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company reads own credit transactions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "factories",
+        "permissive": "PERMISSIVE",
+        "policyname": "Factories public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = factories.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "factories",
+        "permissive": "PERMISSIVE",
+        "policyname": "Factory owner write",
+        "schemaname": "public",
+        "with_check": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = factories.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = factories.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "factories",
+        "permissive": "PERMISSIVE",
+        "policyname": "factories owner write",
+        "schemaname": "public",
+        "with_check": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = factories.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "factories",
+        "permissive": "PERMISSIVE",
+        "policyname": "factories public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "favorites",
+        "permissive": "PERMISSIVE",
+        "policyname": "User manages own favorites",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = user_id)"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "lead_unlock_requests",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin updates unlock requests",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "lead_unlock_requests",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company inserts unlock request",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = lead_unlock_requests.company_id) AND (c.owner_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = lead_unlock_requests.company_id) AND (c.owner_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "lead_unlock_requests",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company or admin reads unlock requests",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin manages all leads",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = leads.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent updates assigned leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = leads.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent views assigned leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Anyone can submit a lead",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = leads.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner deletes own leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = leads.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner updates own leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = leads.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner views own leads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "leads",
+        "permissive": "PERMISSIVE",
+        "policyname": "leads admin read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "listings",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage listings",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((status = 'approved'::listing_status) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = listings.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "listings",
+        "permissive": "PERMISSIVE",
+        "policyname": "Approved listings viewable by all",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = listings.company_id) AND (c.owner_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "listings",
+        "permissive": "PERMISSIVE",
+        "policyname": "Company owner manages listings",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = listings.company_id) AND (c.owner_id = auth.uid()))))"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin manages notifications",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated creates notifications",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "service_role"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Service creates notifications",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Service inserts notifications",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "User marks own notifications read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "User views own notifications",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users mark own notifications read",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = user_id)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users view own notifications",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "public"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "notif_insert_any",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "notif_select_own",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "notifications",
+        "permissive": "PERMISSIVE",
+        "policyname": "notif_update_own",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "partner_offers",
+        "permissive": "PERMISSIVE",
+        "policyname": "admin_full_access_partner_offers",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(is_active = true)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "partner_offers",
+        "permissive": "PERMISSIVE",
+        "policyname": "public_read_active_partner_offers",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "payments",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage payments",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((auth.uid() = user_id) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "payments",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users view own payments",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "payments",
+        "permissive": "PERMISSIVE",
+        "policyname": "payments admin read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "payments",
+        "permissive": "PERMISSIVE",
+        "policyname": "payments user read own",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_messages",
+        "permissive": "PERMISSIVE",
+        "policyname": "Message participant inserts",
+        "schemaname": "public",
+        "with_check": "(sender_id = auth.uid())"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM platform_threads t\n  WHERE ((t.id = platform_messages.thread_id) AND ((t.agent_id = auth.uid()) OR (EXISTS ( SELECT 1\n           FROM companies c\n          WHERE ((c.id = t.company_id) AND (c.owner_id = auth.uid())))))))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_messages",
+        "permissive": "PERMISSIVE",
+        "policyname": "Message participant reads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM platform_threads t\n  WHERE ((t.id = platform_messages.thread_id) AND ((t.agent_id = auth.uid()) OR (EXISTS ( SELECT 1\n           FROM companies c\n          WHERE ((c.id = t.company_id) AND (c.owner_id = auth.uid())))))))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_messages",
+        "permissive": "PERMISSIVE",
+        "policyname": "Message participant updates",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_settings",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin manages platform settings",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "platform_settings",
+        "permissive": "PERMISSIVE",
+        "policyname": "Public reads platform settings",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_threads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Thread participant inserts",
+        "schemaname": "public",
+        "with_check": "true"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (agent_id = auth.uid()) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = platform_threads.company_id) AND (c.owner_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_threads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Thread participant reads",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(has_role(auth.uid(), 'admin'::app_role) OR (agent_id = auth.uid()) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = platform_threads.company_id) AND (c.owner_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "platform_threads",
+        "permissive": "PERMISSIVE",
+        "policyname": "Thread participant updates",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "profiles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins read all profiles",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "profiles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Profiles are viewable by everyone",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "public"
+        ],
+        "tablename": "profiles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users insert own profile",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = id)"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(auth.uid() = id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "profiles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users update own profile",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = referrals.agent_id) AND (a.user_id = auth.uid()))))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "Agent manages own referrals",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM agents a\n  WHERE ((a.id = referrals.agent_id) AND (a.user_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "Referrals lookup by code",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "referrals",
+        "permissive": "PERMISSIVE",
+        "policyname": "Referrals readable",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfq_offers",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq_offers company insert",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = rfq_offers.company_id) AND (c.owner_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((EXISTS ( SELECT 1\n   FROM rfqs r\n  WHERE ((r.id = rfq_offers.rfq_id) AND (r.buyer_id = auth.uid())))) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = rfq_offers.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfq_offers",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq_offers read by stakeholders",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((EXISTS ( SELECT 1\n   FROM rfqs r\n  WHERE ((r.id = rfq_offers.rfq_id) AND (r.buyer_id = auth.uid())))) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = rfq_offers.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfq_offers",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq_offers update by stakeholders",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((buyer_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfqs",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfqs buyer delete",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfqs",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfqs buyer insert",
+        "schemaname": "public",
+        "with_check": "(buyer_id = auth.uid())"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((buyer_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "rfqs",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfqs buyer update",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "rfqs",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfqs public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage all subscriptions",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage subscriptions",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins view subscriptions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "User views own subscription",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users insert own subscriptions",
+        "schemaname": "public",
+        "with_check": "(auth.uid() = user_id)"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users update own subscriptions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "subscriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users view own subscriptions",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tender_proposals",
+        "permissive": "PERMISSIVE",
+        "policyname": "tender_proposals company insert",
+        "schemaname": "public",
+        "with_check": "(EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = tender_proposals.company_id) AND (c.owner_id = auth.uid()))))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((EXISTS ( SELECT 1\n   FROM tenders t\n  WHERE ((t.id = tender_proposals.tender_id) AND (t.publisher_id = auth.uid())))) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = tender_proposals.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tender_proposals",
+        "permissive": "PERMISSIVE",
+        "policyname": "tender_proposals stakeholders read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((EXISTS ( SELECT 1\n   FROM tenders t\n  WHERE ((t.id = tender_proposals.tender_id) AND (t.publisher_id = auth.uid())))) OR (EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = tender_proposals.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tender_proposals",
+        "permissive": "PERMISSIVE",
+        "policyname": "tender_proposals stakeholders update",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "tenders",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenders public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((publisher_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tenders",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenders publisher delete",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tenders",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenders publisher insert",
+        "schemaname": "public",
+        "with_check": "(publisher_id = auth.uid())"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((publisher_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "tenders",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenders publisher update",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "user_roles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admins manage roles",
+        "schemaname": "public",
+        "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "user_roles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Super-admin bootstrap role",
+        "schemaname": "public",
+        "with_check": "((user_id = auth.uid()) AND (role = 'admin'::app_role) AND ((auth.jwt() ->> 'email'::text) = ANY (ARRAY['capbeltagy@gmail.com'::text, 'capbeltagy95@gmail.com'::text])))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(auth.uid() = user_id)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "user_roles",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users view own roles",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "has_role(auth.uid(), 'admin'::app_role)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "violation_reports",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin updates violation",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "violation_reports",
+        "permissive": "PERMISSIVE",
+        "policyname": "Reporter inserts violation",
+        "schemaname": "public",
+        "with_check": "(reporter_id = auth.uid())"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((reporter_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "violation_reports",
+        "permissive": "PERMISSIVE",
+        "policyname": "Reporter or admin reads violation",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "ALL",
+        "qual": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = wholesale_listings.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "wholesale_listings",
+        "permissive": "PERMISSIVE",
+        "policyname": "wholesale owner write",
+        "schemaname": "public",
+        "with_check": "((EXISTS ( SELECT 1\n   FROM companies c\n  WHERE ((c.id = wholesale_listings.company_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "true",
+        "roles": [
+          "public"
+        ],
+        "tablename": "wholesale_listings",
+        "permissive": "PERMISSIVE",
+        "policyname": "wholesale public read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "wholesale_orders",
+        "permissive": "PERMISSIVE",
+        "policyname": "wholesale_orders buyer insert",
+        "schemaname": "public",
+        "with_check": "(buyer_id = auth.uid())"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((EXISTS ( SELECT 1\n   FROM (wholesale_listings wl\n     JOIN companies c ON ((c.id = wl.company_id)))\n  WHERE ((wl.id = wholesale_orders.listing_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "wholesale_orders",
+        "permissive": "PERMISSIVE",
+        "policyname": "wholesale_orders company update",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((buyer_id = auth.uid()) OR (EXISTS ( SELECT 1\n   FROM (wholesale_listings wl\n     JOIN companies c ON ((c.id = wl.company_id)))\n  WHERE ((wl.id = wholesale_orders.listing_id) AND (c.owner_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "wholesale_orders",
+        "permissive": "PERMISSIVE",
+        "policyname": "wholesale_orders stakeholders read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((bucket_id = 'payment-proofs'::text) AND has_role(auth.uid(), 'admin'::app_role))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Admin reads all payment proofs",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated delete own avatars",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'company-assets'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated delete own company-assets",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'listing-media'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated delete own listing-media",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated update own avatars",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'company-assets'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated update own company-assets",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'company-assets'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'listing-media'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated update own listing-media",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'listing-media'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated upload avatars",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated upload company-assets",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'company-assets'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Authenticated upload listing-media",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'listing-media'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'avatars'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Public read avatars",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'company-assets'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Public read company-assets",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'listing-media'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Public read listing-media",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((bucket_id = 'payment-proofs'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users read own payment proofs",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "Users upload own payment proofs",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'payment-proofs'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'partner-assets'::text) AND (auth.role() = 'authenticated'::text))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "authenticated_delete_partner_assets",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "authenticated_insert_partner_assets",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'partner-assets'::text) AND (auth.role() = 'authenticated'::text))"
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'partner-assets'::text) AND (auth.role() = 'authenticated'::text))",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "authenticated_update_partner_assets",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(bucket_id = 'avatars'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "avatars auth update",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "avatars auth upload",
+        "schemaname": "storage",
+        "with_check": "(bucket_id = 'avatars'::text)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'avatars'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "avatars public read",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(bucket_id = 'company-assets'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-assets auth update",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-assets auth upload",
+        "schemaname": "storage",
+        "with_check": "(bucket_id = 'company-assets'::text)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'company-assets'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-assets public read",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'company-catalogs'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-catalogs owner delete",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'company-catalogs'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-catalogs owner update",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'company-catalogs'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))"
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-catalogs owner write",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'company-catalogs'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'company-catalogs'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "company-catalogs read auth",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "(bucket_id = 'listing-media'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "listing-media auth delete",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "(bucket_id = 'listing-media'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "listing-media auth update",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "listing-media auth upload",
+        "schemaname": "storage",
+        "with_check": "(bucket_id = 'listing-media'::text)"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'listing-media'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "listing-media public read",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((bucket_id = 'payment-proofs'::text) AND (EXISTS ( SELECT 1\n   FROM user_roles\n  WHERE ((user_roles.user_id = auth.uid()) AND (user_roles.role = 'admin'::app_role)))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "payment_proofs_admin_select",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "((bucket_id = 'payment-proofs'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "payment_proofs_user_select",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "payment_proofs_user_upload",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'payment-proofs'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'partner-assets'::text)",
+        "roles": [
+          "public"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "public_read_partner_assets",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'rfq-attachments'::text) AND (EXISTS ( SELECT 1\n   FROM rfqs r\n  WHERE (((r.id)::text = (storage.foldername(objects.name))[1]) AND (r.buyer_id = auth.uid())))))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq-attachments buyer update",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'rfq-attachments'::text) AND (EXISTS ( SELECT 1\n   FROM rfqs r\n  WHERE (((r.id)::text = (storage.foldername(objects.name))[1]) AND (r.buyer_id = auth.uid())))))"
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((bucket_id = 'rfq-attachments'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq-attachments owner delete",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "UPDATE",
+        "qual": "((bucket_id = 'rfq-attachments'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq-attachments owner update",
+        "schemaname": "storage",
+        "with_check": null
+      },
+      {
+        "cmd": "INSERT",
+        "qual": null,
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq-attachments owner write",
+        "schemaname": "storage",
+        "with_check": "((bucket_id = 'rfq-attachments'::text) AND ((auth.uid())::text = (storage.foldername(name))[1]))"
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "(bucket_id = 'rfq-attachments'::text)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "objects",
+        "permissive": "PERMISSIVE",
+        "policyname": "rfq-attachments read auth",
+        "schemaname": "storage",
+        "with_check": null
+      }
+    ]
+  }
+]
+

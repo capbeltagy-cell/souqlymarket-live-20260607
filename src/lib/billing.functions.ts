@@ -31,7 +31,7 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: true,
     landingPages: false,
     prioritySupport: true,
-    priceMonthly: 79,
+    priceMonthly: 499,
   },
   premium_agent: {
     maxListings: 5,
@@ -40,7 +40,7 @@ export const PLAN_LIMITS: Record<
     advancedAnalytics: true,
     landingPages: true,
     prioritySupport: true,
-    priceMonthly: 29,
+    priceMonthly: 0,
   },
 };
 
@@ -50,7 +50,7 @@ export const getMyPlan = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: company } = await supabase
       .from("companies")
-      .select("id, subscription_plan")
+      .select("id, subscription_plan, subscription_expires_at")
       .eq("owner_id", userId)
       .maybeSingle();
     const { data: agent } = await supabase
@@ -66,11 +66,20 @@ export const getMyPlan = createServerFn({ method: "GET" })
       .order("started_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+    const subscriptionIsCurrent =
+      Boolean(sub?.is_active) &&
+      (!sub?.expires_at || new Date(sub.expires_at).getTime() > Date.now());
+    const companyPlanIsCurrent =
+      company?.subscription_plan === "premium_company" &&
+      (!company.subscription_expires_at ||
+        new Date(company.subscription_expires_at).getTime() > Date.now());
+    const candidate = subscriptionIsCurrent
+      ? sub?.plan
+      : companyPlanIsCurrent
+        ? company.subscription_plan
+        : agent?.subscription_plan;
     const plan: PlanKey =
-      (sub?.plan as PlanKey) ??
-      (company?.subscription_plan as PlanKey) ??
-      (agent?.subscription_plan as PlanKey) ??
-      "free";
+      candidate === "premium_company" || candidate === "premium_agent" ? candidate : "free";
     return {
       plan,
       limits: PLAN_LIMITS[plan],

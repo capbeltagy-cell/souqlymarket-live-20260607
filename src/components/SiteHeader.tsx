@@ -22,6 +22,7 @@ import {
   Menu,
   Store,
   Home,
+  ChevronDown,
 } from "lucide-react";
 import { cartCount, subscribeCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -56,59 +57,85 @@ export function SiteHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70"
+      className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <div className="container-souqly flex h-14 lg:h-16 items-center gap-2 lg:gap-4">
+      <div className="container-souqly flex h-14 items-center gap-2 lg:gap-3">
         <Link
           to="/"
           className="group flex items-center gap-2 lg:gap-3 font-bold text-lg shrink-0"
           aria-label="سوقلي — الرئيسية"
         >
-          <div className="relative flex h-9 w-9 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold transition-transform group-hover:-translate-y-0.5">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-gold transition-transform group-hover:-translate-y-0.5">
             <BriefcaseBusiness className="h-4 w-4 lg:h-5 lg:w-5" />
             <span className="absolute -end-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-background bg-success" />
           </div>
           <span className="leading-none">
-            <span className="block text-serif text-xl lg:text-2xl text-foreground tracking-tight">
+            <span className="block text-serif text-xl text-foreground tracking-tight">
               {t("brand")}
-            </span>
-            <span className="hidden lg:block mt-1 text-[9px] font-semibold tracking-[0.16em] text-muted-foreground">
-              سوق الأعمال المصري
             </span>
           </span>
         </Link>
 
         <nav
-          className="hidden lg:flex items-center gap-1 text-sm font-medium"
+          className="hidden lg:flex min-w-0 items-center gap-0.5 text-sm font-medium"
           aria-label="التنقل الرئيسي"
         >
-          <PrimaryLink to="/" label="الرئيسية" />
           <PrimaryLink to="/marketplace" label={t("nav_marketplace")} />
-          <PrimaryLink to="/stores" label="المتاجر" />
-          <PrimaryLink to="/companies" label={t("nav_companies")} />
+          <PrimaryLink to="/companies" label="الشركات والمصانع" />
           <PrimaryLink to="/rfq" label="طلبات الأسعار" />
-          <PrimaryLink to="/store/open" label="افتح متجرك" emphasis />
+          <PrimaryLink to="/services" label="الخدمات" />
+          <PrimaryLink to="/business-solutions" label="الأعمال" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 rounded-full text-muted-foreground"
+              >
+                المزيد <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52">
+              <MobilePrimaryLink to="/factories" icon={<Store />} label="دليل المصانع" />
+              <MobilePrimaryLink to="/tenders" icon={<ListChecks />} label="المناقصات" />
+              <MobilePrimaryLink to="/earn" icon={<Link2 />} label="برنامج المسوقين" />
+              <MobilePrimaryLink to="/contact" icon={<MessageSquare />} label="المساعدة" />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="ms-auto flex items-center gap-1.5 lg:gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="فتح القائمة">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                aria-label="فتح قائمة التنقل"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-64" aria-label="روابط التنقل">
               <MobilePrimaryLink to="/" icon={<Home />} label="الرئيسية" />
               <MobilePrimaryLink to="/marketplace" icon={<ShoppingBag />} label="السوق" />
-              <MobilePrimaryLink to="/stores" icon={<Store />} label="المتاجر" />
               <MobilePrimaryLink to="/companies" icon={<Building2 />} label="الشركات" />
+              <MobilePrimaryLink to="/factories" icon={<Store />} label="المصانع" />
+              <MobilePrimaryLink to="/services" icon={<Briefcase />} label="الخدمات" />
               <MobilePrimaryLink to="/rfq" icon={<ListChecks />} label="طلبات الأسعار" />
+              <MobilePrimaryLink
+                to="/business-solutions"
+                icon={<BriefcaseBusiness />}
+                label="حلول الأعمال"
+              />
+              <MobilePrimaryLink to="/tenders" icon={<ListChecks />} label="المناقصات" />
+              <MobilePrimaryLink to="/contact" icon={<MessageSquare />} label="المساعدة" />
               <DropdownMenuSeparator />
               <MobilePrimaryLink to="/store/open" icon={<PlusCircle />} label="افتح متجرك" />
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="hidden xl:block w-[260px]">
+          <div className="hidden 2xl:block w-[240px]">
             <GlobalSearch compact />
           </div>
 
@@ -222,7 +249,7 @@ export function SiteHeader() {
                       <DropdownMenuSubTrigger className="gap-2">
                         <UserIcon className="h-4 w-4" />
                         الحساب
-                        <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
+                        <ChevronRight className="ms-auto h-4 w-4 opacity-60 rtl:rotate-180" />
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent className="w-56">
                         <DropdownMenuItem asChild>
@@ -264,7 +291,7 @@ export function SiteHeader() {
                         <DropdownMenuSubTrigger className="gap-2">
                           <Briefcase className="h-4 w-4" />
                           الأعمال
-                          <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
+                          <ChevronRight className="ms-auto h-4 w-4 opacity-60 rtl:rotate-180" />
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-56">
                           {isCompany && (
@@ -298,7 +325,7 @@ export function SiteHeader() {
                       <DropdownMenuSubTrigger className="gap-2">
                         <Link2 className="h-4 w-4" />
                         التسويق
-                        <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
+                        <ChevronRight className="ms-auto h-4 w-4 opacity-60 rtl:rotate-180" />
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent className="w-56">
                         <DropdownMenuItem asChild>
@@ -328,7 +355,7 @@ export function SiteHeader() {
                       <DropdownMenuSubTrigger className="gap-2">
                         <ShieldCheck className="h-4 w-4" />
                         أدوات المشرف
-                        <ChevronRight className="ms-auto h-4 w-4 opacity-60" />
+                        <ChevronRight className="ms-auto h-4 w-4 opacity-60 rtl:rotate-180" />
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent className="w-56">
                         <DropdownMenuItem asChild>
@@ -375,7 +402,11 @@ export function SiteHeader() {
               <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                 <Link to="/auth">{t("nav_signin")}</Link>
               </Button>
-              <Button asChild size="sm" className="bg-primary hover:bg-primary-hover">
+              <Button
+                asChild
+                size="sm"
+                className="hidden bg-primary hover:bg-primary-hover sm:inline-flex"
+              >
                 <Link to="/auth" search={{ mode: "signup" }}>
                   <span className="sm:hidden">ابدأ</span>
                   <span className="hidden sm:inline">{t("nav_signup")}</span>
@@ -386,7 +417,7 @@ export function SiteHeader() {
         </div>
       </div>
       {/* Mobile inline search */}
-      <div className="xl:hidden border-t border-border/60 bg-background/70 px-3 py-2">
+      <div className="border-t border-border/60 bg-background/70 px-3 py-2 2xl:hidden">
         <GlobalSearch compact />
       </div>
     </header>
@@ -398,13 +429,32 @@ function PrimaryLink({
   label,
   emphasis = false,
 }: {
-  to: "/" | "/marketplace" | "/stores" | "/companies" | "/rfq" | "/store/open";
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/tenders"
+    | "/earn"
+    | "/contact"
+    | "/store/open";
   label: string;
   emphasis?: boolean;
 }) {
   return (
     <Link
       to={to}
+      activeOptions={{ exact: to === "/" }}
+      activeProps={{
+        className: emphasis
+          ? "rounded-full bg-primary-hover px-3 py-2 font-semibold text-primary-foreground"
+          : "rounded-full bg-muted px-3 py-2 text-foreground",
+        "aria-current": "page",
+      }}
       className={
         emphasis
           ? "rounded-full bg-primary px-3 py-2 font-semibold text-primary-foreground transition hover:bg-primary-hover"
@@ -421,13 +471,33 @@ function MobilePrimaryLink({
   icon,
   label,
 }: {
-  to: "/" | "/marketplace" | "/stores" | "/companies" | "/rfq" | "/store/open";
+  to:
+    | "/"
+    | "/marketplace"
+    | "/stores"
+    | "/companies"
+    | "/factories"
+    | "/services"
+    | "/rfq"
+    | "/business-solutions"
+    | "/tenders"
+    | "/earn"
+    | "/contact"
+    | "/store/open";
   icon: ReactNode;
   label: string;
 }) {
   return (
     <DropdownMenuItem asChild>
-      <Link to={to} className="gap-2">
+      <Link
+        to={to}
+        activeOptions={{ exact: to === "/" }}
+        activeProps={{
+          className: "gap-2 bg-muted font-semibold text-foreground",
+          "aria-current": "page",
+        }}
+        className="gap-2"
+      >
         <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
         {label}
       </Link>
@@ -444,7 +514,7 @@ function CartButton() {
   return (
     <Link
       to="/cart"
-      aria-label="Cart"
+      aria-label="سلة المشتريات"
       className="relative inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-muted transition"
     >
       <ShoppingCart className="h-5 w-5" />

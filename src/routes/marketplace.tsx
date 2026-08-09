@@ -1,15 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useDeferredValue } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Boxes, Search, SlidersHorizontal, Wrench, Building2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { useI18n } from "@/i18n/I18nProvider";
-import { LISTING_TYPES, type ListingType } from "@/lib/marketplace";
+import type { ListingType } from "@/lib/marketplace";
 import {
   EGYPT_GOVERNORATES,
   getCitiesForGovernorate,
@@ -33,15 +32,25 @@ export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
 });
 
-const TYPES: { value: ListingType | "all"; key: string }[] = [
-  { value: "all", key: "filter_all" },
-  ...LISTING_TYPES.map((t) => ({ value: t, key: `cat_${t}` })),
+type MarketplaceDomain = "all" | "products" | "services" | "assets";
+
+const DOMAIN_TYPES: Record<Exclude<MarketplaceDomain, "all">, ListingType[]> = {
+  products: ["product", "market", "fish_shed"],
+  services: ["service", "opportunity"],
+  assets: ["real_estate", "land", "factory"],
+};
+
+const DOMAINS: { value: MarketplaceDomain; ar: string; en: string }[] = [
+  { value: "all", ar: "الكل", en: "All" },
+  { value: "products", ar: "المنتجات", en: "Products" },
+  { value: "services", ar: "الخدمات", en: "Services" },
+  { value: "assets", ar: "الأصول", en: "Assets" },
 ];
 
 function Marketplace() {
   const { t, locale } = useI18n();
   const [q, setQ] = useState("");
-  const [type, setType] = useState<ListingType | "all">("all");
+  const [domain, setDomain] = useState<MarketplaceDomain>("all");
   const [governorate, setGovernorate] = useState("all");
   const [city, setCity] = useState("all");
   const [items, setItems] = useState<ListingCardData[]>([]);
@@ -59,9 +68,10 @@ function Marketplace() {
       )
       .eq("status", "approved")
       .eq("visible_in_marketplace", true)
+      .neq("type", "company")
       .order("created_at", { ascending: false })
       .limit(120);
-    if (type !== "all") query = query.eq("type", type);
+    if (domain !== "all") query = query.in("type", DOMAIN_TYPES[domain]);
     query.then(({ data }) => {
       if (cancelled) return;
       const rows = (data ?? []) as unknown as ListingCardData[];
@@ -71,7 +81,7 @@ function Marketplace() {
     return () => {
       cancelled = true;
     };
-  }, [type]);
+  }, [domain]);
 
   const cities = governorate !== "all" ? getCitiesForGovernorate(governorate) : [];
 
@@ -79,7 +89,7 @@ function Marketplace() {
   const filtered = useMemo(() => {
     const needle = deferredQ.trim().toLowerCase();
     return items.filter((l) => {
-      if (type !== "all" && l.type !== type) return false;
+      if (domain !== "all" && !DOMAIN_TYPES[domain].includes(l.type)) return false;
       if (governorate !== "all" && normalizeEgyptGovernorate(l.governorate) !== governorate)
         return false;
       if (city !== "all" && normalizeEgyptCity(l.city) !== city) return false;
@@ -88,10 +98,10 @@ function Marketplace() {
         `${l.title_ar ?? ""} ${l.title_en ?? ""} ${l.companies?.name_ar ?? ""} ${l.companies?.name_en ?? ""}`.toLowerCase();
       return hay.includes(needle);
     });
-  }, [items, deferredQ, type, governorate, city]);
+  }, [items, deferredQ, domain, governorate, city]);
 
   const activeCount =
-    (type !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
+    (domain !== "all" ? 1 : 0) + (governorate !== "all" ? 1 : 0) + (city !== "all" ? 1 : 0);
 
   const filterBody = (
     <div className="space-y-5">
@@ -100,15 +110,15 @@ function Marketplace() {
           {t("filter_type")}
         </div>
         <div className="flex flex-wrap gap-2">
-          {TYPES.map((tp) => (
+          {DOMAINS.map((item) => (
             <Button
-              key={tp.value}
+              key={item.value}
               size="sm"
-              variant={type === tp.value ? "default" : "outline"}
-              onClick={() => setType(tp.value)}
-              className={type === tp.value ? "bg-primary hover:bg-primary-hover" : ""}
+              variant={domain === item.value ? "default" : "outline"}
+              onClick={() => setDomain(item.value)}
+              className={domain === item.value ? "bg-primary hover:bg-primary-hover" : ""}
             >
-              {t(tp.key as never)}
+              {locale === "ar" ? item.ar : item.en}
             </Button>
           ))}
         </div>
@@ -159,7 +169,7 @@ function Marketplace() {
           size="sm"
           className="text-muted-foreground"
           onClick={() => {
-            setType("all");
+            setDomain("all");
             setGovernorate("all");
             setCity("all");
           }}
@@ -171,11 +181,49 @@ function Marketplace() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
+    <PublicLayout>
       <section className="bg-surface-2 border-b border-border">
         <div className="container-souqly py-6 md:py-10">
           <h1 className="text-2xl md:text-3xl font-bold mb-4">{t("nav_marketplace")}</h1>
+          <p className="mb-5 max-w-2xl text-sm text-muted-foreground">
+            {locale === "ar"
+              ? "استكشف المنتجات والخدمات والأصول التجارية في مسارات واضحة. الشركات والمصانع لها أدلة مستقلة."
+              : "Explore products, services and business assets in clear domains. Companies and factories have separate directories."}
+          </p>
+          <nav className="mb-6 grid max-w-2xl grid-cols-3 gap-2" aria-label="أقسام السوق">
+            {[
+              {
+                icon: Boxes,
+                label: locale === "ar" ? "المنتجات" : "Products",
+                value: "products",
+              },
+              {
+                icon: Wrench,
+                label: locale === "ar" ? "الخدمات" : "Services",
+                value: "services",
+              },
+              {
+                icon: Building2,
+                label: locale === "ar" ? "الأصول" : "Assets",
+                value: "assets",
+              },
+            ].map(({ icon: Icon, label, value }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setDomain(value as MarketplaceDomain)}
+                aria-pressed={domain === value}
+                className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition ${
+                  domain === value
+                    ? "border-primary bg-primary text-primary-foreground shadow-card"
+                    : "border-border bg-card text-foreground hover:border-accent/50 hover:bg-accent/5"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {label}
+              </button>
+            ))}
+          </nav>
 
           {/* Search + mobile filter trigger */}
           <div className="flex items-center gap-2 max-w-2xl">
@@ -199,7 +247,7 @@ function Marketplace() {
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
                 <SheetHeader>
                   <SheetTitle>{t("filter_type")}</SheetTitle>
                 </SheetHeader>
@@ -215,7 +263,7 @@ function Marketplace() {
           </div>
 
           {/* Desktop inline filters */}
-          <div className="hidden lg:block mt-6 rounded-2xl border border-white/10 bg-surface p-5">
+          <div className="mt-6 hidden rounded-xl border border-border bg-card p-5 shadow-card lg:block">
             {filterBody}
           </div>
         </div>
@@ -225,7 +273,10 @@ function Marketplace() {
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-card p-3 space-y-3">
+              <div
+                key={i}
+                className="space-y-3 rounded-xl border border-border bg-card p-3 shadow-card"
+              >
                 <Skeleton className="h-32 md:h-40 w-full rounded-xl" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
@@ -249,14 +300,13 @@ function Marketplace() {
           {filtered.length} {t("listings_count")} • {locale.toUpperCase()}
         </p>
       </section>
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }
 
 function EmptyState({ title, cta }: { title: string; cta?: { label: string; to: string } }) {
   return (
-    <div className="py-24 text-center">
+    <div className="rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center shadow-card">
       <div className="text-lg font-semibold mb-2">{title}</div>
       {cta && (
         <Button asChild className="mt-4 bg-primary hover:bg-primary-hover">

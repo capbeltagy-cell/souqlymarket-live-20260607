@@ -239,14 +239,14 @@ function CompanyProfile() {
       </section>
       <section className="container-souqly py-8 flex-1 grid lg:grid-cols-3 gap-6">
         <aside className="lg:col-span-1 space-y-4">
-          <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="font-medium">{t("profile_completion")}</span>
               <span className="text-muted-foreground">{profileCompletion(company)}%</span>
             </div>
             <Progress value={profileCompletion(company)} />
           </div>
-          <div className="rounded-lg border border-border bg-card p-5 shadow-card">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
             <h2 className="font-semibold mb-2">{t("about")}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
               {desc ?? "—"}
@@ -293,7 +293,7 @@ function CompanyProfile() {
           <div>
             <h2 className="text-xl font-semibold mb-4">{t("portfolio")}</h2>
             {listings.length === 0 ? (
-              <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
+              <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center text-muted-foreground shadow-card">
                 {t("no_listings_yet")}
               </div>
             ) : (

@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BusinessSolutionsRouteImport } from './routes/business-solutions'
@@ -28,6 +30,7 @@ import { Route as HealthRouteImport } from './routes/health'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LandsRouteImport } from './routes/lands'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as PaymentResultRouteImport } from './routes/payment-result'
@@ -35,15 +38,19 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RealEstateRouteImport } from './routes/real-estate'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RfqRouteImport } from './routes/rfq'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SearchAllRouteImport } from './routes/search-all'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as TendersRouteImport } from './routes/tenders'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WholesaleRouteImport } from './routes/wholesale'
+import { Route as WorkspaceRouteImport } from './routes/workspace'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin-audit'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin-commissions'
@@ -142,6 +149,16 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgentsRoute = AgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
@@ -222,6 +239,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
@@ -257,6 +279,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -277,6 +304,11 @@ const SearchAllRoute = SearchAllRouteImport.update({
   path: '/search-all',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -285,6 +317,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TendersRoute = TendersRouteImport.update({
@@ -300,6 +337,11 @@ const TermsRoute = TermsRouteImport.update({
 const WholesaleRoute = WholesaleRouteImport.update({
   id: '/wholesale',
   path: '/wholesale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAchievementsRoute =
@@ -764,6 +806,8 @@ const AuthenticatedStoreProductsNewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/business-solutions': typeof BusinessSolutionsRoute
@@ -780,6 +824,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/payment-result': typeof PaymentResultRoute
@@ -787,15 +832,19 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
+  '/support': typeof SupportRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/workspace': typeof WorkspaceRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -883,6 +932,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/business-solutions': typeof BusinessSolutionsRoute
@@ -899,6 +950,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/payment-result': typeof PaymentResultRoute
@@ -906,15 +958,19 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
+  '/support': typeof SupportRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/workspace': typeof WorkspaceRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -1004,6 +1060,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/business-solutions': typeof BusinessSolutionsRoute
@@ -1020,6 +1078,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/lands': typeof LandsRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/marketplace': typeof MarketplaceRoute
   '/payment-result': typeof PaymentResultRoute
@@ -1027,15 +1086,19 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/real-estate': typeof RealEstateRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rfq': typeof RfqRouteWithChildren
   '/search': typeof SearchRoute
   '/search-all': typeof SearchAllRoute
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
+  '/support': typeof SupportRoute
   '/tenders': typeof TendersRouteWithChildren
   '/terms': typeof TermsRoute
   '/wholesale': typeof WholesaleRouteWithChildren
+  '/workspace': typeof WorkspaceRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/admin-audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin-commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -1125,6 +1188,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/account'
+    | '/admin'
     | '/agents'
     | '/auth'
     | '/business-solutions'
@@ -1141,6 +1206,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
+    | '/login'
     | '/map'
     | '/marketplace'
     | '/payment-result'
@@ -1148,15 +1214,19 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/real-estate'
     | '/refund-policy'
+    | '/register'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
+    | '/support'
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/workspace'
     | '/achievements'
     | '/admin-audit'
     | '/admin-commissions'
@@ -1244,6 +1314,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/account'
+    | '/admin'
     | '/agents'
     | '/auth'
     | '/business-solutions'
@@ -1260,6 +1332,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
+    | '/login'
     | '/map'
     | '/marketplace'
     | '/payment-result'
@@ -1267,15 +1340,19 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/real-estate'
     | '/refund-policy'
+    | '/register'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
+    | '/support'
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/workspace'
     | '/achievements'
     | '/admin-audit'
     | '/admin-commissions'
@@ -1364,6 +1441,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
+    | '/account'
+    | '/admin'
     | '/agents'
     | '/auth'
     | '/business-solutions'
@@ -1380,6 +1459,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/lands'
     | '/leaderboard'
+    | '/login'
     | '/map'
     | '/marketplace'
     | '/payment-result'
@@ -1387,15 +1467,19 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/real-estate'
     | '/refund-policy'
+    | '/register'
     | '/reset-password'
     | '/rfq'
     | '/search'
     | '/search-all'
+    | '/services'
     | '/sitemap.xml'
     | '/subscribe'
+    | '/support'
     | '/tenders'
     | '/terms'
     | '/wholesale'
+    | '/workspace'
     | '/_authenticated/achievements'
     | '/_authenticated/admin-audit'
     | '/_authenticated/admin-commissions'
@@ -1485,6 +1569,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRoute
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   BusinessSolutionsRoute: typeof BusinessSolutionsRoute
@@ -1501,6 +1587,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   LandsRoute: typeof LandsRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PaymentResultRoute: typeof PaymentResultRoute
@@ -1508,15 +1595,19 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RealEstateRoute: typeof RealEstateRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RfqRoute: typeof RfqRouteWithChildren
   SearchRoute: typeof SearchRoute
   SearchAllRoute: typeof SearchAllRoute
+  ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscribeRoute: typeof SubscribeRoute
+  SupportRoute: typeof SupportRoute
   TendersRoute: typeof TendersRouteWithChildren
   TermsRoute: typeof TermsRoute
   WholesaleRoute: typeof WholesaleRouteWithChildren
+  WorkspaceRoute: typeof WorkspaceRoute
   CompaniesIdRoute: typeof CompaniesIdRoute
   ListingsIdRoute: typeof ListingsIdRoute
   RCodeRoute: typeof RCodeRoute
@@ -1547,6 +1638,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agents': {
@@ -1661,6 +1766,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/map': {
       id: '/map'
       path: '/map'
@@ -1710,6 +1822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -1738,6 +1857,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchAllRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -1750,6 +1876,13 @@ declare module '@tanstack/react-router' {
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tenders': {
@@ -1771,6 +1904,13 @@ declare module '@tanstack/react-router' {
       path: '/wholesale'
       fullPath: '/wholesale'
       preLoaderRoute: typeof WholesaleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/achievements': {
@@ -2633,6 +2773,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
+  AdminRoute: AdminRoute,
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   BusinessSolutionsRoute: BusinessSolutionsRoute,
@@ -2649,6 +2791,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   LandsRoute: LandsRoute,
   LeaderboardRoute: LeaderboardRoute,
+  LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   MarketplaceRoute: MarketplaceRoute,
   PaymentResultRoute: PaymentResultRoute,
@@ -2656,15 +2799,19 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RealEstateRoute: RealEstateRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RfqRoute: RfqRouteWithChildren,
   SearchRoute: SearchRoute,
   SearchAllRoute: SearchAllRoute,
+  ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscribeRoute: SubscribeRoute,
+  SupportRoute: SupportRoute,
   TendersRoute: TendersRouteWithChildren,
   TermsRoute: TermsRoute,
   WholesaleRoute: WholesaleRouteWithChildren,
+  WorkspaceRoute: WorkspaceRoute,
   CompaniesIdRoute: CompaniesIdRoute,
   ListingsIdRoute: ListingsIdRoute,
   RCodeRoute: RCodeRoute,

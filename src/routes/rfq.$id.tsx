@@ -114,7 +114,7 @@ function RfqDetail() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <section className="container-souqly py-10 flex-1 grid lg:grid-cols-3 gap-6">
+      <section className="container-souqly grid flex-1 gap-6 py-7 md:py-9 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold">{rfq.title}</h1>
@@ -153,7 +153,10 @@ function RfqDetail() {
             </div>
           ) : (
             offers.map((o) => (
-              <div key={o.id} className="rounded-lg border border-border bg-card p-4 shadow-card">
+              <div
+                key={o.id}
+                className="rounded-xl border border-border bg-card p-4 shadow-card transition hover:border-accent/30 hover:shadow-elev"
+              >
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div>
                     <div className="font-semibold">
@@ -191,7 +194,7 @@ function RfqDetail() {
           {rfq.status === "open" && user && !isBuyer && (
             <form
               onSubmit={submit}
-              className="rounded-lg border border-border bg-card p-5 shadow-card space-y-3"
+              className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-card"
             >
               <h3 className="font-semibold">{ar ? "قدّم عرضك" : "Submit your offer"}</h3>
               <Input
@@ -228,11 +231,11 @@ function RfqDetail() {
   );
 }
 
-function Cell({ label, value }: { label: string; value: any }) {
+function Cell({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded border border-border bg-card p-2">
+    <div className="rounded-lg border border-border bg-card p-3 shadow-card">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-medium">{value ?? "—"}</div>
+      <div className="font-medium">{value == null ? "—" : String(value)}</div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Search,
@@ -11,6 +12,7 @@ import {
   FileText,
   ClipboardList,
   UserCircle2,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -25,8 +27,10 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [res, setRes] = useState<Results | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const resultsId = useId();
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -42,18 +46,26 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
       setRes(null);
       return;
     }
+    let active = true;
     setLoading(true);
+    setFailed(false);
     const handle = setTimeout(async () => {
       try {
         const r = await globalSearch({ data: { q: term, limit: 4 } });
-        setRes(r);
+        if (active) setRes(r);
       } catch {
-        setRes(null);
+        if (active) {
+          setRes(null);
+          setFailed(true);
+        }
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }, 250);
-    return () => clearTimeout(handle);
+    return () => {
+      active = false;
+      clearTimeout(handle);
+    };
   }, [q]);
 
   function submit(e: React.FormEvent) {
@@ -89,21 +101,51 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
               setOpen(true);
             }}
             onFocus={() => setOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setOpen(false);
+            }}
             placeholder={ar ? "ابحث في كل سوقلي…" : "Search Souqly…"}
             className="ps-9 h-10 rounded-full bg-surface-2"
             aria-label={ar ? "بحث" : "Search"}
+            aria-expanded={open && q.trim().length >= 2}
+            aria-controls={resultsId}
+            aria-autocomplete="list"
           />
           {loading && (
             <Loader2 className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+          )}
+          {!loading && q && (
+            <button
+              type="button"
+              onClick={() => {
+                setQ("");
+                setRes(null);
+                setOpen(false);
+              }}
+              className="absolute end-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              aria-label={ar ? "مسح البحث" : "Clear search"}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           )}
         </div>
       </form>
 
       {open && q.trim().length >= 2 && (
-        <div className="absolute z-50 mt-2 w-[min(560px,calc(100vw-2rem))] start-0 rounded-2xl border border-border bg-popover shadow-2xl overflow-hidden max-h-[70vh] overflow-y-auto">
+        <div
+          id={resultsId}
+          role="region"
+          aria-label={ar ? "نتائج البحث" : "Search results"}
+          className="absolute z-50 mt-2 w-[min(560px,calc(100vw-2rem))] start-0 rounded-2xl border border-border bg-popover shadow-2xl overflow-hidden max-h-[70vh] overflow-y-auto"
+        >
           {!res && loading && (
             <div className="p-6 text-center text-sm text-muted-foreground">
               {ar ? "جاري البحث…" : "Searching…"}
+            </div>
+          )}
+          {failed && !loading && (
+            <div className="p-6 text-center text-sm text-destructive" role="alert">
+              {ar ? "تعذر إكمال البحث. حاول مرة أخرى." : "Search failed. Please try again."}
             </div>
           )}
           {res && total === 0 && (
@@ -242,7 +284,7 @@ export function GlobalSearch({ compact = false }: { compact?: boolean }) {
                 onClick={() => setOpen(false)}
                 className="block text-center mt-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-sm font-medium"
               >
-                {ar ? `عرض كل النتائج (${total}+)` : `See all results (${total}+)`}
+                {ar ? `عرض النتائج (${total})` : `See results (${total})`}
               </Link>
             </div>
           )}
@@ -259,9 +301,15 @@ function Group({
   q,
   onPick,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
-  items: { key: string; to: string; params: any; title: string; sub: string }[];
+  items: {
+    key: string;
+    to: string;
+    params: Record<string, string>;
+    title: string;
+    sub: string;
+  }[];
   q: string;
   onPick: () => void;
 }) {
@@ -276,7 +324,7 @@ function Group({
           <li key={it.key}>
             <Link
               to={it.to as any}
-              params={it.params}
+              params={it.params as never}
               onClick={onPick}
               className="flex flex-col gap-0.5 px-3 py-2 rounded-lg hover:bg-muted"
             >

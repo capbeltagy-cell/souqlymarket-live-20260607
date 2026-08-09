@@ -6,20 +6,26 @@ import {
   BadgeCheck,
   Building2,
   Factory,
-  Landmark,
   Megaphone,
   Package,
   Search,
   ShieldCheck,
   Store,
+  Star,
   Sparkles,
   TrendingUp,
   Users,
   Wrench,
+  Boxes,
+  Car,
+  Construction,
+  Cpu,
+  Shirt,
+  Sprout,
+  UtensilsCrossed,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { CompanyCard, type CompanyCardData } from "@/components/CompanyCard";
 import { FeaturedAdBar } from "@/components/FeaturedAdBar";
@@ -52,28 +58,31 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { key: "cat_product", icon: Package, to: "/marketplace" },
-  { key: "cat_factory", icon: Factory, to: "/factories" },
-  { key: "cat_real_estate", icon: Building2, to: "/real-estate" },
-  { key: "cat_land", icon: Landmark, to: "/lands" },
-  { key: "cat_service", icon: Wrench, to: "/marketplace" },
-  { key: "cat_opportunity", icon: TrendingUp, to: "/marketplace" },
+  { ar: "الأغذية", en: "Food", icon: UtensilsCrossed, to: "/marketplace" },
+  { ar: "الملابس", en: "Clothing", icon: Shirt, to: "/marketplace" },
+  { ar: "التعبئة والتغليف", en: "Packaging", icon: Boxes, to: "/marketplace" },
+  { ar: "الإلكترونيات", en: "Electronics", icon: Cpu, to: "/marketplace" },
+  { ar: "الزراعة", en: "Agriculture", icon: Sprout, to: "/marketplace" },
+  { ar: "الإنشاءات", en: "Construction", icon: Construction, to: "/marketplace" },
+  { ar: "الآلات", en: "Machinery", icon: Factory, to: "/marketplace" },
+  { ar: "السيارات", en: "Automotive", icon: Car, to: "/marketplace" },
+  { ar: "مستلزمات صناعية", en: "Industrial supplies", icon: Wrench, to: "/marketplace" },
 ] as const;
 
-type FactoryRow = {
-  company_id: string;
-  production_capacity: string | null;
-  employees_range: string | null;
-  verified: boolean;
-  companies: {
-    id: string;
-    name_ar: string | null;
-    name_en: string | null;
-    industry: string | null;
-    governorate: string | null;
-    logo_url: string | null;
-    is_verified: boolean | null;
-  } | null;
+type RfqPreview = {
+  id: string;
+  title: string;
+  quantity: number | null;
+  unit: string | null;
+  governorate: string | null;
+  created_at: string;
+};
+
+type ReviewPreview = {
+  id: string;
+  comment: string | null;
+  rating: number;
+  companies: { name_ar: string | null; name_en: string | null } | null;
 };
 
 function CardSkeleton({ count = 4, aspect = "aspect-[4/3]" }: { count?: number; aspect?: string }) {
@@ -130,10 +139,13 @@ function Landing() {
   const [query, setQuery] = useState("");
   const [listings, setListings] = useState<ListingCardData[] | null>(null);
   const [companies, setCompanies] = useState<CompanyCardData[] | null>(null);
-  const [factories, setFactories] = useState<FactoryRow[] | null>(null);
-  const [opportunities, setOpportunities] = useState<ListingCardData[] | null>(null);
-  const [wholesale, setWholesale] = useState<any[] | null>(null);
-  const [counts, setCounts] = useState({ companies: 0, listings: 0, agents: 0 });
+  const [rfqs, setRfqs] = useState<RfqPreview[] | null>(null);
+  const [reviews, setReviews] = useState<ReviewPreview[] | null>(null);
+  const [counts, setCounts] = useState<{
+    companies: number;
+    listings: number;
+    agents: number;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -146,17 +158,19 @@ function Landing() {
           .eq("visible_in_marketplace", true),
         supabase.from("agents").select("id", { count: "exact", head: true }),
       ]);
-      setCounts({
-        companies: cCount.count ?? 0,
-        listings: lCount.count ?? 0,
-        agents: aCount.count ?? 0,
-      });
+      if (!cCount.error && !lCount.error && !aCount.error) {
+        setCounts({
+          companies: cCount.count ?? 0,
+          listings: lCount.count ?? 0,
+          agents: aCount.count ?? 0,
+        });
+      }
     })();
 
     (async () => {
       const listingSelect =
         "id, type, title_ar, title_en, images, price, currency, country, city, governorate, commission_percentage, featured, featured_until, marketer_promotion_enabled, promotion_status, leads_count, created_at, company_id, companies(name_ar, name_en, is_verified, is_premium)";
-      const [lRes, oRes, cRes, fRes, wRes] = await Promise.all([
+      const [lRes, cRes, rRes, reviewRes] = await Promise.all([
         supabase
           .from("listings")
           .select(listingSelect)
@@ -166,13 +180,6 @@ function Landing() {
           .order("created_at", { ascending: false })
           .limit(40),
         supabase
-          .from("listings")
-          .select(listingSelect)
-          .eq("status", "approved")
-          .eq("type", "opportunity")
-          .order("created_at", { ascending: false })
-          .limit(4),
-        supabase
           .from("companies")
           .select("id, name_ar, name_en, industry, country, is_verified, is_premium, logo_url")
           .order("is_premium", { ascending: false })
@@ -180,27 +187,23 @@ function Landing() {
           .order("created_at", { ascending: false })
           .limit(6),
         supabase
-          .from("factories")
-          .select(
-            "company_id, production_capacity, employees_range, verified, companies(id, name_ar, name_en, industry, governorate, logo_url, is_verified)",
-          )
-          .order("verified", { ascending: false })
-          .limit(6),
-        supabase
-          .from("wholesale_listings")
-          .select(
-            "id, title, images, price_per_unit, currency, moq, governorate, companies(name_ar, name_en, is_verified)",
-          )
-          .eq("active", true)
+          .from("rfqs")
+          .select("id, title, quantity, unit, governorate, created_at")
+          .eq("status", "open")
           .order("created_at", { ascending: false })
           .limit(4),
+        supabase
+          .from("reviews")
+          .select("id, comment, rating, companies(name_ar, name_en)")
+          .not("comment", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(3),
       ]);
       const { rankListings } = await import("@/lib/ranking");
       setListings(rankListings((lRes.data ?? []) as unknown as ListingCardData[]).slice(0, 8));
-      setOpportunities((oRes.data ?? []) as unknown as ListingCardData[]);
       setCompanies((cRes.data ?? []) as CompanyCardData[]);
-      setFactories((fRes.data ?? []) as unknown as FactoryRow[]);
-      setWholesale((wRes.data ?? []) as any[]);
+      setRfqs((rRes.data ?? []) as unknown as RfqPreview[]);
+      setReviews((reviewRes.data ?? []) as unknown as ReviewPreview[]);
     })();
   }, []);
 
@@ -215,9 +218,7 @@ function Landing() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-
+    <PublicLayout>
       {/* 1. HERO + SEARCH — compact */}
       <section className="relative overflow-hidden hero-gradient">
         <div className="hero-grid" aria-hidden="true" />
@@ -225,27 +226,26 @@ function Landing() {
         <div className="hero-orb hero-orb-b" aria-hidden="true" />
         <div className="hero-ring hero-ring-a" aria-hidden="true" />
         <div className="hero-ring hero-ring-b" aria-hidden="true" />
-        <div className="container-souqly relative z-10 pt-8 pb-10 md:pt-20 md:pb-16">
+        <div className="container-souqly relative z-10 py-7 md:py-11">
           <span className="status-pill mb-3 fade-up text-[10px] md:text-xs">
             <Sparkles className="h-3 w-3" />
             {ar ? "منصة الأعمال الفاخرة في مصر" : "Egypt's Premier B2B Marketplace"}
           </span>
-          <h1 className="text-serif text-[2.25rem] leading-[1.08] md:text-6xl lg:text-7xl tracking-tight text-foreground mb-4 fade-up-1 max-w-5xl">
+          <h1 className="mb-3 max-w-4xl text-serif text-[2rem] leading-[1.12] tracking-tight text-foreground fade-up-1 sm:text-4xl md:text-5xl lg:text-6xl">
             {ar ? (
               <>
-                حيث تلتقي <span className="gold-shine italic">الصفقات</span> بالشركات الجادة.
+                سوق الأعمال <span className="gold-shine italic">المصري</span>
               </>
             ) : (
               <>
-                Where serious <span className="gold-shine italic">deals</span> meet serious
-                business.
+                Egypt&apos;s <span className="gold-shine italic">Business Marketplace</span>
               </>
             )}
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-5 fade-up-2">
+          <p className="mb-4 max-w-2xl text-sm leading-relaxed text-muted-foreground fade-up-2 md:text-base">
             {ar
-              ? "سوقلي يربط الشركات والموردين والمصانع والمسوقين المحترفين عبر مصر."
-              : "Souqly connects companies, suppliers, factories and pro agents across Egypt."}
+              ? "سوقلي هو سوق الأعمال المصري لاكتشاف الموردين وطلب عروض الأسعار والشراء والبيع وإدارة علاقات الأعمال."
+              : "Souqly is Egypt's business marketplace for discovering suppliers, requesting quotations, buying, selling and managing business relationships."}
           </p>
 
           <form
@@ -273,23 +273,36 @@ function Landing() {
             </Button>
           </form>
 
-          <div className="mt-4 flex flex-col gap-2 fade-up-3 sm:flex-row sm:items-center">
+          <div className="mt-4 grid max-w-3xl gap-2 fade-up-3 sm:grid-cols-2 lg:grid-cols-4">
             <Button
               asChild
               size="lg"
-              className="group h-12 justify-center rounded-xl bg-gold px-5 font-bold text-background shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
+              className="group h-11 justify-center rounded-lg bg-accent px-4 font-bold text-accent-foreground shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-soft sm:w-auto"
             >
               <Link to="/store/open">
                 <Store className="me-2 h-5 w-5" />
-                {ar ? "أنشئ متجرك الآن" : "Create your store now"}
+                {ar ? "ابدأ البيع" : "Start selling"}
                 <Arrow className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
               </Link>
             </Button>
             <Link
-              to="/stores"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-5 text-sm font-semibold text-foreground transition hover:border-gold/40 hover:bg-gold/5"
+              to="/marketplace"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
             >
-              {ar ? "تصفح المتاجر" : "Browse stores"}
+              {ar ? "تصفح السوق" : "Browse marketplace"}
+            </Link>
+            <Link
+              to="/rfq/new"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
+            >
+              {ar ? "اطلب عرض سعر" : "Request quotation"}
+            </Link>
+            <Link
+              to="/auth"
+              search={{ mode: "signup" }}
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-card transition hover:border-accent/40 hover:bg-accent/5"
+            >
+              {ar ? "سجّل شركتك" : "Register company"}
             </Link>
           </div>
 
@@ -306,23 +319,24 @@ function Landing() {
           </div>
 
           {/* Compact stats — desktop only, hidden on mobile to reduce clutter */}
-          <div className="mt-8 hidden md:grid grid-cols-3 gap-4 max-w-2xl">
-            {[
-              { label: ar ? "شركة" : "Companies", value: counts.companies },
-              { label: ar ? "إعلان" : "Listings", value: counts.listings },
-              { label: ar ? "مسوّق" : "Agents", value: counts.agents },
-            ].map((item) => (
-              <div key={item.label} className="premium-panel rounded-xl p-6">
-                <div className="text-serif text-4xl text-gold tabular-nums leading-none">
-                  {item.value.toLocaleString(ar ? "ar-EG" : "en-US")}
-                  <span className="text-gold-soft">+</span>
+          {counts && counts.companies + counts.listings + counts.agents > 0 && (
+            <div className="mt-5 hidden max-w-2xl grid-cols-3 gap-3 md:grid">
+              {[
+                { label: ar ? "شركة" : "Companies", value: counts.companies },
+                { label: ar ? "إعلان" : "Listings", value: counts.listings },
+                { label: ar ? "مسوّق" : "Agents", value: counts.agents },
+              ].map((item) => (
+                <div key={item.label} className="premium-panel rounded-xl p-4">
+                  <div className="text-serif text-3xl text-gold tabular-nums leading-none">
+                    {item.value.toLocaleString(ar ? "ar-EG" : "en-US")}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">
+                    {item.label}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -350,18 +364,18 @@ function Landing() {
       {/* 3. MAIN CATEGORIES */}
       <section className="container-souqly py-6 md:py-10">
         <h2 className="text-serif text-xl md:text-3xl mb-3 md:mb-5">{t("section_categories")}</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
-          {categories.map(({ key, icon: Icon, to }) => (
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-5 md:gap-3 lg:grid-cols-9">
+          {categories.map(({ ar: arLabel, en, icon: Icon, to }) => (
             <Link
-              key={key}
+              key={en}
               to={to}
-              className="group premium-panel category-tile rounded-2xl p-3 md:p-5 flex flex-col items-center text-center gap-2 md:gap-3 hover:border-primary/50 hover:shadow-gold transition-all min-h-[88px]"
+              className="group premium-panel category-tile flex min-h-[88px] flex-col items-center gap-2 rounded-xl p-3 text-center transition-all hover:border-accent/50 hover:shadow-elev md:gap-3 md:p-5"
             >
-              <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-primary/10 text-primary grid place-items-center group-hover:bg-primary group-hover:text-primary-foreground transition shadow-[0_0_30px_-12px_var(--primary)]">
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent/10 text-accent transition group-hover:bg-accent group-hover:text-accent-foreground md:h-12 md:w-12">
                 <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div className="text-[11px] md:text-sm font-semibold text-foreground leading-tight">
-                {t(key)}
+                {ar ? arLabel : en}
               </div>
             </Link>
           ))}
@@ -454,6 +468,123 @@ function Landing() {
         )}
       </section>
 
+      {/* 6. LATEST RFQS — production records only */}
+      <section className="container-souqly py-6 md:py-8">
+        <SectionHead
+          title={ar ? "أحدث طلبات الأسعار" : "Latest RFQs"}
+          href="/rfq"
+          cta={ar ? "عرض الكل" : "View all"}
+        />
+        {rfqs === null ? (
+          <CardSkeleton count={4} aspect="aspect-[2/1]" />
+        ) : rfqs.length > 0 ? (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            {rfqs.map((rfq) => (
+              <Link
+                key={rfq.id}
+                to="/rfq/$id"
+                params={{ id: rfq.id }}
+                className="rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary/50"
+              >
+                <span className="text-xs font-semibold text-primary">
+                  {rfq.governorate || (ar ? "كل مصر" : "Egypt")}
+                </span>
+                <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-snug">{rfq.title}</h3>
+                {(rfq.quantity || rfq.unit) && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    {rfq.quantity ?? "—"} {rfq.unit ?? ""}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Empty label={ar ? "أنشئ طلب سعر" : "Create an RFQ"} href="/rfq/new" />
+        )}
+      </section>
+
+      <section className="border-y border-border bg-surface-2/45">
+        <div className="container-souqly py-10 md:py-16">
+          <SectionHead
+            title={ar ? "خدمات تنمّي أعمالك" : "Services that grow your business"}
+            href="/services"
+            cta={ar ? "كل الخدمات" : "All services"}
+          />
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              {
+                icon: Factory,
+                title: ar ? "التصنيع والتوريد" : "Manufacturing & sourcing",
+                body: ar
+                  ? "اعثر على شركاء إنتاج وموردين مناسبين لمواصفاتك."
+                  : "Find production partners and suppliers matched to your requirements.",
+              },
+              {
+                icon: Store,
+                title: ar ? "اللوجستيات والتجارة" : "Logistics & trade",
+                body: ar
+                  ? "خدمات شحن واستيراد وتصدير لدعم الصفقة من البداية للنهاية."
+                  : "Shipping, import and export services that support the full deal.",
+              },
+              {
+                icon: TrendingUp,
+                title: ar ? "التسويق والاستشارات" : "Marketing & consulting",
+                body: ar
+                  ? "خبرات متخصصة تساعد شركتك على الوصول والنمو واتخاذ القرار."
+                  : "Specialist expertise to help your company reach, grow and decide.",
+              },
+            ].map(({ icon: Icon, title, body }) => (
+              <Link
+                key={title}
+                to="/services"
+                className="group rounded-2xl border border-border bg-card p-6 shadow-card transition hover:-translate-y-0.5 hover:border-primary/50"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-xl">{title}</h3>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. VERIFIED CUSTOMER REVIEWS — no fabricated testimonials */}
+      {reviews && reviews.length > 0 && (
+        <section className="border-y border-border bg-surface-2/50">
+          <div className="container-souqly py-10 md:py-14">
+            <h2 className="text-serif text-2xl md:text-4xl">
+              {ar ? "تقييمات حقيقية من المنصة" : "Real platform reviews"}
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {reviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="rounded-2xl border border-border bg-card p-5 shadow-card"
+                >
+                  <div className="flex gap-1 text-gold" aria-label={`${review.rating} / 5`}>
+                    {Array.from({ length: Math.max(0, Math.min(5, review.rating)) }).map(
+                      (_, index) => (
+                        <Star key={index} className="h-4 w-4 fill-current" />
+                      ),
+                    )}
+                  </div>
+                  <p className="mt-4 line-clamp-4 text-sm leading-7 text-foreground">
+                    “{review.comment}”
+                  </p>
+                  <p className="mt-4 text-xs font-semibold text-muted-foreground">
+                    {review.companies?.name_ar ||
+                      review.companies?.name_en ||
+                      (ar ? "شركة على سوقلي" : "A Souqly company")}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 8. HOW SOUQLY WORKS */}
       <section className="container-souqly py-10 md:py-16">
         <div className="text-center max-w-2xl mx-auto mb-6 md:mb-10">
@@ -497,13 +628,52 @@ function Landing() {
       </section>
 
       {/* 9. CTA FOR COMPANIES */}
+      <section className="container-souqly py-10 md:py-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="status-pill">{ar ? "أسئلة شائعة" : "FAQ"}</span>
+          <h2 className="mt-4 text-serif text-2xl md:text-4xl">
+            {ar ? "قبل أن تبدأ" : "Before you start"}
+          </h2>
+        </div>
+        <div className="mx-auto mt-7 grid max-w-4xl gap-3">
+          {[
+            [
+              ar ? "هل التسجيل مجاني؟" : "Is registration free?",
+              ar
+                ? "يمكن إنشاء الحساب وملف الشركة مجانًا، وتظهر أي خطط مدفوعة وأسعارها بوضوح قبل الاشتراك."
+                : "You can create an account and company profile for free. Any paid plan is shown clearly before subscribing.",
+            ],
+            [
+              ar ? "كيف أطلب أسعارًا من الموردين؟" : "How do I request supplier quotes?",
+              ar
+                ? "أنشئ RFQ وحدد الكمية والموقع والموعد، ثم استقبل عروض الموردين وقارنها."
+                : "Create an RFQ with quantity, location and deadline, then receive and compare supplier offers.",
+            ],
+            [
+              ar ? "هل الشركات والمنتجات شيء واحد؟" : "Are companies and products the same?",
+              ar
+                ? "لا. لكل شركة ملف مستقل، ويمكن أن يتبعه متجر ومنتجات وخدمات ومصانع وفروع."
+                : "No. Every company has its own profile and may have a store, products, services, factories and branches.",
+            ],
+          ].map(([question, answer]) => (
+            <details
+              key={question}
+              className="group rounded-2xl border border-border bg-card p-5 shadow-card"
+            >
+              <summary className="cursor-pointer list-none font-semibold">{question}</summary>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       <section className="container-souqly py-10 md:py-16">
-        <div className="premium-panel rounded-2xl md:rounded-[2rem] p-6 md:p-14 text-center overflow-hidden relative">
+        <div className="premium-panel relative overflow-hidden rounded-xl p-6 text-center md:p-12">
           <div
             className="absolute inset-0 opacity-40 pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle at 50% 0%, rgba(201,168,76,0.15), transparent 60%)",
+                "radial-gradient(circle at 50% 0%, rgba(249,115,22,0.14), transparent 60%)",
             }}
           />
           <div className="relative">
@@ -546,8 +716,6 @@ function Landing() {
           </div>
         </div>
       </section>
-
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }

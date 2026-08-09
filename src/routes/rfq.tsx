@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -38,12 +37,11 @@ function RfqList() {
       .finally(() => setLoading(false));
   }, [ar, retryToken]);
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <section className="container-souqly py-10 flex-1">
+    <PublicLayout>
+      <section className="container-souqly flex-1 py-8 md:py-10">
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr] items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-2xl font-bold md:text-3xl">
               {ar ? "طلبات عروض الأسعار (RFQ)" : "Requests for Quotation"}
             </h1>
             <p className="text-muted-foreground text-sm mt-2">
@@ -52,7 +50,7 @@ function RfqList() {
                 : "Request quotes from multiple companies"}
             </p>
           </div>
-          <div className="flex flex-wrap justify-end gap-3">
+          <div className="flex flex-wrap gap-3 lg:justify-end">
             <Button asChild className="bg-primary hover:bg-primary-hover">
               <Link to="/rfq/new">{ar ? "+ نشر طلب عرض سعر" : "+ New RFQ"}</Link>
             </Button>
@@ -81,7 +79,7 @@ function RfqList() {
                 key={r.id}
                 to="/rfq/$id"
                 params={{ id: r.id }}
-                className="block rounded-[1.5rem] border border-border bg-surface-2 p-6 hover:bg-surface shadow-elev transition"
+                className="block rounded-2xl border border-border bg-surface-2 p-4 shadow-elev transition hover:bg-surface md:p-6"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="flex-1">
@@ -126,7 +124,6 @@ function RfqList() {
           </div>
         )}
       </section>
-      <SiteFooter />
-    </div>
+    </PublicLayout>
   );
 }

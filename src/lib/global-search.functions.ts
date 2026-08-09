@@ -15,7 +15,7 @@ const Input = z
   .transform((d) => ({ ...d, q: sanitize(d.q) }));
 
 export const globalSearch = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => Input.parse(d))
+  .validator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const q = data.q;
