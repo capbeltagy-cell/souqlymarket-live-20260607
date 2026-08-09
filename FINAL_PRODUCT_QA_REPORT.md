@@ -80,8 +80,12 @@ The complete static route crawl passed 108/108 routes: 97 returned HTTP 200 and 
 
 ## Remaining blockers
 
-No repository, build, route, dependency, production connectivity or publish blocker remains. End-to-end mutations for each live role require dedicated non-production QA accounts and data; they were intentionally not run against production.
+No repository, build, route, dependency or production-connectivity blocker remains. End-to-end mutations for each live role require dedicated non-production QA accounts and data; they were intentionally not run against production.
+
+Lovable deployment was requested for the existing project and returned deployment ID `7c4809bf-3f23-4061-91b6-89e5a5f3ebf7`. The deployment completed, but Lovable's project snapshot remained pinned to its old internal commit `8ad77e4d2dc5e35e82c9d4705e1f433f0b5b23d1`. A live response check identified build `souqly-2-reconstruction-rc1-20260809`, not RC4. Two programmatic requests to refresh the project from its connected `souqly-v2-rebuild` branch were rejected by Lovable with `INVALID_ARGUMENT`.
+
+The exact remaining action is to refresh/synchronize the connected branch inside the existing Lovable editor until it recognizes GitHub commit `4b955186c3cd9d0133f36e2a2f1e577cce0a5bac`, then publish again. Do not publish the currently cached Lovable snapshot as the final RC4 release.
 
 ## Release decision
 
-RC4 is suitable for publication from the existing Lovable project and connected branch. No new project, repository, database environment or migration was created.
+RC4 is complete and suitable for publication, but the current Lovable production URL has not consumed the RC4 branch commit. No new project, repository, database environment or migration was created.
